@@ -1,6 +1,10 @@
 import './App.css';
-import Header from './components/header'; 
-import Footer from './components/footer'; 
+import Header from './components/header';
+import Footer from './components/footer';
+import React, { Suspense } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import HomeRoute from './routes/HomeRoute';
+import NotFound from './pages/NotFound';
 
 const styles = {
   container: {
@@ -13,14 +17,18 @@ const styles = {
   },
 };
 
-const  App = () => {
+
+const App = () => {
   return (
     <div className="App" style={styles.container}>
-      <Header /> {}
-        <div style={styles.content}>
-            
-        </div>
-      <Footer /> {}
+      <Header /> { }
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/home/*" element={<HomeRoute />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      <Footer /> { }
     </div>
   );
 }

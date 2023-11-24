@@ -1,0 +1,9 @@
+.appBar {
+    top: auto !important;
+    bottom: 0;
+    position: absolute ;
+
+    @media (max-width: 600px) {
+        position: relative;
+      }
+}
