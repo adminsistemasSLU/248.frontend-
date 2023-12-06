@@ -5,17 +5,13 @@ import NotFound from '../pages/NotFound';
 
 
 const HomePage = lazy(() => import('../pages/HomePage'));
-
-const Steppers = lazy(() => import('../components/steppers'));
-const HomeRoutes = () => {
+const BrockerRoutes = () => {
   return (
     <Routes>
-      
       <Route path="" element={<HomePage />} />
-      <Route path="stepper" element={<Steppers />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
 
-export default HomeRoutes;
+export default BrockerRoutes;

@@ -13,17 +13,20 @@ function HomeCarrousel(props) {
             name: "Automovil ligero",
             description: "Probably the most random thing you have ever seen!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/automovil.jpg',
+            url:'/FireInsurance/form'
         },
         {
             name: "Vida",
             description: "Hello World!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/vida2.jpg',
+            url:'/FireInsurance/form'
         }
         ,
         {
             name: "Incendio",
             description: "Hello World!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/incendio.jpg',
+            url:'/FireInsurance/form'
         }
     ];
     const groupItems = (items, groupSize) => {
@@ -88,16 +91,22 @@ function Item(props) {
         // Manejar elementos nulos si el grupo no tiene suficientes elementos
         return <div style={{ width: '0%' }} />;
     }
+    const handleImageClick = () => {
+        // Redirige a la URL deseada
+        window.location.href = props.item.url; // Reemplaza 'url' con la propiedad correcta de tu objeto
+      };
     return (
         <Card sx={{ maxWidth: 200 }}>
-            <CardMedia
+            <a href={props.item.url} onClick={(e) => { e.preventDefault(); handleImageClick(); }}>
+                <CardMedia
                 component="img"
                 height="194px"
                 image={props.item.imageUrl}
                 alt={props.item.name}
                 width="150px"
-                background-size='contain'
-            />
+                style={{ cursor: 'pointer' }} // Cambia el cursor para indicar que es interactivo
+                />
+            </a>
             <CardContent>
                 <Typography variant="body2" color="#018997" >
                     {props.item.name}

@@ -35,14 +35,14 @@ const navItemsMob = [
   { text: 'Nuestro Seguro', path: '/nuestro-seguro' },
   { text: 'Transparencias', path: '/transparencias' },
   { text: 'Nuestra Historia', path: '/nuestra-historia' },
-  { text: 'Login', path: '/home/login' },
-  { text: 'Registrar', path: '/home/Register' },
+  { text: 'Login', path: '/login' },
+  { text: 'Registrar', path: '/Register' },
 ];
 
 const settings = [
-  { text: 'Login', path: '/home/login' },
-  { text: 'Registrar', path: '/home/Register' },
-  { text: 'Dashboard', path: '/transparencias' },
+  { text: 'Login', path: '/login' },
+  { text: 'Registrar', path: '/Register' },
+  { text: 'Dashboard', path: '/brocker/personalForm' },
   { text: 'Logout', path: '/nuestra-historia' },
 ];
 
