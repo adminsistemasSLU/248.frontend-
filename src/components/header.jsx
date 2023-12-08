@@ -100,7 +100,7 @@ function Header(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Link to='/home' style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to='/quoter/dashboard' style={{ textDecoration: 'none', color: 'inherit' }}>
           <img src={process.env.PUBLIC_URL + '/assets/images/LogoSLU.jpg'} alt="Icono" style={{ height: '100px' }} />
           </Link>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>

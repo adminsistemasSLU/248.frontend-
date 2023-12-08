@@ -4,11 +4,8 @@ import Footer from './components/footer';
 import React, { Suspense, lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import NotFound from './pages/NotFound';
-import PersonalForm from './components/Brockers/personalForm';
-import ProtectObjectsTable from './components/Brockers/protectObjectsTable';
-import AddObjectInsurance from './components/Brockers/addObjectInsurance';
-import MapContainer from './components/Brockers/mapContainer';
 import QuoterRoutes from './routes/QuoterRoute';
+import Steppers from './components/steppers';
 
 
 const styles = {
@@ -36,10 +33,7 @@ const App = () => {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="/brocker/personalForm" element={<PersonalForm />} />
-          <Route path="/brocker/ProtectTable" element={<ProtectObjectsTable />} />
-          <Route path="/brocker/addObject" element={<AddObjectInsurance />} />
-          <Route path="/brocker/mapContainer" element={<MapContainer />} />
+          <Route path="/quoter/stepper" element={<Steppers />} />
         </Routes>
       </Suspense>
       <Footer /> { }

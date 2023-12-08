@@ -283,6 +283,7 @@ const AddObjectInsurance = () => {
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
+                  disabled
                   required
                 />
               </Grid>
@@ -295,6 +296,7 @@ const AddObjectInsurance = () => {
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
+                  disabled
                   required
                 />
               </Grid>

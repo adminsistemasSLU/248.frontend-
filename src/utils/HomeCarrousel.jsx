@@ -26,7 +26,7 @@ function HomeCarrousel(props) {
             name: "Incendio",
             description: "Hello World!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/incendio.jpg',
-            url:'/FireInsurance/form'
+            url:'/quoter/stepper'
         }
     ];
     const groupItems = (items, groupSize) => {

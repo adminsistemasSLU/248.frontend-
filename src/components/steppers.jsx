@@ -16,8 +16,8 @@ import Box from '@mui/material/Box';
 import '../styles/button.scss';
 import PersonalForm from './Brockers/personalForm';
 import ProtectObjectsTable from './Brockers/protectObjectsTable';
-import MapContainer from './Brockers/mapContainer';
 import DetailObjectsTable from './Brockers/detailObjectsTable';
+import PaidForm from './Brockers/paidForm';
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -109,7 +109,7 @@ export default function Steppers() {
     { label: 'Datos Personales', formComponent: <PersonalForm /> },
     { label: 'Producto', formComponent: <ProtectObjectsTable /> },
     { label: 'Detalle de Producto', formComponent: <DetailObjectsTable /> },
-    { label: 'Forma de Pago', formComponent: <MapContainer /> },
+    { label: 'Forma de Pago', formComponent: <PaidForm /> },
   ];
 
   // const steps2 = ['Datos Personales', 'Producto', 'Forma de Pago'];
