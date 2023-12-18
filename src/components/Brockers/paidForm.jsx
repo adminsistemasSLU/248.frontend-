@@ -207,10 +207,10 @@ const PaidForm = () => {
             </Grid>
           </Grid>
 
-          {/* Botón de envío */}
+          {/* Botón de envío
           <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
             Registrarse
-          </Button>
+          </Button> */}
         </div >
       </Paper>
       </form>

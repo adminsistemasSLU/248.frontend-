@@ -183,13 +183,13 @@ export default function Steppers() {
               sx={{ mr: 1 }}
               className='btnStepper btnBack'
             >
-              Back
+              Regresar
             </Button>
 
 
             
             <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper'>
-              Next
+              Siguiente
             </Button>
             {/* {activeStep !== steps.length &&
               (completed[activeStep] ? (

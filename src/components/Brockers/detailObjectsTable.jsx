@@ -33,15 +33,14 @@ const rows = [
   createData(2, 'Maquinarias y equipos', 452, 25.0, 51 ,false),
   createData(3, 'Muebles, enseres y equipos de oficina', 262, 16.0, 24 ,false),
   createData(4, 'Equipo electrónico fijo y portátil', 159, 6.0, 24 ,false),
-  createData(5, 'Targaryen', 356, 16.0, 49 ,true),
-  createData(6, 'Melisandre', 408, 3.2, 87 ,false),
-  createData(7, 'Ice cream sandwich', 237, 9.45, 4 ,false),
-  createData(8, 'Jelly Bean', 375, 0.0, 94 ,false),
-  createData(9, 'KitKat', 518, 26.0, 65 ,false),
-  createData(10, 'Lollipop', 392, 0.2, 98 ,false),
-  createData(11, 'Marshmallow', 318, 0, 81 ,false),
-  createData(12, 'Nougat', 360, 19.0, 9, false),
-  createData(13, 'Oreo', 437, 18.0, 63 ,false),
+  createData(5, 'AMPAROS ADICIONALES QUE SUMAN CAPITAL', 356, 16.0, 49 ,true),
+  createData(6, 'Remocion de escombros', 408, 3.2, 87 ,false),
+  createData(7, 'Honorarios de Ingenieros Arquitectos y topografos', 237, 9.45, 4 ,false),
+  createData(8, 'Documentos y modelos', 375, 0.0, 94 ,false),
+  createData(9, 'AMPAROS ADICIONALES CON COSTOS', 518, 26.0, 65 ,true),
+  createData(10, 'Terrorismo y/o sabotaje', 392, 0.2, 98 ,false),
+  createData(11, 'Responsabilidad civil Extracontractual', 318, 0, 81 ,false),
+  
 ];
 
 const headCells = [
@@ -261,11 +260,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   return (
     <div style={{ height: 400, width: '100%',display:'flex',flexDirection:'column',gap:'5px' }}>
-      <div style={{backgroundColor:'#00a99e', color:'white',paddingLeft:'5px', display:'flex',justifyContent:'space-between'}}>
+      <div style={{backgroundColor:'#00a99e', color:'white',paddingTop:'5px',paddingLeft:'15px', paddingRight:'15px', display:'flex',justifyContent:'space-between'}}>
         <div>Detalle de Amparo</div>
         <div  onClick={closeModal}> <CloseIcon/></div>
       </div>
-      <TableContainer style={{overflow:'auto',height: 300 }}>
+      <TableContainer style={{overflow:'auto',height: 300,padding:'20px' }}>
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"

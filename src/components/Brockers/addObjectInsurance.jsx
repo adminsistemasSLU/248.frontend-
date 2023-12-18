@@ -107,7 +107,7 @@ const AddObjectInsurance = ({ closeModal }) => {
 
       <div className='modalForm '>
         <Paper elevation={3} style={{ width: '50%', paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ width: '100%', backgroundColor: '#00a99e', color: 'white', position: 'relative', top: '0px', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ width: '100%',paddingTop:'5px',paddingLeft:'15px', paddingRight:'15px', backgroundColor: '#00a99e', color: 'white', position: 'relative', top: '0px', display: 'flex', justifyContent: 'space-between' }}>
             Objeto del seguro
             <div style={{ cursor: 'pointer' }} >
               <CloseIcon onClick={cerrarModal} />

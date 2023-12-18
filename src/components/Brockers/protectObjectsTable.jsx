@@ -350,10 +350,7 @@ export default function ProtectObjectsTable() {
           {/* Componente del formulario */}
           <AddObjectInsurance closeModal={handleCloseModal} style={{ width:'80%'}}/>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseModal}>Cerrar</Button>
-          {/* Puedes agregar más botones según tus necesidades */}
-        </DialogActions>
+       
       </Dialog>
 
       <Box sx={{ width: '100%', marginTop: '12px' }}>
