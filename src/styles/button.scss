@@ -1,13 +1,14 @@
 .btnStepper{
-    color: #fff;
-    background-color: #00a99e;
-    height: 50%;
-    position: relative;
-    top: 20%;
+    color: #fff !important; 
+    background-color: #21bd6f !important;
+    height: 25px !important;
+    position: relative !important;
+    top: 20%  !important;
+    width: 20% !important;
 
     &:hover {
-        color: #007d73; // Change the background color on hover
-        background-color: #fff;
+        color: #007d73 !important; // Change the background color on hover
+        background-color: #fff !important;
     }
 
     &:disabled {
@@ -15,4 +16,7 @@
         cursor: not-allowed; // Example: change cursor to not-allowed
         color: #fff;
     }
+}
+.btnBack{
+    background-color: #2775e2 !important;
 }

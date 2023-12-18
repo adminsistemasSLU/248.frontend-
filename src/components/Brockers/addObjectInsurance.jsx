@@ -1,16 +1,13 @@
-import React, { useState,useRef  } from 'react';
-import { TextField, Button, Container, Grid, Paper } from '@mui/material';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import React, { useState, useRef } from 'react';
+import { Button, Container, Paper } from '@mui/material';
 import MapContainer from './mapContainer';
 import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
-import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
 import '../../styles/moddalForm.scss';
 
 
-const AddObjectInsurance = () => {
+const AddObjectInsurance = ({ closeModal }) => {
   const [formData, setFormData] = useState({
     province: '',
     city: '',
@@ -27,6 +24,11 @@ const AddObjectInsurance = () => {
     lat: '',
     lng: '',
   });
+
+  const cerrarModal = () => {
+    closeModal('true');
+  };
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -64,35 +66,47 @@ const AddObjectInsurance = () => {
       component="main"
       style={{ width: '80%', minHeight: '80vh', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
     >
-      <h2 style={{ color: '#00a99e' }}>Objeto del Seguro</h2>
       <div className='modalForm '>
-        <Paper elevation={3} style={{ width: '50%', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Paper elevation={3} style={{ width: '50%', paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ width: '100%', backgroundColor: '#00a99e', color: 'white', position: 'relative', top: '0px', display: 'flex',justifyContent:'space-between' }}>
+            Objeto del seguro
+            <div style={{cursor:'pointer'}} >
+              <CloseIcon onClick={cerrarModal}/>
+            </div>
+          </div>
           <form component="form" onSubmit={handleSubmit} className='form'>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <FormControl style={{ width: '100%', height: 30 }} >
-                  <InputLabel id="province-Label">Provincia</InputLabel>
-                  <Select
+            <table container spacing={2} >
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }} >
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="province-Label"> <b>Provincia:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <select
                     labelId="province-Label"
                     id="province"
                     name="province"
                     value={formData.province}
                     onChange={handleChange}
                     variant="standard"
-                    fullWidth
+
                     required
-                    style={{ textAlign: 'left', height: 30 }}
+                    style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
                   >
-                    <MenuItem value="01">Guayas</MenuItem>
-                    <MenuItem value="02">Quito</MenuItem>
-                    <MenuItem value="03">Azogues</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl style={{ width: '100%' }}>
-                  <InputLabel id="city-Label">Ciudad</InputLabel>
-                  <Select
+                    <option value="01">Guayas</option>
+                    <option value="02">Quito</option>
+                    <option value="03">Azogues</option>
+                  </select>
+                </td>
+
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="city-Label"> <b>Ciudad:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <select
                     labelId="city-Label"
                     id="city"
                     name="city"
@@ -101,18 +115,22 @@ const AddObjectInsurance = () => {
                     variant="standard"
                     fullWidth
                     required
-                    style={{ textAlign: 'left' }}
+                    style={{ textAlign: 'left', border: '1px solid #A1A8AE' }}
                   >
-                    <MenuItem value="G01">Guayaquil</MenuItem>
-                    <MenuItem value="G02">Duran</MenuItem>
-                    <MenuItem value="G03">Daule</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl style={{ width: '100%' }}>
-                  <InputLabel id="parish-Label">Parroquia</InputLabel>
-                  <Select
+                    <option value="G01">Guayaquil</option>
+                    <option value="G02">Duran</option>
+                    <option value="G03">Daule</option>
+                  </select>
+                </td>
+              </tr>
+
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="parish-Label"> <b>Parroquia:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <select
                     labelId="parish-Label"
                     id="parish"
                     name="parish"
@@ -123,81 +141,99 @@ const AddObjectInsurance = () => {
                     required
                     style={{ textAlign: 'left' }}
                   >
-                    <MenuItem value="G01">Guayaquil</MenuItem>
-                    <MenuItem value="G02">Duran</MenuItem>
-                    <MenuItem value="G03">Daule</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={10}>
-                <TextField
-                  label="Direccion"
-                  type="text"
-                  name="direccion"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={1}>
-                <IconButton onClick={SearchLocation} style={{ marginTop: '20px' }}>
-                  <AddLocationAltRoundedIcon />
-                </IconButton>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Manzana"
-                  type="number"
-                  name="block"
-                  value={formData.block}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Villa"
-                  type="text"
-                  name="house"
-                  value={formData.house}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Piso"
-                  type="text"
-                  name="floor"
-                  value={formData.floor}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Suma Asegurada"
-                  type="text"
-                  name="sumInsure"
-                  value={formData.sumInsure}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl style={{ width: '100%' }}>
-                  <InputLabel id="buildingAge-Label">Antiguedad</InputLabel>
-                  <Select
+                    <option value="G01">Balao</option>
+                    <option value="G02">Duran</option>
+                    <option value="G03">Daule</option>
+                  </select>
+                </td>
+              </tr>
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="direction-Label"> <b>Direccion:</b>  </label>
+                </td>
+                <td style={{ width: '50%' }}>
+                  <input
+                    label="direction-Label"
+                    type="text"
+                    name="direccion"
+                    value={formData.direccion}
+                    onChange={handleChange}
+                    variant="standard"
+                    required
+                    style={{ width: '100%' }}
+                  />
+                </td>
+                <td style={{ width: '20%' }}>
+                  <div onClick={SearchLocation} >
+                    <AddLocationAltRoundedIcon />
+                  </div>
+                </td>
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="number-Label"> <b>Manzana:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <input
+                    label="number"
+                    type="text"
+                    name="block"
+                    value={formData.block}
+                    onChange={handleChange}
+                    variant="standard"
+                    required
+                    style={{ width: '30%' }}
+                  />
+                </td>
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="house-Label"> <b>Villa:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <input
+                    labelId="house-Label"
+                    id="house"
+                    name="house"
+                    value={formData.house}
+                    onChange={handleChange}
+                    variant="standard"
+                    fullWidth
+                    required
+                    style={{ width: '30%' }}
+                  />
+
+                </td>
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="floor-Label"> <b>Pisos:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <input
+                    labelId="floor-Label"
+                    id="floor"
+                    name="floor"
+                    value={formData.floor}
+                    onChange={handleChange}
+                    variant="standard"
+                    fullWidth
+                    required
+                    style={{ width: '30%' }}
+                  />
+
+                </td>
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="buildingAge-Label"> <b>Antiguedad:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <select
                     labelId="buildingAge-Label"
                     id="buildingAge"
                     name="buildingAge"
@@ -206,18 +242,23 @@ const AddObjectInsurance = () => {
                     variant="standard"
                     fullWidth
                     required
-                    style={{ textAlign: 'left' }}
+                    style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
                   >
-                    <MenuItem value="G01">Guayaquil</MenuItem>
-                    <MenuItem value="G02">Duran</MenuItem>
-                    <MenuItem value="G03">Daule</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl style={{ width: '100%' }}>
-                  <InputLabel id="constructionType-Label">T.Constuccion</InputLabel>
-                  <Select
+                    <option value="G01">1</option>
+                    <option value="G02">2</option>
+                    <option value="G03">3</option>
+                  </select>
+                </td>
+              </tr>
+
+
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T.Constuccion:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <select
                     labelId="constructionType-Label"
                     id="constructionType"
                     name="constructionType"
@@ -226,18 +267,21 @@ const AddObjectInsurance = () => {
                     variant="standard"
                     fullWidth
                     required
-                    style={{ textAlign: 'left' }}
+                    style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                   >
-                    <MenuItem value="G01">Guayaquil</MenuItem>
-                    <MenuItem value="G02">Duran</MenuItem>
-                    <MenuItem value="G03">Daule</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl style={{ width: '100%' }}>
-                  <InputLabel id="riskType-Label">T. Riesgo</InputLabel>
-                  <Select
+                    <option value="G01">CEMENTO</option>
+                    <option value="G02">2</option>
+                    <option value="G03">3</option>
+                  </select>
+                </td>
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="riskType-Label"> <b>T. Riesgo:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <select
                     labelId="riskType-Label"
                     id="riskType"
                     name="riskType"
@@ -246,18 +290,22 @@ const AddObjectInsurance = () => {
                     variant="standard"
                     fullWidth
                     required
-                    style={{ textAlign: 'left' }}
+                    style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                   >
-                    <MenuItem value="G01">Guayaquil</MenuItem>
-                    <MenuItem value="G02">Duran</MenuItem>
-                    <MenuItem value="G03">Daule</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl style={{ width: '100%' }}>
-                  <InputLabel id="destiny-Label">Destinado a</InputLabel>
-                  <Select
+                    <option value="G01">VIVIENDA</option>
+                    <option value="G02">2</option>
+                    <option value="G03">3</option>
+                  </select>
+                </td>
+              </tr>
+
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="destiny-Label"> <b>Destinado a:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <select
                     labelId="destiny-Label"
                     id="destiny"
                     name="destiny"
@@ -266,41 +314,85 @@ const AddObjectInsurance = () => {
                     variant="standard"
                     fullWidth
                     required
-                    style={{ textAlign: 'left' }}
+                    style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                   >
-                    <MenuItem value="G01">Guayaquil</MenuItem>
-                    <MenuItem value="G02">Duran</MenuItem>
-                    <MenuItem value="G03">Daule</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Latitud"
-                  type="text"
-                  name="lat"
-                  value={formData.lat}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Longitud"
-                  type="text"
-                  name="lng"
-                  value={formData.lng}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  required
-                />
-              </Grid>
-            </Grid>
+                    <option value="G01">VIVIENDA</option>
+                    <option value="G02">2</option>
+                    <option value="G03">3</option>
+                  </select>
+                </td>
+              </tr>
+
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="sumInsure-Label"> <b>Suma Aseg:</b>  </label>
+                </td>
+                <td style={{ width: '50%' }}>
+                  <input
+                    label="sumInsure-Label"
+                    type="text"
+                    name="umInsure"
+                    value={formData.sumInsure}
+
+                    variant="standard"
+                    required
+                    style={{ width: '100%' }}
+                  />
+                </td>
+                <td style={{ width: '20%' }}>
+                  <div >
+                    <AddLocationAltRoundedIcon />
+                  </div>
+                </td>
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="latituded-Label"> <b>Latitud:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <input
+                    labelId="latituded-Label"
+                    id="lat"
+                    name="lat"
+                    value={formData.lat}
+                    onChange={handleChange}
+                    variant="standard"
+                    fullWidth
+                    required
+                    disabled
+                    style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                  >
+
+                  </input>
+                </td>
+              </tr>
+
+              <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                <td style={{ width: '30%', textAlign: 'right' }}>
+                  <label textAlign='right' style={{ fontSize: '13px' }} id="longitude-Label"> <b>Longitud:</b>  </label>
+                </td>
+                <td style={{ width: '70%' }}>
+                  <input
+                    labelId="longitude-Label"
+                    id="lng"
+                    name="lng"
+                    value={formData.lng}
+                    onChange={handleChange}
+                    variant="standard"
+                    fullWidth
+                    required
+                    disabled
+                    style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                  >
+
+                  </input>
+                </td>
+              </tr>
+
+
+            </table>
 
             {/* Botón de envío */}
             <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff', marginTop: '20px' }} fullWidth>
@@ -308,14 +400,14 @@ const AddObjectInsurance = () => {
             </Button>
           </form >
         </Paper>
-        <div style={{ width: '80%' }}>
-          <MapContainer 
-          ref={mapContainerRef}
-          lat={formData.lat} 
-          lng={formData.lng} 
-          direccion={formData.direccion} 
-          onMarkerDragEnd={onMarkerDragEnd}
-          onUpdateLocation={updateLocation} 
+        <div style={{ width: '50%', display: 'flex', alignItems: 'center' }}>
+          <MapContainer
+            ref={mapContainerRef}
+            lat={formData.lat}
+            lng={formData.lng}
+            direccion={formData.direccion}
+            onMarkerDragEnd={onMarkerDragEnd}
+            onUpdateLocation={updateLocation}
           ></MapContainer>
         </div>
       </div>

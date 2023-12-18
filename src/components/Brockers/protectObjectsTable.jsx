@@ -2,9 +2,10 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
@@ -40,19 +41,19 @@ function createData(number, province, city, direction, risk, amount, prima, rate
 }
 
 const rows = [
-  createData(1, 'Cupcake', 305, 3.7, 67, 4.3, 3.7, 67),
-  createData(2, 'Donut', 452, 25.0, 51, 4.9, 3.7, 67),
-  createData(3, 'Eclair', 262, 16.0, 24, 6.0, 3.7, 67),
-  createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0, 3.7, 67),
-  createData(5, 'Gingerbread', 356, 16.0, 49, 3.9, 3.7, 67),
-  createData(6, 'Honeycomb', 408, 3.2, 87, 6.5, 3.7, 67),
-  createData(7, 'Ice cream sandwich', 237, 9.0, 37, 3.7, 67),
-  createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0, 3.7, 67),
-  createData(9, 'KitKat', 518, 26.0, 65, 7.0, 3.7, 67),
-  createData(10, 'Lollipop', 392, 0.2, 98, 0.0, 3.7, 67),
-  createData(11, 'Marshmallow', 318, 0, 81, 2.0, 3.7, 67),
-  createData(12, 'Nougat', 360, 19.0, 9, 37.0, 3.7, 67),
-  createData(13, 'Oreo', 437, 18.0, 63, 4.0, 3.7, 67),
+  // createData(1, 'Cupcake', 305, 3.7, 67, 4.3, 3.7, 67),
+  // createData(2, 'Donut', 452, 25.0, 51, 4.9, 3.7, 67),
+  // createData(3, 'Eclair', 262, 16.0, 24, 6.0, 3.7, 67),
+  // createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0, 3.7, 67),
+  // createData(5, 'Gingerbread', 356, 16.0, 49, 3.9, 3.7, 67),
+  // createData(6, 'Honeycomb', 408, 3.2, 87, 6.5, 3.7, 67),
+  // createData(7, 'Ice cream sandwich', 237, 9.0, 37, 3.7, 67),
+  // createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0, 3.7, 67),
+  // createData(9, 'KitKat', 518, 26.0, 65, 7.0, 3.7, 67),
+  // createData(10, 'Lollipop', 392, 0.2, 98, 0.0, 3.7, 67),
+  // createData(11, 'Marshmallow', 318, 0, 81, 2.0, 3.7, 67),
+  // createData(12, 'Nougat', 360, 19.0, 9, 37.0, 3.7, 67),
+  // createData(13, 'Oreo', 437, 18.0, 63, 4.0, 3.7, 67),
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -143,9 +144,9 @@ function EnhancedTableHead(props) {
   };
 
   return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
+    <TableHead >
+      <TableRow >
+        <StyledTableCell padding="checkbox">
           <Checkbox
             color="primary"
             indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -155,9 +156,9 @@ function EnhancedTableHead(props) {
               'aria-label': 'select all desserts',
             }}
           />
-        </TableCell>
+        </StyledTableCell>
         {headCells.map((headCell) => (
-          <TableCell
+          <StyledTableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
@@ -175,7 +176,7 @@ function EnhancedTableHead(props) {
                 </Box>
               ) : null}
             </TableSortLabel>
-          </TableCell>
+          </StyledTableCell>
         ))}
       </TableRow>
     </TableHead>
@@ -204,26 +205,18 @@ function EnhancedTableToolbar(props) {
             alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
         }),
       }}
+      style={{ borderBottom: '2px solid #00a99e ', height: '40px', minHeight: '0px' }}
     >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Objeto del Amparo
-        </Typography>
-      )}
+
+      <Typography
+        sx={{ flex: '1 1 100%' }}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+        style={{ textAlign: 'start', fontSize: '14px', color: '#00a99e' }}
+      >
+        Objeto del Seguro
+      </Typography>
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
@@ -246,7 +239,21 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    borderBottom: '1px solid black'
+  },
+  [`&.${tableCellClasses.body}`]: {
+    borderBottom: '1px solid black'
+  },
+}));
 
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+
+  '&:last-child td, &:last-child th': {
+    borderBottom: '1px solid black'
+  },
+}));
 
 export default function ProtectObjectsTable() {
   const [order, setOrder] = React.useState('asc');
@@ -324,106 +331,117 @@ export default function ProtectObjectsTable() {
     [order, orderBy, page, rowsPerPage],
   );
 
-  
+
 
   return (
     <div>
 
       {/* Modal */}
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
-       PaperProps={{
-        style: {
-          backgroundColor: '#ffffffe6',
-          boxShadow: 'none',
-        },
-      }}>
-          <DialogContent>
-            {/* Componente del formulario */}
-            <AddObjectInsurance />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseModal}>Cerrar</Button>
-            {/* Puedes agregar más botones según tus necesidades */}
-          </DialogActions>
-        </Dialog>
+        PaperProps={{
+          style: {
+            backgroundColor: '#ffffff00',
+            boxShadow: 'none',
+            width: '70%',
+            overflow:'hidden' 
+          },
+        }}>
+        <DialogContent style={{overflow:'hidden'}}>
+          {/* Componente del formulario */}
+          <AddObjectInsurance closeModal={handleCloseModal} style={{ width:'80%'}}/>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal}>Cerrar</Button>
+          {/* Puedes agregar más botones según tus necesidades */}
+        </DialogActions>
+      </Dialog>
 
-      <Box sx={{ width: '100%', marginTop:'12px' }}>
-        <Paper  sx={{ width: '100%', display:'flex', justifyContent:'end'}}>
-          <Button variant="contained"  onClick={handleOpenModal}   sx={{ marginRight:'20px'}}>
-            Agregar Objeto
+      <Box sx={{ width: '100%', marginTop: '12px' }}>
+        <Paper sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
+          <Button variant="contained" onClick={handleOpenModal} sx={{ marginRight: '20px' }}>
+            Nuevo
           </Button>
         </Paper>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar numSelected={selected.length} />
-          <TableContainer>
-            <Table
-              sx={{ minWidth: 750 }}
-              aria-labelledby="tableTitle"
-              size={'small'}
-            >
-              <EnhancedTableHead
-                numSelected={selected.length}
-                order={order}
-                orderBy={orderBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={rows.length}
-              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isItemSelected = isSelected(row.number);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+          {visibleRows.length === 0 ? (
+            <Typography variant="body2" style={{ padding: '16px' }}>
+              No hay registros en la tabla.
+            </Typography>
+          ) : (
+            <TableContainer>
+              <Table
+                sx={{ minWidth: 750 }}
+                aria-labelledby="tableTitle"
+                size={'small'}
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.number)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.number}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
+              >
+                <EnhancedTableHead
+                  numSelected={selected.length}
+                  order={order}
+                  orderBy={orderBy}
+                  onSelectAllClick={handleSelectAllClick}
+                  onRequestSort={handleRequestSort}
+                  rowCount={rows.length}
+                />
+                <TableBody
+
+                >
+                  {visibleRows.map((row, index) => {
+                    const isItemSelected = isSelected(row.number);
+                    const labelId = `enhanced-table-checkbox-${index}`;
+
+                    return (
+                      <StyledTableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.number)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.number}
+                        selected={isItemSelected}
+                        sx={{ cursor: 'pointer' }}
                       >
-                        {row.number}
-                      </TableCell>
-                      <TableCell align="right">{row.province}</TableCell>
-                      <TableCell align="right">{row.city}</TableCell>
-                      <TableCell align="right">{row.direction}</TableCell>
-                      <TableCell align="right">{row.risk}</TableCell>
-                      <TableCell align="right">{row.amount}</TableCell>
-                      <TableCell align="right">{row.rate}</TableCell>
-                      <TableCell align="right">{row.prima}</TableCell>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            color="primary"
+                            checked={isItemSelected}
+                            inputProps={{
+                              'aria-labelledby': labelId,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                        >
+                          {row.number}
+                        </TableCell>
+                        <TableCell align="right">{row.province}</TableCell>
+                        <TableCell align="right">{row.city}</TableCell>
+                        <TableCell align="right">{row.direction}</TableCell>
+                        <TableCell align="right">{row.risk}</TableCell>
+                        <TableCell align="right">{row.amount}</TableCell>
+                        <TableCell align="right">{row.rate}</TableCell>
+                        <TableCell align="right">{row.prima}</TableCell>
+                      </StyledTableRow>
+                    );
+                  })}
+                  {emptyRows > 0 && (
+                    <TableRow
+                      style={{
+                        height: (33) * emptyRows,
+                      }}
+                    >
+                      <TableCell colSpan={6} />
                     </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: (33) * emptyRows,
-                    }}
-                  >
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"

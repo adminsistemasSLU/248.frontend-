@@ -128,9 +128,9 @@ const PersonalForm = () => {
           </Grid>
 
           {/* Botón de envío */}
-          <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
+          {/* <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
             Registrarse
-          </Button>
+          </Button> */}
         </FormControl >
       </Paper>
     </Container>

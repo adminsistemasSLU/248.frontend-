@@ -11,7 +11,6 @@ import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantity
 import InventoryRoundedIcon from '@mui/icons-material/InventoryRounded';
 import PaidIcon from '@mui/icons-material/Paid';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import '../styles/button.scss';
 import PersonalForm from './Brockers/personalForm';
@@ -48,8 +47,8 @@ const ColorlibStepIconRoot = styled('div')(({ theme, ownerState }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#ccc',
   zIndex: 1,
   color: '#fff',
-  width: 50,
-  height: 50,
+  width: 40,
+  height: 40,
   display: 'flex',
   borderRadius: '50%',
   justifyContent: 'center',
@@ -76,7 +75,7 @@ function ColorlibStepIcon(props) {
   };
 
   return (
-    <ColorlibStepIconRoot ownerState={{ completed, active }} className={className}>
+    <ColorlibStepIconRoot  style={{aspectRatio:'1/1'}} ownerState={{ completed, active }} className={className}>
       {icons[String(props.icon)]}
     </ColorlibStepIconRoot>
   );
@@ -151,12 +150,12 @@ export default function Steppers() {
   //   setActiveStep(step);
   // };
 
-  const handleComplete = () => {
-    const newCompleted = completed;
-    newCompleted[activeStep] = true;
-    setCompleted(newCompleted);
-    handleNext();
-  };
+  // const handleComplete = () => {
+  //   const newCompleted = completed;
+  //   newCompleted[activeStep] = true;
+  //   setCompleted(newCompleted);
+  //   handleNext();
+  // };
 
   // const handleReset = () => {
   //   setActiveStep(0);
@@ -164,11 +163,11 @@ export default function Steppers() {
   // };
 
   return (
-    <Stack sx={{ width: '100%', marginTop: '25px' }} spacing={4}>
+    <Stack sx={{ width: '80%', marginTop: '25px', alignSelf:'center' }} spacing={4}>
 
       <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
         {steps.map((step, index) => (
-          <Step key={index}>
+          <Step  key={index}>
             <StepLabel StepIconComponent={ColorlibStepIcon}>
               {step.label}
             </StepLabel>
@@ -177,26 +176,24 @@ export default function Steppers() {
         ))}
       </Stepper>
       <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center' , marginBottom: '10%'}}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', pt: 2, width: '80%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', pt: 2, width: '80%', gap: '5%'}}>
           {steps[activeStep].formComponent}
-          <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', gap: '10%'  }}>
             <Button
               disabled={activeStep === 0}
               onClick={handleBack}
               sx={{ mr: 1 }}
-              className='btnStepper'
+              className='btnStepper btnBack'
             >
               Back
             </Button>
 
 
-            <Box sx={{ flex: '1 1 auto' }} ><Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-              Step {activeStep + 1}
-            </Typography></Box>
+            
             <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper'>
               Next
             </Button>
-            {activeStep !== steps.length &&
+            {/* {activeStep !== steps.length &&
               (completed[activeStep] ? (
                 <p style={{ color: '#00a99e' }}>
                   Step {activeStep + 1} already completed
@@ -207,7 +204,7 @@ export default function Steppers() {
                     ? 'Finish'
                     : 'Complete Step'}
                 </Button>
-              ))}
+              ))} */}
           </div>
         </Box>
       </div>
