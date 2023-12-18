@@ -70,8 +70,7 @@ function ColorlibStepIcon(props) {
   const icons = {
     1: <PersonIcon />,
     2: <ProductionQuantityLimitsIcon />,
-    3: <InventoryRoundedIcon />,
-    4: <PaidIcon/>
+    3: <PaidIcon/>
   };
 
   return (
@@ -107,7 +106,6 @@ export default function Steppers() {
   const steps = [
     { label: 'Datos Personales', formComponent: <PersonalForm /> },
     { label: 'Producto', formComponent: <ProtectObjectsTable /> },
-    { label: 'Detalle de Producto', formComponent: <DetailObjectsTable /> },
     { label: 'Forma de Pago', formComponent: <PaidForm /> },
   ];
 

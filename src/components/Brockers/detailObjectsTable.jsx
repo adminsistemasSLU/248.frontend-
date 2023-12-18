@@ -15,7 +15,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
 import '../../styles/detailQuoter.scss';
-
+import CloseIcon from '@mui/icons-material/Close';
 
 function createData(id, cobertura, monto, tasa, prima,titulo) {
   return {
@@ -181,12 +181,12 @@ function getComparator(order, orderBy) {
 
 
 
-export default function DetailObjectsTable() {
+export default function DetailObjectsTable({ closeModalDetail }) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const [editableRows, setEditableRows] = React.useState(rows);
 
@@ -204,7 +204,10 @@ export default function DetailObjectsTable() {
     setPage(0);
   };
 
- 
+  const closeModal = () => {
+    closeModalDetail('true');
+  };
+
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
@@ -257,7 +260,11 @@ export default function DetailObjectsTable() {
   );
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <div style={{ height: 400, width: '100%',display:'flex',flexDirection:'column',gap:'5px' }}>
+      <div style={{backgroundColor:'#00a99e', color:'white',paddingLeft:'5px', display:'flex',justifyContent:'space-between'}}>
+        <div>Detalle de Amparo</div>
+        <div  onClick={closeModal}> <CloseIcon/></div>
+      </div>
       <TableContainer style={{overflow:'auto',height: 300 }}>
         <Table
           sx={{ minWidth: 750 }}
@@ -373,7 +380,7 @@ export default function DetailObjectsTable() {
      
 
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[10, 25]}
         component="div"
         count={rows.length}
         rowsPerPage={rowsPerPage}

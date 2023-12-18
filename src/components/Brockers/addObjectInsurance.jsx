@@ -3,7 +3,11 @@ import { Button, Container, Paper } from '@mui/material';
 import MapContainer from './mapContainer';
 import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
 import CloseIcon from '@mui/icons-material/Close';
-
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DetailObjectsTable from './detailObjectsTable';
 import '../../styles/moddalForm.scss';
 
 
@@ -24,6 +28,18 @@ const AddObjectInsurance = ({ closeModal }) => {
     lat: '',
     lng: '',
   });
+
+  const [openModal, setOpenModal] = React.useState(false);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  // Manejador para cerrar el modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
 
   const cerrarModal = () => {
     closeModal('true');
@@ -66,12 +82,35 @@ const AddObjectInsurance = ({ closeModal }) => {
       component="main"
       style={{ width: '80%', minHeight: '80vh', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
     >
+
+
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
+        PaperProps={{
+          style: {
+            backgroundColor: '#ffffff',
+            boxShadow: 'none',
+            width: '70%',
+            overflow: 'hidden',
+            zIndex:'2000'
+          },
+        }}>
+        <DialogContent style={{ overflow: 'hidden',padding:'0px',paddingBottom:'20px' }}>
+          {/* Componente del formulario */}
+          <DetailObjectsTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal}>Cerrar</Button>
+          {/* Puedes agregar más botones según tus necesidades */}
+        </DialogActions>
+      </Dialog>
+
+
       <div className='modalForm '>
         <Paper elevation={3} style={{ width: '50%', paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ width: '100%', backgroundColor: '#00a99e', color: 'white', position: 'relative', top: '0px', display: 'flex',justifyContent:'space-between' }}>
+          <div style={{ width: '100%', backgroundColor: '#00a99e', color: 'white', position: 'relative', top: '0px', display: 'flex', justifyContent: 'space-between' }}>
             Objeto del seguro
-            <div style={{cursor:'pointer'}} >
-              <CloseIcon onClick={cerrarModal}/>
+            <div style={{ cursor: 'pointer' }} >
+              <CloseIcon onClick={cerrarModal} />
             </div>
           </div>
           <form component="form" onSubmit={handleSubmit} className='form'>
@@ -341,8 +380,8 @@ const AddObjectInsurance = ({ closeModal }) => {
                   />
                 </td>
                 <td style={{ width: '20%' }}>
-                  <div >
-                    <AddLocationAltRoundedIcon />
+                  <div onClick={handleOpenModal}  >
+                    <CalendarMonthIcon />
                   </div>
                 </td>
               </tr>
@@ -413,6 +452,11 @@ const AddObjectInsurance = ({ closeModal }) => {
       </div>
     </Container>
   );
+
+
 };
+
+
+
 
 export default AddObjectInsurance;
