@@ -3,7 +3,7 @@ import { TextField, Button, Container, Grid, Paper } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-
+import '../../styles/form.scss';
 const PaidForm = () => {
         const [formData, setFormData] = useState({
           paidType: '',
@@ -35,9 +35,9 @@ const PaidForm = () => {
       maxWidth="md"
       
     >
-      <form  onSubmit={handleSubmit} className='form' style={{width:'100%', marginBottom: '20px', display: 'flex', alignItems: 'start', flexDirection: 'row', justifyContent: 'center' }}
+      <form  onSubmit={handleSubmit} style={{width:'100%', marginBottom: '20px', alignItems: 'start', justifyContent: 'center' }}
+        className='paidForm'
       >
-        
      
       <Paper elevation={3} style={{ width:'100%',padding: 20, display: 'flex',flexGrow: 2, flexDirection: 'column', alignItems: 'center', margin: '20px' }}>
         <div component="form" >
@@ -107,7 +107,7 @@ const PaidForm = () => {
       </Paper>
 
       <Paper elevation={3} style={{ width:'100%', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '20px' }}>
-        <div component="form" onSubmit={handleSubmit} className='form'>
+        <div component="form" onSubmit={handleSubmit} >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField

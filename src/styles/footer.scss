@@ -4,6 +4,7 @@
     position: relative;
     
     @media (max-width: 600px) {
-        position: relative;
+        position: relative !important;
+        bottom: 0;
       }
 }

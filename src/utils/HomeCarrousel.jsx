@@ -10,23 +10,26 @@ import '../styles/carrousel.scss';
 function HomeCarrousel(props) {
     var items = [
         {
-            name: "Automovil ligero",
+            name: "Vehiculos",
             description: "Probably the most random thing you have ever seen!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/automovil.jpg',
-            url:'/FireInsurance/form'
+            url:'/FireInsurance/form',
+            enable:false,
         },
         {
             name: "Vida",
-            description: "Hello World!",
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores nobis ullam facilis ',
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/vida2.jpg',
-            url:'/FireInsurance/form'
+            url:'/FireInsurance/form',
+            enable:false,
         }
         ,
         {
-            name: "Incendio",
-            description: "Hello World!",
+            name: "Pymes",
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores nobis ullam facilis ',
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/incendio.jpg',
-            url:'/quoter/stepper'
+            url:'/quoter/stepper',
+            enable:true,
         }
     ];
     const groupItems = (items, groupSize) => {
@@ -96,21 +99,24 @@ function Item(props) {
         window.location.href = props.item.url; // Reemplaza 'url' con la propiedad correcta de tu objeto
       };
     return (
-        <Card sx={{ maxWidth: 200 }}>
-            <a href={props.item.url} onClick={(e) => { e.preventDefault(); handleImageClick(); }}>
+        <Card sx={{ maxWidth: 200 }} >
+            <a href={props.item.url} className={props.item.enable ? 'carousel-content' : ''}  onClick={(e) => { e.preventDefault(); handleImageClick(); }}>
                 <CardMedia
+                className={props.item.enable ? '' : 'inactivo'}
                 component="img"
                 height="194px"
                 image={props.item.imageUrl}
                 alt={props.item.name}
                 width="150px"
-                style={{ cursor: 'pointer' }} // Cambia el cursor para indicar que es interactivo
                 />
             </a>
             <CardContent>
-                <Typography variant="body2" color="#018997" >
+                <Typography variant="h6" color="#018997" >
                     {props.item.name}
                 </Typography>
+                <Typography variant="body2" color="text.secondary" style={{textAlign:'justify'}}>
+                        {props.item.description }
+                    </Typography>
             </CardContent>
             <CardActions disableSpacing>
                 

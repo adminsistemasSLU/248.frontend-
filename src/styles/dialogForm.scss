@@ -1,0 +1,14 @@
+.dialog-Form{
+    width: 100%;
+    @media (max-width: 600px) {
+        width: 100%;
+    }
+}
+
+
+.dialog-content{
+    min-width: 600px;
+    @media (max-width: 600px) {
+        min-width: 300px;
+    }
+}

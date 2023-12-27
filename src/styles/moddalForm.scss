@@ -1,9 +1,52 @@
-.modalForm{
+.modalForm {
     display: flex;
     gap: 1%;
     width: 100%;
+
 }
 
 .combined-row {
-    background-color: lightcoral; /* Cambia el color de fondo según tus necesidades */
+    background-color: lightcoral;
+    /* Cambia el color de fondo según tus necesidades */
+}
+
+.modalFormColumn {
+    display: flex;
+    gap: 1%;
+    width: 100%;
+
+    overflow: auto;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+    }
+}
+
+.modalContent {
+    width: 50%;
+
+    @media (max-width: 600px) {
+        width: 100%;
+    }
+}
+
+.paginationResponsive {
+    display: flex;
+
+    @media (max-width: 950px) {
+        flex-direction: column;
+    }
+}
+
+.elementsModal {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 50px;
+}
+
+.elementRight {
+    @media (max-width: 600px) {
+      margin-right: 10px; 
+    }
   }

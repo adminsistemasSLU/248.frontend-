@@ -21,29 +21,29 @@ import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 const navItems = [
-  { text: 'Inicio', path: '/home' },
-  { text: 'Nuestro Seguro', path: '/nuestro-seguro' },
-  { text: 'Transparencias', path: '/transparencias' },
-  { text: 'Nuestra Historia', path: '/nuestra-historia' },
-  { text: 'Noticias', path: '/noticias' },
-  { text: 'Contacto', path: '/contacto' },
-  { text: 'Accionista', path: '/accionista' },
+  { text: 'Inicio', path: '/quoter/dashboard' },
+  // { text: 'Nuestro Seguro', path: '/nuestro-seguro' },
+  // { text: 'Transparencias', path: '/transparencias' },
+  // { text: 'Nuestra Historia', path: '/nuestra-historia' },
+  // { text: 'Noticias', path: '/noticias' },
+  // { text: 'Contacto', path: '/contacto' },
+  // { text: 'Accionista', path: '/accionista' },
 ];
 
 const navItemsMob = [
-  { text: 'Inicio', path: '/home' },
-  { text: 'Nuestro Seguro', path: '/nuestro-seguro' },
-  { text: 'Transparencias', path: '/transparencias' },
-  { text: 'Nuestra Historia', path: '/nuestra-historia' },
-  { text: 'Login', path: '/login' },
-  { text: 'Registrar', path: '/Register' },
+  { text: 'Inicio', path: '/quoter/dashboard' },
+  // { text: 'Nuestro Seguro', path: '/nuestro-seguro' },
+  // { text: 'Transparencias', path: '/transparencias' },
+  // { text: 'Nuestra Historia', path: '/nuestra-historia' },
+  // { text: 'Login', path: '/login' },
+  // { text: 'Registrar', path: '/Register' },
 ];
 
 const settings = [
   { text: 'Login', path: '/login' },
   { text: 'Registrar', path: '/Register' },
-  { text: 'Dashboard', path: '/brocker/personalForm' },
-  { text: 'Logout', path: '/nuestra-historia' },
+  // { text: 'Dashboard', path: '/brocker/personalForm' },
+  // { text: 'Logout', path: '/nuestra-historia' },
 ];
 
 function Header(props) {

@@ -9,15 +9,16 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
-import CurrencyInput from '../currencyInput';
+
 import { styled } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
 import '../../styles/detailQuoter.scss';
 import CloseIcon from '@mui/icons-material/Close';
+import CurrencyInput from '../../utils/currencyInput';
 
-function createData(id, cobertura, monto, tasa, prima,titulo) {
+function createData(id, cobertura, monto, tasa, prima, titulo) {
   return {
     id,
     cobertura,
@@ -29,18 +30,18 @@ function createData(id, cobertura, monto, tasa, prima,titulo) {
 }
 
 const rows = [
-  createData(1, 'Edificio con todas sus instalaciones fijas y permanentes (Estructuras)', 305, 3.7, 67 ,false),
-  createData(2, 'Maquinarias y equipos', 452, 25.0, 51 ,false),
-  createData(3, 'Muebles, enseres y equipos de oficina', 262, 16.0, 24 ,false),
-  createData(4, 'Equipo electrónico fijo y portátil', 159, 6.0, 24 ,false),
-  createData(5, 'AMPAROS ADICIONALES QUE SUMAN CAPITAL', 356, 16.0, 49 ,true),
-  createData(6, 'Remocion de escombros', 408, 3.2, 87 ,false),
-  createData(7, 'Honorarios de Ingenieros Arquitectos y topografos', 237, 9.45, 4 ,false),
-  createData(8, 'Documentos y modelos', 375, 0.0, 94 ,false),
-  createData(9, 'AMPAROS ADICIONALES CON COSTOS', 518, 26.0, 65 ,true),
-  createData(10, 'Terrorismo y/o sabotaje', 392, 0.2, 98 ,false),
-  createData(11, 'Responsabilidad civil Extracontractual', 318, 0, 81 ,false),
-  
+  createData(1, 'Edificio con todas sus instalaciones fijas y permanentes (Estructuras)', 305, 3.7, 67, false),
+  createData(2, 'Maquinarias y equipos', 452, 25.0, 51, false),
+  createData(3, 'Muebles, enseres y equipos de oficina', 262, 16.0, 24, false),
+  createData(4, 'Equipo electrónico fijo y portátil', 159, 6.0, 24, false),
+  createData(5, 'AMPAROS ADICIONALES QUE SUMAN CAPITAL', 356, 16.0, 49, true),
+  createData(6, 'Remocion de escombros', 408, 3.2, 87, false),
+  createData(7, 'Honorarios de Ingenieros Arquitectos y topografos', 237, 9.45, 4, false),
+  createData(8, 'Documentos y modelos', 375, 0.0, 94, false),
+  createData(9, 'AMPAROS ADICIONALES CON COSTOS', 518, 26.0, 65, true),
+  createData(10, 'Terrorismo y/o sabotaje', 392, 0.2, 98, false),
+  createData(11, 'Responsabilidad civil Extracontractual', 318, 0, 81, false),
+
 ];
 
 const headCells = [
@@ -181,8 +182,8 @@ function getComparator(order, orderBy) {
 
 
 export default function DetailObjectsTable({ closeModalDetail }) {
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [order,] = React.useState('asc');
+  const [orderBy,] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -227,7 +228,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
       );
     }
     setSelected(newSelected);
-    
+
   };
 
   const handleCellValueChange = (event, index, field) => {
@@ -259,12 +260,12 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   );
 
   return (
-    <div style={{ height: 400, width: '100%',display:'flex',flexDirection:'column',gap:'5px' }}>
-      <div style={{backgroundColor:'#00a99e', color:'white',paddingTop:'5px',paddingLeft:'15px', paddingRight:'15px', display:'flex',justifyContent:'space-between'}}>
+    <div style={{ height: 400, width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
         <div>Detalle de Amparo</div>
-        <div  onClick={closeModal}> <CloseIcon/></div>
+        <div onClick={closeModal}> <CloseIcon /></div>
       </div>
-      <TableContainer style={{overflow:'auto',height: 300,padding:'20px' }}>
+      <TableContainer style={{ overflow: 'auto', height: 300, padding: '20px' }}>
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
@@ -279,7 +280,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             {visibleRows.map((row, index) => {
               const isItemSelected = isSelected(row.id);
               const labelId = `enhanced-table-checkbox-${index}`;
-             
+
 
               return (
                 !row.titulo ? (
@@ -358,35 +359,42 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           </TableBody>
         </Table>
       </TableContainer>
-      <div style={{display:'flex',justifyContent:'end', gap:'15px'}}>
-      <div style={{display:'flex',justifyContent:'end', alignItems:'center', gap:'50px'}}>
-            <p>Monto: </p>
+      <div className='paginationResponsive' style={{ justifyContent: 'space-between', gap: '15px' }}>
+        <TablePagination
+          style={{ justifySelf: 'flex-start' }}
+          rowsPerPageOptions={[10, 25]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <div className='paginationResponsive' >
+          <div className='elementsModal' style={{ marginRight:'10px', gap: '50px' }}>
+            <div>Monto: </div>
             <div>
-            $305
+              $305
             </div>
-      </div>
-      <div style={{display:'flex',justifyContent:'end', alignItems:'center', gap:'50px'}}>
-            <p>
+          </div>
+          <div className='elementsModal elementRight'  style={{  gap: '50px' }}>
+            <div>
               Prima:
-            </p>
-            <div>
-            $67
             </div>
-      </div>
-      <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
+            <div>
+              $67
+            </div>
+          </div>
+          <div style={{ display: 'flex', marginLeft:'5px', marginRight:'20px', alignItems: 'center',justifyContent:'end' }}>
+            <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
+          </div>
+        </div>
+
 
       </div>
-     
 
-      <TablePagination
-        rowsPerPageOptions={[10, 25]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+
+
     </div>
   );
 }

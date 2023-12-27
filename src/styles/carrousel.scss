@@ -9,3 +9,11 @@
       align-items: center;
     }
   }
+
+  .carousel-content :hover{
+      transform: scale(1.1);
+      cursor: pointer;
+  }
+  .inactivo{
+    filter: grayscale(100%);
+  }

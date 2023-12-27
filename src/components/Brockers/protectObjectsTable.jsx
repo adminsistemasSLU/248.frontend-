@@ -23,9 +23,8 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import AddObjectInsurance from './addObjectInsurance';
-
+import '../../styles/form.scss';
 
 function createData(number, province, city, direction, risk, amount, prima, rate) {
   return {
@@ -41,19 +40,19 @@ function createData(number, province, city, direction, risk, amount, prima, rate
 }
 
 const rows = [
-  // createData(1, 'Cupcake', 305, 3.7, 67, 4.3, 3.7, 67),
-  // createData(2, 'Donut', 452, 25.0, 51, 4.9, 3.7, 67),
-  // createData(3, 'Eclair', 262, 16.0, 24, 6.0, 3.7, 67),
-  // createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0, 3.7, 67),
-  // createData(5, 'Gingerbread', 356, 16.0, 49, 3.9, 3.7, 67),
-  // createData(6, 'Honeycomb', 408, 3.2, 87, 6.5, 3.7, 67),
-  // createData(7, 'Ice cream sandwich', 237, 9.0, 37, 3.7, 67),
-  // createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0, 3.7, 67),
-  // createData(9, 'KitKat', 518, 26.0, 65, 7.0, 3.7, 67),
-  // createData(10, 'Lollipop', 392, 0.2, 98, 0.0, 3.7, 67),
-  // createData(11, 'Marshmallow', 318, 0, 81, 2.0, 3.7, 67),
-  // createData(12, 'Nougat', 360, 19.0, 9, 37.0, 3.7, 67),
-  // createData(13, 'Oreo', 437, 18.0, 63, 4.0, 3.7, 67),
+  createData(1, 'Cupcake', 305, 3.7, 67, 4.3, 3.7, 67),
+  createData(2, 'Donut', 452, 25.0, 51, 4.9, 3.7, 67),
+  createData(3, 'Eclair', 262, 16.0, 24, 6.0, 3.7, 67),
+  createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0, 3.7, 67),
+  createData(5, 'Gingerbread', 356, 16.0, 49, 3.9, 3.7, 67),
+  createData(6, 'Honeycomb', 408, 3.2, 87, 6.5, 3.7, 67),
+  createData(7, 'Ice cream sandwich', 237, 9.0, 37, 3.7, 67),
+  createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0, 3.7, 67),
+  createData(9, 'KitKat', 518, 26.0, 65, 7.0, 3.7, 67),
+  createData(10, 'Lollipop', 392, 0.2, 98, 0.0, 3.7, 67),
+  createData(11, 'Marshmallow', 318, 0, 81, 2.0, 3.7, 67),
+  createData(12, 'Nougat', 360, 19.0, 9, 37.0, 3.7, 67),
+  createData(13, 'Oreo', 437, 18.0, 63, 4.0, 3.7, 67),
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -334,26 +333,26 @@ export default function ProtectObjectsTable() {
 
 
   return (
-    <div>
+    <div style={{width:'100%'}}>
 
       {/* Modal */}
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
+      className='outerDialog'
         PaperProps={{
           style: {
             backgroundColor: '#ffffff00',
             boxShadow: 'none',
-            width: '70%',
-            overflow:'hidden' 
+            overflow:'hidden',
           },
         }}>
-        <DialogContent style={{overflow:'hidden'}}>
+        <DialogContent className='dialog-content' style={{overflow:'auto'}}>
           {/* Componente del formulario */}
-          <AddObjectInsurance closeModal={handleCloseModal} style={{ width:'80%'}}/>
+          <AddObjectInsurance closeModal={handleCloseModal} />
         </DialogContent>
        
       </Dialog>
 
-      <Box sx={{ width: '100%', marginTop: '12px' }}>
+      <Box style={{ width: '100%'}} sx={{ width: '100%', marginTop: '12px' }}>
         <Paper sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
           <Button variant="contained" onClick={handleOpenModal} sx={{ marginRight: '20px' }}>
             Nuevo
@@ -366,11 +365,12 @@ export default function ProtectObjectsTable() {
               No hay registros en la tabla.
             </Typography>
           ) : (
-            <TableContainer>
+            <TableContainer style={{overflow:'auto',height: 300,padding:'20px' }}>
               <Table
-                sx={{ minWidth: 750 }}
-                aria-labelledby="tableTitle"
-                size={'small'}
+                 sx={{ minWidth: 750 }}
+                 aria-labelledby="tableTitle"
+                 size={'small'}
+                 style={{ height: 400 }}
 
               >
                 <EnhancedTableHead
