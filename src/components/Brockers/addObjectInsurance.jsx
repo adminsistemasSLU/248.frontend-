@@ -7,6 +7,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DetailObjectsTable from './detailObjectsTable';
+import Tooltip from '@mui/material/Tooltip';
 import '../../styles/moddalForm.scss';
 import '../../styles/dialogForm.scss';
 
@@ -26,6 +27,11 @@ const AddObjectInsurance = ({ closeModal }) => {
     sumInsure: '',
     lat: '',
     lng: '',
+    inspection: false,
+    direcctionInspection: '',
+    phoneInspection: '',
+    agentInspection: '',
+
   });
 
   const [openModal, setOpenModal] = React.useState(false);
@@ -47,6 +53,9 @@ const AddObjectInsurance = ({ closeModal }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const toggleInspection = () => {
+    setFormData({ ...formData, inspection: !formData.inspection });
   };
   const mapContainerRef = useRef(null);
   const handleSubmit = (e) => {
@@ -159,7 +168,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.city}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         style={{ textAlign: 'left', border: '1px solid #A1A8AE' }}
                       >
@@ -183,7 +192,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.parish}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         style={{ textAlign: 'left' }}
                       >
@@ -246,7 +255,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.house}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         style={{ width: '30%' }}
                       />
@@ -266,7 +275,6 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.floor}
                         onChange={handleChange}
                         variant="standard"
-        
                         required
                         style={{ width: '30%' }}
                       />
@@ -286,7 +294,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.buildingAge}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
                       >
@@ -311,7 +319,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.constructionType}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
@@ -334,7 +342,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.riskType}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
@@ -358,7 +366,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.destiny}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
@@ -405,7 +413,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.lat}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         disabled
                         style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
@@ -427,7 +435,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         value={formData.lng}
                         onChange={handleChange}
                         variant="standard"
-        
+
                         required
                         disabled
                         style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
@@ -436,6 +444,101 @@ const AddObjectInsurance = ({ closeModal }) => {
                       </input>
                     </td>
                   </tr>
+
+                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                    <td style={{ width: '30%', textAlign: 'right' }}>
+                      <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Inspeccion:</b>  </label>
+                    </td>
+                    <td style={{ width: '70%' }}>
+                      <input
+
+                        id="inspection"
+                        name="inspection"
+                        checked={formData.inspection}
+                        onChange={toggleInspection}
+                        variant="standard"
+                        type='checkbox'
+                        style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                      >
+                      </input>
+                    </td>
+                  </tr>
+
+
+                  {formData.inspection && ( // Verificar si inspection es true
+                    <Tooltip title="Direccion de inspeccion" placement="left">
+                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                        <td style={{ width: '30%', textAlign: 'right' }}>
+
+                          <label style={{ fontSize: '13px' }} id="longitude-Label">
+                            <b>Direccion:</b>
+                          </label>
+
+                        </td>
+                        <td style={{ width: '70%' }}>
+                          <input
+                            id="direcctionInspection"
+                            name="direcctionInspection"
+                            value={formData.direcctionInspection}
+                            onChange={handleChange}
+                            variant="standard"
+                            style={{ textAlign: 'left', width: '70%', border: '1px solid #A1A8AE' }}
+                          >
+                          </input>
+                        </td>
+                      </tr>
+                    </Tooltip>
+                  )}
+
+                  {formData.inspection && ( // Verificar si inspection es true
+                    <Tooltip title="Telefono de inspeccion" placement="left">
+                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                        <td style={{ width: '30%', textAlign: 'right' }}>
+
+                          <label style={{ fontSize: '13px' }} id="longitude-Label">
+                            <b>Telefono:</b>
+                          </label>
+
+                        </td>
+                        <td style={{ width: '70%' }}>
+                          <input
+                            id="phoneInspection"
+                            name="phoneInspection"
+                            value={formData.phoneInspection}
+                            onChange={handleChange}
+                            variant="standard"
+                            style={{ textAlign: 'left', width: '70%', border: '1px solid #A1A8AE' }}
+                          >
+                          </input>
+                        </td>
+                      </tr>
+                    </Tooltip>
+                  )}
+
+                  {formData.inspection && ( // Verificar si inspection es true
+                    <Tooltip title="Agente de inspeccion" placement="left">
+                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                        <td style={{ width: '30%', textAlign: 'right' }}>
+
+                          <label style={{ fontSize: '13px' }} id="longitude-Label">
+                            <b>Agente:</b>
+                          </label>
+
+                        </td>
+                        <td style={{ width: '70%' }}>
+                          <input
+                            id="agentInspection"
+                            name="agentInspection"
+                            value={formData.agentInspection}
+                            onChange={handleChange}
+                            variant="standard"
+                            style={{ textAlign: 'left', width: '70%', border: '1px solid #A1A8AE' }}
+                          >
+                          </input>
+                        </td>
+                      </tr>
+                    </Tooltip>
+                  )}
 
                 </tbody>
               </table>

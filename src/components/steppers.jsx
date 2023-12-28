@@ -16,6 +16,10 @@ import '../styles/form.scss';
 import PersonalForm from './Brockers/personalForm';
 import ProtectObjectsTable from './Brockers/protectObjectsTable';
 import PaidForm from './Brockers/paidForm';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ProductListCards from './Brockers/productListCards';
+import PaymentMethods from './Brockers/paymentMethods';
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -69,7 +73,9 @@ function ColorlibStepIcon(props) {
   const icons = {
     1: <PersonIcon />,
     2: <ProductionQuantityLimitsIcon />,
-    3: <PaidIcon/>
+    3: <LocalFireDepartmentIcon />,
+    4: <PaidIcon/>,
+    5: <AddShoppingCartIcon/>
   };
 
   return (
@@ -104,8 +110,10 @@ ColorlibStepIcon.propTypes = {
 export default function Steppers() {
   const steps = [
     { label: 'Datos Personales', formComponent: <PersonalForm /> },
-    { label: 'Producto', formComponent: <ProtectObjectsTable /> },
-    { label: 'Forma de Pago', formComponent: <PaidForm /> },
+    { label: 'Producto', formComponent: <ProductListCards /> },
+    { label: 'Riesgo', formComponent: <ProtectObjectsTable /> },
+    { label: 'Pago', formComponent: <PaidForm /> },
+    { label: 'Pasarela de Pago', formComponent: <PaymentMethods /> },
   ];
 
   // const steps2 = ['Datos Personales', 'Producto', 'Forma de Pago'];

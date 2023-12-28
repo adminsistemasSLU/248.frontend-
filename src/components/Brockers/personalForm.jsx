@@ -10,7 +10,7 @@ const PersonalForm = () => {
     name: '',
     lastname: '',
     email: '',
-    password: '',
+    phone:'',
     documentType: '',
     identification: '',
     age: '',
@@ -95,6 +95,18 @@ const PersonalForm = () => {
                 type="number"
                 name="age"
                 value={formData.age}
+                onChange={handleChange}
+                variant="standard"
+                fullWidth
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Telefono"
+                type="text"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
                 variant="standard"
                 fullWidth

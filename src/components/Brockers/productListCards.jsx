@@ -1,0 +1,68 @@
+import React from 'react';
+import { Card, CardContent, CardMedia, Container, Grid, Typography } from '@mui/material';
+import '../../styles/carrousel.scss';
+
+const ProductListCards = () => {
+  // Definición de datos para las cartas
+  const data = [
+    {
+      imagen: process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/industria-pesada.jpg',
+      titulo: 'Industrias',
+      descripcion: 'Descripción breve de la carta 1.',
+    },
+    {
+      imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/oficinas.jpg',
+      titulo: 'Oficina',
+      descripcion: 'Descripción breve de la carta 2.',
+    },
+    {
+      imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/edificios.jpg',
+      titulo: 'Edificios',
+      descripcion: 'Descripción breve de la carta 3.',
+    },
+    {
+        imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/locales.jpg',
+        titulo: 'Locales comerciales',
+        descripcion: 'Descripción breve de la carta 1.',
+      },
+      {
+        imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/consultorios.jpg',
+        titulo: 'Consultorios ',
+        descripcion: 'Descripción breve de la carta 2.',
+      },
+      {
+        imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/colegios.jpg',
+        titulo: 'Colegios y Unidades Educativas',
+        descripcion: 'Descripción breve de la carta 3.',
+      },
+  ];
+
+  return (
+    <Container style={{ marginBottom: 80 }} >
+      <Grid container spacing={2}>
+        {data.map((item, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-content'>
+            <Card style={{ maxWidth: 240 }} >
+              <CardMedia
+                component="img"
+                height="200"
+                image={item.imagen}
+                alt={item.titulo}
+              />
+              <CardContent>
+                <Typography variant="h6" component="div">
+                  {item.titulo}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {item.descripcion}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
+  );
+};
+
+export default ProductListCards;
