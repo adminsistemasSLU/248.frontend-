@@ -20,21 +20,6 @@ const ProductListCards = ({ onNext }) => {
       titulo: 'Edificios',
       descripcion: 'Descripción breve de la carta 3.',
     },
-    {
-        imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/locales.jpg',
-        titulo: 'Locales comerciales',
-        descripcion: 'Descripción breve de la carta 1.',
-      },
-      {
-        imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/consultorios.jpg',
-        titulo: 'Consultorios ',
-        descripcion: 'Descripción breve de la carta 2.',
-      },
-      {
-        imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/colegios.jpg',
-        titulo: 'Colegios y Unidades Educativas',
-        descripcion: 'Descripción breve de la carta 3.',
-      },
   ];
 
   const handleCardClick = (index) => {

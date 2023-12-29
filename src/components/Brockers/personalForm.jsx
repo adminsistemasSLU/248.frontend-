@@ -34,7 +34,7 @@ const PersonalForm = () => {
       style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
     >
       <Paper elevation={3} style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '20px' }}>
-        <FormControl component="form" onSubmit={handleSubmit} className='form'>
+        <FormControl component="form" variant="standard" onSubmit={handleSubmit} className='form'>
           <Grid container spacing={2}>
             <Grid item xs={12}>
             <InputLabel id="documentType-Label">Seleccione documento</InputLabel>
@@ -44,6 +44,7 @@ const PersonalForm = () => {
                 name="documentType"
                 value={formData.documentType}
                 onChange={handleChange}
+                style={{textAlign:'left'}}
                 variant="standard"
                 fullWidth
                 required
@@ -65,7 +66,7 @@ const PersonalForm = () => {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <TextField
                 label="Nombres"
                 type="text"
@@ -77,7 +78,7 @@ const PersonalForm = () => {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <TextField
                 label="Apellidos"
                 type="text"

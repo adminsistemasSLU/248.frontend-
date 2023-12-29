@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Grid, Paper } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import '../../styles/form.scss';
@@ -43,36 +44,41 @@ const PaidForm = () => {
         <div component="form" >
           <Grid container spacing={2}>
             <Grid item xs={12}>
-            <InputLabel id="documentType-Label">Tipo de credito</InputLabel>
-              <Select
-                labelId="documentType-Label"
-                id="documentType"
-                name="documentType"
-                value={formData.documentType}
-                onChange={handleChange}
-                variant="standard"
-                fullWidth
-                required
-              >
-                <MenuItem value="deb">Debito Automatico</MenuItem>
-                
-              </Select>
+            <FormControl sx={{ m: 1, minWidth: 290 }}  variant="standard">
+              <InputLabel id="documentType-Label">Tipo de credito</InputLabel>
+                <Select
+                  labelId="documentType-Label"
+                  id="documentType"
+                  name="documentType"
+                  value={formData.documentType}
+                  onChange={handleChange}
+                  style={{textAlign:'left'}}
+                  variant="standard"
+                  fullWidth
+                  required
+                >
+                  <MenuItem value="deb">Debito Automatico</MenuItem>
+                  
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
+            <FormControl sx={{ m: 1, minWidth: 290 }}  variant="standard"> 
             <InputLabel id="paidForm-Label">Forma de pago</InputLabel>
               <Select
                 labelId="paidForm-Label"
-                id="documentType"
-                name="documentType"
-                value={formData.documentType}
+                id="paidForm"
+                name="paidForm"
+                value={formData.paidForm}
                 onChange={handleChange}
+                style={{textAlign:'left'}}
                 variant="standard"
                 fullWidth
                 required
               >
                 <MenuItem value="pgiguales">Pagos iguales</MenuItem>
-                
               </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField

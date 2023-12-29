@@ -385,7 +385,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             </div>
           </div>
           <div style={{ display: 'flex', marginLeft:'5px', marginRight:'20px', alignItems: 'center',justifyContent:'end' }}>
-            <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
+            {/* <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button> */}
           </div>
         </div>
 

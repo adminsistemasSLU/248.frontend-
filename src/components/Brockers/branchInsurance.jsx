@@ -44,14 +44,14 @@ const headCells = [
     id: 'descripcion',
     numeric: true,
     disablePadding: false,
-    label: 'descripcion',
+    label: 'Descripción',
   }
   , 
   {
     id: 'accion',
     numeric: true,
     disablePadding: false,
-    label: 'accion',
+    label: 'Acción',
   }
 ];
 
@@ -223,7 +223,7 @@ export default function BranchInsurance({ closeModalDetail }) {
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
           size={'small'}
-          style={{ height: 100 }}
+          style={{ height: 150 }}
         >
           <EnhancedTableHead
             rowCount={rows.length}
@@ -257,10 +257,11 @@ export default function BranchInsurance({ closeModalDetail }) {
                         {row.ramo}
                         </div>
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell align="left">
                       {/* Campo editable con CurrencyInput */}
                       <input
                         className='input-table'
+                        style={{textAlign:'left'}}
                         value={editableValues[index].descripcion}
                         onChange={(event) =>
                         handleCellValueChange(event, index, 'descripcion')
