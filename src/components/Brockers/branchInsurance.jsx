@@ -5,81 +5,53 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
-
 import { styled } from '@mui/material/styles';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
 import '../../styles/detailQuoter.scss';
 import CloseIcon from '@mui/icons-material/Close';
-import CurrencyInput from '../../utils/currencyInput';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import DetailObjectsTable from './detailObjectsTable';
 
-function createData(id, cobertura, monto, tasa, prima, titulo) {
+function createData(id, ramo,descripcion) {
   return {
     id,
-    cobertura,
-    monto,
-    tasa,
-    prima,
-    titulo
+    ramo,
+    descripcion
   };
 }
 
 const rows = [
-  createData(1, 'Edificio con todas sus instalaciones fijas y permanentes (Estructuras)', 305, 3.7, 67, false),
-  createData(2, 'Maquinarias y equipos', 452, 25.0, 51, false),
-  createData(3, 'Muebles, enseres y equipos de oficina', 262, 16.0, 24, false),
-  createData(4, 'Equipo electrónico fijo y portátil', 159, 6.0, 24, false),
-  createData(5, 'AMPAROS ADICIONALES QUE SUMAN CAPITAL', 356, 16.0, 49, true),
-  createData(6, 'Remocion de escombros', 408, 3.2, 87, false),
-  createData(7, 'Honorarios de Ingenieros Arquitectos y topografos', 237, 9.45, 4, false),
-  createData(8, 'Documentos y modelos', 375, 0.0, 94, false),
-  createData(9, 'AMPAROS ADICIONALES CON COSTOS', 518, 26.0, 65, true),
-  createData(10, 'Terrorismo y/o sabotaje', 392, 0.2, 98, false),
-  createData(11, 'Responsabilidad civil Extracontractual', 318, 0, 81, false),
-
+  createData(1, 'Incendio','' ),
+  createData(2, 'Robo', ''),
+  createData(3, 'Componentes electronicos', ''),
 ];
 
 const headCells = [
+  
   {
-    id: 'id',
-    numeric: false,
-    disablePadding: true,
-    label: '#',
-  },
-  {
-    id: 'cobertura',
+    id: 'ramo',
     numeric: false,
     disablePadding: false,
-    label: 'cobertura',
-  },
+    label: 'Ramo',
+  }, 
+  {
+    id: 'descripcion',
+    numeric: true,
+    disablePadding: false,
+    label: 'descripcion',
+  }
+  , 
   {
     id: 'accion',
-    numeric: false,
+    numeric: true,
     disablePadding: false,
     label: 'accion',
-  },
-  {
-    id: 'monto',
-    numeric: true,
-    disablePadding: false,
-    label: 'monto',
-  },
-  {
-    id: 'tasa',
-    numeric: true,
-    disablePadding: false,
-    label: 'tasa',
-  },
-  {
-    id: 'prima',
-    numeric: true,
-    disablePadding: false,
-    label: 'prima',
   }
 ];
 
@@ -145,7 +117,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-
   '&:last-child td, &:last-child th': {
     borderBottom: '1px solid black'
   },
@@ -178,31 +149,27 @@ function getComparator(order, orderBy) {
 }
 
 
-
-
-
-export default function DetailObjectsTable({ closeModalDetail }) {
+export default function BranchInsurance({ closeModalDetail }) {
   const [order,] = React.useState('asc');
   const [orderBy,] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [selected,] = React.useState([]);
+  const [page, ] = React.useState(0);
+  const [rowsPerPage, ] = React.useState(10);
+  const [openModal, setOpenModal] = React.useState(false);
 
-  const [editableRows, setEditableRows] = React.useState(rows);
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  // Manejador para cerrar el modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
-    rows.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
+    rows.map((row) => ({ descripcion: row.descripcion }))
   );
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   const closeModal = () => {
     closeModalDetail('true');
@@ -211,43 +178,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-    setSelected(newSelected);
-
-  };
-
   const handleCellValueChange = (event, index, field) => {
     const newValue = event.target.value;
     const newEditableValues = [...editableValues];
     newEditableValues[index][field] = newValue;
     setEditableValues(newEditableValues);
-  };
-
-  const handleSaveChanges = () => {
-    // Actualizar los valores editables en el estado principal (editableRows)
-    const newEditableRows = editableRows.map((row, index) => ({
-      ...row,
-      monto: editableValues[index].monto,
-      tasa: editableValues[index].tasa,
-      prima: editableValues[index].prima,
-    }));
-    setEditableRows(newEditableRows);
-    console.log(newEditableRows);
   };
 
   const visibleRows = React.useMemo(
@@ -262,15 +197,33 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   return (
     <div style={{ height: 400, width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
-        <div>Detalle de Amparo</div>
+        <div>Descripcion de Ramo</div>
         <div onClick={closeModal}> <CloseIcon /></div>
       </div>
+
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
+        PaperProps={{
+          style: {
+            backgroundColor: '#ffffff',
+            boxShadow: 'none',
+            width: '70%',
+            overflow: 'hidden',
+            zIndex: '2000'
+          },
+        }}>
+        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }}>
+          {/* Componente del formulario */}
+          <DetailObjectsTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
+        </DialogContent>
+      </Dialog>
+
+
       <TableContainer style={{ overflow: 'auto', height: 300, padding: '20px' }}>
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
           size={'small'}
-          style={{ height: 400 }}
+          style={{ height: 100 }}
         >
           <EnhancedTableHead
             rowCount={rows.length}
@@ -285,24 +238,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                 !row.titulo ? (
                   <StyledTableRow
                     hover
-                    role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
-                    selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
                     key={row.id}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        onClick={(event) => handleClick(event, row.id)}
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                        key={row.id}
-                      />
-                    </TableCell>
                     <TableCell
                       component="th"
                       id={labelId}
@@ -311,38 +251,25 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     >
                       {row.id}
                     </TableCell>
-                    <TableCell align="left">{row.cobertura}</TableCell>
                     <TableCell align="left">
-                      {isItemSelected ? (<VisibilityIcon />) : (<div></div>)}
+                      {/* Campo editable con CurrencyInput */}
+                      <div className='input-table' style={{textAlign:'left'}}>
+                        {row.ramo}
+                        </div>
                     </TableCell>
                     <TableCell align="right">
                       {/* Campo editable con CurrencyInput */}
-                      <CurrencyInput
+                      <input
                         className='input-table'
-                        value={editableValues[index].monto}
+                        value={editableValues[index].descripcion}
                         onChange={(event) =>
-                          handleCellValueChange(event, index, 'monto')
+                        handleCellValueChange(event, index, 'descripcion')
                         }
                       />
                     </TableCell>
                     <TableCell align="right">
-                      {/* Campo editable con CurrencyInput */}
-                      <CurrencyInput
-                        className='input-table'
-                        value={editableValues[index].tasa}
-                        onChange={(event) =>
-                          handleCellValueChange(event, index, 'tasa')
-                        }
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      {/* Campo editable con CurrencyInput */}
-                      <CurrencyInput
-                        className='input-table'
-                        value={editableValues[index].prima}
-                        onChange={(event) =>
-                          handleCellValueChange(event, index, 'prima')
-                        }
+                      <EventAvailableIcon
+                            onClick={handleOpenModal}
                       />
                     </TableCell>
                   </StyledTableRow>
@@ -358,42 +285,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           </TableBody>
         </Table>
       </TableContainer>
-      <div className='paginationResponsive' style={{ justifyContent: 'space-between', gap: '15px' }}>
-        <TablePagination
-          style={{ justifySelf: 'flex-start' }}
-          rowsPerPageOptions={[10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-        <div className='paginationResponsive' >
-          <div className='elementsModal' style={{ marginRight:'10px', gap: '50px' }}>
-            <div>Monto: </div>
-            <div>
-              $305
-            </div>
-          </div>
-          <div className='elementsModal elementRight'  style={{  gap: '50px' }}>
-            <div>
-              Prima:
-            </div>
-            <div>
-              $67
-            </div>
-          </div>
-          <div style={{ display: 'flex', marginLeft:'5px', marginRight:'20px', alignItems: 'center',justifyContent:'end' }}>
-            <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
-          </div>
-        </div>
-
-
-      </div>
-
-
-
+      
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardMedia, Container, Grid, Typography } from '@mui/material';
 import '../../styles/carrousel.scss';
 
-const ProductListCards = () => {
+const ProductListCards = ({ onNext }) => {
   // Definición de datos para las cartas
   const data = [
     {
@@ -37,11 +37,16 @@ const ProductListCards = () => {
       },
   ];
 
+  const handleCardClick = (index) => {
+    // Llama a la función onNext cuando se hace clic en una carta y pasa el índice como argumento.
+    onNext(index);
+  };
+
   return (
     <Container style={{ marginBottom: 80 }} >
       <Grid container spacing={2}>
         {data.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-content'>
+          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-content' onClick={() => handleCardClick(index)}>
             <Card style={{ maxWidth: 240 }} >
               <CardMedia
                 component="img"

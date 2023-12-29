@@ -74,12 +74,12 @@ function ColorlibStepIcon(props) {
     1: <PersonIcon />,
     2: <ProductionQuantityLimitsIcon />,
     3: <LocalFireDepartmentIcon />,
-    4: <PaidIcon/>,
-    5: <AddShoppingCartIcon/>
+    4: <PaidIcon />,
+    5: <AddShoppingCartIcon />
   };
 
   return (
-    <ColorlibStepIconRoot  style={{aspectRatio:'1/1'}} ownerState={{ completed, active }} className={className}>
+    <ColorlibStepIconRoot style={{ aspectRatio: '1/1' }} ownerState={{ completed, active }} className={className}>
       {icons[String(props.icon)]}
     </ColorlibStepIconRoot>
   );
@@ -103,23 +103,29 @@ ColorlibStepIcon.propTypes = {
   icon: PropTypes.node,
 };
 
-
-
-
-
 export default function Steppers() {
+  const handleNext = (formData) => {
+    // Actualiza el estado formData con los datos recibidos
+    setFormData(formData);
+
+    const newActiveStep =
+      isLastStep() && !allStepsCompleted()
+        ? steps.findIndex((step, i) => !(i in completed))
+        : activeStep + 1;
+    setActiveStep(newActiveStep);
+  };
+  
   const steps = [
     { label: 'Datos Personales', formComponent: <PersonalForm /> },
-    { label: 'Producto', formComponent: <ProductListCards /> },
-    { label: 'Riesgo', formComponent: <ProtectObjectsTable /> },
-    { label: 'Pago', formComponent: <PaidForm /> },
-    { label: 'Pasarela de Pago', formComponent: <PaymentMethods /> },
+    { label: 'Producto', formComponent: <ProductListCards onNext={handleNext} /> },
+    { label: 'Riesgo', formComponent: <ProtectObjectsTable onNext={handleNext} /> },
+    { label: 'Pago', formComponent: <PaidForm onNext={handleNext} /> },
+    { label: 'Pasarela de Pago', formComponent: <PaymentMethods onNext={handleNext} /> },
   ];
-
-  // const steps2 = ['Datos Personales', 'Producto', 'Forma de Pago'];
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed] = React.useState({});
+  const [formData, setFormData] = React.useState({});
 
   const totalSteps = () => {
     return steps.length;
@@ -137,37 +143,27 @@ export default function Steppers() {
     return completedSteps() === totalSteps();
   };
 
-  const handleNext = () => {
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed,
-        // find the first step that has been completed
-        steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
-  };
+  
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-
   return (
     <Stack className={'stack-content'} spacing={4}>
       <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
         {steps.map((step, index) => (
-          <Step  key={index}>
+          <Step key={index}>
             <StepLabel StepIconComponent={ColorlibStepIcon}>
               {step.label}
             </StepLabel>
-           
           </Step>
         ))}
       </Stepper>
-      <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center' , marginBottom: '10%'}}>
-        <Box style={{width:'90%'}} >
-          {steps[activeStep].formComponent}
-          <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', gap: '10%'  }}>
+      <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', marginBottom: '10%' }}>
+        <Box style={{ width: '90%' }} >
+          {React.cloneElement(steps[activeStep].formComponent, { formData, onNext: handleNext })}
+          <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', gap: '10%' }}>
             <Button
               disabled={activeStep === 0}
               onClick={handleBack}
@@ -176,13 +172,9 @@ export default function Steppers() {
             >
               Regresar
             </Button>
-
-
-            
             <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper'>
               Siguiente
             </Button>
-           
           </div>
         </Box>
       </div>

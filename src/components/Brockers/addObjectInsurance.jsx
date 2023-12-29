@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DetailObjectsTable from './detailObjectsTable';
+import BranchInsurance from './branchInsurance';
 import Tooltip from '@mui/material/Tooltip';
 import '../../styles/moddalForm.scss';
 import '../../styles/dialogForm.scss';
@@ -105,7 +105,7 @@ const AddObjectInsurance = ({ closeModal }) => {
         }}>
         <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }}>
           {/* Componente del formulario */}
-          <DetailObjectsTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
+          <BranchInsurance closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
         </DialogContent>
       </Dialog>
 
