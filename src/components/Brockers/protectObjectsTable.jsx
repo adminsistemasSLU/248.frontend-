@@ -24,7 +24,7 @@ import { visuallyHidden } from '@mui/utils';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import AddObjectInsurance from './addObjectInsurance';
-import '../../styles/form.scss';
+import '../../styles/dialogForm.scss';
 
 function createData(number, province, city, direction, risk, amount, prima, rate) {
   return {
@@ -326,16 +326,17 @@ export default function ProtectObjectsTable() {
     <div style={{width:'100%'}}>
 
       {/* Modal */}
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
+      <Dialog open={openModal} onClose={handleCloseModal}  maxWidth="xl"
       className='outerDialog'
         PaperProps={{
           style: {
             backgroundColor: '#ffffff00',
             boxShadow: 'none',
             overflow:'hidden',
+            width:'100%'
           },
         }}>
-        <DialogContent className='dialog-content' style={{overflow:'auto'}}>
+        <DialogContent className='dialog-content'>
           {/* Componente del formulario */}
           <AddObjectInsurance closeModal={handleCloseModal} />
         </DialogContent>
@@ -361,7 +362,6 @@ export default function ProtectObjectsTable() {
                  aria-labelledby="tableTitle"
                  size={'small'}
                  style={{ height: 150 }}
-
               >
                 <EnhancedTableHead
                   numSelected={selected.length}

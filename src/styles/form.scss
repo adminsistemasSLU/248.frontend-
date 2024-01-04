@@ -42,7 +42,16 @@
         flex-direction: column;
     }
 }
-.datePicker {
-    width: 94%;
+.datePicker , .hourPicker {
+    width: 100%;
     overflow: hidden;
+}
+
+.datePicker div div button, .hourPicker  div div button{
+    margin: 0;
+    
+}
+
+.hourPicker >div {
+    width: 69%;
 }

@@ -1,14 +1,43 @@
 .dialog-Form{
     width: 100%;
+    overflow-y: hidden;
     @media (max-width: 600px) {
         width: 100%;
+        padding: 0;
+        overflow-y: scroll;
     }
 }
 
 
 .dialog-content{
     min-width: 600px;
+    
     @media (max-width: 600px) {
         min-width: 300px;
+        padding: 0 !important;
+       
+    }
+}
+
+.outerDialog{
+    width: 100%;
+    @media(max-width: 600px) {
+        width: 100%;
+        padding: 0 ;
+    }
+}
+
+.dialog-height{
+    height: 90vh;
+    
+    @media(max-width: 600px) {
+        height: 90vh;
+        width: 100%;
+    }
+}
+.dialog-height-content{
+    @media(max-width: 600px) {
+        height: 90vh;
+        width: 100%;
     }
 }

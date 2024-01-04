@@ -31,7 +31,7 @@ const ProductListCards = ({ onNext }) => {
     <Container style={{ marginBottom: 80 }} >
       <Grid container spacing={2}>
         {data.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-content' onClick={() => handleCardClick(index)}>
+          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-container' onClick={() => handleCardClick(index)}>
             <Card style={{ maxWidth: 240 }} >
               <CardMedia
                 component="img"

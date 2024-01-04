@@ -10,7 +10,7 @@ import BranchInsurance from './branchInsurance';
 import Tooltip from '@mui/material/Tooltip';
 import '../../styles/moddalForm.scss';
 import '../../styles/dialogForm.scss';
-import dayjs from 'dayjs';
+import '../../styles/form.scss';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -95,21 +95,21 @@ const AddObjectInsurance = ({ closeModal }) => {
     <Container
       component="main"
       className='dialog-Form'
-      style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
+      style={{ padding:0, minHeight: '80vh', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
     >
 
 
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" className='dialog-height'
         PaperProps={{
           style: {
             backgroundColor: '#ffffff',
             boxShadow: 'none',
-            width: '70%',
+          
             overflow: 'hidden',
             zIndex: '2000'
           },
         }}>
-        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }}>
+        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
           {/* Componente del formulario */}
           <BranchInsurance closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
         </DialogContent>
@@ -133,7 +133,7 @@ const AddObjectInsurance = ({ closeModal }) => {
         <div className='modalFormColumn'>
 
 
-          <Paper elevation={3} className='modalContent' style={{ paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Paper elevation={3} className='modalContent' style={{overflowY:'scroll', height: '50vh' , paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
             <form component="form" onSubmit={handleSubmit} className='form'>
               <table container spacing={2} >
@@ -549,7 +549,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Fecha Tentativa" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'right' }}>
+                        <td style={{ width: '30%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'    }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Fecha:</b>
@@ -558,8 +558,8 @@ const AddObjectInsurance = ({ closeModal }) => {
                         </td>
                         <td style={{ width: '70%' }}>
                           <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DemoContainer components={['DatePicker']}>
-                              <DatePicker label="Basic date picker" />
+                            <DemoContainer components={['DatePicker']}  sx={{overflow:'hidden'}}>
+                              <DatePicker className='hourPicker'  style={{overflow:'hidden'}}   slotProps={{ textField: {variant: 'standard', size:'small'} }} />
                             </DemoContainer>
                           </LocalizationProvider>
                         </td>
@@ -570,19 +570,19 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Hora tentativa" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'right' }}>
+                        <td style={{ width: '30%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'   }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Hora:</b>
                           </label>
-
                         </td>
-                        <td style={{ width: '70%' }}>
-                          <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <td style={{ width: '70%', }} >
+                          <LocalizationProvider dateAdapter={AdapterDayjs} style={{overflow:'hidden'}}>
+                            <DemoContainer components={['TimePicker']} sx={{overflow:'hidden'}}>
                               <TimePicker
-                                label="Uncontrolled picker"
-                                defaultValue={dayjs('2022-04-17T15:30')}
+                              className='hourPicker' 
+                               slotProps={{ textField: {variant: 'standard', size:'small'} }}
+                               
                               />
 
                             </DemoContainer>
@@ -600,7 +600,7 @@ const AddObjectInsurance = ({ closeModal }) => {
               </Button>
             </form >
           </Paper>
-          <div className='modalContent' style={{ display: 'flex', alignItems: 'center' }}>
+          <div className='modalContent' style={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>
             <MapContainer
               ref={mapContainerRef}
               lat={formData.lat}

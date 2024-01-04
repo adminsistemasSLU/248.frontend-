@@ -9,7 +9,7 @@ const MapContainer = forwardRef(({ lat: externalLat, lon: externalLng, direccion
   const [position, setPosition] = useState({ lat: externalLat || -2.1894128, lng: externalLng || -79.8890662 });
 
   const mapContainerStyle = {
-    width: '100%',
+    width: '90%',
     height: '300px',
   };
 
@@ -141,7 +141,7 @@ const MapContainer = forwardRef(({ lat: externalLat, lon: externalLng, direccion
           <input type="text" value={position.lng} readOnly />
         </label>
       </div>
-      <GoogleMap
+      <GoogleMap 
         mapContainerStyle={mapContainerStyle}
         center={center}
         zoom={13}

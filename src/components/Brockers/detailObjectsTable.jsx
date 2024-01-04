@@ -260,12 +260,12 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   );
 
   return (
-    <div style={{ height: 400, width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
         <div>Detalle de Amparo</div>
         <div onClick={closeModal}> <CloseIcon /></div>
       </div>
-      <TableContainer style={{ overflow: 'auto', height: 300, padding: '20px' }}>
+      <TableContainer style={{ overflow: 'auto', height: '100%', padding: '20px' }}>
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"

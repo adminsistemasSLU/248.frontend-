@@ -215,30 +215,29 @@ export default function BranchInsurance({ closeModalDetail }) {
   );
 
   return (
-    <div style={{ height: 400, width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
         <div>Descripcion de Ramo</div>
         <div onClick={closeModal}> <CloseIcon /></div>
       </div>
 
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" className='dialog-height'
         PaperProps={{
           style: {
             backgroundColor: '#ffffff',
             boxShadow: 'none',
-            width: '70%',
             overflow: 'hidden',
             zIndex: '2000'
           },
         }}>
-        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }}>
+        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
           {/* Componente del formulario */}
           <DetailObjectsTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
         </DialogContent>
       </Dialog>
 
 
-      <TableContainer style={{ overflow: 'auto', height: 300, padding: '20px' }}>
+      <TableContainer style={{ overflow: 'auto', height: '100%', padding: '20px' }}>
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"

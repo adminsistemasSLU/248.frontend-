@@ -50,3 +50,19 @@
       margin-right: 10px; 
     }
   }
+
+
+  ::-webkit-scrollbar {
+    width: 10px; /* Ancho de la barra de desplazamiento */
+}
+
+/* Estilizar el "thumb" (la parte que se mueve) */
+::-webkit-scrollbar-thumb {
+    background: #00a99e; /* Color del thumb */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilizar el "track" (la pista de la barra) */
+::-webkit-scrollbar-track {
+    background: lightgray; /* Color de fondo del track */
+}
