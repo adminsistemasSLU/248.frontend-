@@ -18,41 +18,61 @@ import CloseIcon from '@mui/icons-material/Close';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import DetailObjectsTable from './detailObjectsTable';
 
-function createData(id, ramo,descripcion) {
+function createData(id, ramo, descripcion, monto, prima) {
   return {
     id,
     ramo,
-    descripcion
+    descripcion,
+    monto,
+    prima
   };
 }
 
 const rows = [
-  createData(1, 'Incendio','' ),
-  createData(2, 'Robo', ''),
-  createData(3, 'Componentes electronicos', ''),
+  createData(1, 'Incendio', '', 70, 7),
+  createData(2, 'Robo', '', 70, 7),
+  createData(3, 'Componentes electronicos', '', 70, 7),
 ];
 
 const headCells = [
-  
   {
     id: 'ramo',
     numeric: false,
     disablePadding: false,
     label: 'Ramo',
-  }, 
+    visible: true,
+  },
+  // {
+  //   id: 'descripcion',
+  //   numeric: true,
+  //   disablePadding: false,
+  //   label: 'Descripción',
+  //   visible: false,
+  // } 
   {
-    id: 'descripcion',
+    id: 'monto',
     numeric: true,
     disablePadding: false,
-    label: 'Descripción',
+    label: 'Monto',
+    visible: true,
   }
-  , 
+  ,
+  {
+    id: 'prima',
+    numeric: true,
+    disablePadding: false,
+    label: 'Prima',
+    visible: true,
+  }
+  ,
   {
     id: 'accion',
     numeric: true,
     disablePadding: false,
     label: 'Acción',
+    visible: true,
   }
+
 ];
 
 
@@ -153,8 +173,8 @@ export default function BranchInsurance({ closeModalDetail }) {
   const [order,] = React.useState('asc');
   const [orderBy,] = React.useState('calories');
   const [selected,] = React.useState([]);
-  const [page, ] = React.useState(0);
-  const [rowsPerPage, ] = React.useState(10);
+  const [page,] = React.useState(0);
+  const [rowsPerPage,] = React.useState(10);
   const [openModal, setOpenModal] = React.useState(false);
 
   const handleOpenModal = () => {
@@ -253,12 +273,11 @@ export default function BranchInsurance({ closeModalDetail }) {
                     </TableCell>
                     <TableCell align="left">
                       {/* Campo editable con CurrencyInput */}
-                      <div className='input-table' style={{textAlign:'left'}}>
+                      <div className='input-table' style={{ textAlign: 'left' }}>
                         {row.ramo}
-                        </div>
+                      </div>
                     </TableCell>
-                    <TableCell align="left">
-                      {/* Campo editable con CurrencyInput */}
+                    {/* <TableCell align="left">
                       <input
                         className='input-table'
                         style={{textAlign:'left'}}
@@ -267,10 +286,26 @@ export default function BranchInsurance({ closeModalDetail }) {
                         handleCellValueChange(event, index, 'descripcion')
                         }
                       />
+                    </TableCell> */}
+                    <TableCell align="right"
+                      component="th"
+                      id={labelId}
+                      scope="row"
+                      padding="none"
+                    >
+                      {row.monto}
+                    </TableCell>
+                    <TableCell align="right"
+                      component="th"
+                      id={labelId}
+                      scope="row"
+                      padding="none"
+                    >
+                      {row.prima}
                     </TableCell>
                     <TableCell align="right">
                       <EventAvailableIcon
-                            onClick={handleOpenModal}
+                        onClick={handleOpenModal}
                       />
                     </TableCell>
                   </StyledTableRow>
@@ -284,9 +319,26 @@ export default function BranchInsurance({ closeModalDetail }) {
               );
             })}
           </TableBody>
+        
         </Table>
+        <div className='paginationResponsive' style={{ justifyContent:'right'}}>
+            <div className='elementsModal' style={{ marginRight: '10px', gap: '50px' }}>
+              <div>Monto: </div>
+              <div>
+                $305
+              </div>
+            </div>
+            <div className='elementsModal elementRight' style={{ gap: '50px' }}>
+              <div>
+                Prima:
+              </div>
+              <div>
+                $67
+              </div>
+            </div>
+          </div>
       </TableContainer>
-      
+            
     </div>
   );
 }

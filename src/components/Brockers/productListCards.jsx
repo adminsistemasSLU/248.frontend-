@@ -7,7 +7,7 @@ const ProductListCards = ({ onNext }) => {
   const data = [
     {
       imagen: process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/industria-pesada.jpg',
-      titulo: 'Industrias',
+      titulo: 'Hogar',
       descripcion: 'Descripción breve de la carta 1.',
     },
     {

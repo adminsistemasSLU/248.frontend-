@@ -9,7 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
-
+import DescriptionIcon from '@mui/icons-material/Description';
 import { styled } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { visuallyHidden } from '@mui/utils';
@@ -313,7 +313,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     </TableCell>
                     <TableCell align="left">{row.cobertura}</TableCell>
                     <TableCell align="left">
-                      {isItemSelected ? (<VisibilityIcon />) : (<div></div>)}
+                      {isItemSelected ? (<DescriptionIcon />) : (<div></div>)}
                     </TableCell>
                     <TableCell align="right">
                       {/* Campo editable con CurrencyInput */}

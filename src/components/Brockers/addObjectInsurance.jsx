@@ -10,6 +10,12 @@ import BranchInsurance from './branchInsurance';
 import Tooltip from '@mui/material/Tooltip';
 import '../../styles/moddalForm.scss';
 import '../../styles/dialogForm.scss';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const AddObjectInsurance = ({ closeModal }) => {
   const [formData, setFormData] = useState({
@@ -521,7 +527,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         <td style={{ width: '30%', textAlign: 'right' }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Agente:</b>
+                            <b>Contacto:</b>
                           </label>
 
                         </td>
@@ -540,6 +546,51 @@ const AddObjectInsurance = ({ closeModal }) => {
                     </Tooltip>
                   )}
 
+                  {formData.inspection && ( // Verificar si inspection es true
+                    <Tooltip title="Fecha Tentativa" placement="left">
+                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                        <td style={{ width: '30%', textAlign: 'right' }}>
+
+                          <label style={{ fontSize: '13px' }} id="longitude-Label">
+                            <b>Fecha:</b>
+                          </label>
+
+                        </td>
+                        <td style={{ width: '70%' }}>
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={['DatePicker']}>
+                              <DatePicker label="Basic date picker" />
+                            </DemoContainer>
+                          </LocalizationProvider>
+                        </td>
+                      </tr>
+                    </Tooltip>
+                  )}
+
+                  {formData.inspection && ( // Verificar si inspection es true
+                    <Tooltip title="Hora tentativa" placement="left">
+                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+                        <td style={{ width: '30%', textAlign: 'right' }}>
+
+                          <label style={{ fontSize: '13px' }} id="longitude-Label">
+                            <b>Hora:</b>
+                          </label>
+
+                        </td>
+                        <td style={{ width: '70%' }}>
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={['TimePicker', 'TimePicker']}>
+                              <TimePicker
+                                label="Uncontrolled picker"
+                                defaultValue={dayjs('2022-04-17T15:30')}
+                              />
+
+                            </DemoContainer>
+                          </LocalizationProvider>
+                        </td>
+                      </tr>
+                    </Tooltip>
+                  )}
                 </tbody>
               </table>
 

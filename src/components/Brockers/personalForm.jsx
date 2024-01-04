@@ -4,13 +4,18 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import '../../styles/form.scss';
 const PersonalForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     lastname: '',
     email: '',
-    phone:'',
+    phone: '',
     documentType: '',
     identification: '',
     age: '',
@@ -20,6 +25,8 @@ const PersonalForm = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const [age, setAge] = React.useState();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,14 +44,14 @@ const PersonalForm = () => {
         <FormControl component="form" variant="standard" onSubmit={handleSubmit} className='form'>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-            <InputLabel id="documentType-Label">Seleccione documento</InputLabel>
+              <InputLabel id="documentType-Label">Seleccione documento</InputLabel>
               <Select
                 labelId="documentType-Label"
                 id="documentType"
                 name="documentType"
                 value={formData.documentType}
                 onChange={handleChange}
-                style={{textAlign:'left'}}
+                style={{ textAlign: 'left' }}
                 variant="standard"
                 fullWidth
                 required
@@ -90,17 +97,20 @@ const PersonalForm = () => {
                 required
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Edad"
-                type="number"
-                name="age"
-                value={formData.age}
-                onChange={handleChange}
-                variant="standard"
-                fullWidth
-                required
-              />
+
+            <Grid item xs={12} md={12}>
+
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={['DatePicker']}>
+                  <DatePicker
+                    label="Fecha de nacimiento"
+                    slotProps={{ textField: {variant: 'standard', size:'small'} }}
+                    value={age}
+                    className='datePicker'
+                    onChange={(newValue) => setAge(newValue)}
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
             </Grid>
             <Grid item xs={12}>
               <TextField
