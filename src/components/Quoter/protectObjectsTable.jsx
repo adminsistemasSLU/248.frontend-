@@ -17,6 +17,7 @@ import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+import CurrencyInput from '../../utils/currencyInput';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
@@ -26,13 +27,12 @@ import AddObjectInsurance from './addObjectInsurance';
 import '../../styles/dialogForm.scss';
 import EditIcon from '@mui/icons-material/Edit';
 
-function createData(number, province, city, direction, risk, amount, prima, rate) {
+function createData(number, province, city, direction, amount, prima, rate) {
   return {
     number,
     province,
     city,
     direction,
-    risk,
     amount,
     prima,
     rate
@@ -40,9 +40,7 @@ function createData(number, province, city, direction, risk, amount, prima, rate
 }
 
 const rows = [
-  createData(1, 'Guayas', 'Guayaquil', 'Av 9 de Octubre', '20%', 4.3, 3.7, 67),
-  createData(2, 'Pichincha', 'Quito', 'Sangolqui', '15%', 4.9, 3.7, 67),
-
+  createData(1, 'Guayas', 'Guayaquil', 'Av 9 de Octubre', 958000.00 , 0.52, 495.00),
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -99,12 +97,12 @@ const headCells = [
     disablePadding: false,
     label: 'Dirección',
   },
-  {
-    id: 'risk',
-    numeric: true,
-    disablePadding: false,
-    label: 'T.Riesgo',
-  },
+  // {
+  //   id: 'risk',
+  //   numeric: true,
+  //   disablePadding: false,
+  //   label: 'T.Riesgo',
+  // },
   {
     id: 'amount',
     numeric: true,
@@ -142,7 +140,7 @@ function EnhancedTableHead(props) {
     <TableHead >
       <TableRow >
         <StyledTableCell padding="checkbox">
-        
+
         </StyledTableCell>
         {headCells.map((headCell) => (
           <StyledTableCell
@@ -359,7 +357,7 @@ export default function ProtectObjectsTable() {
                 sx={{ minWidth: 750 }}
                 aria-labelledby="tableTitle"
                 size={'small'}
-                style={{ height: 150 }}
+                style={{ height: 50 }}
               >
                 <EnhancedTableHead
                   numSelected={selected.length}
@@ -379,7 +377,7 @@ export default function ProtectObjectsTable() {
                     return (
                       <StyledTableRow
                         hover
-                        
+
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -388,7 +386,7 @@ export default function ProtectObjectsTable() {
                         sx={{ cursor: 'pointer' }}
                       >
                         <TableCell padding="checkbox">
-                         
+
                         </TableCell>
                         <TableCell
                           component="th"
@@ -401,20 +399,26 @@ export default function ProtectObjectsTable() {
                         <TableCell align="right">{row.province}</TableCell>
                         <TableCell align="right">{row.city}</TableCell>
                         <TableCell align="right">{row.direction}</TableCell>
-                        <TableCell align="right">{row.risk}</TableCell>
-                        <TableCell align="right">{row.amount}</TableCell>
-                        <TableCell align="right">{row.rate}</TableCell>
-                        <TableCell align="right">{row.prima}</TableCell>
+
                         <TableCell align="right">
-                          <div  style={{display: 'flex', justifyContent:'end'}}>
-                          <IconButton>
-                            <EditIcon  onClick={handleOpenModal} />
-                          </IconButton>
-                          <IconButton>
-                            <DeleteIcon />
-                          </IconButton>
+                          <CurrencyInput value={row.amount.toFixed(2)} className='input-table' disabled />
+                        </TableCell>
+                        <TableCell align="right">
+                          <input value={row.prima.toFixed(2)+'%'} className='input-table' disabled />
+                        </TableCell>
+                        <TableCell align="right">
+                          <CurrencyInput value={row.rate.toFixed(2)} className='input-table' disabled />
+                        </TableCell>
+                        <TableCell align="right">
+                          <div style={{ display: 'flex', justifyContent: 'end' }}>
+                            <IconButton>
+                              <EditIcon onClick={handleOpenModal} />
+                            </IconButton>
+                            <IconButton>
+                              <DeleteIcon />
+                            </IconButton>
                           </div>
-                          
+
                         </TableCell>
                       </StyledTableRow>
                     );
@@ -440,7 +444,7 @@ export default function ProtectObjectsTable() {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage ='Filas por pagina'
+            labelRowsPerPage='Filas por pagina'
           />
         </Paper>
 

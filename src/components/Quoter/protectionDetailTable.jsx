@@ -244,7 +244,7 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
                     sx={{ minWidth: 750 }}
                     aria-labelledby="tableTitle"
                     size={'small'}
-                    style={{ height: 150 }}
+                    style={{ height: 50 }}
                 >
                     <TableHead>
                         <TableRow>

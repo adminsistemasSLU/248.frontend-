@@ -19,23 +19,31 @@ import CloseIcon from '@mui/icons-material/Close';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import DetailObjectsTable from './detailObjectsTable';
 
-function createData(id, ramo, descripcion, monto, prima) {
+function createData(id, ramo, descripcion, monto, tasa, prima) {
   return {
     id,
     ramo,
     descripcion,
     monto,
+    tasa,
     prima
   };
 }
 
 const rows = [
-  createData(1, 'Incendio', '', 950000., 300),
-  createData(2, 'Robo', '', 7800, 135),
-  createData(3, 'Componentes electronicos', '', 9000, 60),
+  createData(1, 'Incendio', '', 950000., 0.52, 300),
+  createData(2, 'Robo', '', 7800, 0.52, 135),
+  createData(3, 'Componentes electrónicos', '', 9000, 0.52, 60),
 ];
 
 const headCells = [
+  {
+    id: 'id',
+    numeric: false,
+    disablePadding: false,
+    label: '#',
+    visible: true,
+  },
   {
     id: 'seccion',
     numeric: false,
@@ -55,6 +63,14 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'Monto',
+    visible: true,
+  }
+  ,
+  {
+    id: 'tasa',
+    numeric: true,
+    disablePadding: false,
+    label: 'Tasa',
     visible: true,
   }
   ,
@@ -173,10 +189,11 @@ function getComparator(order, orderBy) {
 export default function BranchInsurance({ closeModalDetail }) {
   const [order,] = React.useState('asc');
   const [orderBy,] = React.useState('calories');
-  const [selected,] = React.useState([]);
+  const [selected, setSelected] = React.useState([]);
   const [page,] = React.useState(0);
   const [rowsPerPage,] = React.useState(10);
   const [openModal, setOpenModal] = React.useState(false);
+  const [editableRows, setEditableRows] = React.useState(rows);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -188,14 +205,53 @@ export default function BranchInsurance({ closeModalDetail }) {
   };
 
   // Nuevo estado para rastrear los valores editables
-  // const [editableValues, setEditableValues] = React.useState(
-  //   rows.map((row) => ({ descripcion: row.descripcion }))
-  // );
+  const [editableValues, setEditableValues] = React.useState(
+    rows.map((row) => ({ descripcion: row.descripcion }))
+  );
+
+  const handleSaveChanges = () => {
+    // Actualizar los valores editables en el estado principal (editableRows)
+    const newEditableRows = editableRows.map((row, index) => ({
+      ...row,
+      monto: editableValues[index].monto,
+      tasa: editableValues[index].tasa,
+      prima: editableValues[index].prima,
+    }));
+    setEditableRows(newEditableRows);
+    console.log(newEditableRows);
+  };
+
+  React.useEffect(() => {
+    setEditableValues(
+      rows.map((row) => ({
+        monto: row.monto, tasa: row.tasa, prima: row.prima
+      }))
+    );
+  }, []);
 
   const closeModal = () => {
     closeModalDetail('true');
   };
 
+  const handleClick = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
+    setSelected(newSelected);
+
+  };
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
@@ -242,7 +298,7 @@ export default function BranchInsurance({ closeModalDetail }) {
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
-          size={'small'}
+          size="small"
           style={{ height: 150 }}
         >
           <EnhancedTableHead
@@ -263,6 +319,17 @@ export default function BranchInsurance({ closeModalDetail }) {
                     sx={{ cursor: 'pointer' }}
                     key={row.id}
                   >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        onClick={(event) => handleClick(event, row.id)}
+                        color="primary"
+                        checked={isItemSelected}
+                        inputProps={{
+                          'aria-labelledby': labelId,
+                        }}
+                        key={row.id}
+                      />
+                    </TableCell>
                     <TableCell
                       component="th"
                       id={labelId}
@@ -293,7 +360,15 @@ export default function BranchInsurance({ closeModalDetail }) {
                       scope="row"
                       padding="none"
                     >
-                     <CurrencyInput className='input-table' disabled value={row.monto.toFixed(2)} />
+                      <CurrencyInput className='input-table' disabled value={row.monto.toFixed(2)} />
+                    </TableCell>
+                    <TableCell align="right"
+                      component="th"
+                      id={labelId}
+                      scope="row"
+                      padding="none"
+                    >
+                      <input className='input-table' disabled value={row.tasa.toFixed(2)+'%'} />
                     </TableCell>
                     <TableCell align="right"
                       component="th"
@@ -319,26 +394,28 @@ export default function BranchInsurance({ closeModalDetail }) {
               );
             })}
           </TableBody>
-        
+
         </Table>
-        <div className='' style={{ display:'flex',justifyContent:'end'}}>
-            <div className='elementsModal' style={{ marginRight: '10px', gap: '5px' }}>
-              <div>Monto: </div>
-              <div>
-              <CurrencyInput style={{width:'105px'}} className='input-table' disabled value={(958000).toFixed(2)} />
-              </div>
-            </div>
-            <div className='elementsModal elementRight' style={{ gap: '5px' }}>
-              <div>
-                Prima:
-              </div>
-              <div>
-              <CurrencyInput style={{width:'105px'}} className='input-table' disabled value={(495).toFixed(2)} />
-              </div>
+        <div className='' style={{ display: 'flex', justifyContent: 'end' }}>
+          <div className='elementsModal' style={{ marginRight: '10px', gap: '5px' }}>
+            <div>Monto: </div>
+            <div>
+              <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={(958000).toFixed(2)} />
             </div>
           </div>
+          <div className='elementsModal elementRight' style={{ gap: '5px' }}>
+            <div>
+              Prima:
+            </div>
+            <div>
+              <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={(495).toFixed(2)} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'end' }}>
+            <button className='btnStepper btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
+          </div>
+        </div>
       </TableContainer>
-            
     </div>
   );
 }
