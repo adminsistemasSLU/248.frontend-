@@ -581,9 +581,9 @@ const AddObjectInsurance = ({ closeModal }) => {
                         </div>
                       </Tooltip>
 
-
+                      <Tooltip title="Hora tentativa" placement="left" style={{display:'flex'}}>
                       <div className='modalFormContent'>
-                        <Tooltip title="Hora tentativa" placement="left" style={{display:'flex'}}>
+                        
                           <td className=' tdTableTitle dateTimePickerForm'>
                             <label className='tdTableTitle' style={{ fontSize: '13px' }} id="longitude-Label">
                               <b>Hora:</b>
@@ -601,8 +601,9 @@ const AddObjectInsurance = ({ closeModal }) => {
                               </DemoContainer>
                             </LocalizationProvider>
                           </td>
-                        </Tooltip>
+                      
                       </div>
+                      </Tooltip>
                     </tr>
                   )}
 
