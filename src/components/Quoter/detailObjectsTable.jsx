@@ -64,7 +64,7 @@ const headCells = [
     id: 'accion',
     numeric: false,
     disablePadding: false,
-    label: 'accion',
+    label: 'acción',
   },
   {
     id: 'monto',

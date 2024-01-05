@@ -97,7 +97,7 @@ const headCells = [
     id: 'direction',
     numeric: true,
     disablePadding: false,
-    label: 'Direccion',
+    label: 'Dirección',
   },
   {
     id: 'risk',
@@ -127,7 +127,7 @@ const headCells = [
     id: 'action',
     numeric: true,
     disablePadding: false,
-    label: 'Accion',
+    label: 'Acción',
   },
 ];
 

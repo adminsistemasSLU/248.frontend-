@@ -32,7 +32,7 @@ function createData(id, ramo, descripcion, monto, prima) {
 const rows = [
   createData(1, 'Incendio', '', 950000., 300),
   createData(2, 'Robo', '', 7800, 135),
-  createData(3, 'Componentes electronicos', '', 9000, 60),
+  createData(3, 'Componentes electrónicos', '', 9000, 60),
 ];
 
 const headCells = [
