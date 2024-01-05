@@ -428,6 +428,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
+          labelRowsPerPage ='Filas por pagina'
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />

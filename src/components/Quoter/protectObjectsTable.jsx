@@ -440,6 +440,7 @@ export default function ProtectObjectsTable() {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage ='Filas por pagina'
           />
         </Paper>
 
