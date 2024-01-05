@@ -138,7 +138,7 @@ const AddObjectInsurance = ({ closeModal }) => {
           <Paper elevation={3} className='modalContent' style={{ overflowY: 'scroll', height: '50vh', paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
             <form component="form" onSubmit={handleSubmit} className='form'>
-              <table container spacing={2} >
+              <table container spacing={3} >
                 <tbody>
                   <tr className='modalFormRow' >
                     <div className='modalFormContent' >
@@ -210,7 +210,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                     </div>
                     <div className='modalFormContent'>
                       <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Direccion:</b>  </label>
+                        <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Dirección:</b>  </label>
                       </td>
                       <td className='tdTableData' style={{ display: 'flex', alignItems: 'center' }} >
                         <input
@@ -316,7 +316,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                   <tr className='modalFormRow' >
                     <div className='modalFormContent'>
                       <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T.Constuccion:</b>  </label>
+                        <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T.Construcción:</b>  </label>
                       </td>
                       <td className='tdTableData'>
                         <select
@@ -456,7 +456,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                   <tr className='modalFormRow' >
                     <div className='modalFormContent'>
                       <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Inspeccion:</b>  </label>
+                        <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Inspección:</b>  </label>
                       </td>
                       <td className='tdTableData'>
                         <input

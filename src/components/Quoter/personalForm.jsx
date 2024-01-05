@@ -24,7 +24,6 @@ const PersonalForm = () => {
   });
   const [error, setError] = useState('');
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
   
@@ -52,9 +51,10 @@ const PersonalForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Agregar lógica de envío del formulario si es necesario
+    
     console.log('Formulario enviado:', formData);
   };
+
 
   return (
     <Container
