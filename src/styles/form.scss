@@ -4,6 +4,7 @@
     justify-content: center;
     gap: 20px;
     padding-top: 2%;
+    width: 80%;
     @media(max-width: 750px) {
         padding-top: 5%;
     }
@@ -58,7 +59,7 @@
 }
 
 .hourPicker >div {
-    width: 69%;
+    width: 100%;
 }
 .modalFormRow{
     display: flex;
