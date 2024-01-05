@@ -132,9 +132,9 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
       }, [jsonData]); // Observa cambios en jsonData
       const [totalMonto, setTotalMonto] = React.useState(0);
 
-    const handleOpenModal = () => {
-        setOpenModal(true);
-    };
+    // const handleOpenModal = () => {
+    //     setOpenModal(true);
+    // };
 
     const handleCloseModal = () => {
         setOpenModal(false);
@@ -155,6 +155,20 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
         setTotalMonto(total);
     };
 
+    const handleDeleteRow = (index) => {
+        const newEditableValues = [...editableValues];
+        newEditableValues.splice(index, 1);
+        setEditableValues(newEditableValues);
+    
+        const newJsonData = [...jsonData];
+        newJsonData.splice(index, 1);
+        setJsonData(newJsonData);
+    
+        const total = newJsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.monto), 0);
+        setTotalMonto(total);
+    };
+    
+
     const handleAddRow = () => {
         const newRow = createData(
             editableValues.length + 1,
@@ -170,15 +184,15 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
     };
 
     // Función para guardar los datos en un objeto JSON
-    const saveDataToJson = () => {
-        const jsonData = editableValues.map((value, index) => ({
-            id: index + 1,
-            descripcion: value.descripcion,
-            monto: parseFloat(value.monto),
-            prima: 7, // Puedes proporcionar otro valor por defecto para la prima
-        }));
-        console.log(jsonData); // Puedes hacer lo que desees con los datos JSON
-    };
+    // const saveDataToJson = () => {
+    //     const jsonData = editableValues.map((value, index) => ({
+    //         id: index + 1,
+    //         descripcion: value.descripcion,
+    //         monto: parseFloat(value.monto),
+    //         prima: 7, // Puedes proporcionar otro valor por defecto para la prima
+    //     }));
+    //     console.log(jsonData); // Puedes hacer lo que desees con los datos JSON
+    // };
 
     const visibleRows = React.useMemo(
         () =>
@@ -193,11 +207,7 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
         closeModalDetail('true');
     };
 
-    const handleDeleteRow = (index) => {
-        const newEditableValues = [...editableValues];
-        newEditableValues.splice(index, 1);
-        setEditableValues(newEditableValues);
-    };
+   
 
     return (
         <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>

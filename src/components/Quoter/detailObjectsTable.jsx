@@ -191,7 +191,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(15);
   const [openModal, setOpenModal] = React.useState(false);
-  const [editableRows, setEditableRows] = React.useState(rows);
+  // const [editableRows, setEditableRows] = React.useState(rows);
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
@@ -245,17 +245,17 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     setOpenModal(true);
   };
 
-  const handleSaveChanges = () => {
-    // Actualizar los valores editables en el estado principal (editableRows)
-    const newEditableRows = editableRows.map((row, index) => ({
-      ...row,
-      monto: editableValues[index].monto,
-      tasa: editableValues[index].tasa,
-      prima: editableValues[index].prima,
-    }));
-    setEditableRows(newEditableRows);
-    console.log(newEditableRows);
-  };
+  // const handleSaveChanges = () => {
+  //   // Actualizar los valores editables en el estado principal (editableRows)
+  //   const newEditableRows = editableRows.map((row, index) => ({
+  //     ...row,
+  //     monto: editableValues[index].monto,
+  //     tasa: editableValues[index].tasa,
+  //     prima: editableValues[index].prima,
+  //   }));
+  //   setEditableRows(newEditableRows);
+  //   console.log(newEditableRows);
+  // };
 
 
     // Manejador para cerrar el modal

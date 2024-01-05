@@ -187,9 +187,9 @@ export default function BranchInsurance({ closeModalDetail }) {
   };
 
   // Nuevo estado para rastrear los valores editables
-  const [editableValues, setEditableValues] = React.useState(
-    rows.map((row) => ({ descripcion: row.descripcion }))
-  );
+  // const [editableValues, setEditableValues] = React.useState(
+  //   rows.map((row) => ({ descripcion: row.descripcion }))
+  // );
 
   const closeModal = () => {
     closeModalDetail('true');
@@ -198,12 +198,12 @@ export default function BranchInsurance({ closeModalDetail }) {
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
-  const handleCellValueChange = (event, index, field) => {
-    const newValue = event.target.value;
-    const newEditableValues = [...editableValues];
-    newEditableValues[index][field] = newValue;
-    setEditableValues(newEditableValues);
-  };
+  // const handleCellValueChange = (event, index, field) => {
+  //   const newValue = event.target.value;
+  //   const newEditableValues = [...editableValues];
+  //   newEditableValues[index][field] = newValue;
+  //   setEditableValues(newEditableValues);
+  // };
 
   const visibleRows = React.useMemo(
     () =>
