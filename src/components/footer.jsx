@@ -8,7 +8,7 @@ const Footer = () => {
     <AppBar  component="footer" className='appBar'>
       <Toolbar sx={{backgroundColor: '#00a99e', Height: '75px'}}>
         <Typography variant="body1" color="inherit">
-          © 2023 Seguros La Union.
+          © 2023 Seguros La Unión.
         </Typography>
       </Toolbar>
     </AppBar>

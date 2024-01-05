@@ -1,32 +1,43 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Grid, Paper } from '@mui/material';
+import { TextField, Button, Container, Grid, Paper, Alert } from '@mui/material';
 import '../../styles/form.scss'; 
-// Componente del formulario
+import authService from '../../services/authServices';
+
 const Login = () => {
-  // Estado del formulario
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
   });
+  const [error, setError] = useState('');
 
-  // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Manejar envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica para enviar el formulario
-    console.log(formData);
+    console.log(formData.username);
+    try {
+      const data = {
+        usuario: formData.username,
+        password: formData.password,
+      };
+      const response = await authService.fetchWithAuth('login', 'POST', data);
+      localStorage.setItem('authToken', response.token);
+    } catch (error) {
+      setError("Se presentó un error con el inicio de sesión. Por favor, intente nuevamente.");
+    }
   };
 
   return (
     <Container component="main" maxWidth="xs" style={{ marginTop: '70px',marginBottom: '90px',display:'flex',alignItems:'center', flexDirection:'column', justifyContent:'center'}}>
        <h2 style={{color:'#00a99e'}}>Login</h2>
+      
       <Paper elevation={3} style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center',margin:'20px' }}>
         <form onSubmit={handleSubmit} className='form'>
+        {error && <Alert severity="error">{error}</Alert>}
           <Grid container spacing={2}>
             {/* Componentes de campo de entrada de Material-UI */}
             <Grid item xs={12}>
@@ -37,6 +48,7 @@ const Login = () => {
                 value={formData.username}
                 onChange={handleChange}
                 variant="standard"
+                required
                 fullWidth
               />
             </Grid>
@@ -48,6 +60,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 variant="standard"
+                required
                 fullWidth
               />
             </Grid>
@@ -58,7 +71,7 @@ const Login = () => {
             Enviar
           </Button>
         </form>
-      </Paper>
+      </Paper>|
     </Container>
   );
 };

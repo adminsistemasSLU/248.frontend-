@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Grid, Paper } from '@mui/material';
+import { TextField, Button, Container, Grid, Paper, Alert } from '@mui/material';
 import '../../styles/form.scss';
+import ValidationUtils from '../../utils/ValiationsUtils';
 
 // Componente del formulario
 const Register = () => {
@@ -12,10 +13,21 @@ const Register = () => {
     email: '',
     password: '',
   });
+  const [error, setError] = useState('');
 
   // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let modifiedValue = value;
+
+    if (name === 'email') {
+      if (!ValidationUtils.validateEmail(value)) {
+        setError('Por favor ingresa un correo electrónico válido.');
+      } else {
+        setError('');
+      }
+    }
+    setFormData({ ...formData, [name]: modifiedValue });
   };
 
   // Manejar envío del formulario
@@ -100,6 +112,8 @@ const Register = () => {
             Registrarse
           </Button>
         </form>
+        <br/>
+        {error && <Alert severity="error">{error}</Alert>}
       </Paper>
     </Container>
   );
