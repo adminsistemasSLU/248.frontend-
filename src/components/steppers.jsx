@@ -181,7 +181,7 @@ export default function Steppers() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-          <Grid item xs={12}>
+            <Grid item xs={12}>
               <TextField
                 label="Correo electrónico"
                 type="text"
@@ -214,6 +214,10 @@ export default function Steppers() {
       </Stepper>
       <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', marginBottom: '10%' }}>
         <Box style={{ width: '90%' }} >
+        {steps[activeStep].label === 'Producto' && (
+             <h3 style={{color:'#00a99e'}}> 
+              SELECCIONE UN PRODUCTO
+             </h3> )}
           {React.cloneElement(steps[activeStep].formComponent, { formData, onNext: handleNext })}
           <div className='btnDisplay'>
             <Button
@@ -225,14 +229,16 @@ export default function Steppers() {
               Regresar
             </Button>
 
-            {steps[activeStep].label === 'Pago' && ( 
-            <Button onClick={handleClickOpen} sx={{ mr: 1 }} className='btnPaid'>
-              Enviar Cotización
-            </Button>
+            {steps[activeStep].label === 'Pago' && (
+              <Button onClick={handleClickOpen} sx={{ mr: 1 }} className='btnPaid'>
+                Enviar Cotización
+              </Button>
             )}
-            <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper'>
-              Siguiente
-            </Button>
+
+            {steps[activeStep].label !== 'Producto' && (
+              <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper'>
+                Siguiente
+              </Button>)}
           </div>
         </Box>
       </div>
