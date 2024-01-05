@@ -1,29 +1,47 @@
-// authService.js
 const API_URL = process.env.REACT_APP_API_URL || 'default_url';
+const TOKEN_STORAGE_KEY = 'authToken';
+
+const getToken = () => {
+  return localStorage.getItem(TOKEN_STORAGE_KEY);
+};
 
 const authService = {
-  login: async (username, password) => {
-    try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+  fetchWithAuth: async (endpoint, method = 'GET', data = null, additionalHeaders = {}) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...additionalHeaders,
+    };
 
-      if (response.ok) {
-        const { token, permissions } = await response.json();
-        return { token, permissions };
-      } else {
-        // Manejar errores de autenticación
-        console.error('Error de autenticación');
-        return null;
+    const token = getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const config = {
+      method: method,
+      headers: headers,
+      body: data ? JSON.stringify(data) : null,
+    };
+
+    if (method.toUpperCase() === 'GET' || !data) {
+      delete config.body;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/${endpoint}`, config);
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error);
       }
+
+      return response.json();
     } catch (error) {
-      console.error('Error de red:', error);
-      return null;
-    }   
+      if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+        throw new Error('Network error: No se pudo conectar al servidor.');
+      }
+      console.error('Error in fetchWithAuth:', error);
+      throw error;
+    }
   },
 };
 

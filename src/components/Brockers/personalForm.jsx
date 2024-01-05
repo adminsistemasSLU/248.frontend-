@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { TextField, Container, Grid, Paper } from '@mui/material';
+import { TextField, Container, Grid, Paper, Alert } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import ValidationUtils from '../../utils/ValiationsUtils';
 
 const PersonalForm = () => {
   const [formData, setFormData] = useState({
@@ -16,9 +17,30 @@ const PersonalForm = () => {
     age: '',
     address: '',
   });
+  const [error, setError] = useState('');
+
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+  
+    let modifiedValue = value;
+    if (name === 'identification') {
+      if (formData.documentType === 'C' && value.length > 10) {
+        modifiedValue = value.slice(0, 10);
+      } else if (formData.documentType === 'R' && value.length > 13) {
+        modifiedValue = value.slice(0, 13);
+      }
+    } else if (name === 'phone') {
+      modifiedValue = value.slice(0, 10);
+    } else if (name === 'email') {
+      if (!ValidationUtils.validateEmail(modifiedValue)) {
+        setError('Por favor ingresa un correo electrónico válido.');
+      } else {
+        setError('');
+      }
+    }
+  
+    setFormData({ ...formData, [name]: modifiedValue });
   };
 
   const handleSubmit = (e) => {
@@ -49,15 +71,15 @@ const PersonalForm = () => {
                 fullWidth
                 required
               >
-                <MenuItem value="cedula">Cédula</MenuItem>
-                <MenuItem value="ruc">RUC</MenuItem>
-                <MenuItem value="pasaporte">Pasaporte</MenuItem>
+                <MenuItem value="C">Cédula</MenuItem>
+                <MenuItem value="R">RUC</MenuItem>
+                <MenuItem value="P">Pasaporte</MenuItem>
               </Select>
             </Grid>
             <Grid item xs={12}>
               <TextField
                 label="Documento de identificación"
-                type="text"
+                type={formData.documentType === "P" ? "text" : "number"}
                 name="identification"
                 value={formData.identification}
                 onChange={handleChange}
@@ -75,6 +97,7 @@ const PersonalForm = () => {
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
+                inputProps={{ maxLength: 30 }}
                 required
               />
             </Grid>
@@ -87,6 +110,7 @@ const PersonalForm = () => {
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
+                inputProps={{ maxLength: 30 }}
                 required
               />
             </Grid>
@@ -99,18 +123,20 @@ const PersonalForm = () => {
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
+                inputProps={{ maxLength: 2 }}
                 required
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
-                label="Telefono"
-                type="text"
+                label="Teléfono"
+                type="number"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
+                inputProps={{ maxLength: 10 }}
                 required
               />
             </Grid>
@@ -123,6 +149,7 @@ const PersonalForm = () => {
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
+
                 required
               />
             </Grid>
@@ -144,6 +171,7 @@ const PersonalForm = () => {
           {/* <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
             Registrarse
           </Button> */}
+          {error && <Alert severity="error">{error}</Alert>}
         </FormControl >
       </Paper>
     </Container>

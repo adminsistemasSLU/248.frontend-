@@ -204,7 +204,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                     <td style={{ width: '30%', textAlign: 'right' }}>
-                      <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Direccion:</b>  </label>
+                      <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Dirección:</b>  </label>
                     </td>
                     <td style={{ width: '50%' }}>
                       <input
@@ -466,12 +466,12 @@ const AddObjectInsurance = ({ closeModal }) => {
 
 
                   {formData.inspection && ( // Verificar si inspection es true
-                    <Tooltip title="Direccion de inspeccion" placement="left">
+                    <Tooltip title="Dirección de inspeccion" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                         <td style={{ width: '30%', textAlign: 'right' }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Direccion:</b>
+                            <b>Dirección:</b>
                           </label>
 
                         </td>
@@ -496,7 +496,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         <td style={{ width: '30%', textAlign: 'right' }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Telefono:</b>
+                            <b>Teléfono:</b>
                           </label>
 
                         </td>
