@@ -46,7 +46,7 @@ const PaidForm = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <FormControl sx={{ margin: '0px', minWidth: 290,width:'100%'}} variant="standard">
-                  <InputLabel id="paidType-Label">Tipo de credito</InputLabel>
+                  <InputLabel id="paidType-Label">Tipo de crédito</InputLabel>
                   <Select
                     labelId="paidType-Label"
                     id="paidType"
@@ -58,7 +58,7 @@ const PaidForm = () => {
                     fullWidth
                     required
                   >
-                    <MenuItem value="deb">Debito Automatico</MenuItem>
+                    <MenuItem value="deb">Debito Automático</MenuItem>
 
                   </Select>
                 </FormControl>
@@ -83,7 +83,7 @@ const PaidForm = () => {
               </Grid>
               <Grid item xs={12} md={12}>
                 <TextField
-                  label="Numeros de pagos"
+                  label="Números de pagos"
                   type="text"
                   name="numberPaid"
                   value={formData.numberPaid}
@@ -166,7 +166,7 @@ const PaidForm = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Derecho de Emision"
+                  label="Derecho de Emisión"
                   type="text"
                   name="admision"
                   value={formData.admision}

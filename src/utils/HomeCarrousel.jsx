@@ -10,7 +10,7 @@ import '../styles/carrousel.scss';
 function HomeCarrousel(props) {
     var items = [
         {
-            name: "Vehiculos",
+            name: "Vehículos",
             description: "Probably the most random thing you have ever seen!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/automovil.jpg',
             url:'/FireInsurance/form',

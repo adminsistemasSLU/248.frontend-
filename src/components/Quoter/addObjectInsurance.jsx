@@ -472,12 +472,12 @@ const AddObjectInsurance = ({ closeModal }) => {
 
 
                   {formData.inspection && ( // Verificar si inspection es true
-                    <Tooltip title="Direccion de inspeccion" placement="left">
+                    <Tooltip title="Dirección de inspeccion" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                         <td className='tdTableTitle' >
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Direccion:</b>
+                            <b>Dirección:</b>
                           </label>
 
                         </td>
@@ -502,7 +502,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         <td className='tdTableTitle'>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Telefono:</b>
+                            <b>Teléfono:</b>
                           </label>
 
                         </td>

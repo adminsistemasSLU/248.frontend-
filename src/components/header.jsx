@@ -67,7 +67,7 @@ function Header(props) {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        La Union S.A.
+        La Unión S.A.
       </Typography>
       <Divider />
       <List>
