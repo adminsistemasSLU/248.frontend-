@@ -316,7 +316,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                   <tr className='modalFormRow' >
                     <div className='modalFormContent'>
                       <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T.Construcción:</b>  </label>
+                        <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T. Construcción:</b>  </label>
                       </td>
                       <td className='tdTableData'>
                         <select
