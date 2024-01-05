@@ -105,32 +105,32 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
     const [rowsPerPage] = React.useState(10);
     const [openModal, setOpenModal] = React.useState(false);
     const [editableValues, setEditableValues] = React.useState([]);
-    
+
     // Datos iniciales para la tabla
     const initialRows = [
-        createData(1, 'Menaje de hogar', 7000,),
-        createData(2, 'Joyeria', 2500,),
-        createData(3, 'Estructura de casa', 152000,),
+        createData(1, 'Menaje de hogar', 750000,),
+        createData(2, 'Joyeria', 150000,),
+        createData(3, 'Estructura de casa', 50000,),
     ];
     const [jsonData, setJsonData] = React.useState(initialRows); // Estado para los datos
 
 
     React.useEffect(() => {
         setEditableValues(
-          initialRows.map((row) => ({
-            descripcion: row.descripcion,
-            monto: row.monto,
-          }))
+            initialRows.map((row) => ({
+                descripcion: row.descripcion,
+                monto: row.monto,
+            }))
         );
-      }, []);
+    }, []);
 
-      React.useEffect(() => {
+    React.useEffect(() => {
         // Calcula el total del monto desde el estado jsonData
         const total = jsonData.reduce((acc, item) => acc + parseFloat(item.monto), 0);
         // Actualiza el estado totalMonto
         setTotalMonto(total);
-      }, [jsonData]); // Observa cambios en jsonData
-      const [totalMonto, setTotalMonto] = React.useState(0);
+    }, [jsonData]); // Observa cambios en jsonData
+    const [totalMonto, setTotalMonto] = React.useState(0);
 
     // const handleOpenModal = () => {
     //     setOpenModal(true);
@@ -144,14 +144,15 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
 
     const handleCellValueChange = (event, index, field) => {
         const newValue = event.target.value;
+        const numericValue1 = parseFloat(newValue.replace(/[^\d.-]/g, ''));
         const newEditableValues = [...editableValues];
-        newEditableValues[index][field] = newValue;
+        isNaN(numericValue1) ? newEditableValues[index][field] = newValue : newEditableValues[index][field] = numericValue1;
         setEditableValues(newEditableValues);
         const newJsonData = [...jsonData];
         const numericValue = parseFloat(newValue.replace(/[^\d.-]/g, '')); // Remueve caracteres no numéricos, excepto puntos y guiones
         newJsonData[index][field] = numericValue;
         setJsonData(newJsonData);
-        const total = jsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.monto) , 0);
+        const total = jsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.monto), 0);
         setTotalMonto(total);
     };
 
@@ -159,23 +160,21 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
         const newEditableValues = [...editableValues];
         newEditableValues.splice(index, 1);
         setEditableValues(newEditableValues);
-    
+
         const newJsonData = [...jsonData];
         newJsonData.splice(index, 1);
         setJsonData(newJsonData);
-    
+
         const total = newJsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.monto), 0);
         setTotalMonto(total);
     };
-    
+
 
     const handleAddRow = () => {
         const newRow = createData(
             editableValues.length + 1,
             '', // Puedes proporcionar valores por defecto
-            '',
-            0,
-            0
+            0.00,
         );
         const newEditableValues = [...editableValues, { descripcion: '', monto: 0 }];
         setEditableValues(newEditableValues);
@@ -207,7 +206,7 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
         closeModalDetail('true');
     };
 
-   
+
 
     return (
         <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -292,7 +291,7 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
                                     sx={{ cursor: 'pointer' }}
-                                    
+
                                 >
                                     <TableCell
                                         component="th"
@@ -316,7 +315,7 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
                                         <CurrencyInput
                                             className='input-table'
                                             style={{ textAlign: 'right' }}
-                                            value={row.monto}
+                                            value={row.monto.toFixed(2)}
                                             onChange={(event) =>
                                                 handleCellValueChange(event, index, 'monto')
                                             }
@@ -337,7 +336,7 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
                 <div style={{ marginRight: '20px' }}>Monto:</div>
                 <div style={{ fontWeight: 'bold' }}>
                     {/* Calcula el total del monto desde el JSON */}
-                    ${totalMonto} 
+                    <CurrencyInput className='input-table' value={totalMonto.toFixed(2)} />
                 </div>
             </div>
 

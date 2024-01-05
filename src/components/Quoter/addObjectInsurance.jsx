@@ -11,6 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 import '../../styles/moddalForm.scss';
 import '../../styles/dialogForm.scss';
 import '../../styles/form.scss';
+import '../../styles/button.scss';
 import '../../styles/objectInsuranceTable.scss';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -110,7 +111,7 @@ const AddObjectInsurance = ({ closeModal }) => {
             zIndex: '2000'
           },
         }}>
-        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
+        <DialogContent style={{ overflow: 'scroll', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
           {/* Componente del formulario */}
           <BranchInsurance closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
         </DialogContent>
@@ -153,7 +154,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         variant="standard"
 
                         required
-                        style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
                         <option value="01">Guayas</option>
                         <option value="02">Quito</option>
@@ -177,7 +178,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         variant="standard"
 
                         required
-                        style={{ textAlign: 'left', border: '1px solid #A1A8AE' }}
+                        style={{ textAlign: 'left', border: '1px solid #A1A8AE',width:'80%' }}
                       >
                         <option value="G01">Guayaquil</option>
                         <option value="G02">Duran</option>
@@ -201,7 +202,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         variant="standard"
 
                         required
-                        style={{ textAlign: 'left' }}
+                        style={{ textAlign: 'left',width:'80%' }}
                       >
                         <option value="G01">Balao</option>
                         <option value="G02">Duran</option>
@@ -222,7 +223,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         onChange={handleChange}
                         variant="standard"
                         required
-                        style={{ width: '100%' }}
+                        style={{ width: '80%' }}
                       />
                        <div onClick={SearchLocation} >
                         <AddLocationAltRoundedIcon />
@@ -244,7 +245,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         onChange={handleChange}
                         variant="standard"
                         required
-                        style={{ width: '30%' }}
+                        style={{ width: '80%' }}
                       />
                     </td>
                   </tr>
@@ -263,7 +264,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         variant="standard"
 
                         required
-                        style={{ width: '30%' }}
+                        style={{ width: '80%' }}
                       />
 
                     </td>
@@ -282,7 +283,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         onChange={handleChange}
                         variant="standard"
                         required
-                        style={{ width: '30%' }}
+                        style={{ width: '80%' }}
                       />
 
                     </td>
@@ -302,7 +303,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         variant="standard"
 
                         required
-                        style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
                         <option value="G01">1</option>
                         <option value="G02">2</option>
@@ -397,7 +398,7 @@ const AddObjectInsurance = ({ closeModal }) => {
 
                         variant="standard"
                         required
-                        style={{ width: '100%' }}
+                        style={{ width: '80%' }}
                       />
                        <div onClick={handleOpenModal}  >
                         <CalendarMonthIcon />
@@ -421,7 +422,7 @@ const AddObjectInsurance = ({ closeModal }) => {
 
                         required
                         disabled
-                        style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
 
                       </input>
@@ -443,7 +444,7 @@ const AddObjectInsurance = ({ closeModal }) => {
 
                         required
                         disabled
-                        style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
 
                       </input>
@@ -463,7 +464,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                         onChange={toggleInspection}
                         variant="standard"
                         type='checkbox'
-                        style={{ textAlign: 'left', width: '45%', border: '1px solid #A1A8AE' }}
+                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                       >
                       </input>
                     </td>
@@ -487,7 +488,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                             value={formData.direcctionInspection}
                             onChange={handleChange}
                             variant="standard"
-                            style={{ textAlign: 'left', width: '70%', border: '1px solid #A1A8AE' }}
+                            style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                           >
                           </input>
                         </td>
@@ -512,7 +513,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                             value={formData.phoneInspection}
                             onChange={handleChange}
                             variant="standard"
-                            style={{ textAlign: 'left', width: '70%', border: '1px solid #A1A8AE' }}
+                            style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                           >
                           </input>
                         </td>
@@ -537,7 +538,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                             value={formData.agentInspection}
                             onChange={handleChange}
                             variant="standard"
-                            style={{ textAlign: 'left', width: '70%', border: '1px solid #A1A8AE' }}
+                            style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
                           >
                           </input>
                         </td>
@@ -548,7 +549,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Fecha Tentativa" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '40%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'    }}>
+                        <td style={{ width: '30%', textAlign: 'left', display: 'flex', flexDirection: 'row', justifyContent:'start',alignItems:'center'    }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Fecha:</b>
@@ -569,7 +570,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Hora tentativa" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '40%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'   }}>
+                        <td style={{ width: '30%', textAlign: 'left', display: 'flex', flexDirection: 'row', justifyContent:'start',alignItems:'center'   }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Hora:</b>
@@ -592,11 +593,12 @@ const AddObjectInsurance = ({ closeModal }) => {
                   )}
                 </tbody>
               </table>
-
-              {/* Botón de envío */}
-              <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff', marginTop: '20px' }} fullWidth>
+              <div style={{display:'flex',justifyContent:'center'}}>
+              <Button type="submit" className='btnStepper' variant="contained"  style={{top:'0', backgroundColor:'rgb(0, 169, 158)'}} fullWidth>
                 Agregar
               </Button>
+              </div>
+            
             </form >
           </Paper>
           <div className='modalContent' style={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>

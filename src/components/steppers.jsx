@@ -156,8 +156,9 @@ export default function Steppers() {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleChangeEmail = (email) => {
-    setEmail(email);
+  const handleChangeEmail = (event) => {
+    const newEmail = event.target.value;
+    setEmail(newEmail);
   };
 
   const handleClickOpen = () => {
@@ -236,7 +237,7 @@ export default function Steppers() {
             )}
 
             {steps[activeStep].label !== 'Producto' && (
-              <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper'>
+              <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper' style={{top:'20%'}}>
                 Siguiente
               </Button>)}
           </div>

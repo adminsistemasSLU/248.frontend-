@@ -33,7 +33,7 @@ function createData(id, cobertura, monto, tasa, prima, titulo) {
 }
 
 const rows = [
-  createData(1, 'Edificio con todas sus instalaciones fijas y permanentes (Estructuras)', 305, 3.7, 67, false),
+  createData(1, 'Edificio con todas sus instalaciones fijas y permanentes (Estructuras)', 950000.00, 3.7, 67, false),
   createData(2, 'Maquinarias y equipos', 452, 25.0, 51, false),
   createData(3, 'Muebles, enseres y equipos de oficina', 262, 16.0, 24, false),
   createData(4, 'Equipo electrónico fijo y portátil', 159, 6.0, 24, false),
@@ -198,6 +198,29 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     rows.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
   );
 
+
+  const [jsonData, setJsonData] = React.useState(rows); // Estado para los datos
+  const [totalMonto, setTotalMonto] = React.useState(0);
+  const [totalPrima, setTotalPrima] = React.useState(0);
+
+  React.useEffect(() => {
+    setEditableValues(
+      rows.map((row) => ({
+        monto: row.monto, tasa: row.tasa, prima: row.prima
+      }))
+    );
+  }, []);
+
+  React.useEffect(() => {
+    // Calcula el total del monto desde el estado jsonData
+    const totalMonto = jsonData.reduce((acc, item) => acc + parseFloat(item.monto), 0);
+    const totalPrima = jsonData.reduce((acc, item) => acc + parseFloat(item.prima), 0);
+    // Actualiza el estado totalMonto
+    setTotalMonto(totalMonto);
+    setTotalPrima(totalPrima);
+  }, [jsonData]); // Observa cambios en jsonData
+
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -236,9 +259,17 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   const handleCellValueChange = (event, index, field) => {
     const newValue = event.target.value;
+    const numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ''));
     const newEditableValues = [...editableValues];
-    newEditableValues[index][field] = newValue;
+    isNaN(numericValue) ? newEditableValues[index][field] = newValue : newEditableValues[index][field] = numericValue;
     setEditableValues(newEditableValues);
+    const newJsonData = [...jsonData];
+    newJsonData[index][field] = numericValue;
+    setJsonData(newJsonData);
+    const total = jsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.monto), 0);
+    setTotalMonto(total);
+    const totalPrima = jsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.prima), 0);
+    setTotalPrima(totalPrima)
   };
 
   const handleOpenModal = () => {
@@ -258,10 +289,10 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   // };
 
 
-    // Manejador para cerrar el modal
-    const handleCloseModal = () => {
-      setOpenModal(false);
-    };
+  // Manejador para cerrar el modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const visibleRows = React.useMemo(
     () =>
@@ -274,13 +305,13 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   return (
     <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      
+
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" className='dialog-height'
         PaperProps={{
           style: {
             backgroundColor: '#ffffff',
             boxShadow: 'none',
-          
+
             overflow: 'hidden',
             zIndex: '2000'
           },
@@ -290,8 +321,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           <ProtectionDetailTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
         </DialogContent>
       </Dialog>
-      
-      
+
+
       <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
         <div>Detalle de Amparo</div>
         <div onClick={closeModal}> <CloseIcon /></div>
@@ -344,13 +375,13 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     </TableCell>
                     <TableCell align="left">{row.cobertura}</TableCell>
                     <TableCell align="left">
-                      {isItemSelected ? (<DescriptionIcon  onClick={handleOpenModal} />) : (<div></div>)}
+                      {isItemSelected ? (<DescriptionIcon onClick={handleOpenModal} />) : (<div></div>)}
                     </TableCell>
                     <TableCell align="right">
                       {/* Campo editable con CurrencyInput */}
                       <CurrencyInput
                         className='input-table'
-                        value={editableValues[index].monto}
+                        value={editableValues[index].monto.toFixed(2)}
                         onChange={(event) =>
                           handleCellValueChange(event, index, 'monto')
                         }
@@ -360,7 +391,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                       {/* Campo editable con CurrencyInput */}
                       <CurrencyInput
                         className='input-table'
-                        value={editableValues[index].tasa}
+                        value={editableValues[index].tasa.toFixed(2)}
                         onChange={(event) =>
                           handleCellValueChange(event, index, 'tasa')
                         }
@@ -370,7 +401,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                       {/* Campo editable con CurrencyInput */}
                       <CurrencyInput
                         className='input-table'
-                        value={editableValues[index].prima}
+                        value={editableValues[index].prima.toFixed(2)}
                         onChange={(event) =>
                           handleCellValueChange(event, index, 'prima')
                         }
@@ -400,22 +431,26 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        <div className='paginationResponsive' >
-          <div className='elementsModal' style={{ marginRight:'10px', gap: '50px' }}>
+        <div style={{display:'flex',justifyContent:'end'}}>
+          <div className='elementsModal' style={{ marginRight: '10px' }}>
             <div>Monto: </div>
             <div>
-              $305
+            <CurrencyInput style={{width:'105px'}}
+                        className='input-table'
+                        value={totalMonto.toFixed(2)} />
             </div>
           </div>
-          <div className='elementsModal elementRight'  style={{  gap: '50px' }}>
+          <div className='elementsModal elementRight'>
             <div>
               Prima:
             </div>
             <div>
-              $67
+            <CurrencyInput style={{width:'105px'}}
+                        className='input-table'
+                        value= {totalPrima.toFixed(2)} />
             </div>
           </div>
-          <div style={{ display: 'flex', marginLeft:'5px', marginRight:'20px', alignItems: 'center',justifyContent:'end' }}>
+          <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'end' }}>
             {/* <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button> */}
           </div>
         </div>

@@ -11,6 +11,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import CurrencyInput from '../../utils/currencyInput';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
 import '../../styles/detailQuoter.scss';
@@ -29,9 +30,9 @@ function createData(id, ramo, descripcion, monto, prima) {
 }
 
 const rows = [
-  createData(1, 'Incendio', '', 70, 7),
-  createData(2, 'Robo', '', 70, 7),
-  createData(3, 'Componentes electronicos', '', 70, 7),
+  createData(1, 'Incendio', '', 950000., 300),
+  createData(2, 'Robo', '', 7800, 135),
+  createData(3, 'Componentes electronicos', '', 9000, 60),
 ];
 
 const headCells = [
@@ -230,7 +231,7 @@ export default function BranchInsurance({ closeModalDetail }) {
             zIndex: '2000'
           },
         }}>
-        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
+        <DialogContent style={{ overflow: 'scroll', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
           {/* Componente del formulario */}
           <DetailObjectsTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
         </DialogContent>
@@ -292,7 +293,7 @@ export default function BranchInsurance({ closeModalDetail }) {
                       scope="row"
                       padding="none"
                     >
-                      {row.monto}
+                     <CurrencyInput className='input-table' disabled value={row.monto.toFixed(2)} />
                     </TableCell>
                     <TableCell align="right"
                       component="th"
@@ -300,7 +301,7 @@ export default function BranchInsurance({ closeModalDetail }) {
                       scope="row"
                       padding="none"
                     >
-                      {row.prima}
+                      <CurrencyInput className='input-table' disabled value={row.prima.toFixed(2)} />
                     </TableCell>
                     <TableCell align="right">
                       <EventAvailableIcon
@@ -320,19 +321,19 @@ export default function BranchInsurance({ closeModalDetail }) {
           </TableBody>
         
         </Table>
-        <div className='paginationResponsive' style={{ justifyContent:'right'}}>
-            <div className='elementsModal' style={{ marginRight: '10px', gap: '50px' }}>
+        <div className='' style={{ display:'flex',justifyContent:'end'}}>
+            <div className='elementsModal' style={{ marginRight: '10px', gap: '5px' }}>
               <div>Monto: </div>
               <div>
-                $305
+              <CurrencyInput style={{width:'105px'}} className='input-table' disabled value={(958000).toFixed(2)} />
               </div>
             </div>
-            <div className='elementsModal elementRight' style={{ gap: '50px' }}>
+            <div className='elementsModal elementRight' style={{ gap: '5px' }}>
               <div>
                 Prima:
               </div>
               <div>
-                $67
+              <CurrencyInput style={{width:'105px'}} className='input-table' disabled value={(495).toFixed(2)} />
               </div>
             </div>
           </div>

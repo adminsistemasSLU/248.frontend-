@@ -33,7 +33,7 @@
 .paginationResponsive {
     display: flex;
 
-    @media (max-width: 950px) {
+    @media (max-width: 840px) {
         flex-direction: column;
     }
 }
@@ -42,7 +42,7 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 50px;
+    gap: 15px;
 }
 
 .elementRight {

@@ -12,12 +12,13 @@ const PaidForm = () => {
     numberPaid: '',
     firstPaid: '',
     sumAdd: '',
-    email: '',
-    password: '',
-    documentType: '',
-    identification: '',
-    age: '',
-    address: '',
+    iva: '',
+    prima: '',
+    impScvs: '',
+    impSsc: '',
+    admision: '',
+    subtotal: '',
+    total: '',
   });
 
   const handleChange = (e) => {
@@ -45,12 +46,12 @@ const PaidForm = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <FormControl sx={{ margin: '0px', minWidth: 290,width:'100%'}} variant="standard">
-                  <InputLabel id="documentType-Label">Tipo de credito</InputLabel>
+                  <InputLabel id="paidType-Label">Tipo de credito</InputLabel>
                   <Select
-                    labelId="documentType-Label"
-                    id="documentType"
-                    name="documentType"
-                    value={formData.documentType}
+                    labelId="paidType-Label"
+                    id="paidType"
+                    name="paidType"
+                    value={formData.paidType}
                     onChange={handleChange}
                     style={{ textAlign: 'left',width:'100%' }}
                     variant="standard"
@@ -84,8 +85,8 @@ const PaidForm = () => {
                 <TextField
                   label="Numeros de pagos"
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="numberPaid"
+                  value={formData.numberPaid}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -96,8 +97,8 @@ const PaidForm = () => {
                 <TextField
                   label="Entrada"
                   type="text"
-                  name="lastname"
-                  value={formData.lastname}
+                  name="firstPaid"
+                  value={formData.firstPaid}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -119,8 +120,8 @@ const PaidForm = () => {
                 <TextField
                   label="Suma Agregada"
                   type="text"
-                  name="identification"
-                  value={formData.identification}
+                  name="sumAdd"
+                  value={formData.sumAdd}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -131,8 +132,8 @@ const PaidForm = () => {
                 <TextField
                   label="Prima"
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="prima"
+                  value={formData.prima}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -143,8 +144,8 @@ const PaidForm = () => {
                 <TextField
                   label="Imp SCVS"
                   type="text"
-                  name="lastname"
-                  value={formData.lastname}
+                  name="impScvs"
+                  value={formData.impScvs}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -155,8 +156,8 @@ const PaidForm = () => {
                 <TextField
                   label="Imp SSC"
                   type="number"
-                  name="age"
-                  value={formData.age}
+                  name="impSsc"
+                  value={formData.impSsc}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -167,8 +168,8 @@ const PaidForm = () => {
                 <TextField
                   label="Derecho de Emision"
                   type="text"
-                  name="address"
-                  value={formData.address}
+                  name="admision"
+                  value={formData.admision}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -178,9 +179,9 @@ const PaidForm = () => {
               <Grid item xs={12}>
                 <TextField
                   label="SubTotal"
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="subtotal"
+                  value={formData.subtotal}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -190,9 +191,9 @@ const PaidForm = () => {
               <Grid item xs={12}>
                 <TextField
                   label="Iva 12%"
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="iva"
+                  value={formData.iva}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -202,9 +203,9 @@ const PaidForm = () => {
               <Grid item xs={12}>
                 <TextField
                   label="Total"
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="total"
+                  value={formData.total}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
