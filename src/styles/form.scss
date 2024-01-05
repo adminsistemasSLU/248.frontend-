@@ -36,10 +36,11 @@
 .paidForm{
     display: flex;
     width: 100%;
-   
+    
     overflow: auto;
-    @media (max-width: 600px) {
+    @media (max-width: 1027px) {
         flex-direction: column;
+        flex-wrap: wrap;
     }
 }
 .datePicker , .hourPicker {

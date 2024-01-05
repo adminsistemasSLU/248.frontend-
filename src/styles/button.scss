@@ -1,3 +1,14 @@
+.btnDisplay{
+    display: flex; 
+    flex-direction: row; 
+    justify-content: center; 
+    padding-top: 2%;
+    gap: 10%;
+    @media (max-width: 600px) {
+        gap: 5%;
+    }
+}
+
 .btnStepper{
     color: #fff !important; 
     background-color: #21bd6f !important;
@@ -15,8 +26,45 @@
         opacity: 0.5; // Example: reduce opacity when disabled
         cursor: not-allowed; // Example: change cursor to not-allowed
         color: #fff;
+        
+    }
+    @media (max-width: 600px) {
+        font-size: 10px !important;
     }
 }
+
+.btnPaid{
+    color: #fff !important; 
+    background-color: #bd8921 !important;
+    height: 25px !important;
+    position: relative !important;
+    top: 20%  !important;
+    width: 195px !important;
+
+    &:hover {
+        color: #bd8921 !important; // Change the background color on hover
+        background-color: #fff  !important;
+    }
+
+    &:disabled {
+        opacity: 0.5; // Example: reduce opacity when disabled
+        cursor: not-allowed; // Example: change cursor to not-allowed
+        color: #fff;
+    }
+
+    @media (max-width: 600px) {
+        font-size: 10px !important;
+        width: 285px !important;
+    }
+}
+
 .btnBack{
     background-color: #2775e2 !important;
+    &:hover {
+        color: #2775e2 !important; // Change the background color on hover
+        background-color: #fff  !important;
+    }
+    @media (max-width: 600px) {
+        font-size: 10px;
+    }
 }

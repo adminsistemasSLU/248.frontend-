@@ -36,10 +36,10 @@ const rows = [
 
 const headCells = [
   {
-    id: 'ramo',
+    id: 'seccion',
     numeric: false,
     disablePadding: false,
-    label: 'Ramo',
+    label: 'Sección',
     visible: true,
   },
   // {
@@ -217,7 +217,7 @@ export default function BranchInsurance({ closeModalDetail }) {
   return (
     <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
-        <div>Descripcion de Ramo</div>
+        <div>Descripcion de Sección</div>
         <div onClick={closeModal}> <CloseIcon /></div>
       </div>
 

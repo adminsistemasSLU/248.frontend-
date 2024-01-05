@@ -11,12 +11,15 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { styled } from '@mui/material/styles';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
 import '../../styles/detailQuoter.scss';
 import CloseIcon from '@mui/icons-material/Close';
 import CurrencyInput from '../../utils/currencyInput';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import ProtectionDetailTable from './protectionDetailTable';
+
 
 function createData(id, cobertura, monto, tasa, prima, titulo) {
   return {
@@ -186,8 +189,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   const [orderBy,] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
+  const [rowsPerPage, setRowsPerPage] = React.useState(15);
+  const [openModal, setOpenModal] = React.useState(false);
   const [editableRows, setEditableRows] = React.useState(rows);
 
   // Nuevo estado para rastrear los valores editables
@@ -238,6 +241,10 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     setEditableValues(newEditableValues);
   };
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
   const handleSaveChanges = () => {
     // Actualizar los valores editables en el estado principal (editableRows)
     const newEditableRows = editableRows.map((row, index) => ({
@@ -250,6 +257,12 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     console.log(newEditableRows);
   };
 
+
+    // Manejador para cerrar el modal
+    const handleCloseModal = () => {
+      setOpenModal(false);
+    };
+
   const visibleRows = React.useMemo(
     () =>
       stableSort(rows, getComparator(order, orderBy)).slice(
@@ -261,6 +274,24 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   return (
     <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" className='dialog-height'
+        PaperProps={{
+          style: {
+            backgroundColor: '#ffffff',
+            boxShadow: 'none',
+          
+            overflow: 'hidden',
+            zIndex: '2000'
+          },
+        }}>
+        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
+          {/* Componente del formulario */}
+          <ProtectionDetailTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
+        </DialogContent>
+      </Dialog>
+      
+      
       <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
         <div>Detalle de Amparo</div>
         <div onClick={closeModal}> <CloseIcon /></div>
@@ -313,7 +344,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     </TableCell>
                     <TableCell align="left">{row.cobertura}</TableCell>
                     <TableCell align="left">
-                      {isItemSelected ? (<DescriptionIcon />) : (<div></div>)}
+                      {isItemSelected ? (<DescriptionIcon  onClick={handleOpenModal} />) : (<div></div>)}
                     </TableCell>
                     <TableCell align="right">
                       {/* Campo editable con CurrencyInput */}
@@ -388,12 +419,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             {/* <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button> */}
           </div>
         </div>
-
-
       </div>
-
-
-
     </div>
   );
 }

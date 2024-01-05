@@ -11,15 +11,21 @@ import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantity
 import PaidIcon from '@mui/icons-material/Paid';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import '../styles/button.scss';
 import '../styles/form.scss';
-import PersonalForm from './Brockers/personalForm';
-import ProtectObjectsTable from './Brockers/protectObjectsTable';
-import PaidForm from './Brockers/paidForm';
+import PersonalForm from './Quoter/personalForm';
+import ProtectObjectsTable from './Quoter/protectObjectsTable';
+import PaidForm from './Quoter/paidForm';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import ProductListCards from './Brockers/productListCards';
-import PaymentMethods from './Brockers/paymentMethods';
+import ProductListCards from './Quoter/productListCards';
+import PaymentMethods from './Quoter/paymentMethods';
+import { TextField, Grid } from '@mui/material';
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -114,7 +120,8 @@ export default function Steppers() {
         : activeStep + 1;
     setActiveStep(newActiveStep);
   };
-  
+
+
   const steps = [
     { label: 'Datos Personales', formComponent: <PersonalForm /> },
     { label: 'Producto', formComponent: <ProductListCards onNext={handleNext} /> },
@@ -126,6 +133,8 @@ export default function Steppers() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed] = React.useState({});
   const [formData, setFormData] = React.useState({});
+  const [open, setOpen] = React.useState(false);
+  const [email, setEmail] = React.useState('');
 
   const totalSteps = () => {
     return steps.length;
@@ -143,14 +152,57 @@ export default function Steppers() {
     return completedSteps() === totalSteps();
   };
 
-  
-
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const handleChangeEmail = (email) => {
+    setEmail(email);
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <Stack className={'stack-content'} spacing={4}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Enviar cotización por correo"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+          <Grid item xs={12}>
+              <TextField
+                label="Correo electrónico"
+                type="text"
+                name="identification"
+                value={email}
+                onChange={handleChangeEmail}
+                variant="standard"
+                fullWidth
+                required
+              />
+            </Grid>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={handleClose} autoFocus>
+            Aceptar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
         {steps.map((step, index) => (
           <Step key={index}>
@@ -163,7 +215,7 @@ export default function Steppers() {
       <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', marginBottom: '10%' }}>
         <Box style={{ width: '90%' }} >
           {React.cloneElement(steps[activeStep].formComponent, { formData, onNext: handleNext })}
-          <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', gap: '10%' }}>
+          <div className='btnDisplay'>
             <Button
               disabled={activeStep === 0}
               onClick={handleBack}
@@ -172,6 +224,12 @@ export default function Steppers() {
             >
               Regresar
             </Button>
+
+            {steps[activeStep].label === 'Pago' && ( 
+            <Button onClick={handleClickOpen} sx={{ mr: 1 }} className='btnPaid'>
+              Enviar Cotización
+            </Button>
+            )}
             <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper'>
               Siguiente
             </Button>

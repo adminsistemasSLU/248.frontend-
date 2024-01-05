@@ -14,7 +14,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
@@ -25,6 +24,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import AddObjectInsurance from './addObjectInsurance';
 import '../../styles/dialogForm.scss';
+import EditIcon from '@mui/icons-material/Edit';
 
 function createData(number, province, city, direction, risk, amount, prima, rate) {
   return {
@@ -42,7 +42,7 @@ function createData(number, province, city, direction, risk, amount, prima, rate
 const rows = [
   createData(1, 'Guayas', 'Guayaquil', 'Av 9 de Octubre', '20%', 4.3, 3.7, 67),
   createData(2, 'Pichincha', 'Quito', 'Sangolqui', '15%', 4.9, 3.7, 67),
-  
+
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -123,6 +123,12 @@ const headCells = [
     disablePadding: false,
     label: 'Prima',
   },
+  {
+    id: 'action',
+    numeric: true,
+    disablePadding: false,
+    label: 'Accion',
+  },
 ];
 
 function EnhancedTableHead(props) {
@@ -136,15 +142,7 @@ function EnhancedTableHead(props) {
     <TableHead >
       <TableRow >
         <StyledTableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all desserts',
-            }}
-          />
+        
         </StyledTableCell>
         {headCells.map((headCell) => (
           <StyledTableCell
@@ -323,27 +321,27 @@ export default function ProtectObjectsTable() {
 
 
   return (
-    <div style={{width:'100%'}}>
+    <div style={{ width: '100%' }}>
 
       {/* Modal */}
-      <Dialog open={openModal} onClose={handleCloseModal}  maxWidth="xl"
-      className='outerDialog'
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl"
+        className='outerDialog'
         PaperProps={{
           style: {
             backgroundColor: '#ffffff00',
             boxShadow: 'none',
-            overflow:'hidden',
-            width:'100%'
+            overflow: 'hidden',
+            width: '100%'
           },
         }}>
         <DialogContent className='dialog-content'>
           {/* Componente del formulario */}
           <AddObjectInsurance closeModal={handleCloseModal} />
         </DialogContent>
-       
+
       </Dialog>
 
-      <Box style={{ width: '100%'}} sx={{ width: '100%', marginTop: '12px' }}>
+      <Box style={{ width: '100%' }} sx={{ width: '100%', marginTop: '12px' }}>
         <Paper sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
           <Button variant="contained" onClick={handleOpenModal} sx={{ marginRight: '20px' }}>
             Nuevo
@@ -356,12 +354,12 @@ export default function ProtectObjectsTable() {
               No hay registros en la tabla.
             </Typography>
           ) : (
-            <TableContainer style={{overflow:'auto',height: 300,padding:'20px' }}>
+            <TableContainer style={{ overflow: 'auto', height: 300, padding: '20px' }}>
               <Table
-                 sx={{ minWidth: 750 }}
-                 aria-labelledby="tableTitle"
-                 size={'small'}
-                 style={{ height: 150 }}
+                sx={{ minWidth: 750 }}
+                aria-labelledby="tableTitle"
+                size={'small'}
+                style={{ height: 150 }}
               >
                 <EnhancedTableHead
                   numSelected={selected.length}
@@ -381,7 +379,7 @@ export default function ProtectObjectsTable() {
                     return (
                       <StyledTableRow
                         hover
-                        onClick={(event) => handleClick(event, row.number)}
+                        
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -390,13 +388,7 @@ export default function ProtectObjectsTable() {
                         sx={{ cursor: 'pointer' }}
                       >
                         <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                          />
+                         
                         </TableCell>
                         <TableCell
                           component="th"
@@ -413,6 +405,17 @@ export default function ProtectObjectsTable() {
                         <TableCell align="right">{row.amount}</TableCell>
                         <TableCell align="right">{row.rate}</TableCell>
                         <TableCell align="right">{row.prima}</TableCell>
+                        <TableCell align="right">
+                          <div  style={{display: 'flex', justifyContent:'end'}}>
+                          <IconButton>
+                            <EditIcon  onClick={handleOpenModal} />
+                          </IconButton>
+                          <IconButton>
+                            <DeleteIcon />
+                          </IconButton>
+                          </div>
+                          
+                        </TableCell>
                       </StyledTableRow>
                     );
                   })}
