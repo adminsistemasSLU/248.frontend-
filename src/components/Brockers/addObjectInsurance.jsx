@@ -11,6 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 import '../../styles/moddalForm.scss';
 import '../../styles/dialogForm.scss';
 import '../../styles/form.scss';
+import '../../styles/objectInsuranceTable.scss';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -139,10 +140,10 @@ const AddObjectInsurance = ({ closeModal }) => {
               <table container spacing={2} >
                 <tbody>
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }} >
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td   className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="province-Label"> <b>Provincia:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <select
 
                         id="province"
@@ -163,10 +164,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="city-Label"> <b>Ciudad:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <select
 
                         id="city"
@@ -187,10 +188,10 @@ const AddObjectInsurance = ({ closeModal }) => {
 
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="parish-Label"> <b>Parroquia:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <select
 
                         id="parish"
@@ -209,10 +210,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                     </td>
                   </tr>
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Direccion:</b>  </label>
                     </td>
-                    <td style={{ width: '50%' }}>
+                    <td  className='tdTableData'  style={{display:'flex', alignItems:'center'}} >
                       <input
                         label="direction-Label"
                         type="text"
@@ -223,19 +224,18 @@ const AddObjectInsurance = ({ closeModal }) => {
                         required
                         style={{ width: '100%' }}
                       />
-                    </td>
-                    <td style={{ width: '20%' }}>
-                      <div onClick={SearchLocation} >
+                       <div onClick={SearchLocation} >
                         <AddLocationAltRoundedIcon />
                       </div>
                     </td>
+                    
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="number-Label"> <b>Manzana:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <input
                         label="number"
                         type="text"
@@ -250,10 +250,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="house-Label"> <b>Villa:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <input
 
                         id="house"
@@ -270,10 +270,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="floor-Label"> <b>Pisos:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <input
 
                         id="floor"
@@ -289,10 +289,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="buildingAge-Label"> <b>Antiguedad:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <select
 
                         id="buildingAge"
@@ -314,10 +314,10 @@ const AddObjectInsurance = ({ closeModal }) => {
 
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T.Constuccion:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <select
 
                         id="constructionType"
@@ -337,10 +337,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="riskType-Label"> <b>T. Riesgo:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <select
 
                         id="riskType"
@@ -361,10 +361,10 @@ const AddObjectInsurance = ({ closeModal }) => {
 
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="destiny-Label"> <b>Destinado a:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <select
 
                         id="destiny"
@@ -385,10 +385,10 @@ const AddObjectInsurance = ({ closeModal }) => {
 
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="sumInsure-Label"> <b>Suma Aseg:</b>  </label>
                     </td>
-                    <td style={{ width: '50%' }}>
+                    <td  className='tdTableData' style={{display:'flex', alignItems:'center'}}>
                       <input
                         label="sumInsure-Label"
                         type="text"
@@ -399,19 +399,18 @@ const AddObjectInsurance = ({ closeModal }) => {
                         required
                         style={{ width: '100%' }}
                       />
-                    </td>
-                    <td style={{ width: '20%' }}>
-                      <div onClick={handleOpenModal}  >
+                       <div onClick={handleOpenModal}  >
                         <CalendarMonthIcon />
                       </div>
                     </td>
+                   
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="latituded-Label"> <b>Latitud:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <input
 
                         id="lat"
@@ -430,10 +429,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Longitud:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <input
 
                         id="lng"
@@ -452,10 +451,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                   </tr>
 
                   <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td style={{ width: '30%', textAlign: 'right' }}>
+                    <td className='tdTableTitle'>
                       <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Inspeccion:</b>  </label>
                     </td>
-                    <td style={{ width: '70%' }}>
+                    <td className='tdTableData'>
                       <input
 
                         id="inspection"
@@ -474,14 +473,14 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Direccion de inspeccion" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'right' }}>
+                        <td className='tdTableTitle' >
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Direccion:</b>
                           </label>
 
                         </td>
-                        <td style={{ width: '70%' }}>
+                        <td className='tdTableData' >
                           <input
                             id="direcctionInspection"
                             name="direcctionInspection"
@@ -499,14 +498,14 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Telefono de inspeccion" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'right' }}>
+                        <td className='tdTableTitle'>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Telefono:</b>
                           </label>
 
                         </td>
-                        <td style={{ width: '70%' }}>
+                        <td className='tdTableData'>
                           <input
                             id="phoneInspection"
                             name="phoneInspection"
@@ -524,14 +523,14 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Agente de inspeccion" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'right' }}>
+                        <td className='tdTableTitle'>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Contacto:</b>
                           </label>
 
                         </td>
-                        <td style={{ width: '70%' }}>
+                        <td className='tdTableData'>
                           <input
                             id="agentInspection"
                             name="agentInspection"
@@ -549,14 +548,14 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Fecha Tentativa" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'    }}>
+                        <td style={{ width: '40%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'    }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Fecha:</b>
                           </label>
 
                         </td>
-                        <td style={{ width: '70%' }}>
+                        <td className='tdTableData'>
                           <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DemoContainer components={['DatePicker']}  sx={{overflow:'hidden'}}>
                               <DatePicker className='hourPicker'  style={{overflow:'hidden'}}   slotProps={{ textField: {variant: 'standard', size:'small'} }} />
@@ -570,13 +569,13 @@ const AddObjectInsurance = ({ closeModal }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Hora tentativa" placement="left">
                       <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'   }}>
+                        <td style={{ width: '40%', textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent:'end',alignItems:'center'   }}>
 
                           <label style={{ fontSize: '13px' }} id="longitude-Label">
                             <b>Hora:</b>
                           </label>
                         </td>
-                        <td style={{ width: '70%', }} >
+                        <td  className='tdTableData' >
                           <LocalizationProvider dateAdapter={AdapterDayjs} style={{overflow:'hidden'}}>
                             <DemoContainer components={['TimePicker']} sx={{overflow:'hidden'}}>
                               <TimePicker

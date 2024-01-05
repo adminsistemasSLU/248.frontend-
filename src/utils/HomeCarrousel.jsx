@@ -27,7 +27,7 @@ function HomeCarrousel(props) {
         {
             name: "Pymes",
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores nobis ullam facilis ',
-            imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/incendio.jpg',
+            imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/pymes.png',
             url:'/quoter/stepper',
             enable:true,
         }
