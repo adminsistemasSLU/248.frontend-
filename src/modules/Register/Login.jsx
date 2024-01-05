@@ -71,7 +71,7 @@ const Login = () => {
             Enviar
           </Button>
         </form>
-      </Paper>|
+      </Paper>
     </Container>
   );
 };

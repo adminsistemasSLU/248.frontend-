@@ -97,7 +97,7 @@ const AddObjectInsurance = ({ closeModal }) => {
     <Container
       component="main"
       className='dialog-Form'
-      style={{ padding:0, minHeight: '80vh', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
+      style={{ padding: 0, minHeight: '80vh', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
     >
 
 
@@ -106,7 +106,7 @@ const AddObjectInsurance = ({ closeModal }) => {
           style: {
             backgroundColor: '#ffffff',
             boxShadow: 'none',
-          
+
             overflow: 'hidden',
             zIndex: '2000'
           },
@@ -135,473 +135,489 @@ const AddObjectInsurance = ({ closeModal }) => {
         <div className='modalFormColumn'>
 
 
-          <Paper elevation={3} className='modalContent' style={{overflowY:'scroll', height: '50vh' , paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Paper elevation={3} className='modalContent' style={{ overflowY: 'scroll', height: '50vh', paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
             <form component="form" onSubmit={handleSubmit} className='form'>
               <table container spacing={2} >
                 <tbody>
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }} >
-                    <td   className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="province-Label"> <b>Provincia:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <select
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent' >
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="province-Label"> <b>Provincia:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <select
+                          id="province"
+                          name="province"
+                          value={formData.province}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+                          <option value="01">Guayas</option>
+                          <option value="02">Quito</option>
+                          <option value="03">Azogues</option>
+                        </select>
+                      </td>
+                    </div>
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="city-Label"> <b>Ciudad:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <select
 
-                        id="province"
-                        name="province"
-                        value={formData.province}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-                        <option value="01">Guayas</option>
-                        <option value="02">Quito</option>
-                        <option value="03">Azogues</option>
-                      </select>
-                    </td>
-
+                          id="city"
+                          name="city"
+                          value={formData.city}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+                          <option value="G01">Guayaquil</option>
+                          <option value="G02">Duran</option>
+                          <option value="G03">Daule</option>
+                        </select>
+                      </td>
+                    </div>
                   </tr>
 
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="city-Label"> <b>Ciudad:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <select
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent' >
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="parish-Label"> <b>Parroquia:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <select
 
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        style={{ textAlign: 'left', border: '1px solid #A1A8AE',width:'80%' }}
-                      >
-                        <option value="G01">Guayaquil</option>
-                        <option value="G02">Duran</option>
-                        <option value="G03">Daule</option>
-                      </select>
-                    </td>
+                          id="parish"
+                          name="parish"
+                          value={formData.parish}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                        >
+                          <option value="G01">Balao</option>
+                          <option value="G02">Duran</option>
+                          <option value="G03">Daule</option>
+                        </select>
+                      </td>
+                    </div>
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Direccion:</b>  </label>
+                      </td>
+                      <td className='tdTableData' style={{ display: 'flex', alignItems: 'center' }} >
+                        <input
+                          label="direction-Label"
+                          type="text"
+                          name="direccion"
+                          value={formData.direccion}
+                          onChange={handleChange}
+                          variant="standard"
+                          required
+                          className='modalFormInputs'
+                        />
+                        <div onClick={SearchLocation} >
+                          <AddLocationAltRoundedIcon />
+                        </div>
+                      </td>
+                    </div>
                   </tr>
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="number-Label"> <b>Manzana:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <input
+                          label="number"
+                          type="text"
+                          name="block"
+                          value={formData.block}
+                          onChange={handleChange}
+                          variant="standard"
+                          required
+                          className='modalFormInputs'
+                        />
+                      </td>
+                    </div>
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="house-Label"> <b>Villa:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <input
 
+                          id="house"
+                          name="house"
+                          value={formData.house}
+                          onChange={handleChange}
+                          variant="standard"
 
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="parish-Label"> <b>Parroquia:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <select
+                          required
+                          className='modalFormInputs'
+                        />
 
-                        id="parish"
-                        name="parish"
-                        value={formData.parish}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        style={{ textAlign: 'left',width:'80%' }}
-                      >
-                        <option value="G01">Balao</option>
-                        <option value="G02">Duran</option>
-                        <option value="G03">Daule</option>
-                      </select>
-                    </td>
-                  </tr>
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Direccion:</b>  </label>
-                    </td>
-                    <td  className='tdTableData'  style={{display:'flex', alignItems:'center'}} >
-                      <input
-                        label="direction-Label"
-                        type="text"
-                        name="direccion"
-                        value={formData.direccion}
-                        onChange={handleChange}
-                        variant="standard"
-                        required
-                        style={{ width: '80%' }}
-                      />
-                       <div onClick={SearchLocation} >
-                        <AddLocationAltRoundedIcon />
-                      </div>
-                    </td>
-                    
-                  </tr>
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="number-Label"> <b>Manzana:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <input
-                        label="number"
-                        type="text"
-                        name="block"
-                        value={formData.block}
-                        onChange={handleChange}
-                        variant="standard"
-                        required
-                        style={{ width: '80%' }}
-                      />
-                    </td>
-                  </tr>
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="house-Label"> <b>Villa:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <input
-
-                        id="house"
-                        name="house"
-                        value={formData.house}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        style={{ width: '80%' }}
-                      />
-
-                    </td>
-                  </tr>
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="floor-Label"> <b>Pisos:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <input
-
-                        id="floor"
-                        name="floor"
-                        value={formData.floor}
-                        onChange={handleChange}
-                        variant="standard"
-                        required
-                        style={{ width: '80%' }}
-                      />
-
-                    </td>
-                  </tr>
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="buildingAge-Label"> <b>Antiguedad:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <select
-
-                        id="buildingAge"
-                        name="buildingAge"
-                        value={formData.buildingAge}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-                        <option value="G01">1</option>
-                        <option value="G02">2</option>
-                        <option value="G03">3</option>
-                      </select>
-                    </td>
+                      </td>
+                    </div>
                   </tr>
 
 
 
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T.Constuccion:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <select
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="floor-Label"> <b>Pisos:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <input
 
-                        id="constructionType"
-                        name="constructionType"
-                        value={formData.constructionType}
-                        onChange={handleChange}
-                        variant="standard"
+                          id="floor"
+                          name="floor"
+                          value={formData.floor}
+                          onChange={handleChange}
+                          variant="standard"
+                          required
+                          className='modalFormInputs'
+                        />
 
-                        required
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-                        <option value="G01">CEMENTO</option>
-                        <option value="G02">2</option>
-                        <option value="G03">3</option>
-                      </select>
-                    </td>
+                      </td>
+                    </div>
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="buildingAge-Label"> <b>Antiguedad:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <select
+
+                          id="buildingAge"
+                          name="buildingAge"
+                          value={formData.buildingAge}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+                          <option value="G01">1</option>
+                          <option value="G02">2</option>
+                          <option value="G03">3</option>
+                        </select>
+                      </td>
+                    </div>
                   </tr>
 
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="riskType-Label"> <b>T. Riesgo:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <select
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T.Constuccion:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <select
 
-                        id="riskType"
-                        name="riskType"
-                        value={formData.riskType}
-                        onChange={handleChange}
-                        variant="standard"
+                          id="constructionType"
+                          name="constructionType"
+                          value={formData.constructionType}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+                          <option value="G01">CEMENTO</option>
+                          <option value="G02">2</option>
+                          <option value="G03">3</option>
+                        </select>
+                      </td>
+                    </div>
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="riskType-Label"> <b>T. Riesgo:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <select
 
-                        required
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-                        <option value="G01">VIVIENDA</option>
-                        <option value="G02">2</option>
-                        <option value="G03">3</option>
-                      </select>
-                    </td>
-                  </tr>
+                          id="riskType"
+                          name="riskType"
+                          value={formData.riskType}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+                          <option value="G01">VIVIENDA</option>
+                          <option value="G02">2</option>
+                          <option value="G03">3</option>
+                        </select>
+                      </td>
+                    </div>
 
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="destiny-Label"> <b>Destinado a:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <select
-
-                        id="destiny"
-                        name="destiny"
-                        value={formData.destiny}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-                        <option value="G01">VIVIENDA</option>
-                        <option value="G02">2</option>
-                        <option value="G03">3</option>
-                      </select>
-                    </td>
-                  </tr>
-
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="sumInsure-Label"> <b>Suma Aseg:</b>  </label>
-                    </td>
-                    <td  className='tdTableData' style={{display:'flex', alignItems:'center'}}>
-                      <input
-                        label="sumInsure-Label"
-                        type="text"
-                        name="umInsure"
-                        value={formData.sumInsure}
-
-                        variant="standard"
-                        required
-                        style={{ width: '80%' }}
-                      />
-                       <div onClick={handleOpenModal}  >
-                        <CalendarMonthIcon />
-                      </div>
-                    </td>
-                   
-                  </tr>
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="latituded-Label"> <b>Latitud:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <input
-
-                        id="lat"
-                        name="lat"
-                        value={formData.lat}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        disabled
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-
-                      </input>
-                    </td>
-                  </tr>
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Longitud:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <input
-
-                        id="lng"
-                        name="lng"
-                        value={formData.lng}
-                        onChange={handleChange}
-                        variant="standard"
-
-                        required
-                        disabled
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-
-                      </input>
-                    </td>
-                  </tr>
-
-                  <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <td className='tdTableTitle'>
-                      <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Inspeccion:</b>  </label>
-                    </td>
-                    <td className='tdTableData'>
-                      <input
-
-                        id="inspection"
-                        name="inspection"
-                        checked={formData.inspection}
-                        onChange={toggleInspection}
-                        variant="standard"
-                        type='checkbox'
-                        style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                      >
-                      </input>
-                    </td>
                   </tr>
 
 
-                  {formData.inspection && ( // Verificar si inspection es true
-                    <Tooltip title="Dirección de inspeccion" placement="left">
-                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td className='tdTableTitle' >
 
-                          <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Dirección:</b>
-                          </label>
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="destiny-Label"> <b>Destinado a:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <select
 
-                        </td>
-                        <td className='tdTableData' >
-                          <input
-                            id="direcctionInspection"
-                            name="direcctionInspection"
-                            value={formData.direcctionInspection}
-                            onChange={handleChange}
-                            variant="standard"
-                            style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                          >
-                          </input>
-                        </td>
-                      </tr>
-                    </Tooltip>
-                  )}
+                          id="destiny"
+                          name="destiny"
+                          value={formData.destiny}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+                          <option value="G01">VIVIENDA</option>
+                          <option value="G02">2</option>
+                          <option value="G03">3</option>
+                        </select>
+                      </td>
+                    </div>
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="sumInsure-Label"> <b>Suma Aseg:</b>  </label>
+                      </td>
+                      <td className='tdTableData' style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          label="sumInsure-Label"
+                          type="text"
+                          name="umInsure"
+                          value={formData.sumInsure}
+                          className='modalFormInputs'
+                          variant="standard"
+                          required
+                        />
+                        <div onClick={handleOpenModal}  >
+                          <CalendarMonthIcon />
+                        </div>
+                      </td>
+                    </div>
+                  </tr>
 
-                  {formData.inspection && ( // Verificar si inspection es true
-                    <Tooltip title="Telefono de inspeccion" placement="left">
-                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td className='tdTableTitle'>
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="latituded-Label"> <b>Latitud:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <input
 
-                          <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Teléfono:</b>
-                          </label>
+                          id="lat"
+                          name="lat"
+                          value={formData.lat}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          disabled
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
 
-                        </td>
-                        <td className='tdTableData'>
-                          <input
-                            id="phoneInspection"
-                            name="phoneInspection"
-                            value={formData.phoneInspection}
-                            onChange={handleChange}
-                            variant="standard"
-                            style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                          >
-                          </input>
-                        </td>
-                      </tr>
-                    </Tooltip>
-                  )}
+                        </input>
+                      </td>
+                    </div>
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Longitud:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <input
+
+                          id="lng"
+                          name="lng"
+                          value={formData.lng}
+                          onChange={handleChange}
+                          variant="standard"
+                          className='modalFormInputs'
+                          required
+                          disabled
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+
+                        </input>
+                      </td>
+                    </div>
+                  </tr>
+
+
+                  <tr className='modalFormRow' >
+                    <div className='modalFormContent'>
+                      <td className='tdTableTitle'>
+                        <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Inspeccion:</b>  </label>
+                      </td>
+                      <td className='tdTableData'>
+                        <input
+
+                          id="inspection"
+                          name="inspection"
+                          checked={formData.inspection}
+                          onChange={toggleInspection}
+                          variant="standard"
+                          className='modalFormInputs'
+                          type='checkbox'
+                          style={{ border: '1px solid #A1A8AE' }}
+                        >
+                        </input>
+                      </td>
+                    </div>
+                  </tr>
 
                   {formData.inspection && ( // Verificar si inspection es true
                     <Tooltip title="Agente de inspeccion" placement="left">
-                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td className='tdTableTitle'>
+                      <tr className='modalFormRow' >
+                        <div className='modalFormContent'>
+                          <td className='tdTableTitle'>
 
-                          <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Contacto:</b>
-                          </label>
+                            <label style={{ fontSize: '13px' }} id="longitude-Label">
+                              <b>Contacto:</b>
+                            </label>
 
-                        </td>
-                        <td className='tdTableData'>
-                          <input
-                            id="agentInspection"
-                            name="agentInspection"
-                            value={formData.agentInspection}
-                            onChange={handleChange}
-                            variant="standard"
-                            style={{ textAlign: 'left', width: '80%', border: '1px solid #A1A8AE' }}
-                          >
-                          </input>
-                        </td>
+                          </td>
+                          <td className='tdTableData'>
+                            <input
+                              id="agentInspection"
+                              name="agentInspection"
+                              value={formData.agentInspection}
+                              onChange={handleChange}
+                              variant="standard"
+                              className='modalFormInputs'
+                              style={{ border: '1px solid #A1A8AE' }}
+                            >
+                            </input>
+                          </td>
+                        </div>
                       </tr>
                     </Tooltip>
                   )}
 
                   {formData.inspection && ( // Verificar si inspection es true
-                    <Tooltip title="Fecha Tentativa" placement="left">
-                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'left', display: 'flex', flexDirection: 'row', justifyContent:'start',alignItems:'center'    }}>
 
-                          <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Fecha:</b>
-                          </label>
+                    <tr className='modalFormRow' >
+                      <Tooltip title="Dirección de inspeccion" placement="left">
+                        <div className='modalFormContent'>
 
-                        </td>
-                        <td className='tdTableData'>
-                          <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DemoContainer components={['DatePicker']}  sx={{overflow:'hidden'}}>
-                              <DatePicker className='hourPicker'  style={{overflow:'hidden'}}   slotProps={{ textField: {variant: 'standard', size:'small'} }} />
-                            </DemoContainer>
-                          </LocalizationProvider>
-                        </td>
-                      </tr>
-                    </Tooltip>
+                          <td className='tdTableTitle' >
+
+                            <label style={{ fontSize: '13px' }} id="longitude-Label">
+                              <b>Dirección:</b>
+                            </label>
+
+                          </td>
+                          <td className='tdTableData' >
+                            <input
+                              id="direcctionInspection"
+                              name="direcctionInspection"
+                              value={formData.direcctionInspection}
+                              onChange={handleChange}
+                              variant="standard"
+                              className='modalFormInputs'
+                              style={{ border: '1px solid #A1A8AE' }}
+                            >
+                            </input>
+                          </td>
+
+                        </div>
+                      </Tooltip>
+                      <Tooltip title="Telefono de inspeccion" placement="left">
+                        <div className='modalFormContent'>
+
+                          <td className='tdTableTitle'>
+
+                            <label style={{ fontSize: '13px' }} id="longitude-Label">
+                              <b>Teléfono:</b>
+                            </label>
+
+                          </td>
+                          <td className='tdTableData'>
+                            <input
+                              id="phoneInspection"
+                              name="phoneInspection"
+                              value={formData.phoneInspection}
+                              onChange={handleChange}
+                              variant="standard"
+                              className='modalFormInputs'
+                              style={{ border: '1px solid #A1A8AE' }}
+                            >
+                            </input>
+                          </td>
+
+                        </div>
+                      </Tooltip>
+                    </tr>
+
                   )}
 
                   {formData.inspection && ( // Verificar si inspection es true
-                    <Tooltip title="Hora tentativa" placement="left">
-                      <tr style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                        <td style={{ width: '30%', textAlign: 'left', display: 'flex', flexDirection: 'row', justifyContent:'start',alignItems:'center'   }}>
 
-                          <label style={{ fontSize: '13px' }} id="longitude-Label">
-                            <b>Hora:</b>
-                          </label>
-                        </td>
-                        <td  className='tdTableData' >
-                          <LocalizationProvider dateAdapter={AdapterDayjs} style={{overflow:'hidden'}}>
-                            <DemoContainer components={['TimePicker']} sx={{overflow:'hidden'}}>
-                              <TimePicker
-                              className='hourPicker' 
-                               slotProps={{ textField: {variant: 'standard', size:'small'} }}
-                               
-                              />
+                    <tr className='modalFormRow' >
 
-                            </DemoContainer>
-                          </LocalizationProvider>
-                        </td>
-                      </tr>
-                    </Tooltip>
+                      <Tooltip title="Fecha Tentativa" placement="left">
+                        <div className='modalFormContent'>
+                          <td className=' tdTableTitle dateTimePickerForm'>
+                            <label style={{ fontSize: '13px' }} id="longitude-Label">
+                              <b>Fecha:</b>
+                            </label>
+                          </td>
+                          <td className='tdTableData'>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DemoContainer components={['DatePicker']} sx={{ overflow: 'hidden' }}>
+                                <DatePicker className='hourPicker' style={{ overflow: 'hidden' }} slotProps={{ textField: { variant: 'standard', size: 'small' } }} />
+                              </DemoContainer>
+                            </LocalizationProvider>
+                          </td>
+                        </div>
+                      </Tooltip>
+
+
+                      <div className='modalFormContent'>
+                        <Tooltip title="Hora tentativa" placement="left" style={{display:'flex'}}>
+                          <td className=' tdTableTitle dateTimePickerForm'>
+                            <label className='tdTableTitle' style={{ fontSize: '13px' }} id="longitude-Label">
+                              <b>Hora:</b>
+                            </label>
+                          </td>
+                          <td className='tdTableData'>
+                            <LocalizationProvider dateAdapter={AdapterDayjs} style={{ overflow: 'hidden' }}>
+                              <DemoContainer components={['TimePicker']} sx={{ overflow: 'hidden' }}>
+                                <TimePicker
+                                  className='hourPicker'
+                                  slotProps={{ textField: { variant: 'standard', size: 'small' } }}
+
+                                />
+
+                              </DemoContainer>
+                            </LocalizationProvider>
+                          </td>
+                        </Tooltip>
+                      </div>
+                    </tr>
                   )}
+
+
                 </tbody>
               </table>
-              <div style={{display:'flex',justifyContent:'center'}}>
-              <Button type="submit" className='btnStepper' variant="contained"  style={{top:'0', backgroundColor:'rgb(0, 169, 158)'}} fullWidth>
-                Agregar
-              </Button>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Button type="submit" className='btnStepper' variant="contained" style={{ top: '0', backgroundColor: 'rgb(0, 169, 158)' }} fullWidth>
+                  Agregar
+                </Button>
               </div>
-            
+
             </form >
           </Paper>
-          <div className='modalContent' style={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>
+          <div className='modalContent' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <MapContainer
               ref={mapContainerRef}
               lat={formData.lat}

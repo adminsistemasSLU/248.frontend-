@@ -9,8 +9,9 @@ const MapContainer = forwardRef(({ lat: externalLat, lon: externalLng, direccion
   const [position, setPosition] = useState({ lat: externalLat || -2.1894128, lng: externalLng || -79.8890662 });
 
   const mapContainerStyle = {
-    width: '90%',
+    width: '50%',
     height: '300px',
+    margin:'50px'
   };
 
   const center = {
