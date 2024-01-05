@@ -9,7 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
-import DescriptionIcon from '@mui/icons-material/Description';
+import EditIcon from '@mui/icons-material/Edit';
 import { styled } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
@@ -55,34 +55,34 @@ const headCells = [
     label: '#',
   },
   {
+    id: 'accion',
+    numeric: false,
+    disablePaadding: false,
+    label: 'Acción',
+  },
+  {
     id: 'cobertura',
     numeric: false,
     disablePadding: false,
-    label: 'cobertura',
-  },
-  {
-    id: 'accion',
-    numeric: false,
-    disablePadding: false,
-    label: 'acción',
+    label: 'Cobertura',
   },
   {
     id: 'monto',
     numeric: true,
     disablePadding: false,
-    label: 'monto',
+    label: 'Monto',
   },
   {
     id: 'tasa',
     numeric: true,
     disablePadding: false,
-    label: 'tasa',
+    label: 'Tasa',
   },
   {
     id: 'prima',
     numeric: true,
     disablePadding: false,
-    label: 'prima',
+    label: 'Prima',
   }
 ];
 
@@ -191,7 +191,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(15);
   const [openModal, setOpenModal] = React.useState(false);
-  // const [editableRows, setEditableRows] = React.useState(rows);
+  const [editableRows, setEditableRows] = React.useState(rows);
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
@@ -276,17 +276,17 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     setOpenModal(true);
   };
 
-  // const handleSaveChanges = () => {
-  //   // Actualizar los valores editables en el estado principal (editableRows)
-  //   const newEditableRows = editableRows.map((row, index) => ({
-  //     ...row,
-  //     monto: editableValues[index].monto,
-  //     tasa: editableValues[index].tasa,
-  //     prima: editableValues[index].prima,
-  //   }));
-  //   setEditableRows(newEditableRows);
-  //   console.log(newEditableRows);
-  // };
+  const handleSaveChanges = () => {
+    // Actualizar los valores editables en el estado principal (editableRows)
+    const newEditableRows = editableRows.map((row, index) => ({
+      ...row,
+      monto: editableValues[index].monto,
+      tasa: editableValues[index].tasa,
+      prima: editableValues[index].prima,
+    }));
+    setEditableRows(newEditableRows);
+    console.log(newEditableRows);
+  };
 
 
   // Manejador para cerrar el modal
@@ -331,8 +331,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
-          size={'small'}
-          style={{ height: 400 }}
+          size="small"
+          style={{ height: 50 }}
         >
           <EnhancedTableHead
             rowCount={rows.length}
@@ -365,6 +365,10 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                         key={row.id}
                       />
                     </TableCell>
+                    <TableCell align="left">
+                      <EditIcon onClick={handleOpenModal} />
+                    </TableCell>
+
                     <TableCell
                       component="th"
                       id={labelId}
@@ -374,9 +378,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                       {row.id}
                     </TableCell>
                     <TableCell align="left">{row.cobertura}</TableCell>
-                    <TableCell align="left">
-                      {isItemSelected ? (<DescriptionIcon onClick={handleOpenModal} />) : (<div></div>)}
-                    </TableCell>
+
                     <TableCell align="right">
                       {/* Campo editable con CurrencyInput */}
                       <CurrencyInput
@@ -389,9 +391,9 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     </TableCell>
                     <TableCell align="right">
                       {/* Campo editable con CurrencyInput */}
-                      <CurrencyInput
+                      <input
                         className='input-table'
-                        value={editableValues[index].tasa.toFixed(2)}
+                        value={editableValues[index].tasa.toFixed(2) + '%'}
                         onChange={(event) =>
                           handleCellValueChange(event, index, 'tasa')
                         }
@@ -428,17 +430,17 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
-          labelRowsPerPage ='Filas por pagina'
+          labelRowsPerPage='Filas por pagina'
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        <div style={{display:'flex',justifyContent:'end'}}>
+        <div style={{ display: 'flex', justifyContent: 'end', flexWrap: 'wrap' }}>
           <div className='elementsModal' style={{ marginRight: '10px' }}>
             <div>Monto: </div>
             <div>
-            <CurrencyInput style={{width:'105px'}}
-                        className='input-table'
-                        value={totalMonto.toFixed(2)} />
+              <CurrencyInput style={{ width: '105px' }}
+                className='input-table'
+                value={totalMonto.toFixed(2)} />
             </div>
           </div>
           <div className='elementsModal elementRight'>
@@ -446,13 +448,13 @@ export default function DetailObjectsTable({ closeModalDetail }) {
               Prima:
             </div>
             <div>
-            <CurrencyInput style={{width:'105px'}}
-                        className='input-table'
-                        value= {totalPrima.toFixed(2)} />
+              <CurrencyInput style={{ width: '105px' }}
+                className='input-table'
+                value={totalPrima.toFixed(2)} />
             </div>
           </div>
           <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'end' }}>
-            {/* <button className='btnAceptar' onClick={handleSaveChanges}>Aceptar</button> */}
+            <button className='btnStepper btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
           </div>
         </div>
       </div>

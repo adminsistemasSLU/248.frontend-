@@ -10,6 +10,12 @@ import '../styles/carrousel.scss';
 function HomeCarrousel(props) {
     var items = [
         {
+            name: "Pymes",
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores nobis ullam facilis ',
+            imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/pymes.png',
+            url:'/quoter/stepper',
+            enable:true,
+        },{
             name: "Vehículos",
             description: "Probably the most random thing you have ever seen!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/automovil.jpg',
@@ -24,13 +30,7 @@ function HomeCarrousel(props) {
             enable:false,
         }
         ,
-        {
-            name: "Pymes",
-            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores nobis ullam facilis ',
-            imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/pymes.png',
-            url:'/quoter/stepper',
-            enable:true,
-        }
+       
     ];
     const groupItems = (items, groupSize) => {
         const grouped = [];
