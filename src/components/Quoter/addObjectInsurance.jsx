@@ -475,9 +475,10 @@ const AddObjectInsurance = ({ closeModal }) => {
                     </div>
                   </tr>
 
+                
                   {formData.inspection && ( // Verificar si inspection es true
-                    <Tooltip title="Agente de inspeccion" placement="left">
-                      <tr className='modalFormRow' >
+                    <tr className='modalFormRow' >
+                      <Tooltip title="Agente de inspeccion" placement="left">
                         <div className='modalFormContent'>
                           <td className='tdTableTitle'>
 
@@ -499,38 +500,8 @@ const AddObjectInsurance = ({ closeModal }) => {
                             </input>
                           </td>
                         </div>
-                      </tr>
-                    </Tooltip>
-                  )}
-
-                  {formData.inspection && ( // Verificar si inspection es true
-
-                    <tr className='modalFormRow' >
-                      <Tooltip title="Dirección de inspeccion" placement="left">
-                        <div className='modalFormContent'>
-
-                          <td className='tdTableTitle' >
-
-                            <label style={{ fontSize: '13px' }} id="longitude-Label">
-                              <b>Dirección:</b>
-                            </label>
-
-                          </td>
-                          <td className='tdTableData' >
-                            <input
-                              id="direcctionInspection"
-                              name="direcctionInspection"
-                              value={formData.direcctionInspection}
-                              onChange={handleChange}
-                              variant="standard"
-                              className='modalFormInputs'
-                              style={{ border: '1px solid #A1A8AE' }}
-                            >
-                            </input>
-                          </td>
-
-                        </div>
                       </Tooltip>
+
                       <Tooltip title="Telefono de inspeccion" placement="left">
                         <div className='modalFormContent'>
 
@@ -581,9 +552,9 @@ const AddObjectInsurance = ({ closeModal }) => {
                         </div>
                       </Tooltip>
 
-                      <Tooltip title="Hora tentativa" placement="left" style={{display:'flex'}}>
-                      <div className='modalFormContent'>
-                        
+                      <Tooltip title="Hora tentativa" placement="left" style={{ display: 'flex' }}>
+                        <div className='modalFormContent'>
+
                           <td className=' tdTableTitle dateTimePickerForm'>
                             <label className='tdTableTitle' style={{ fontSize: '13px' }} id="longitude-Label">
                               <b>Hora:</b>
@@ -601,8 +572,8 @@ const AddObjectInsurance = ({ closeModal }) => {
                               </DemoContainer>
                             </LocalizationProvider>
                           </td>
-                      
-                      </div>
+
+                        </div>
                       </Tooltip>
                     </tr>
                   )}

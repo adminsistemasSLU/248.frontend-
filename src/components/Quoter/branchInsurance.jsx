@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button'; 
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -209,17 +210,17 @@ export default function BranchInsurance({ closeModalDetail }) {
     rows.map((row) => ({ descripcion: row.descripcion }))
   );
 
-  const handleSaveChanges = () => {
-    // Actualizar los valores editables en el estado principal (editableRows)
-    const newEditableRows = editableRows.map((row, index) => ({
-      ...row,
-      monto: editableValues[index].monto,
-      tasa: editableValues[index].tasa,
-      prima: editableValues[index].prima,
-    }));
-    setEditableRows(newEditableRows);
-    console.log(newEditableRows);
-  };
+  // const handleSaveChanges = () => {
+  //   // Actualizar los valores editables en el estado principal (editableRows)
+  //   const newEditableRows = editableRows.map((row, index) => ({
+  //     ...row,
+  //     monto: editableValues[index].monto,
+  //     tasa: editableValues[index].tasa,
+  //     prima: editableValues[index].prima,
+  //   }));
+  //   setEditableRows(newEditableRows);
+  //   console.log(newEditableRows);
+  // };
 
   React.useEffect(() => {
     setEditableValues(
@@ -411,11 +412,12 @@ export default function BranchInsurance({ closeModalDetail }) {
               <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={(495).toFixed(2)} />
             </div>
           </div>
-          <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'end' }}>
-            <button className='btnStepper btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
-          </div>
+         
         </div>
       </TableContainer>
+      <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'center' }}>
+            <Button variant="contained"   color="primary" onClick={closeModal}>Aceptar</Button>
+          </div>
     </div>
   );
 }

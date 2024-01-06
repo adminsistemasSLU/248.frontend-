@@ -10,6 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
 import EditIcon from '@mui/icons-material/Edit';
+import Button from '@mui/material/Button'; 
 import { styled } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
@@ -49,16 +50,16 @@ const rows = [
 
 const headCells = [
   {
-    id: 'id',
-    numeric: false,
-    disablePadding: true,
-    label: '#',
-  },
-  {
     id: 'accion',
     numeric: false,
     disablePaadding: false,
     label: 'Acción',
+  },
+  {
+    id: 'id',
+    numeric: false,
+    disablePadding: true,
+    label: '#',
   },
   {
     id: 'cobertura',
@@ -355,7 +356,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     key={row.id}
                   >
                     <TableCell padding="checkbox">
-                      <Checkbox
+                       <Checkbox
                         onClick={(event) => handleClick(event, row.id)}
                         color="primary"
                         checked={isItemSelected}
@@ -366,7 +367,14 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                       />
                     </TableCell>
                     <TableCell align="left">
-                      <EditIcon onClick={handleOpenModal} />
+                    {row.id <= 4 ? (
+                         <EditIcon onClick={handleOpenModal} />
+                       
+                      ) : (
+                        null
+                      )}
+
+                     
                     </TableCell>
 
                     <TableCell
@@ -453,11 +461,12 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                 value={totalPrima.toFixed(2)} />
             </div>
           </div>
-          <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'end' }}>
-            <button className='btnStepper btnAceptar' onClick={handleSaveChanges}>Aceptar</button>
-          </div>
+          
         </div>
       </div>
+      <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'center' }}>
+            <Button  variant="contained"   color="primary" onClick={closeModal}>Aceptar</Button>
+          </div>
     </div>
   );
 }

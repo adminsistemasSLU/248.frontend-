@@ -210,6 +210,7 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
 
     return (
         <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            
             <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
                 <div>Descripcion de Sección</div>
                 <div onClick={closeModal}> <CloseIcon /></div>
@@ -342,10 +343,11 @@ export default function ProtectionDetailTable({ closeModalDetail }) {
 
             {/* Botón "Aceptar" */}
             <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-                <Button variant="contained" color="primary">
+                <Button variant="contained" color="primary"  onClick={closeModal} >
                     Aceptar
                 </Button>
             </div>
         </div>
+        
     );
 }
