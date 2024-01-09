@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect ,forwardRef, useImperativeHandle  } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-
+const API_Key_Google_Maps = process.env.REACT_APP_API_GOOGLE_MAPS || 'default_url';
 
 const MapContainer = forwardRef(({ lat: externalLat, lon: externalLng, direccion: externalDireccion, onMarkerDragEnd: externalOnMarkerDragEnd, onUpdateLocation }, ref) => {
   const [map, setMap] = useState(null);
@@ -70,7 +70,7 @@ const MapContainer = forwardRef(({ lat: externalLat, lon: externalLng, direccion
   const getLatLngFromAddress = async (address) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=AIzaSyCzH9Z4WlK74-EgYlMR7BLB9SUnkTfouIE`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=`+API_Key_Google_Maps
       );
       const data = await response.json();
 
@@ -105,7 +105,7 @@ const MapContainer = forwardRef(({ lat: externalLat, lon: externalLng, direccion
   const getAddressFromLatLng = async (lat, lng) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyCzH9Z4WlK74-EgYlMR7BLB9SUnkTfouIE`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=`+API_Key_Google_Maps
       );
       const data = await response.json();
 
@@ -124,7 +124,7 @@ const MapContainer = forwardRef(({ lat: externalLat, lon: externalLng, direccion
   }));
 
   return (
-    <LoadScript googleMapsApiKey="AIzaSyCzH9Z4WlK74-EgYlMR7BLB9SUnkTfouIE" >
+    <LoadScript googleMapsApiKey = {API_Key_Google_Maps} >
       <div>
         <label style={{display:'none'}}>
           Dirección:
