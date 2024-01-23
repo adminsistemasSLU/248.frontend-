@@ -34,7 +34,6 @@ export const AuthProvider = ({ children }) => {
                 setIsLoading(false);
                 try {
                     //Aquí puedes llamar a un endpoint que valide el token y devuelva información del usuario
-                    const token = localStorage.getItem(TOKEN_STORAGE_KEY);
                     const user = localStorage.getItem(USER_STORAGE_KEY);
                     const menu = localStorage.getItem('menu');
                     //const userData = await authService.fetchWithAuth('user_info_endpoint');

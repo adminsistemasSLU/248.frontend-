@@ -1,26 +1,51 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Card, CardContent, CardMedia, Container, Grid, Typography } from '@mui/material';
 import '../../styles/carrousel.scss';
+import BaldosasService from '../../services/BaldosasService/BaldosasService';
 
 const ProductListCards = ({ onNext }) => {
-  // Definición de datos para las cartas
-  const data = [
-    {
-      imagen: process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/industria-pesada.jpg',
-      titulo: 'Hogar',
-      descripcion: 'Descripción breve de la carta 1.',
-    },
-    {
-      imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/oficinas.jpg',
-      titulo: 'Oficina',
-      descripcion: 'Descripción breve de la carta 2.',
-    },
-    {
-      imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/edificios.jpg',
-      titulo: 'Edificios',
-      descripcion: 'Descripción breve de la carta 3.',
-    },
-  ];
+  const [data, setdata] = useState([]);
+
+  // const data = [
+  //   {
+  //     imagen: process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/industria-pesada.jpg',
+  //     titulo: 'Hogar',
+  //     descripcion: 'Descripción breve de la carta 1.',
+  //   },
+  //   {
+  //     imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/oficinas.jpg',
+  //     titulo: 'Oficina',
+  //     descripcion: 'Descripción breve de la carta 2.',
+  //   },
+  //   {
+  //     imagen:  process.env.PUBLIC_URL + '/assets/images/carousel/ProductCards/edificios.jpg',
+  //     titulo: 'Edificios',
+  //     descripcion: 'Descripción breve de la carta 3.',
+  //   },
+  // ];
+
+  useEffect(() => {
+    const printBaldosas = async () => {
+        try {
+            const baldosas = await BaldosasService.fetchSubBaldosas(1,'');
+            console.log(baldosas);
+            if (baldosas && baldosas.data.BaldosaSubServisios) {
+                const newItems = baldosas.data.BaldosaSubServisios.map(baldosa => {
+                    return {
+                        titulo: baldosa.titulo,
+                        descripcion: baldosa.descripcion,
+                        imagen: process.env.REACT_APP_API_URL  + '/Imagen/' + baldosa.nombre_imagen,
+                    };
+                });
+                setdata(newItems);
+                
+            }
+        } catch (error) {
+            console.error('Error al obtener baldosas:', error);
+        }
+    };
+    printBaldosas();
+}, []);
 
   const handleCardClick = (index) => {
     // Llama a la función onNext cuando se hace clic en una carta y pasa el índice como argumento.
