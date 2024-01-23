@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext,useState } from 'react';
 import { TextField, Button, Container, Grid, Paper, Alert } from '@mui/material';
 import '../../styles/form.scss'; 
-import authService from '../../services/authServices';
+import { AuthContext }  from  '../../services/AuthProvider';
+
 
 const Login = () => {
 
@@ -11,6 +12,8 @@ const Login = () => {
     password: '',
   });
   const [error, setError] = useState('');
+  const setAuth = useContext(AuthContext);
+  const { signin } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,15 +21,16 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData.username);
+    
     try {
       const data = {
-        usuario: formData.username,
-        password: formData.password,
+        txtUser: formData.username,
+        txtPassword: formData.password,
       };
-      const response = await authService.fetchWithAuth('login', 'POST', data);
-      localStorage.setItem('authToken', response.token);
+      await signin('api/Login', 'POST', data);
+      
     } catch (error) {
+      console.log(error);
       setError("Se presentó un error con el inicio de sesión. Por favor, intente nuevamente.");
     }
   };

@@ -1,5 +1,6 @@
 const API_URL = process.env.REACT_APP_API_URL || 'default_url';
-const TOKEN_STORAGE_KEY = 'authToken';
+export const TOKEN_STORAGE_KEY = 'authToken';
+export const USER_STORAGE_KEY = 'user';
 
 const getToken = () => {
   return localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -43,6 +44,8 @@ const authService = {
       throw error;
     }
   },
+
+
 };
 
 export default authService;

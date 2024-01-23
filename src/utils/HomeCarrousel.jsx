@@ -5,6 +5,8 @@ import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../styles/carrousel.scss'; 
 
 function HomeCarrousel(props) {
@@ -13,20 +15,20 @@ function HomeCarrousel(props) {
             name: "Pymes",
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores nobis ullam facilis ',
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/pymes.png',
-            url:'/quoter/stepper',
+            url:'/quoter/pymes/stepper',
             enable:true,
         },{
             name: "Vehículos",
             description: "Probably the most random thing you have ever seen!",
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/automovil.jpg',
-            url:'/FireInsurance/form',
+            url:'/quoter/car/stepper',
             enable:false,
         },
         {
             name: "Vida",
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores nobis ullam facilis ',
             imageUrl: process.env.PUBLIC_URL + '/assets/images/carousel/vida2.jpg',
-            url:'/FireInsurance/form',
+            url:'/quoter/life/stepper',
             enable:false,
         }
         ,
@@ -90,17 +92,18 @@ function HomeCarrousel(props) {
 
 
 function Item(props) {
+    const navigate = useNavigate();
     if (!props.item) {
         // Manejar elementos nulos si el grupo no tiene suficientes elementos
         return <div style={{ width: '0%' }} />;
     }
     const handleImageClick = () => {
         // Redirige a la URL deseada
-        window.location.href = props.item.url; // Reemplaza 'url' con la propiedad correcta de tu objeto
+        navigate(props.item.url); // Reemplaza 'url' con la propiedad correcta de tu objeto
       };
     return (
         <Card sx={{ maxWidth: 200 }} >
-            <a href={props.item.url} className={props.item.enable ? 'carousel-content' : ''}  onClick={(e) => { e.preventDefault(); handleImageClick(); }}>
+            <Link to={props.item.url} className={props.item.enable ? 'carousel-content' : ''}  onClick={(e) => { e.preventDefault(); handleImageClick(); }}>
                 <CardMedia
                 className={props.item.enable ? '' : 'inactivo'}
                 component="img"
@@ -109,7 +112,7 @@ function Item(props) {
                 alt={props.item.name}
                 width="150px"
                 />
-            </a>
+            </Link>
             <CardContent>
                 <Typography variant="h6" color="#018997" >
                     {props.item.name}

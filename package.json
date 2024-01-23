@@ -30,7 +30,9 @@
     "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev": "nodemon -e js,json,jsx --exec \"npm start dev\"",
+    "prod": "nodemon -e js,json,jsx  --exec \"npm start prod\""
   },
   "eslintConfig": {
     "extends": [
@@ -49,5 +51,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "serve": "^14.2.1"
   }
 }

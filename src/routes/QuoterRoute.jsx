@@ -1,8 +1,9 @@
 // src/routes/HomeRoutes.js
 import React, { lazy } from 'react';
-import { Route, Routes  } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import NotFound from '../pages/NotFound';
 import Steppers from '../components/steppers';
+import RequireAuth from '../services/RoutesService/RequireAuth';
 
 
 const HomePage = lazy(() => import('../pages/HomePage'));
@@ -10,9 +11,12 @@ const HomePage = lazy(() => import('../pages/HomePage'));
 const QuoterRoutes = () => {
   return (
     <Routes>
-      <Route path="dashboard" element={<HomePage />} />
-      <Route path="stepper" element={<Steppers />} />
+      <Route path="dashboard" element={<RequireAuth> <HomePage /> </RequireAuth>} />
+      <Route path="/Pymes/stepper" element={<RequireAuth> <Steppers /> </RequireAuth>} />
       <Route path="*" element={<NotFound />} />
+
+      <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
+
     </Routes>
   );
 };
