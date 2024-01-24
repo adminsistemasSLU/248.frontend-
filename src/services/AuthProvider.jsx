@@ -30,7 +30,6 @@ export const AuthProvider = ({ children }) => {
         const initializeAuth = async () => {
             const token = localStorage.getItem(TOKEN_STORAGE_KEY);
             if (token) {
-                console.log('encontro token');
                 setIsLoading(false);
                 try {
                     //Aquí puedes llamar a un endpoint que valide el token y devuelva información del usuario
@@ -40,10 +39,8 @@ export const AuthProvider = ({ children }) => {
                     setUser(user);
                     setMenu(menu);
                     AuthContext.user = user;
-                    console.log('encontro token');
                     setIsLoading(false);
                 } catch (error) {
-                    console.log('encontro token');
                     setIsLoading(false);
                     console.error('Error al validar el token:', error);
                 }
@@ -81,12 +78,19 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Cerrar sesión y eliminar el estado del usuario
-    const signout = () => {
-        localStorage.removeItem(TOKEN_STORAGE_KEY);
-        localStorage.removeItem(USER_STORAGE_KEY);
-        localStorage.removeItem('menu');
-        setUser(null);
-        setMenu(null);
+    const signout = async (endpoint, method) => {
+        setIsLoading(true);
+        const userData = await authService.fetchWithAuth(endpoint, method);
+        if(userData.codigo===200){
+            localStorage.removeItem(TOKEN_STORAGE_KEY);
+            localStorage.removeItem(USER_STORAGE_KEY);
+            localStorage.removeItem('menu');
+            setUser(null); // Asumiendo que la información del usuario viene en la respuesta
+            setMenu(null);
+            setIsLoading(false);
+        }else{
+            setIsLoading(false);
+        }
     };
 
     const value = { user, signin, signout,isLoading,menu };

@@ -13,11 +13,11 @@ const QuoterRoutes = () => {
   return (
     <Routes>
       <Route path="dashboard" element={<RequireAuth> <HomePage /> </RequireAuth>} />
-      <Route path="/Pymes/stepper" element={<RequireAuth> <Steppers /> </RequireAuth>} />
+      <Route path="/Pymes" element={<RequireAuth> <Steppers /> </RequireAuth>} />
       <Route path="*" element={<NotFound />} />
 
 
-      <Route path="/Pymes/stepper/product" element={<RequireAuth> <ProductListCards /> </RequireAuth>} />
+      <Route path="/Pymes/product" element={<RequireAuth> <ProductListCards /> </RequireAuth>} />
 
       <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
 

@@ -1,10 +1,10 @@
-import authService from '../authServices'; // Asegúrate de tener la ruta correcta aquí
+import authService from '../authServices'; 
 
 const BaldosasService = {
 
   fetchSubBaldosas: async (ramo, producto) => {
     const endpoint = 'api/subbaldosas';
-    const method = 'PUT'; // Suponiendo que es una solicitud POST, cámbialo según sea necesario
+    const method = 'PUT'; 
     const data = {
       ramo: ramo,
       producto: producto,
@@ -21,7 +21,7 @@ const BaldosasService = {
 
   fetchBaldosas: async () => {
     const endpoint = 'api/baldosas';
-    const method = 'PUT'; // Suponiendo que es una solicitud GET, cámbialo según sea necesario
+    const method = 'PUT'; 
 
     try {
       const response = await authService.fetchWithAuth(endpoint, method);

@@ -23,17 +23,15 @@ import { useAuth } from '../services/AuthProvider';
 
 const drawerWidth = 240;
 
-
-
 function Header(props) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [open, setOpen] = React.useState({});
+  const [ mobileOpen, setMobileOpen] = React.useState(false);
+  const [ open, setOpen] = React.useState({});
   const { user, isLoading, menu, signout } = useAuth();
 
-
+  
   const settings = user
-    ? [{ descripcion: 'Cerrar sesión', url: '/login', action: signout }] // Agrega la acción de cerrar sesión aquí si la necesitas
+    ? [{ descripcion: 'Cerrar sesión', url: '/login', action: () => signout('api/Logout', 'POST') }] // Agrega la acción de cerrar sesión aquí si la necesitas
     : [
       { descripcion: 'Login', url: '/login' },
       { descripcion: 'Registrar', url: '/register' },

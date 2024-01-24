@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { TextField, Container, Grid, Paper, Alert } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import Snackbar from '@mui/material/Snackbar';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import '../../styles/form.scss';
 import ValidationUtils from '../../utils/ValiationsUtils';
+import UsuarioService from '../../services/UsuarioService/UsuarioService';
 
+dayjs.extend(customParseFormat);
 const PersonalForm = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -23,38 +28,109 @@ const PersonalForm = () => {
     address: '',
   });
   const [error, setError] = useState('');
+  const [messageError, setmessageError] = useState('');
+  const [errorCedula, setErrorCedula] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [age, setAge] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     let modifiedValue = value;
     if (name === 'identification') {
+
       if (formData.documentType === 'C' && value.length > 10) {
         modifiedValue = value.slice(0, 10);
-      } else if (formData.documentType === 'R' && value.length > 13) {
+      }
+      if (formData.documentType === 'R' && value.length > 13) {
         modifiedValue = value.slice(0, 13);
       }
-    } else if (name === 'phone') {
+      if (isNaN(value)) {
+        e.preventDefault();
+        return;
+      }
+    }
+
+    if (name === 'phone') {
       modifiedValue = value.slice(0, 10);
-    } else if (name === 'email') {
+    }
+
+    if (name === 'email') {
       if (!ValidationUtils.validateEmail(modifiedValue)) {
         setError('Por favor ingresa un correo electrónico válido.');
       } else {
         setError('');
       }
     }
-  
     setFormData({ ...formData, [name]: modifiedValue });
   };
 
-  const [age, setAge] = React.useState();
+  const verifyIdentification = async (e) => {
+    const { value } = e.target;
+    let documentType = formData.documentType;
+    let identification = value;
+    if (value === '') {
+      setOpen(true);
+      setmessageError("Valor de cedula invalido");
+      return;
+    }
+    try {
+      const cedulaData = await UsuarioService.fetchVerificarCedula(documentType, identification);
+      if (cedulaData.codigo === 200) {
+        setErrorCedula(false);
+        consultUserData(documentType, identification);
+
+      } else {
+        setErrorCedula(true);
+        setOpen(true);
+        setmessageError(cedulaData.message);
+      }
+    } catch (error) {
+      console.error('Error al verificar cédula:', error);
+    }
+  };
+
+  const consultUserData = async (documentType, identification) => {
+    try {
+      const cedulaData = await UsuarioService.fetchConsultarUsuario(documentType, identification);
+      if (cedulaData.codigo === 200 && cedulaData.data) {
+        const dateString = cedulaData.data[0].cli_fecnacio;
+        const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
+        console.log(dateString);
+
+        console.log(dateObject);
+        setAge(dateObject);
+        setFormData({
+          ...formData, // Conserva los valores actuales
+          name: cedulaData.data[0].cli_nombres || '',
+          lastname: cedulaData.data[0].cli_apellidos || '',
+          email: cedulaData.data[0].cli_email || '',
+          phone: cedulaData.data[0].cli_celular || '',
+          address: cedulaData.data[0].cli_direccion || '',
+        });
+      } else {
+
+      }
+    } catch (error) {
+      console.error('Error al verificar cédula:', error);
+    }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     console.log('Formulario enviado:', formData);
   };
-
 
   return (
     <Container
@@ -65,6 +141,14 @@ const PersonalForm = () => {
       <Paper elevation={3} style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '20px' }}>
         <FormControl component="form" variant="standard" onSubmit={handleSubmit} className='form'>
           <Grid container spacing={2}>
+
+            <Snackbar
+              open={open}
+              autoHideDuration={5000}
+              onClose={handleClose}
+            >
+              <Alert severity="warning">{messageError}</Alert>
+            </Snackbar>
             <Grid item xs={12}>
               <InputLabel id="documentType-Label">Seleccione documento</InputLabel>
               <Select
@@ -84,12 +168,21 @@ const PersonalForm = () => {
               </Select>
             </Grid>
             <Grid item xs={12}>
+
+              {errorCedula ?
+                (<Alert severity="error" style={{ fontSize: '10px', textAlign: 'start' }}>
+                  El documento de identificación no es valido.</Alert>)
+                : (null)
+              }
+
+
               <TextField
                 label="Documento de identificación"
-                type={formData.documentType === "P" ? "text" : "number"}
+                type={formData.documentType === "P" ? "text" : "text"}
                 name="identification"
                 value={formData.identification}
                 onChange={handleChange}
+                onBlur={verifyIdentification}
                 variant="standard"
                 fullWidth
                 required
@@ -104,6 +197,7 @@ const PersonalForm = () => {
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
+                disabled={errorCedula}
                 inputProps={{ maxLength: 30 }}
                 required
               />
@@ -115,6 +209,7 @@ const PersonalForm = () => {
                 name="lastname"
                 value={formData.lastname}
                 onChange={handleChange}
+                disabled={errorCedula}
                 variant="standard"
                 fullWidth
                 inputProps={{ maxLength: 30 }}
@@ -128,10 +223,11 @@ const PersonalForm = () => {
                 <DemoContainer components={['DatePicker']}>
                   <DatePicker
                     label="Fecha de nacimiento"
-                    slotProps={{ textField: {variant: 'standard', size:'small'} }}
+                    slotProps={{ textField: { variant: 'standard', size: 'small' } }}
                     value={age}
+                    disabled={errorCedula}
                     className='datePicker'
-                    onChange={(newValue) => setAge(newValue)}
+                    onChange={(newValue) => {setAge(newValue)}}
                   />
                 </DemoContainer>
               </LocalizationProvider>
@@ -140,6 +236,7 @@ const PersonalForm = () => {
               <TextField
                 label="Teléfono"
                 type="number"
+                disabled={errorCedula}
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
@@ -153,6 +250,7 @@ const PersonalForm = () => {
               <TextField
                 label="Dirección"
                 type="text"
+                disabled={errorCedula}
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
@@ -167,6 +265,7 @@ const PersonalForm = () => {
                 label="Email"
                 type="email"
                 name="email"
+                disabled={errorCedula}
                 value={formData.email}
                 onChange={handleChange}
                 variant="standard"
