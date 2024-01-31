@@ -20,7 +20,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import DetailObjectsTable from './detailObjectsTable';
 import IncendioService from '../../services/IncencioService/IncendioService';
-import { LS_PRODUCTO, LS_RAMO,LS_CLASIFICACIONAMPARO } from '../../utils/constantes';
+import { LS_PRODUCTO, LS_RAMO, LS_CLASIFICACIONAMPARO } from '../../utils/constantes';
 
 const rows = [
 
@@ -219,7 +219,7 @@ export default function BranchInsurance({ closeModalDetail }) {
         setEditableRows(newItems);
         const newTotalMonto = newItems.reduce((sum, row) => sum + parseFloat(row.monto), 0);
         setTotalMonto(newTotalMonto);
-    
+
         // Calcular el total de Prima
         const newTotalPrima = newItems.reduce((sum, row) => sum + parseFloat(row.prima), 0);
         setTotalPrima(newTotalPrima);
@@ -232,7 +232,7 @@ export default function BranchInsurance({ closeModalDetail }) {
 
   const handleOpenModal = (codigo) => {
     console.log(codigo);
-    localStorage.setItem(LS_CLASIFICACIONAMPARO,codigo);
+    localStorage.setItem(LS_CLASIFICACIONAMPARO, codigo);
     setOpenModal(true);
   };
 

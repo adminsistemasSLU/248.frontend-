@@ -1,94 +1,123 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Checkbox from '@mui/material/Checkbox';
-import EditIcon from '@mui/icons-material/Edit';
-import Button from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
-import { visuallyHidden } from '@mui/utils';
-import '../../styles/moddalForm.scss';
-import '../../styles/detailQuoter.scss';
-import CloseIcon from '@mui/icons-material/Close';
-import CurrencyInput from '../../utils/currencyInput';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import ProtectionDetailTable from './protectionDetailTable';
-import { LS_PRODUCTO, LS_RAMO, LS_CLASIFICACIONAMPARO } from '../../utils/constantes';
-import IncendioService from '../../services/IncencioService/IncendioService';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
+import Checkbox from "@mui/material/Checkbox";
+import EditIcon from "@mui/icons-material/Edit";
+import Button from "@mui/material/Button";
+import { styled } from "@mui/material/styles";
+import { visuallyHidden } from "@mui/utils";
+import "../../styles/moddalForm.scss";
+import "../../styles/detailQuoter.scss";
+import CloseIcon from "@mui/icons-material/Close";
+import CurrencyInput from "../../utils/currencyInput";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import ProtectionDetailTable from "./protectionDetailTable";
+import {
+  LS_PRODUCTO,
+  LS_RAMO,
+  LS_CLASIFICACIONAMPARO,
+} from "../../utils/constantes";
+import IncendioService from "../../services/IncencioService/IncendioService";
 
-function createData(id, cobertura, monto, tasa, prima, titulo) {
+function createData(
+  id,
+  cobertura,
+  monto,
+  tasa,
+  prima,
+  titulo,
+  sumaCapital,
+  objCheck,
+  disableCheck,
+  tasaMinima,
+  amparo,
+  grupoAmparo,
+  montoFijo,
+  valMaximo
+) {
   return {
     id,
     cobertura,
     monto,
     tasa,
     prima,
-    titulo
+    titulo,
+    sumaCapital,
+    objCheck,
+    disableCheck,
+    tasaMinima,
+    amparo,
+    grupoAmparo,
+    montoFijo,
+    valMaximo,
   };
 }
 
-const rows = [
-
-];
+const rows = [];
 
 const headCells = [
   {
-    id: 'accion',
+    id: "accion",
     numeric: false,
     disablePaadding: false,
-    label: 'Acción',
+    label: "Acción",
   },
   {
-    id: 'id',
+    id: "id",
     numeric: false,
     disablePadding: true,
-    label: '#',
+    label: "#",
   },
   {
-    id: 'cobertura',
+    id: "cobertura",
     numeric: false,
     disablePadding: false,
-    label: 'Cobertura',
+    label: "Cobertura",
   },
   {
-    id: 'monto',
+    id: "monto",
     numeric: true,
     disablePadding: false,
-    label: 'Monto',
+    label: "Monto",
   },
   {
-    id: 'tasa',
+    id: "tasa",
     numeric: true,
     disablePadding: false,
-    label: 'Tasa',
+    label: "Tasa",
   },
   {
-    id: 'prima',
+    id: "prima",
     numeric: true,
     disablePadding: false,
-    label: 'Prima',
-  }
+    label: "Prima",
+  },
 ];
 
-
-
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-    props;
+  const {
+    onSelectAllClick,
+    order,
+    orderBy,
+    numSelected,
+    rowCount,
+    onRequestSort,
+  } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
   return (
-    <TableHead >
-      <TableRow >
+    <TableHead>
+      <TableRow>
         <StyledTableCell padding="checkbox">
           <Checkbox
             color="primary"
@@ -96,27 +125,27 @@ function EnhancedTableHead(props) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              'aria-label': 'select all desserts',
+              "aria-label": "select all desserts",
             }}
-            style={{ visibility: 'hidden' }}
+            style={{ visibility: "hidden" }}
           />
         </StyledTableCell>
         {headCells.map((headCell) => (
           <StyledTableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            align={headCell.numeric ? "right" : "left"}
+            padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
+              direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {order === "desc" ? "sorted descending" : "sorted ascending"}
                 </Box>
               ) : null}
             </TableSortLabel>
@@ -130,18 +159,17 @@ function EnhancedTableHead(props) {
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#00A99D",
-    color: '#fff',
-    borderBottom: '1px solid black'
+    color: "#fff",
+    borderBottom: "1px solid black",
   },
   [`&.${tableCellClasses.body}`]: {
-    borderBottom: '1px solid black'
+    borderBottom: "1px solid black",
   },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-
-  '&:last-child td, &:last-child th': {
-    borderBottom: '1px solid black'
+  "&:last-child td, &:last-child th": {
+    borderBottom: "1px solid black",
   },
 }));
 
@@ -166,18 +194,14 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 function getComparator(order, orderBy) {
-  return order === 'desc'
+  return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-
-
-
-
 export default function DetailObjectsTable({ closeModalDetail }) {
-  const [order,] = React.useState('asc');
-  const [orderBy,] = React.useState('calories');
+  const [order] = React.useState("asc");
+  const [orderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(30);
@@ -186,26 +210,27 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   const [rows1, setRows] = React.useState(rows);
   const producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
   const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
-  const clasificacionAmparo = JSON.parse(localStorage.getItem(LS_CLASIFICACIONAMPARO));
-
+  const clasificacionAmparo = JSON.parse(
+    localStorage.getItem(LS_CLASIFICACIONAMPARO)
+  );
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
     rows1.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
   );
 
-
   const [jsonData, setJsonData] = React.useState(rows1); // Estado para los datos
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
-
-
+  
 
   React.useEffect(() => {
     printClasificacionAmparo(ramo, producto, clasificacionAmparo);
     setEditableValues(
       rows1.map((row) => ({
-        monto: row.monto, tasa: row.tasa, prima: row.prima
+        monto: row.monto,
+        tasa: row.tasa,
+        prima: row.prima,
       }))
     );
   }, []);
@@ -221,50 +246,126 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   React.useEffect(() => {
     // Calcula el total del monto desde el estado jsonData
-    const totalMonto = jsonData.reduce((acc, item) => acc + parseFloat(item.monto), 0);
-    const totalPrima = jsonData.reduce((acc, item) => acc + parseFloat(item.prima), 0);
+    const totalMonto = jsonData.reduce(
+      (acc, item) => acc + parseFloat(item.monto),
+      0
+    );
+    const totalPrima = jsonData.reduce(
+      (acc, item) => acc + parseFloat(item.prima),
+      0
+    );
     // Actualiza el estado totalMonto
     setTotalMonto(totalMonto);
     setTotalPrima(totalPrima);
-
   }, [jsonData]); // Observa cambios en jsonData
 
-  // function createData(id, ramo, descripcion, monto, tasa, prima) 
+  // function createData(id, ramo, descripcion, monto, tasa, prima)
   const printClasificacionAmparo = async (ramo, producto, amparo) => {
     try {
-      const clasificacionAmparo = await IncendioService.fetchAmparoIncendios(ramo, producto, amparo);
+      const clasificacionAmparo = await IncendioService.fetchAmparoIncendios(
+        ramo,
+        producto,
+        amparo
+      );
       let count = 0;
       let result = [];
-      if (clasificacionAmparo && clasificacionAmparo.data && clasificacionAmparo.data.length > 0) {
-        Object.keys(clasificacionAmparo.data[0]).forEach(key => {
-          const tituloObj = createData(count++, key.replace('&nbsp;', ' ').trim(), 0, 0, 0, true);
+      if (
+        clasificacionAmparo &&
+        clasificacionAmparo.data &&
+        clasificacionAmparo.data.length > 0
+      ) {
+        Object.keys(clasificacionAmparo.data[0]).forEach((key) => {
+          const tituloObj = createData(
+            count++,
+            key.replace("&nbsp;", " ").trim(),
+            0,
+            0,
+            0,
+            true,
+            0,
+            false,
+            "false",
+            0
+          );
           result.push(tituloObj);
 
           const items = clasificacionAmparo.data[0][key].map((item, index) => {
-            const montoValue = item.inpMonto && isNaN(item.inpMonto.value) ? parseFloat(item.inpMonto.value.replace(/,/g, '')) : 0.0;
-            const tasaValue = item.inpTasa && isNaN(item.inpTasa.value) && item.inpTasa === "Sin Costo" ? parseFloat(item.inpTasa.value.replace(/,/g, '')) : 0.0;
-            const primaValue = item.inpPrima && isNaN(item.inpPrima.value) ? parseFloat(item.inpPrima.value.replace(/,/g, '')) : 0.0;
-            return createData(count++, item.inpDetalle.value, montoValue, tasaValue, primaValue, false);
+            const montoValue =
+              item.inpMonto && isNaN(item.inpMonto.value)
+                ? parseFloat(item.inpMonto.value.replace(/,/g, ""))
+                : 0.0;
+            const montoSumaCapitalValue = item.inpMonto.sumacapital;
+            const tasaValue =
+              item.inpTasa &&
+              isNaN(item.inpTasa.value) &&
+              item.inpTasa === "Sin Costo"
+                ? parseFloat(item.inpTasa.value.replace(/,/g, ""))
+                : 0.0;
+            const primaValue =
+              item.inpPrima && isNaN(item.inpPrima.value)
+                ? parseFloat(item.inpPrima.value.replace(/,/g, ""))
+                : 0.0;
+            const tasaMinimaValue =
+              item.inpTasa &&
+              isNaN(item.inpTasa.valoriginal) &&
+              item.inpTasa === "Sin Costo"
+                ? parseFloat(item.inpTasa.valoriginal.replace(/,/g, ""))
+                : 0.0;
+            const objectCheck = item.inpCheck.checked;
+            const disabledCheck = item.inpCheck.disabled;
+            const amparo = item.inpMonto.amparo;
+            const grupoAmparo = item.inpMonto.grupoamparo;
+            const montoFijo = item.inpMonto.montofijo;
+            const valMaximo = item.inpMonto.valmaximo;
+            return createData(
+              count++,
+              item.inpDetalle.value,
+              montoValue,
+              tasaValue,
+              primaValue,
+              false,
+              montoSumaCapitalValue,
+              objectCheck,
+              disabledCheck,
+              tasaMinimaValue,
+              amparo,
+              grupoAmparo,
+              montoFijo,
+              valMaximo
+            );
           });
 
           result.push(...items);
         });
 
         setEditableValues(
-          result.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
+          result.map((row) => ({
+            monto: row.monto,
+            tasa: row.tasa,
+            prima: row.prima,
+          }))
         );
-
+        console.log(result);
         setRows(result);
         setJsonData(result);
-        const newTotalMonto = result.reduce((sum, row) => sum + parseFloat(row.monto), 0);
+        const newTotalMonto = result.reduce(
+          (sum, row) => sum + parseFloat(row.monto),
+          0
+        );
         setTotalMonto(newTotalMonto);
-        const newTotalPrima = result.reduce((sum, row) => sum + parseFloat(row.prima), 0);
+        const newTotalPrima = result.reduce(
+          (sum, row) => sum + parseFloat(row.prima),
+          0
+        );
         setTotalPrima(newTotalPrima);
       } else {
-        console.error("Datos recibidos no son válidos: ", clasificacionAmparo.data);
+        console.error(
+          "Datos recibidos no son válidos: ",
+          clasificacionAmparo.data
+        );
       }
     } catch (error) {
-      console.error('Error al obtener Amparo Incendio:', error);
+      console.error("Error al obtener Amparo Incendio:", error);
     }
   };
 
@@ -278,9 +379,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   };
 
   const closeModal = () => {
-    closeModalDetail('true');
+    closeModalDetail("true");
   };
-
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
@@ -297,26 +397,162 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selected.slice(selectedIndex + 1)
       );
     }
     setSelected(newSelected);
-
   };
 
   const handleCellValueChange = (event, index, field) => {
-    const newValue = event.target.value;
-    const numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ''));
+    console.log(field);
+    if (field === "monto") {
+      handleMontoChange(event, index, field);
+    }
+    if (field === "tasa") {
+      handleTasaChange(event, index);
+    }
+  };
+
+  const handleMontoChange = (event, index, field) => {
+    let newMonto = parseFloat(event.target.value);
+    const amparo = event.target.getAttribute("data-amparo");
+    const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
+    const montofijo = event.target.getAttribute("data-montofijo");
+    const valmaximo = parseFloat(event.target.getAttribute("data-valmaximo"));
+
+    const currentMonto = parseFloat(event.target.value);
+
+    // Guarda el valor anterior
+    
+    // Asegúrate de que newMonto no es NaN
+    if (isNaN(newMonto)) {
+      newMonto = 0;
+    }
+
+    let montoPrincipal = 0;
+    let permitirCambio = true;
+
+    if (amparo === grupoAmparo) {
+      // Lógica si el amparo es el mismo que el grupo de amparo
+      // Implementa tu lógica aquí...
+    } else if (montofijo === "N" && valmaximo > 0) {
+      if (grupoAmparo !== "") {
+        const montoPrincipalRow = editableRows.find(
+          (row) => row.amparo === grupoAmparo
+        );
+        montoPrincipal = montoPrincipalRow
+          ? parseFloat(montoPrincipalRow.monto)
+          : 0;
+      }
+
+      if (grupoAmparo === "" && newMonto > valmaximo) {
+        console.log(`El monto no puede ser mayor a ${valmaximo.toFixed(2)}`);
+        permitirCambio = false;
+      } else if (montoPrincipal === 0) {
+        console.log("El valor principal es 0.00");
+        permitirCambio = false;
+      } else {
+        const valMaximoCalculado = montoPrincipal * (valmaximo / 100);
+        if (newMonto > valMaximoCalculado) {
+          console.log(
+            `El monto no puede superar el ${valmaximo}% del cobertura principal`
+          );
+          permitirCambio = false;
+        }
+      }
+    }
+
+    if (permitirCambio) {
+      console.log("Permitir cambio");
+      const newValue = event.target.value;
+      const numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
+      const newEditableValues = [...editableValues];
+      isNaN(numericValue)
+        ? (newEditableValues[index][field] = newValue)
+        : (newEditableValues[index][field] = numericValue);
+      setEditableValues(newEditableValues);
+
+      const newJsonData = [...jsonData];
+      newJsonData[index][field] = numericValue;
+      setJsonData(newJsonData);
+
+      const total = jsonData.reduce(
+        (acc, item) => parseFloat(acc) + parseFloat(item.monto),
+        0
+      );
+      setTotalMonto(total);
+      const totalPrima = jsonData.reduce(
+        (acc, item) => parseFloat(acc) + parseFloat(item.prima),
+        0
+      );
+      setTotalPrima(totalPrima);
+      // Llamar a calculaTblAmparos para recalcular los totales
+      calculaTblAmparos();
+    } else {
+      console.log("No permitir cambio");
+      const newEditableValues = [...editableValues];
+      newEditableValues[index][field] = 0;
+      setEditableValues(newEditableValues);
+    }
+  };
+
+  const handleTasaChange = (event, index) => {
+    let newTasa = parseFloat(event.target.value);
+    const tasaMinima = parseFloat(event.target.getAttribute("data-tasa-minima"));
+    const amparo = event.target.getAttribute("data-amparo");
+    const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
+  
+    // Verificar si la nueva tasa es menor que la tasa mínima
+    if (newTasa < tasaMinima) {
+      alert(`La tasa no puede ser menor que ${tasaMinima.toFixed(2)}`);
+      newTasa = tasaMinima; // Asegúrate de que la tasa no sea menor que la mínima
+    }
+  
+    // Actualizar la tasa en el estado para la fila actual
     const newEditableValues = [...editableValues];
-    isNaN(numericValue) ? newEditableValues[index][field] = newValue : newEditableValues[index][field] = numericValue;
-    setEditableValues(newEditableValues);
-    const newJsonData = [...jsonData];
-    newJsonData[index][field] = numericValue;
-    setJsonData(newJsonData);
-    const total = jsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.monto), 0);
-    setTotalMonto(total);
-    const totalPrima = jsonData.reduce((acc, item) => parseFloat(acc) + parseFloat(item.prima), 0);
-    setTotalPrima(totalPrima)
+    newEditableValues[index].tasa = newTasa;
+  
+    // Si el amparo de la fila actual es el mismo que el grupo de amparo, actualiza todas las filas correspondientes
+    if (amparo === grupoAmparo) {
+      newEditableValues.forEach((value, idx) => {
+        if (editableRows[idx].grupoAmparo === grupoAmparo) {
+          value.tasa = newTasa; // Actualiza la tasa de todas las filas relacionadas
+        }
+      });
+    }
+  
+    setEditableValues(newEditableValues); // Actualiza el estado de los valores editables
+  
+    calculaTblAmparos(); // Llamar a calculaTblAmparos para recalcular los totales
+  };
+  
+
+  const calculaTblAmparos = () => {
+    let newTotalMonto = 0;
+    let newTotalPrima = 0;
+
+    const newEditableRows = editableRows.map((row) => {
+      let { monto, tasa, prima } = row;
+
+      // Asumiendo que el monto y la tasa son números y que quieres calcular la prima basada en ellos
+      // Puedes incluir aquí lógica adicional si es necesario, por ejemplo, verificar si la fila está marcada o no
+      const calculatedPrima = (monto * tasa) / 100;
+
+      // Actualizar totalMonto y totalPrima
+      newTotalMonto += monto;
+      newTotalPrima += calculatedPrima;
+
+      // Devolver la fila actualizada
+      return {
+        ...row,
+        prima: calculatedPrima,
+      };
+    });
+
+    // Actualizar el estado con las nuevas filas y totales
+    setEditableRows(newEditableRows);
+    setTotalMonto(newTotalMonto);
+    setTotalPrima(newTotalPrima);
   };
 
   const handleOpenModal = () => {
@@ -335,182 +571,230 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     console.log(newEditableRows);
   };
 
-
   // Manejador para cerrar el modal
   const handleCloseModal = () => {
     setOpenModal(false);
   };
 
   const visibleRows = React.useMemo(
-    () => stableSort(rows1, getComparator(order, orderBy)).slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage,
-    ),
-    [order, orderBy, page, rowsPerPage, rows1], // Asegúrate de incluir rows1 aquí
+    () =>
+      stableSort(rows1, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      ),
+    [order, orderBy, page, rowsPerPage, rows1] // Asegúrate de incluir rows1 aquí
   );
 
   return (
-    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" className='dialog-height'
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: "5px",
+      }}
+    >
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="xl"
+        className="dialog-height"
         PaperProps={{
           style: {
-            backgroundColor: '#ffffff',
-            boxShadow: 'none',
+            backgroundColor: "#ffffff",
+            boxShadow: "none",
 
-            overflow: 'hidden',
-            zIndex: '2000'
+            overflow: "hidden",
+            zIndex: "2000",
           },
-        }}>
-        <DialogContent style={{ overflow: 'hidden', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
+        }}
+      >
+        <DialogContent
+          style={{ overflow: "hidden", padding: "0px", paddingBottom: "20px" }}
+          className="dialog-height-content"
+        >
           {/* Componente del formulario */}
-          <ProtectionDetailTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
+          <ProtectionDetailTable
+            closeModalDetail={handleCloseModal}
+            style={{ width: "80%" }}
+          />
         </DialogContent>
       </Dialog>
 
-
-      <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          backgroundColor: "#00a99e",
+          color: "white",
+          paddingTop: "5px",
+          paddingLeft: "15px",
+          paddingRight: "15px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <div>Detalle de Amparo</div>
-        <div onClick={closeModal}> <CloseIcon /></div>
+        <div onClick={closeModal}>
+          {" "}
+          <CloseIcon />
+        </div>
       </div>
-      <TableContainer style={{ overflow: 'auto', height: '100%', padding: '20px' }}>
+      <TableContainer
+        style={{ overflow: "auto", height: "100%", padding: "20px" }}
+      >
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
           size="small"
           style={{ height: 50 }}
         >
-          <EnhancedTableHead
-            rowCount={rows.length}
-          />
+          <EnhancedTableHead rowCount={rows.length} />
           <TableBody>
             {visibleRows.map((row, index) => {
               const isItemSelected = isSelected(row.id);
               const labelId = `enhanced-table-checkbox-${index}`;
 
+              return !row.titulo ? (
+                <StyledTableRow
+                  hover
+                  role="checkbox"
+                  aria-checked={isItemSelected}
+                  tabIndex={-1}
+                  selected={isItemSelected}
+                  sx={{ cursor: "pointer" }}
+                  key={row.id}
+                >
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      onClick={(event) => handleClick(event, row.id)}
+                      color="primary"
+                      checked={isItemSelected}
+                      inputProps={{
+                        "aria-labelledby": labelId,
+                      }}
+                      key={row.id}
+                    />
+                  </TableCell>
+                  <TableCell align="left">
+                    {row.id <= 4 ? (
+                      <EditIcon onClick={handleOpenModal} />
+                    ) : null}
+                  </TableCell>
 
-              return (
-                !row.titulo ? (
-                  <StyledTableRow
-                    hover
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    selected={isItemSelected}
-                    sx={{ cursor: 'pointer' }}
-                    key={row.id}
+                  <TableCell
+                    component="th"
+                    id={labelId}
+                    scope="row"
+                    padding="none"
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        onClick={(event) => handleClick(event, row.id)}
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                        key={row.id}
-                      />
-                    </TableCell>
-                    <TableCell align="left">
-                      {row.id <= 4 ? (
-                        <EditIcon onClick={handleOpenModal} />
+                    {row.id}
+                  </TableCell>
+                  <TableCell align="left">{row.cobertura}</TableCell>
 
-                      ) : (
-                        null
-                      )}
-
-
-                    </TableCell>
-
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      {row.id}
-                    </TableCell>
-                    <TableCell align="left">{row.cobertura}</TableCell>
-
-                    <TableCell align="right">
-                      {/* Campo editable con CurrencyInput */}
-                      <CurrencyInput
-                        className='input-table'
-                        value={editableValues[index].monto.toFixed(2)}
-                        onChange={(event) =>
-                          handleCellValueChange(event, index, 'monto')
-                        }
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      {/* Campo editable con CurrencyInput */}
-                      <input
-                        className='input-table'
-                        value={editableValues[index].tasa.toFixed(2) + '%'}
-                        onChange={(event) =>
-                          handleCellValueChange(event, index, 'tasa')
-                        }
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      {/* Campo editable con CurrencyInput */}
-                      <CurrencyInput
-                        className='input-table'
-                        value={editableValues[index].prima.toFixed(2)}
-                        onChange={(event) =>
-                          handleCellValueChange(event, index, 'prima')
-                        }
-                      />
-                    </TableCell>
-                  </StyledTableRow>
-                ) : (
-                  <StyledTableRow>
-                    <TableCell colSpan={7} style={{ backgroundColor: '#00A99D', color: '#fff' }}>
-                      {row.cobertura}
-                    </TableCell>
-                  </StyledTableRow>
-                )
+                  <TableCell align="right">
+                    {/* Campo editable con CurrencyInput */}
+                    <CurrencyInput
+                      className="input-table inpTblAmpIncBscMonto"
+                      value={editableValues[index].monto.toFixed(2)}
+                      onChange={(event) =>
+                        handleCellValueChange(event, index, "monto")
+                      }
+                      data-amparo={row.amparo} 
+                      data-grupo-amparo={row.grupoAmparo}
+                      data-montofijo={row.montoFijo}
+                      data-valmaximo={row.valMaximo}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    {/* Campo editable con CurrencyInput */}
+                    <input
+                      className="input-table"
+                      data-tasa-minima={row.tasaMinima}
+                      data-amparo={row.amparo}
+                      data-grupo-amparo={row.grupoAmparo}
+                      value={editableValues[index].tasa.toFixed(2) + "%"}
+                      onChange={(event) =>
+                        handleCellValueChange(event, index, "tasa")
+                      }
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    {/* Campo editable con CurrencyInput */}
+                    <CurrencyInput
+                      className="input-table"
+                      value={editableValues[index].prima.toFixed(2)}
+                      onChange={(event) =>
+                        handleCellValueChange(event, index, "prima")
+                      }
+                    />
+                  </TableCell>
+                </StyledTableRow>
+              ) : (
+                <StyledTableRow>
+                  <TableCell
+                    colSpan={7}
+                    style={{ backgroundColor: "#00A99D", color: "#fff" }}
+                  >
+                    {row.cobertura}
+                  </TableCell>
+                </StyledTableRow>
               );
             })}
           </TableBody>
         </Table>
       </TableContainer>
-      <div className='paginationResponsive' style={{ justifyContent: 'space-between', gap: '15px' }}>
+      <div
+        className="paginationResponsive"
+        style={{ justifyContent: "space-between", gap: "15px" }}
+      >
         <TablePagination
-          style={{ justifySelf: 'flex-start' }}
+          style={{ justifySelf: "flex-start" }}
           rowsPerPageOptions={[10, 25]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
-          labelRowsPerPage='Filas por pagina'
+          labelRowsPerPage="Filas por pagina"
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        <div style={{ display: 'flex', justifyContent: 'end', flexWrap: 'wrap' }}>
-          <div className='elementsModal' style={{ marginRight: '10px' }}>
+        <div
+          style={{ display: "flex", justifyContent: "end", flexWrap: "wrap" }}
+        >
+          <div className="elementsModal" style={{ marginRight: "10px" }}>
             <div>Monto: </div>
             <div>
-              <CurrencyInput style={{ width: '105px' }}
-                className='input-table'
-                value={totalMonto.toFixed(2)} />
+              <CurrencyInput
+                style={{ width: "105px" }}
+                className="input-table"
+                value={totalMonto.toFixed(2)}
+              />
             </div>
           </div>
-          <div className='elementsModal elementRight'>
+          <div className="elementsModal elementRight">
+            <div>Prima:</div>
             <div>
-              Prima:
-            </div>
-            <div>
-              <CurrencyInput style={{ width: '105px' }}
-                className='input-table'
-                value={totalPrima.toFixed(2)} />
+              <CurrencyInput
+                style={{ width: "105px" }}
+                className="input-table"
+                value={totalPrima.toFixed(2)}
+              />
             </div>
           </div>
-
         </div>
       </div>
-      <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'center' }}>
-        <Button variant="contained" color="primary" onClick={closeModal}>Aceptar</Button>
+      <div
+        style={{
+          display: "flex",
+          marginLeft: "5px",
+          marginRight: "20px",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Button variant="contained" color="primary" onClick={closeModal}>
+          Aceptar
+        </Button>
       </div>
     </div>
   );
