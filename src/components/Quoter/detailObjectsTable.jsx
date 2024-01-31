@@ -27,6 +27,11 @@ import {
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 
+import { isNumber } from "@mui/x-data-grid/internals";
+import Swal from 'sweetalert2'
+
+
+
 function createData(
   id,
   cobertura,
@@ -41,7 +46,8 @@ function createData(
   amparo,
   grupoAmparo,
   montoFijo,
-  valMaximo
+  valMaximo,
+  inventario
 ) {
   return {
     id,
@@ -58,6 +64,7 @@ function createData(
     grupoAmparo,
     montoFijo,
     valMaximo,
+    inventario,
   };
 }
 
@@ -222,7 +229,6 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   const [jsonData, setJsonData] = React.useState(rows1); // Estado para los datos
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
-  
 
   React.useEffect(() => {
     printClasificacionAmparo(ramo, producto, clasificacionAmparo);
@@ -238,7 +244,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   React.useEffect(() => {
     if (rows1 && rows1.length > 0) {
       setEditableValues(
-        rows1.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
+        rows1.map((row) => ({
+          monto: row.monto,
+          tasa: row.tasa,
+          prima: row.prima,
+        }))
       );
     }
     setEditableRows(rows1);
@@ -258,6 +268,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     setTotalMonto(totalMonto);
     setTotalPrima(totalPrima);
   }, [jsonData]); // Observa cambios en jsonData
+
+  React.useEffect(() => {
+    // Llama a calculaTblAmparos cada vez que jsonData se actualiza
+    calculaTblAmparos();
+  }, [jsonData]);
 
   // function createData(id, ramo, descripcion, monto, tasa, prima)
   const printClasificacionAmparo = async (ramo, producto, amparo) => {
@@ -284,8 +299,9 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             true,
             0,
             false,
-            "false",
-            0
+            false,
+            0,
+            false
           );
           result.push(tituloObj);
 
@@ -296,11 +312,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                 : 0.0;
             const montoSumaCapitalValue = item.inpMonto.sumacapital;
             const tasaValue =
-              item.inpTasa &&
-              isNaN(item.inpTasa.value) &&
-              item.inpTasa === "Sin Costo"
-                ? parseFloat(item.inpTasa.value.replace(/,/g, ""))
-                : 0.0;
+              item.inpTasa && !isNaN(item.inpTasa.value)
+                ? item.inpTasa.value === ""
+                  ? (0).toFixed(2)
+                  : item.inpTasa.value
+                : item.inpTasa.value;
             const primaValue =
               item.inpPrima && isNaN(item.inpPrima.value)
                 ? parseFloat(item.inpPrima.value.replace(/,/g, ""))
@@ -317,6 +333,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             const grupoAmparo = item.inpMonto.grupoamparo;
             const montoFijo = item.inpMonto.montofijo;
             const valMaximo = item.inpMonto.valmaximo;
+            const inventario = item.Inventario === "true" ? true : false;
             return createData(
               count++,
               item.inpDetalle.value,
@@ -331,13 +348,14 @@ export default function DetailObjectsTable({ closeModalDetail }) {
               amparo,
               grupoAmparo,
               montoFijo,
-              valMaximo
+              valMaximo,
+              inventario
             );
           });
 
           result.push(...items);
         });
-
+        console.log(result);
         setEditableValues(
           result.map((row) => ({
             monto: row.monto,
@@ -384,6 +402,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
+  // Función para manejar clics en las casillas de verificación de las filas
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
@@ -401,15 +420,61 @@ export default function DetailObjectsTable({ closeModalDetail }) {
       );
     }
     setSelected(newSelected);
+
+    // Actualiza el estado de objCheck para la fila seleccionada
+    setJsonData((currentJsonData) => {
+      return currentJsonData.map((row) => {
+        if (row.id === id) {
+          return {
+            ...row,
+            objCheck: !row.objCheck, // Cambia el estado de objCheck
+          };
+        }
+        return row;
+      });
+    });
+
+    setEditableValues((currentJsonData) => {
+      return currentJsonData.map((row) => {
+        if (row.id === id) {
+          return {
+            ...row,
+            objCheck: !row.objCheck, // Cambia el estado de objCheck
+          };
+        }
+        return row;
+      });
+    });
+
+    setEditableRows((currentJsonData) => {
+      return currentJsonData.map((row) => {
+        if (row.id === id) {
+          return {
+            ...row,
+            objCheck: !row.objCheck, // Cambia el estado de objCheck
+          };
+        }
+        return row;
+      });
+    });
+
+    setRows((currentJsonData) => {
+      return currentJsonData.map((row) => {
+        if (row.id === id) {
+          return {
+            ...row,
+            objCheck: !row.objCheck, // Cambia el estado de objCheck
+          };
+        }
+        return row;
+      });
+    });
   };
 
   const handleCellValueChange = (event, index, field) => {
     console.log(field);
     if (field === "monto") {
       handleMontoChange(event, index, field);
-    }
-    if (field === "tasa") {
-      handleTasaChange(event, index);
     }
   };
 
@@ -423,7 +488,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     const currentMonto = parseFloat(event.target.value);
 
     // Guarda el valor anterior
-    
+
     // Asegúrate de que newMonto no es NaN
     if (isNaN(newMonto)) {
       newMonto = 0;
@@ -435,6 +500,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     if (amparo === grupoAmparo) {
       // Lógica si el amparo es el mismo que el grupo de amparo
       // Implementa tu lógica aquí...
+      // getValTasaAmparoIncendio(amparo, monto, $(this));
+      permitirCambio = true;
     } else if (montofijo === "N" && valmaximo > 0) {
       if (grupoAmparo !== "") {
         const montoPrincipalRow = editableRows.find(
@@ -447,9 +514,26 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
       if (grupoAmparo === "" && newMonto > valmaximo) {
         console.log(`El monto no puede ser mayor a ${valmaximo.toFixed(2)}`);
+
+        Swal.fire({
+          title: 'Error!',
+          text: `El monto no puede ser mayor a ${valmaximo.toFixed(2)}`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        })
+        
+
         permitirCambio = false;
       } else if (montoPrincipal === 0) {
         console.log("El valor principal es 0.00");
+
+        Swal.fire({
+          title: 'Error!',
+          text: `El valor principal es 0.00`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        })
+
         permitirCambio = false;
       } else {
         const valMaximoCalculado = montoPrincipal * (valmaximo / 100);
@@ -457,6 +541,14 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           console.log(
             `El monto no puede superar el ${valmaximo}% del cobertura principal`
           );
+
+          Swal.fire({
+            title: 'Error!',
+            text: `El monto no puede superar el ${valmaximo}% del cobertura principal`,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          })
+
           permitirCambio = false;
         }
       }
@@ -464,7 +556,21 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
     if (permitirCambio) {
       console.log("Permitir cambio");
+      setEditableValues((currentValues) => {
+        const newValues = [...currentValues];
+        newValues[index][field] = numericValue;
+        setJsonData((currentJsonData) => {
+          const newJsonData = [...currentJsonData];
+          newJsonData[index][field] = numericValue;
+          // Puedes poner aquí tus console.log para verificar los datos actualizados
+          console.log(newJsonData);
+          return newJsonData;
+        });
+        return newValues;
+      });
+
       const newValue = event.target.value;
+      console.log(newValue);
       const numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
       const newEditableValues = [...editableValues];
       isNaN(numericValue)
@@ -475,7 +581,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
       const newJsonData = [...jsonData];
       newJsonData[index][field] = numericValue;
       setJsonData(newJsonData);
-
+      setEditableRows(newEditableValues);
       const total = jsonData.reduce(
         (acc, item) => parseFloat(acc) + parseFloat(item.monto),
         0
@@ -496,63 +602,130 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     }
   };
 
-  const handleTasaChange = (event, index) => {
+  const handleTasaBlur = (event, index) => {
     let newTasa = parseFloat(event.target.value);
-    const tasaMinima = parseFloat(event.target.getAttribute("data-tasa-minima"));
+
+    if (jsonData[index].tasa === "Sin Costo") {
+      return;
+    }
+
+    const tasaMinima = parseFloat(
+      event.target.getAttribute("data-tasa-minima")
+    );
     const amparo = event.target.getAttribute("data-amparo");
     const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
-  
+
     // Verificar si la nueva tasa es menor que la tasa mínima
     if (newTasa < tasaMinima) {
       alert(`La tasa no puede ser menor que ${tasaMinima.toFixed(2)}`);
       newTasa = tasaMinima; // Asegúrate de que la tasa no sea menor que la mínima
     }
-  
+
     // Actualizar la tasa en el estado para la fila actual
     const newEditableValues = [...editableValues];
     newEditableValues[index].tasa = newTasa;
-  
+
     // Si el amparo de la fila actual es el mismo que el grupo de amparo, actualiza todas las filas correspondientes
     if (amparo === grupoAmparo) {
       newEditableValues.forEach((value, idx) => {
-        if (editableRows[idx].grupoAmparo === grupoAmparo) {
+        console.log(editableRows[idx].tasa);
+
+        if (
+          editableRows[idx].grupoAmparo === grupoAmparo &&
+          editableRows[idx].tasa !== "Sin Costo"
+        ) {
           value.tasa = newTasa; // Actualiza la tasa de todas las filas relacionadas
         }
       });
     }
-  
+
     setEditableValues(newEditableValues); // Actualiza el estado de los valores editables
-  
+    setEditableValues((currentValues) => {
+      const newValues = [...currentValues];
+      newValues[index].tasa = newTasa;
+      if (amparo === grupoAmparo) {
+        newValues.forEach((value, idx) => {
+          if (
+            currentValues[idx].grupoAmparo === grupoAmparo &&
+            editableRows[idx].tasa !== "Sin Costo"
+          ) {
+            value.tasa = newTasa;
+          }
+        });
+      }
+      setJsonData((currentJsonData) => {
+        const newJsonData = [...currentJsonData];
+        newJsonData.forEach((item, idx) => {
+          if (
+            item.grupoAmparo === grupoAmparo &&
+            editableRows[idx].tasa !== "Sin Costo"
+          ) {
+            item.tasa = newTasa;
+          }
+        });
+        // Puedes poner aquí tus console.log para verificar los datos actualizados
+        console.log(newJsonData);
+        return newJsonData;
+      });
+      // Puedes poner aquí tus console.log para verificar los datos actualizados
+      console.log(newValues);
+      return newValues;
+    });
+    console.log(newEditableValues);
     calculaTblAmparos(); // Llamar a calculaTblAmparos para recalcular los totales
   };
-  
 
   const calculaTblAmparos = () => {
     let newTotalMonto = 0;
     let newTotalPrima = 0;
 
-    const newEditableRows = editableRows.map((row) => {
-      let { monto, tasa, prima } = row;
+    const newJsonData = jsonData.map((row) => {
+      let { monto, tasa, prima, objCheck } = row;
 
-      // Asumiendo que el monto y la tasa son números y que quieres calcular la prima basada en ellos
-      // Puedes incluir aquí lógica adicional si es necesario, por ejemplo, verificar si la fila está marcada o no
-      const calculatedPrima = (monto * tasa) / 100;
+      // Calcular la prima solo si objCheck es true
+      let calculatedPrima = 0;
+      
+      tasa !== 'Sin Costo'? calculatedPrima = objCheck ? (monto * tasa) / 100 : prima : calculatedPrima = 0;
 
-      // Actualizar totalMonto y totalPrima
-      newTotalMonto += monto;
-      newTotalPrima += calculatedPrima;
+      // Actualizar totalMonto y totalPrima solo si objCheck es true
+      if (objCheck) {
+        newTotalMonto += monto;
+        newTotalPrima += calculatedPrima;
+      }
 
-      // Devolver la fila actualizada
+      // Devolver la fila actualizada con la prima calculada
       return {
         ...row,
         prima: calculatedPrima,
       };
     });
 
-    // Actualizar el estado con las nuevas filas y totales
-    setEditableRows(newEditableRows);
+    // Actualiza el estado con los nuevos datos y totales
     setTotalMonto(newTotalMonto);
     setTotalPrima(newTotalPrima);
+    setEditableRows(newJsonData);
+    console.log(jsonData);
+    // También actualiza editableValues si es necesario para reflejar las primas calculadas
+    setEditableValues(
+      newJsonData.map((row) => ({
+        monto: row.monto,
+        tasa: row.tasa,
+        prima: row.prima,
+      }))
+    );
+  };
+
+  const handleTasaChange = (event, index) => {
+    if (jsonData[index].tasa === "Sin Costo") {
+      return;
+    }
+
+    const newTasa = event.target.value; // Add validation if needed
+    setEditableValues((currentValues) => {
+      const newValues = [...currentValues];
+      newValues[index].tasa = newTasa;
+      return newValues;
+    });
   };
 
   const handleOpenModal = () => {
@@ -668,7 +841,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     <Checkbox
                       onClick={(event) => handleClick(event, row.id)}
                       color="primary"
-                      checked={isItemSelected}
+                      checked={row.objCheck}
+                      disabled={row.disableCheck}
                       inputProps={{
                         "aria-labelledby": labelId,
                       }}
@@ -676,7 +850,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     />
                   </TableCell>
                   <TableCell align="left">
-                    {row.id <= 4 ? (
+                    {row.inventario ? (
                       <EditIcon onClick={handleOpenModal} />
                     ) : null}
                   </TableCell>
@@ -696,10 +870,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     <CurrencyInput
                       className="input-table inpTblAmpIncBscMonto"
                       value={editableValues[index].monto.toFixed(2)}
-                      onChange={(event) =>
+                      onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }
-                      data-amparo={row.amparo} 
+                      disabled={row.objCheck ? false : true}
+                      data-amparo={row.amparo}
                       data-grupo-amparo={row.grupoAmparo}
                       data-montofijo={row.montoFijo}
                       data-valmaximo={row.valMaximo}
@@ -708,14 +883,15 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                   <TableCell align="right">
                     {/* Campo editable con CurrencyInput */}
                     <input
+                      type="text"
                       className="input-table"
                       data-tasa-minima={row.tasaMinima}
                       data-amparo={row.amparo}
                       data-grupo-amparo={row.grupoAmparo}
-                      value={editableValues[index].tasa.toFixed(2) + "%"}
-                      onChange={(event) =>
-                        handleCellValueChange(event, index, "tasa")
-                      }
+                      value={editableValues[index].tasa !== 'Sin Costo' && isNumber(editableValues[index].tasa) ? editableValues[index].tasa.toFixed(2) : editableValues[index].tasa}
+                      onBlur={(event) => handleTasaBlur(event, index)}
+                      onChange={(event) => handleTasaChange(event, index)}
+                      disabled={row.objCheck ? false : true}
                     />
                   </TableCell>
                   <TableCell align="right">
@@ -723,6 +899,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     <CurrencyInput
                       className="input-table"
                       value={editableValues[index].prima.toFixed(2)}
+                      disabled
                       onChange={(event) =>
                         handleCellValueChange(event, index, "prima")
                       }
