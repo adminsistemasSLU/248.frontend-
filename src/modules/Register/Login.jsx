@@ -27,8 +27,10 @@ const Login = () => {
         txtUser: formData.username,
         txtPassword: formData.password,
       };
-      await signin('api/Login', 'POST', data);
-      
+      const error = await signin('api/Login', 'POST', data);
+      if(error){
+        
+      }
     } catch (error) {
       console.log(error);
       setError("Se presentó un error con el inicio de sesión. Por favor, intente nuevamente.");

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button'; 
+import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -19,22 +19,11 @@ import '../../styles/detailQuoter.scss';
 import CloseIcon from '@mui/icons-material/Close';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import DetailObjectsTable from './detailObjectsTable';
-
-function createData(id, ramo, descripcion, monto, tasa, prima) {
-  return {
-    id,
-    ramo,
-    descripcion,
-    monto,
-    tasa,
-    prima
-  };
-}
+import IncendioService from '../../services/IncencioService/IncendioService';
+import { LS_PRODUCTO, LS_RAMO,LS_CLASIFICACIONAMPARO } from '../../utils/constantes';
 
 const rows = [
-  createData(1, 'Incendio', '', 950000., 0.52, 300),
-  createData(2, 'Robo', '', 7800, 0.52, 135),
-  createData(3, 'Componentes electrónicos', '', 9000, 0.52, 60),
+
 ];
 
 const headCells = [
@@ -188,15 +177,62 @@ function getComparator(order, orderBy) {
 
 
 export default function BranchInsurance({ closeModalDetail }) {
-  const [order,] = React.useState('asc');
-  const [orderBy,] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
-  const [page,] = React.useState(0);
-  const [rowsPerPage,] = React.useState(10);
-  const [openModal, setOpenModal] = React.useState(false);
-  const [editableRows, setEditableRows] = React.useState(rows);
+  const [order,] = useState('asc');
+  const [orderBy,] = useState('calories');
+  const [selected, setSelected] = useState([]);
+  const [page,] = useState(0);
+  const [rowsPerPage,] = useState(10);
+  const [openModal, setOpenModal] = useState(false);
+  const [editableRows, setEditableRows] = useState(rows);
+  const [rows1, setRows] = useState(rows);
+  const [totalMonto, setTotalMonto] = useState(0);
+  const [totalPrima, setTotalPrima] = useState(0);
 
-  const handleOpenModal = () => {
+  const producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+  const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+  console.log(rows1);
+  useEffect(() => {
+    printDetalleAsegurado();
+  }, []);
+
+  // function createData(id, ramo, descripcion, monto, tasa, prima) 
+  const printDetalleAsegurado = async () => {
+
+    try {
+      const detalleAsegurado = await IncendioService.fetchDetalleAsegurado(ramo, producto);
+
+      console.log(detalleAsegurado);
+      if (detalleAsegurado && detalleAsegurado.data) {
+        const newItems = detalleAsegurado.data.map(detalleAsegurado => {
+          return {
+            id: detalleAsegurado.codigo,
+            ramo: detalleAsegurado.descripcion,
+            descripcion: detalleAsegurado.descripcion,
+            monto: detalleAsegurado.monto,
+            tasa: detalleAsegurado.tasa,
+            prima: detalleAsegurado.prima,
+            codigo: detalleAsegurado.codigo
+          };
+        });
+        console.log(newItems);
+        setRows(newItems);
+        setEditableRows(newItems);
+        const newTotalMonto = newItems.reduce((sum, row) => sum + parseFloat(row.monto), 0);
+        setTotalMonto(newTotalMonto);
+    
+        // Calcular el total de Prima
+        const newTotalPrima = newItems.reduce((sum, row) => sum + parseFloat(row.prima), 0);
+        setTotalPrima(newTotalPrima);
+      }
+    } catch (error) {
+      console.error('Error al obtener Detalle Asegurado:', error);
+    }
+  };
+
+
+  const handleOpenModal = (codigo) => {
+    console.log(codigo);
+    localStorage.setItem(LS_CLASIFICACIONAMPARO,codigo);
     setOpenModal(true);
   };
 
@@ -207,7 +243,7 @@ export default function BranchInsurance({ closeModalDetail }) {
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
-    rows.map((row) => ({ descripcion: row.descripcion }))
+    rows.map((rows1) => ({ descripcion: rows1.descripcion }))
   );
 
   // const handleSaveChanges = () => {
@@ -224,8 +260,8 @@ export default function BranchInsurance({ closeModalDetail }) {
 
   React.useEffect(() => {
     setEditableValues(
-      rows.map((row) => ({
-        monto: row.monto, tasa: row.tasa, prima: row.prima
+      rows.map((rows1) => ({
+        monto: rows1.monto, tasa: rows1.tasa, prima: rows1.prima
       }))
     );
   }, []);
@@ -251,7 +287,6 @@ export default function BranchInsurance({ closeModalDetail }) {
       );
     }
     setSelected(newSelected);
-
   };
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
@@ -264,12 +299,11 @@ export default function BranchInsurance({ closeModalDetail }) {
   // };
 
   const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage,
-      ),
-    [order, orderBy, page, rowsPerPage],
+    () => stableSort(rows1, getComparator(order, orderBy)).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage,
+    ),
+    [order, orderBy, page, rowsPerPage, rows1], // Asegúrate de incluir rows1 aquí
   );
 
   return (
@@ -303,7 +337,7 @@ export default function BranchInsurance({ closeModalDetail }) {
           style={{ height: 150 }}
         >
           <EnhancedTableHead
-            rowCount={rows.length}
+            rowCount={rows1.length}
           />
           <TableBody>
             {visibleRows.map((row, index) => {
@@ -361,7 +395,7 @@ export default function BranchInsurance({ closeModalDetail }) {
                       scope="row"
                       padding="none"
                     >
-                      <CurrencyInput className='input-table' disabled value={row.monto.toFixed(2)} />
+                      <CurrencyInput className='input-table' disabled value={row.monto} />
                     </TableCell>
                     <TableCell align="right"
                       component="th"
@@ -369,7 +403,7 @@ export default function BranchInsurance({ closeModalDetail }) {
                       scope="row"
                       padding="none"
                     >
-                      <input className='input-table' disabled value={row.tasa.toFixed(2)+'%'} />
+                      <input className='input-table' disabled value={row.tasa + '%'} />
                     </TableCell>
                     <TableCell align="right"
                       component="th"
@@ -377,11 +411,11 @@ export default function BranchInsurance({ closeModalDetail }) {
                       scope="row"
                       padding="none"
                     >
-                      <CurrencyInput className='input-table' disabled value={row.prima.toFixed(2)} />
+                      <CurrencyInput className='input-table' disabled value={row.prima} />
                     </TableCell>
                     <TableCell align="right">
                       <EventAvailableIcon
-                        onClick={handleOpenModal}
+                        onClick={() => handleOpenModal(row.codigo)}
                       />
                     </TableCell>
                   </StyledTableRow>
@@ -397,27 +431,31 @@ export default function BranchInsurance({ closeModalDetail }) {
           </TableBody>
 
         </Table>
-        <div className='' style={{ display: 'flex', justifyContent: 'end' }}>
-          <div className='elementsModal' style={{ marginRight: '10px', gap: '5px' }}>
-            <div>Monto: </div>
-            <div>
-              <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={(958000).toFixed(2)} />
+        <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          {/* ... (resto del código de tu componente) */}
+
+          <div className='' style={{ display: 'flex', justifyContent: 'end' }}>
+            <div className='elementsModal' style={{ marginRight: '10px', gap: '5px' }}>
+              <div>Monto: </div>
+              <div>
+                <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={totalMonto.toFixed(2)} />
+              </div>
+            </div>
+            <div className='elementsModal elementRight' style={{ gap: '5px' }}>
+              <div>
+                Prima:
+              </div>
+              <div>
+                <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={totalPrima.toFixed(2)} />
+              </div>
             </div>
           </div>
-          <div className='elementsModal elementRight' style={{ gap: '5px' }}>
-            <div>
-              Prima:
-            </div>
-            <div>
-              <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={(495).toFixed(2)} />
-            </div>
-          </div>
-         
+
         </div>
       </TableContainer>
       <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'center' }}>
-            <Button variant="contained"   color="primary" onClick={closeModal}>Aceptar</Button>
-          </div>
+        <Button variant="contained" color="primary" onClick={closeModal}>Aceptar</Button>
+      </div>
     </div>
   );
 }

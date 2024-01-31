@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
 import EditIcon from '@mui/icons-material/Edit';
-import Button from '@mui/material/Button'; 
+import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
 import '../../styles/moddalForm.scss';
@@ -20,7 +20,8 @@ import CurrencyInput from '../../utils/currencyInput';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import ProtectionDetailTable from './protectionDetailTable';
-
+import { LS_PRODUCTO, LS_RAMO, LS_CLASIFICACIONAMPARO } from '../../utils/constantes';
+import IncendioService from '../../services/IncencioService/IncendioService';
 
 function createData(id, cobertura, monto, tasa, prima, titulo) {
   return {
@@ -34,17 +35,6 @@ function createData(id, cobertura, monto, tasa, prima, titulo) {
 }
 
 const rows = [
-  createData(1, 'Edificio con todas sus instalaciones fijas y permanentes (Estructuras)', 950000.00, 3.7, 67, false),
-  createData(2, 'Maquinarias y equipos', 452, 25.0, 51, false),
-  createData(3, 'Muebles, enseres y equipos de oficina', 262, 16.0, 24, false),
-  createData(4, 'Equipo electrónico fijo y portátil', 159, 6.0, 24, false),
-  createData(5, 'AMPAROS ADICIONALES QUE SUMAN CAPITAL', 356, 16.0, 49, true),
-  createData(6, 'Remocion de escombros', 408, 3.2, 87, false),
-  createData(7, 'Honorarios de Ingenieros Arquitectos y topografos', 237, 9.45, 4, false),
-  createData(8, 'Documentos y modelos', 375, 0.0, 94, false),
-  createData(9, 'AMPAROS ADICIONALES CON COSTOS', 518, 26.0, 65, true),
-  createData(10, 'Terrorismo y/o sabotaje', 392, 0.2, 98, false),
-  createData(11, 'Responsabilidad civil Extracontractual', 318, 0, 81, false),
 
 ];
 
@@ -190,27 +180,44 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   const [orderBy,] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(15);
+  const [rowsPerPage, setRowsPerPage] = React.useState(30);
   const [openModal, setOpenModal] = React.useState(false);
   const [editableRows, setEditableRows] = React.useState(rows);
+  const [rows1, setRows] = React.useState(rows);
+  const producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+  const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+  const clasificacionAmparo = JSON.parse(localStorage.getItem(LS_CLASIFICACIONAMPARO));
+
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
-    rows.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
+    rows1.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
   );
 
 
-  const [jsonData, setJsonData] = React.useState(rows); // Estado para los datos
+  const [jsonData, setJsonData] = React.useState(rows1); // Estado para los datos
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
 
+
+
   React.useEffect(() => {
+    printClasificacionAmparo(ramo, producto, clasificacionAmparo);
     setEditableValues(
-      rows.map((row) => ({
+      rows1.map((row) => ({
         monto: row.monto, tasa: row.tasa, prima: row.prima
       }))
     );
   }, []);
+
+  React.useEffect(() => {
+    if (rows1 && rows1.length > 0) {
+      setEditableValues(
+        rows1.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
+      );
+    }
+    setEditableRows(rows1);
+  }, [rows1]);
 
   React.useEffect(() => {
     // Calcula el total del monto desde el estado jsonData
@@ -219,8 +226,47 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     // Actualiza el estado totalMonto
     setTotalMonto(totalMonto);
     setTotalPrima(totalPrima);
+
   }, [jsonData]); // Observa cambios en jsonData
 
+  // function createData(id, ramo, descripcion, monto, tasa, prima) 
+  const printClasificacionAmparo = async (ramo, producto, amparo) => {
+    try {
+      const clasificacionAmparo = await IncendioService.fetchAmparoIncendios(ramo, producto, amparo);
+      let count = 0;
+      let result = [];
+      if (clasificacionAmparo && clasificacionAmparo.data && clasificacionAmparo.data.length > 0) {
+        Object.keys(clasificacionAmparo.data[0]).forEach(key => {
+          const tituloObj = createData(count++, key.replace('&nbsp;', ' ').trim(), 0, 0, 0, true);
+          result.push(tituloObj);
+
+          const items = clasificacionAmparo.data[0][key].map((item, index) => {
+            const montoValue = item.inpMonto && isNaN(item.inpMonto.value) ? parseFloat(item.inpMonto.value.replace(/,/g, '')) : 0.0;
+            const tasaValue = item.inpTasa && isNaN(item.inpTasa.value) && item.inpTasa === "Sin Costo" ? parseFloat(item.inpTasa.value.replace(/,/g, '')) : 0.0;
+            const primaValue = item.inpPrima && isNaN(item.inpPrima.value) ? parseFloat(item.inpPrima.value.replace(/,/g, '')) : 0.0;
+            return createData(count++, item.inpDetalle.value, montoValue, tasaValue, primaValue, false);
+          });
+
+          result.push(...items);
+        });
+
+        setEditableValues(
+          result.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
+        );
+
+        setRows(result);
+        setJsonData(result);
+        const newTotalMonto = result.reduce((sum, row) => sum + parseFloat(row.monto), 0);
+        setTotalMonto(newTotalMonto);
+        const newTotalPrima = result.reduce((sum, row) => sum + parseFloat(row.prima), 0);
+        setTotalPrima(newTotalPrima);
+      } else {
+        console.error("Datos recibidos no son válidos: ", clasificacionAmparo.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener Amparo Incendio:', error);
+    }
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -296,12 +342,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   };
 
   const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage,
-      ),
-    [order, orderBy, page, rowsPerPage],
+    () => stableSort(rows1, getComparator(order, orderBy)).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage,
+    ),
+    [order, orderBy, page, rowsPerPage, rows1], // Asegúrate de incluir rows1 aquí
   );
 
   return (
@@ -356,7 +401,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                     key={row.id}
                   >
                     <TableCell padding="checkbox">
-                       <Checkbox
+                      <Checkbox
                         onClick={(event) => handleClick(event, row.id)}
                         color="primary"
                         checked={isItemSelected}
@@ -367,14 +412,14 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                       />
                     </TableCell>
                     <TableCell align="left">
-                    {row.id <= 4 ? (
-                         <EditIcon onClick={handleOpenModal} />
-                       
+                      {row.id <= 4 ? (
+                        <EditIcon onClick={handleOpenModal} />
+
                       ) : (
                         null
                       )}
 
-                     
+
                     </TableCell>
 
                     <TableCell
@@ -461,12 +506,12 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                 value={totalPrima.toFixed(2)} />
             </div>
           </div>
-          
+
         </div>
       </div>
       <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'center' }}>
-            <Button  variant="contained"   color="primary" onClick={closeModal}>Aceptar</Button>
-          </div>
+        <Button variant="contained" color="primary" onClick={closeModal}>Aceptar</Button>
+      </div>
     </div>
   );
 }

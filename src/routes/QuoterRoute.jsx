@@ -4,8 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 import NotFound from '../pages/NotFound';
 import Steppers from '../components/steppers';
 import RequireAuth from '../services/RoutesService/RequireAuth';
-import ProductListCards from '../components/Quoter/productListCards';
-
+import DetailObjectsTable from '../components/Quoter/detailObjectsTable';
 
 const HomePage = lazy(() => import('../pages/HomePage'));
 
@@ -17,7 +16,7 @@ const QuoterRoutes = () => {
       <Route path="*" element={<NotFound />} />
 
 
-      <Route path="/Pymes/product" element={<RequireAuth> <ProductListCards /> </RequireAuth>} />
+      <Route path="/Pymes/product" element={<RequireAuth> <DetailObjectsTable /> </RequireAuth>} />
 
       <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
 

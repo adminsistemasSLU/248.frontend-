@@ -3,13 +3,20 @@ import { Card, CardContent, CardMedia, Container, Grid, Typography } from '@mui/
 import '../../styles/carrousel.scss';
 import BaldosasService from '../../services/BaldosasService/BaldosasService';
 import Loading from '../../utils/loading';
-
+import { API_SUBBALDOSAS,LS_PRODUCTO } from '../../utils/constantes';
 
 const ProductListCards = ({ onNext }) => {
   const [data, setdata] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
+  console.log(subbaldosas);
 
   useEffect(() => {
+    if(subbaldosas){
+      setdata(subbaldosas);
+      return;
+    }
+
     const printBaldosas = async () => {
       setIsLoading(true);
       try {
@@ -22,10 +29,11 @@ const ProductListCards = ({ onNext }) => {
               titulo: baldosa.titulo,
               descripcion: baldosa.descripcion,
               imagen: process.env.REACT_APP_API_URL + '/Imagen/' + baldosa.nombre_imagen,
+              producto:baldosa.producto,
             };
           });
           setdata(newItems);
-
+          localStorage.setItem(API_SUBBALDOSAS,JSON.stringify(newItems));
         }
       } catch (error) {
         console.error('Error al obtener baldosas:', error);
@@ -34,8 +42,10 @@ const ProductListCards = ({ onNext }) => {
     printBaldosas();
   }, []);
 
-  const handleCardClick = (index) => {
-    // Llama a la función onNext cuando se hace clic en una carta y pasa el índice como argumento.
+  const handleCardClick = (index,producto) => {
+    
+    console.log('Producto elegido: '+producto);
+    localStorage.setItem(LS_PRODUCTO,(producto));
     onNext(index);
   };
 
@@ -47,7 +57,7 @@ const ProductListCards = ({ onNext }) => {
       </div>
       <Grid container spacing={2}>
         {data.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-container' onClick={() => handleCardClick(index)}>
+          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-container' onClick={() => handleCardClick(index,item.producto)}>
             <Card style={{ maxWidth: 240, cursor: 'pointer' }} >
               <CardMedia
                 component="img"

@@ -70,6 +70,7 @@ export const AuthProvider = ({ children }) => {
             }else{
                 navigate('/login');
                 setIsLoading(false);
+                return userData.message;
             }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);

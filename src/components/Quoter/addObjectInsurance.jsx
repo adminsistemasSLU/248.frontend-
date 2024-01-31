@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, Container, Paper } from '@mui/material';
 import MapContainer from './mapContainer';
 import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
@@ -18,6 +18,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import ComboService from '../../services/ComboService/ComboService';
+import { LS_PRODUCTO,LS_RAMO } from '../../utils/constantes';
 
 const AddObjectInsurance = ({ closeModal }) => {
   const [formData, setFormData] = useState({
@@ -39,10 +41,17 @@ const AddObjectInsurance = ({ closeModal }) => {
     direcctionInspection: '',
     phoneInspection: '',
     agentInspection: '',
-
   });
 
   const [openModal, setOpenModal] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [provinces, setProvinces] = useState([]);
+  const [ciudades, setCiudades] = useState([]);
+  const [parroquia, setParroquia] = useState([]);
+  const [antiguedad, setAntiguedad] = useState([]);
+  const [construccion, setConstruccion] = useState([]);
+  const [riesgo, setRiesgo] = useState([]);
+  const [destinado, setDestinado] = useState([]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -61,6 +70,15 @@ const AddObjectInsurance = ({ closeModal }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if(e.target.name==='province'){
+      cargarCiudad(e.target.value);
+    }
+    if(e.target.name==='riskType'){
+      cargarDestinado(e.target.value);
+    }
+    if(e.target.name==='city'){
+      cargarParroquia(e.target.value);
+    }
   };
   const toggleInspection = () => {
     setFormData({ ...formData, inspection: !formData.inspection });
@@ -89,6 +107,119 @@ const AddObjectInsurance = ({ closeModal }) => {
   const SearchLocation = () => {
     if (mapContainerRef.current) {
       mapContainerRef.current.handleSearchLocation();
+    }
+  };
+
+  useEffect(() => {
+    cargarConstruccion();
+    cargarAntiguedad();
+    cargarRiesgo();
+    cargarProvincias();
+  }, []);
+
+  const ramo = (localStorage.getItem(LS_RAMO));
+  console.log(ramo);
+  const producto = (localStorage.getItem(LS_PRODUCTO));
+  console.log(producto);
+
+  const cargarAntiguedad = async () => {
+    setIsLoading(true);
+    setAntiguedad([]);
+    try {
+      const antiguedad = await ComboService.fetchComboAntiguedad(ramo, producto,1);
+      setIsLoading(false);
+      if (antiguedad && antiguedad.data) {
+        setAntiguedad(antiguedad.data);
+        console.log(antiguedad);
+      }
+    } catch (error) {
+      console.error('Error al obtener antiguedad:', error);
+    }
+  };
+
+  const cargarCiudad = async (value) => {
+    setIsLoading(true);
+    setCiudades([]);
+    try {
+      const ciudades = await ComboService.fetchComboCiudad(ramo, producto,value);
+      setIsLoading(false);
+      if (ciudades && ciudades.data) {
+        setCiudades(ciudades.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener ciudad:', error);
+    }
+  };
+
+  const cargarParroquia = async (ciudad) => {
+    setIsLoading(true);
+    setParroquia([]);
+    try {
+      const parroquia = await ComboService.fetchComboParroquia(ciudad);
+      setIsLoading(false);
+      if (parroquia && parroquia.data) {
+        setParroquia(parroquia.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener ciudad:', error);
+    }
+  };
+
+  const cargarDestinado = async (value) => {
+    setIsLoading(true);
+    setDestinado([]);
+    try {
+      const destinado = await ComboService.fetchTipDestino(ramo,producto,1,value);
+      setIsLoading(false);
+      if (destinado && destinado.data) {
+        setDestinado(destinado.data);
+        console.log(destinado);
+      }
+    } catch (error) {
+      console.error('Error al obtener destinado:', error);
+    }
+  };
+
+  const cargarRiesgo = async () => {
+    setIsLoading(true);
+    setRiesgo([]);
+    try {
+      const riesgo = await ComboService.fetchComboTipoRiesgos(ramo,producto);
+      setIsLoading(false);
+      if (riesgo && riesgo.data) {
+        setRiesgo(riesgo.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener riesgo:', error);
+    }
+  };
+
+  const cargarConstruccion = async (value) => {
+    setIsLoading(true);
+    setConstruccion([]);
+    try {
+      const construccion = await ComboService.fetchComboTipConstruccion();
+      setIsLoading(false);
+      if (construccion && construccion.data) {
+        setConstruccion(construccion.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener antiguedad:', error);
+    }
+  };
+
+  
+
+  const cargarProvincias = async () => {
+    setIsLoading(true);
+    try {
+      const provincias = await ComboService.fetchComboProvincias(ramo, producto);
+      setIsLoading(false);
+      if (provincias && provincias.data) {
+        setProvinces(provincias.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener provincias:', error);
     }
   };
 
@@ -155,10 +286,14 @@ const AddObjectInsurance = ({ closeModal }) => {
                           className='modalFormInputs'
                           required
                           style={{ border: '1px solid #A1A8AE' }}
+                          
                         >
-                          <option value="01">Guayas</option>
-                          <option value="02">Quito</option>
-                          <option value="03">Azogues</option>
+                          <option  value="--">SELECCIONE UNA OPCION</option>
+                          {provinces.map((province) => (
+                            <option key={province.Codigo} value={province.Codigo}>
+                              {province.Nombre}
+                            </option>
+                          ))}
                         </select>
                       </td>
                     </div>
@@ -178,9 +313,12 @@ const AddObjectInsurance = ({ closeModal }) => {
                           required
                           style={{ border: '1px solid #A1A8AE' }}
                         >
-                          <option value="G01">Guayaquil</option>
-                          <option value="G02">Duran</option>
-                          <option value="G03">Daule</option>
+                          <option  value="--">SELECCIONE UNA PROVINCIA</option>
+                          {ciudades.map((ciudad) => (
+                            <option key={ciudad.Codigo} value={ciudad.Codigo}>
+                              {ciudad.Nombre}
+                            </option>
+                          ))}
                         </select>
                       </td>
                     </div>
@@ -202,9 +340,12 @@ const AddObjectInsurance = ({ closeModal }) => {
                           className='modalFormInputs'
                           required
                         >
-                          <option value="G01">Balao</option>
-                          <option value="G02">Duran</option>
-                          <option value="G03">Daule</option>
+                         <option  value="--">SELECCIONE UNA CIUDAD</option>
+                          {parroquia.map((ciudad) => (
+                            <option key={ciudad.Codigo} value={ciudad.Codigo}>
+                              {ciudad.Nombre}
+                            </option>
+                          ))}
                         </select>
                       </td>
                     </div>
@@ -305,9 +446,11 @@ const AddObjectInsurance = ({ closeModal }) => {
                           required
                           style={{ border: '1px solid #A1A8AE' }}
                         >
-                          <option value="G01">1</option>
-                          <option value="G02">2</option>
-                          <option value="G03">3</option>
+                          {antiguedad.map((province) => (
+                            <option key={province.Codigo} value={province.Codigo}>
+                              {province.Nombre}
+                            </option>
+                          ))}
                         </select>
                       </td>
                     </div>
@@ -330,9 +473,11 @@ const AddObjectInsurance = ({ closeModal }) => {
                           required
                           style={{ border: '1px solid #A1A8AE' }}
                         >
-                          <option value="G01">CEMENTO</option>
-                          <option value="G02">2</option>
-                          <option value="G03">3</option>
+                          {construccion.map((province) => (
+                            <option key={province.Codigo} value={province.Codigo}>
+                              {province.Nombre}
+                            </option>
+                          ))}
                         </select>
                       </td>
                     </div>
@@ -352,9 +497,12 @@ const AddObjectInsurance = ({ closeModal }) => {
                           required
                           style={{ border: '1px solid #A1A8AE' }}
                         >
-                          <option value="G01">VIVIENDA</option>
-                          <option value="G02">2</option>
-                          <option value="G03">3</option>
+                          <option  value="--">SELECCIONE UNA OPCION</option>
+                          {riesgo.map((province) => (
+                            <option key={province.Codigo} value={province.Codigo}>
+                              {province.Nombre}
+                            </option>
+                          ))}
                         </select>
                       </td>
                     </div>
@@ -380,9 +528,11 @@ const AddObjectInsurance = ({ closeModal }) => {
                           required
                           style={{ border: '1px solid #A1A8AE' }}
                         >
-                          <option value="G01">VIVIENDA</option>
-                          <option value="G02">2</option>
-                          <option value="G03">3</option>
+                           {destinado.map((province) => (
+                            <option key={province.Codigo} value={province.Codigo}>
+                              {province.Nombre}
+                            </option>
+                          ))}
                         </select>
                       </td>
                     </div>
@@ -475,7 +625,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                     </div>
                   </tr>
 
-                
+
                   {formData.inspection && ( // Verificar si inspection es true
                     <tr className='modalFormRow' >
                       <Tooltip title="Agente de inspeccion" placement="left">
