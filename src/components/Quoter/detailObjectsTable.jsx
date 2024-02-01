@@ -28,9 +28,7 @@ import {
 import IncendioService from "../../services/IncencioService/IncendioService";
 
 import { isNumber } from "@mui/x-data-grid/internals";
-import Swal from 'sweetalert2'
-
-
+import Swal from "sweetalert2";
 
 function createData(
   id,
@@ -47,7 +45,9 @@ function createData(
   grupoAmparo,
   montoFijo,
   valMaximo,
-  inventario
+  inventario,
+  tasaReadOnly,
+  montoReadOnly
 ) {
   return {
     id,
@@ -65,6 +65,8 @@ function createData(
     montoFijo,
     valMaximo,
     inventario,
+    tasaReadOnly,
+    montoReadOnly,
   };
 }
 
@@ -301,6 +303,12 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             false,
             false,
             0,
+            false,
+            false,
+            0,
+            0,
+            false,
+            false,
             false
           );
           result.push(tituloObj);
@@ -334,6 +342,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             const montoFijo = item.inpMonto.montofijo;
             const valMaximo = item.inpMonto.valmaximo;
             const inventario = item.Inventario === "true" ? true : false;
+            const montoReadOnly = item.inpMonto.readonly === "true" ? true : false;
+            const tasaReadOnly = item.inpTasa.readonly === "true" ? true : false;
             return createData(
               count++,
               item.inpDetalle.value,
@@ -349,7 +359,9 @@ export default function DetailObjectsTable({ closeModalDetail }) {
               grupoAmparo,
               montoFijo,
               valMaximo,
-              inventario
+              inventario,
+              montoReadOnly,
+              tasaReadOnly
             );
           });
 
@@ -516,23 +528,22 @@ export default function DetailObjectsTable({ closeModalDetail }) {
         console.log(`El monto no puede ser mayor a ${valmaximo.toFixed(2)}`);
 
         Swal.fire({
-          title: 'Error!',
+          title: "Error!",
           text: `El monto no puede ser mayor a ${valmaximo.toFixed(2)}`,
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        })
-        
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
 
         permitirCambio = false;
       } else if (montoPrincipal === 0) {
         console.log("El valor principal es 0.00");
 
         Swal.fire({
-          title: 'Error!',
+          title: "Error!",
           text: `El valor principal es 0.00`,
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        })
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
 
         permitirCambio = false;
       } else {
@@ -543,11 +554,11 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           );
 
           Swal.fire({
-            title: 'Error!',
+            title: "Error!",
             text: `El monto no puede superar el ${valmaximo}% del cobertura principal`,
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          })
+            icon: "error",
+            confirmButtonText: "Ok",
+          });
 
           permitirCambio = false;
         }
@@ -616,9 +627,16 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
 
     // Verificar si la nueva tasa es menor que la tasa mínima
-    if (newTasa < tasaMinima) {
+    if (newTasa < tasaMinima && tasaMinima !== 0) {
+      Swal.fire({
+        title: "Error!",
+        text: `La tasa no puede ser menor que ${tasaMinima.toFixed(2)}`,
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
       alert(`La tasa no puede ser menor que ${tasaMinima.toFixed(2)}`);
       newTasa = tasaMinima; // Asegúrate de que la tasa no sea menor que la mínima
+      return;
     }
 
     // Actualizar la tasa en el estado para la fila actual
@@ -632,7 +650,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
         if (
           editableRows[idx].grupoAmparo === grupoAmparo &&
-          editableRows[idx].tasa !== "Sin Costo"
+          editableRows[idx].tasa !== "Sin Costo" &&
+          editableRows[idx].grupoAmparo !== ""
         ) {
           value.tasa = newTasa; // Actualiza la tasa de todas las filas relacionadas
         }
@@ -655,14 +674,17 @@ export default function DetailObjectsTable({ closeModalDetail }) {
       }
       setJsonData((currentJsonData) => {
         const newJsonData = [...currentJsonData];
-        newJsonData.forEach((item, idx) => {
-          if (
-            item.grupoAmparo === grupoAmparo &&
-            editableRows[idx].tasa !== "Sin Costo"
-          ) {
-            item.tasa = newTasa;
-          }
-        });
+        newJsonData[index].tasa = newTasa;
+        if (amparo === grupoAmparo) {
+          newJsonData.forEach((item, idx) => {
+            if (
+              item.grupoAmparo === grupoAmparo &&
+              editableRows[idx].tasa !== "Sin Costo"
+            ) {
+              item.tasa = newTasa;
+            }
+          });
+        }
         // Puedes poner aquí tus console.log para verificar los datos actualizados
         console.log(newJsonData);
         return newJsonData;
@@ -684,8 +706,10 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
       // Calcular la prima solo si objCheck es true
       let calculatedPrima = 0;
-      
-      tasa !== 'Sin Costo'? calculatedPrima = objCheck ? (monto * tasa) / 100 : prima : calculatedPrima = 0;
+
+      tasa !== "Sin Costo"
+        ? (calculatedPrima = objCheck ? (monto * tasa) / 100 : prima)
+        : (calculatedPrima = 0);
 
       // Actualizar totalMonto y totalPrima solo si objCheck es true
       if (objCheck) {
@@ -878,6 +902,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                       data-grupo-amparo={row.grupoAmparo}
                       data-montofijo={row.montoFijo}
                       data-valmaximo={row.valMaximo}
+                      readOnly = {row.montoReadOnly}
                     />
                   </TableCell>
                   <TableCell align="right">
@@ -888,10 +913,16 @@ export default function DetailObjectsTable({ closeModalDetail }) {
                       data-tasa-minima={row.tasaMinima}
                       data-amparo={row.amparo}
                       data-grupo-amparo={row.grupoAmparo}
-                      value={editableValues[index].tasa !== 'Sin Costo' && isNumber(editableValues[index].tasa) ? editableValues[index].tasa.toFixed(2) : editableValues[index].tasa}
+                      value={
+                        editableValues[index].tasa !== "Sin Costo" &&
+                        isNumber(editableValues[index].tasa)
+                          ? editableValues[index].tasa.toFixed(2)
+                          : editableValues[index].tasa
+                      }
                       onBlur={(event) => handleTasaBlur(event, index)}
                       onChange={(event) => handleTasaChange(event, index)}
                       disabled={row.objCheck ? false : true}
+                      readOnly = {row.tasaReadOnly}
                     />
                   </TableCell>
                   <TableCell align="right">
