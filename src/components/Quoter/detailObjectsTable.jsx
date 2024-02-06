@@ -311,7 +311,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         amparo
       );
       let count = 0;
-      
+
       let tablaAmparo = [];
 
       let tablaA = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
@@ -327,16 +327,15 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         clasificacionAmparo.data &&
         clasificacionAmparo.data.length > 0
       ) {
-        if (tablaAmparo.length!==0) {
+        if (tablaAmparo.length !== 0) {
           result = tablaAmparo;
           setEditableValues(
             result.map((row) => ({
               monto: row.monto,
               tasa: row.tasa,
-              prima: row.prima,
+              prima: row.monto * row.tasa/100,
             }))
           );
-
           setRows(result);
           setJsonData(result);
           const newTotalMonto = result.reduce(
@@ -450,10 +449,12 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         );
         setTotalMonto(newTotalMonto);
         const newTotalPrima = result.reduce(
-          (sum, row) => sum + parseFloat(row.prima),
+          (sum, row) => sum + (parseFloat(row.prima)||0),
           0
         );
+        const newTotalPrima2 = result.map((row) => {console.log(row.prima||0)});
         setTotalPrima(newTotalPrima);
+        console.log('total Pimra: ' +newTotalPrima);
       } else {
         console.error(
           "Datos recibidos no son válidos: ",
@@ -471,12 +472,19 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     //mapear id seccion con tabla secciones
 
     const newTablaAmparo = tablaSecciones.map((amparo, index) => {
+      const newJsonData = jsonData.map((item, index) => ({
+        ...item,
+        monto: editableValues[index].monto,
+        tasa: editableValues[index].tasa,
+        prima: editableValues[index].monto * editableValues[index].tasa/100,
+      }));
+
       if (tablaSecciones[index].id === idSelected) {
         return {
           ...amparo,
           monto: String(totalMonto),
           prima: String(totalPrima),
-          Amparo: jsonData,
+          Amparo: newJsonData,
         };
       } else
         return {
@@ -484,13 +492,22 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         };
     });
     console.log(newTablaAmparo);
-    const amparo = newTablaAmparo.find(
-      (row) => row.id === clasificacionAmparo
-    );
+    const amparo = newTablaAmparo.find((row) => row.id === clasificacionAmparo);
     localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(newTablaAmparo));
-    if(amparo.Amparo){
+    if (amparo.Amparo) {
       localStorage.setItem(LS_TABLAAMPARO, JSON.stringify(amparo.Amparo));
     }
+
+    const newTotalMonto = newTablaAmparo.reduce(
+      (sum, row) => sum + parseFloat(row.monto),
+      0
+    );
+    setTotalMonto(newTotalMonto);
+    const newTotalPrima = newTablaAmparo.reduce(
+      (sum, row) => sum + parseFloat(row.prima),
+      0
+    );
+    setTotalPrima(newTotalPrima);
   }
 
   const handleChangePage = (event, newPage) => {
@@ -796,7 +813,9 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       let calculatedPrima = 0;
 
       tasa !== "Sin Costo"
-        ? (calculatedPrima = objCheck ? (monto * tasa) / 100 : prima)
+        ? (calculatedPrima = objCheck
+            ? (parseFloat(monto) * tasa) / 100
+            : prima)
         : (calculatedPrima = 0);
 
       // Actualizar totalMonto y totalPrima solo si objCheck es true
@@ -852,10 +871,17 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       ...row,
       monto: editableValues[index].monto,
       tasa: editableValues[index].tasa,
-      prima: editableValues[index].prima,
+      prima: editableValues[index].monto * editableValues[index].tasa/100,
     }));
     setEditableRows(newEditableRows);
     console.log(newEditableRows);
+    const newJsonData = jsonData.map((item, index) => ({
+      ...item,
+      monto: editableValues[index].monto,
+      tasa: editableValues[index].tasa,
+      prima: editableValues[index].monto * editableValues[index].tasa/100,
+    }));
+    console.log(newJsonData);
     tablaSeccionesMap();
     closeModalDetail("true");
   };
@@ -1025,7 +1051,11 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                     {/* Campo editable con CurrencyInput */}
                     <CurrencyInput
                       className="input-table"
-                      value={editableValues[index].prima.toFixed(2)}
+                      value={
+                        editableValues[index].prima
+                          ? editableValues[index].prima
+                          : 0
+                      }
                       disabled
                       onChange={(event) =>
                         handleCellValueChange(event, index, "prima")
