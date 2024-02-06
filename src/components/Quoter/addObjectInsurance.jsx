@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import dayjs from 'dayjs';
 import { Button, Container, Paper } from '@mui/material';
 import MapContainer from './mapContainer';
 import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
@@ -19,7 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import ComboService from '../../services/ComboService/ComboService';
-import { LS_PRODUCTO,LS_RAMO } from '../../utils/constantes';
+import { LS_PRODUCTO,LS_RAMO,LS_TABLASECCIONES } from '../../utils/constantes';
 
 const AddObjectInsurance = ({ closeModal }) => {
   const [formData, setFormData] = useState({
@@ -52,6 +53,10 @@ const AddObjectInsurance = ({ closeModal }) => {
   const [construccion, setConstruccion] = useState([]);
   const [riesgo, setRiesgo] = useState([]);
   const [destinado, setDestinado] = useState([]);
+  const ramo = (localStorage.getItem(LS_RAMO));
+  const producto = (localStorage.getItem(LS_PRODUCTO));
+  const [dateInspecction, setdateInspecction] = useState([]);
+  const [timeInspecction, setTimeInspecction] = useState([]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -60,6 +65,7 @@ const AddObjectInsurance = ({ closeModal }) => {
   // Manejador para cerrar el modal
   const handleCloseModal = () => {
     setOpenModal(false);
+
   };
 
 
@@ -84,10 +90,42 @@ const AddObjectInsurance = ({ closeModal }) => {
     setFormData({ ...formData, inspection: !formData.inspection });
   };
   const mapContainerRef = useRef(null);
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Agregar lógica de envío del formulario si es necesario
-    console.log('Formulario enviado:', formData);
+
+    const formattedDate = dayjs(dateInspecction).format('DD/MM/YYYY');
+    const formattedTime = dayjs(timeInspecction).format('HH:mm');
+  
+    const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    const objetoSeguro = {
+      contactoInspeccion:formData.agentInspection,
+      manzana:formData.block,
+      antiguedad:formData.buildingAge,
+      ciudad:formData.city,
+      tConstruccion:formData.constructionType,
+      destinado:formData.destiny,
+      direccion:formData.direccion,
+      direccionInspeccion:formData.direcctionInspection,
+      piso:formData.floor,
+      villa:formData.house,
+      inspeccion: formData.inspection,
+      latitud:formData.lat,
+      longitud:formData.lng,
+      parroqua:formData.parish,
+      telefonoContacto:formData.phoneInspection,
+      provincia:formData.province,
+      riesgo:formData.riskType,
+      sumaAsegurada:formData.sumInsure,
+      producto:producto,
+      ramo:ramo,
+      tablaSumaAsegurada:secciones,
+      fechaInspeccion:formattedDate,
+      horaInspeccion:formattedTime
+    }
+
+    console.log(objetoSeguro);
   };
 
   const onMarkerDragEnd = ({ lat, lng, direccion }) => {
@@ -117,10 +155,8 @@ const AddObjectInsurance = ({ closeModal }) => {
     cargarProvincias();
   }, []);
 
-  const ramo = (localStorage.getItem(LS_RAMO));
-  console.log(ramo);
-  const producto = (localStorage.getItem(LS_PRODUCTO));
-  console.log(producto);
+
+
 
   const cargarAntiguedad = async () => {
     setIsLoading(true);
@@ -130,7 +166,8 @@ const AddObjectInsurance = ({ closeModal }) => {
       setIsLoading(false);
       if (antiguedad && antiguedad.data) {
         setAntiguedad(antiguedad.data);
-        console.log(antiguedad);
+        console.log(antiguedad.data[0].Codigo);
+        setFormData(formData => ({ ...formData, buildingAge: antiguedad.data[0].Codigo }));
       }
     } catch (error) {
       console.error('Error al obtener antiguedad:', error);
@@ -173,6 +210,7 @@ const AddObjectInsurance = ({ closeModal }) => {
       setIsLoading(false);
       if (destinado && destinado.data) {
         setDestinado(destinado.data);
+        setFormData(formData => ({ ...formData, destiny: destinado.data[0].Codigo }));
         console.log(destinado);
       }
     } catch (error) {
@@ -188,6 +226,7 @@ const AddObjectInsurance = ({ closeModal }) => {
       setIsLoading(false);
       if (riesgo && riesgo.data) {
         setRiesgo(riesgo.data);
+        //setFormData(formData => ({ ...formData, riskType: riesgo.data[0].Codigo }));
       }
     } catch (error) {
       console.error('Error al obtener riesgo:', error);
@@ -202,6 +241,7 @@ const AddObjectInsurance = ({ closeModal }) => {
       setIsLoading(false);
       if (construccion && construccion.data) {
         setConstruccion(construccion.data);
+        setFormData(formData => ({ ...formData, constructionType: construccion.data[0].Codigo }));
       }
     } catch (error) {
       console.error('Error al obtener antiguedad:', error);
@@ -446,9 +486,9 @@ const AddObjectInsurance = ({ closeModal }) => {
                           required
                           style={{ border: '1px solid #A1A8AE' }}
                         >
-                          {antiguedad.map((province) => (
-                            <option key={province.Codigo} value={province.Codigo}>
-                              {province.Nombre}
+                          {antiguedad.map((antig) => (
+                            <option key={antig.Codigo} value={antig.Codigo}>
+                              {antig.Nombre}
                             </option>
                           ))}
                         </select>
@@ -548,7 +588,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                           value={formData.sumInsure}
                           className='modalFormInputs'
                           variant="standard"
-                          required
+                          
                         />
                         <div onClick={handleOpenModal}  >
                           <CalendarMonthIcon />
@@ -695,7 +735,7 @@ const AddObjectInsurance = ({ closeModal }) => {
                           <td className='tdTableData'>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                               <DemoContainer components={['DatePicker']} sx={{ overflow: 'hidden' }}>
-                                <DatePicker className='hourPicker' style={{ overflow: 'hidden' }} slotProps={{ textField: { variant: 'standard', size: 'small' } }} />
+                                <DatePicker value={dateInspecction} onChange={setdateInspecction} className='hourPicker' style={{ overflow: 'hidden' }} slotProps={{ textField: { variant: 'standard', size: 'small' } }} />
                               </DemoContainer>
                             </LocalizationProvider>
                           </td>
@@ -714,9 +754,9 @@ const AddObjectInsurance = ({ closeModal }) => {
                             <LocalizationProvider dateAdapter={AdapterDayjs} style={{ overflow: 'hidden' }}>
                               <DemoContainer components={['TimePicker']} sx={{ overflow: 'hidden' }}>
                                 <TimePicker
+                                  value={timeInspecction} onChange={setTimeInspecction}
                                   className='hourPicker'
                                   slotProps={{ textField: { variant: 'standard', size: 'small' } }}
-
                                 />
 
                               </DemoContainer>

@@ -5,3 +5,4 @@ export const LS_RAMO = 'IdRamo';
 export const LS_CLASIFICACIONAMPARO = 'ClasificacionAmparo';
 export const LS_DETALLEAMPARO = 'DetalleAmparo';
 export const LS_TABLAAMPARO = 'TablaAmparo';
+export const LS_TABLASECCIONES = 'TablaSecciones';

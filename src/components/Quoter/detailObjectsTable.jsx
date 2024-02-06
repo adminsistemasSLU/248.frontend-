@@ -25,6 +25,7 @@ import {
   LS_RAMO,
   LS_CLASIFICACIONAMPARO,
   LS_TABLAAMPARO,
+  LS_TABLASECCIONES,
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 
@@ -209,7 +210,7 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-export default function DetailObjectsTable({ closeModalDetail }) {
+export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   const [order] = React.useState("asc");
   const [orderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -224,7 +225,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   const clasificacionAmparo = JSON.parse(
     localStorage.getItem(LS_CLASIFICACIONAMPARO)
   );
-
+  const idSelected = idSeccion;
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
     rows1.map((row) => ({ monto: row.monto, tasa: row.tasa, prima: row.prima }))
@@ -236,7 +237,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
 
   React.useEffect(() => {
     let result;
-
+    console.log("Id Seccion: " + idSelected);
     printClasificacionAmparo(ramo, producto, clasificacionAmparo);
     setEditableValues(
       rows1.map((row) => ({
@@ -303,7 +304,6 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   // function createData(id, ramo, descripcion, monto, tasa, prima)
   const printClasificacionAmparo = async (ramo, producto, amparo) => {
     let result = [];
-    console.log("entro");
     try {
       const clasificacionAmparo = await IncendioService.fetchAmparoIncendios(
         ramo,
@@ -311,13 +311,23 @@ export default function DetailObjectsTable({ closeModalDetail }) {
         amparo
       );
       let count = 0;
-      const tablaAmparo = JSON.parse(localStorage.getItem(LS_TABLAAMPARO));
+      
+      let tablaAmparo = [];
+
+      let tablaA = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+
+      tablaA = tablaA.find((row) => row.id === amparo);
+      console.log(tablaA);
+      if (Array.isArray(tablaA.Amparo)) {
+        tablaAmparo = tablaA.Amparo;
+      }
+
       if (
         clasificacionAmparo &&
         clasificacionAmparo.data &&
         clasificacionAmparo.data.length > 0
       ) {
-        if (tablaAmparo) {
+        if (tablaAmparo.length!==0) {
           result = tablaAmparo;
           setEditableValues(
             result.map((row) => ({
@@ -326,7 +336,7 @@ export default function DetailObjectsTable({ closeModalDetail }) {
               prima: row.prima,
             }))
           );
-    
+
           setRows(result);
           setJsonData(result);
           const newTotalMonto = result.reduce(
@@ -339,7 +349,6 @@ export default function DetailObjectsTable({ closeModalDetail }) {
             0
           );
           setTotalPrima(newTotalPrima);
-          
         } else {
           Object.keys(clasificacionAmparo.data[0]).forEach((key) => {
             const tituloObj = createData(
@@ -423,6 +432,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
           });
         }
 
+        //Mapear result al id de la seccion actual
+
         setEditableValues(
           result.map((row) => ({
             monto: row.monto,
@@ -454,6 +465,34 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     }
   };
 
+  function tablaSeccionesMap() {
+    const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    console.log(tablaSecciones);
+    //mapear id seccion con tabla secciones
+
+    const newTablaAmparo = tablaSecciones.map((amparo, index) => {
+      if (tablaSecciones[index].id === idSelected) {
+        return {
+          ...amparo,
+          monto: String(totalMonto),
+          prima: String(totalPrima),
+          Amparo: jsonData,
+        };
+      } else
+        return {
+          ...amparo,
+        };
+    });
+    console.log(newTablaAmparo);
+    const amparo = newTablaAmparo.find(
+      (row) => row.id === clasificacionAmparo
+    );
+    localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(newTablaAmparo));
+    if(amparo.Amparo){
+      localStorage.setItem(LS_TABLAAMPARO, JSON.stringify(amparo.Amparo));
+    }
+  }
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -464,7 +503,6 @@ export default function DetailObjectsTable({ closeModalDetail }) {
   };
 
   const closeModal = () => {
-    // closeModalDetail("true");
     handleSaveChanges();
   };
 
@@ -818,6 +856,8 @@ export default function DetailObjectsTable({ closeModalDetail }) {
     }));
     setEditableRows(newEditableRows);
     console.log(newEditableRows);
+    tablaSeccionesMap();
+    closeModalDetail("true");
   };
 
   // Manejador para cerrar el modal

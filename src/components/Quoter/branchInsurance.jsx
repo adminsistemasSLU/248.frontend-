@@ -1,44 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import CurrencyInput from '../../utils/currencyInput';
-import { visuallyHidden } from '@mui/utils';
-import '../../styles/moddalForm.scss';
-import '../../styles/detailQuoter.scss';
-import CloseIcon from '@mui/icons-material/Close';
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import DetailObjectsTable from './detailObjectsTable';
-import IncendioService from '../../services/IncencioService/IncendioService';
-import { LS_PRODUCTO, LS_RAMO, LS_CLASIFICACIONAMPARO } from '../../utils/constantes';
+import React, { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Button from "@mui/material/Button";
+import { styled } from "@mui/material/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import CurrencyInput from "../../utils/currencyInput";
+import { visuallyHidden } from "@mui/utils";
+import "../../styles/moddalForm.scss";
+import "../../styles/detailQuoter.scss";
+import CloseIcon from "@mui/icons-material/Close";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import DetailObjectsTable from "./detailObjectsTable";
+import IncendioService from "../../services/IncencioService/IncendioService";
+import {
+  LS_PRODUCTO,
+  LS_RAMO,
+  LS_CLASIFICACIONAMPARO,
+  LS_TABLASECCIONES,
+} from "../../utils/constantes";
 
-const rows = [
-
-];
+const rows = [];
 
 const headCells = [
   {
-    id: 'id',
+    id: "id",
     numeric: false,
     disablePadding: false,
-    label: '#',
+    label: "#",
     visible: true,
   },
   {
-    id: 'seccion',
+    id: "seccion",
     numeric: false,
     disablePadding: false,
-    label: 'Sección',
+    label: "Sección",
     visible: true,
   },
   // {
@@ -47,53 +50,53 @@ const headCells = [
   //   disablePadding: false,
   //   label: 'Descripción',
   //   visible: false,
-  // } 
+  // }
   {
-    id: 'monto',
+    id: "monto",
     numeric: true,
     disablePadding: false,
-    label: 'Monto',
+    label: "Monto",
     visible: true,
-  }
-  ,
+  },
   {
-    id: 'tasa',
+    id: "tasa",
     numeric: true,
     disablePadding: false,
-    label: 'Tasa',
+    label: "Tasa",
     visible: true,
-  }
-  ,
+  },
   {
-    id: 'prima',
+    id: "prima",
     numeric: true,
     disablePadding: false,
-    label: 'Prima',
+    label: "Prima",
     visible: true,
-  }
-  ,
+  },
   {
-    id: 'accion',
+    id: "accion",
     numeric: true,
     disablePadding: false,
-    label: 'Acción',
+    label: "Acción",
     visible: true,
-  }
-
+  },
 ];
 
-
-
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-    props;
+  const {
+    onSelectAllClick,
+    order,
+    orderBy,
+    numSelected,
+    rowCount,
+    onRequestSort,
+  } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
   return (
-    <TableHead >
-      <TableRow >
+    <TableHead>
+      <TableRow>
         <StyledTableCell padding="checkbox">
           <Checkbox
             color="primary"
@@ -101,27 +104,27 @@ function EnhancedTableHead(props) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              'aria-label': 'select all desserts',
+              "aria-label": "select all desserts",
             }}
-            style={{ visibility: 'hidden' }}
+            style={{ visibility: "hidden" }}
           />
         </StyledTableCell>
         {headCells.map((headCell) => (
           <StyledTableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            align={headCell.numeric ? "right" : "left"}
+            padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
+              direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {order === "desc" ? "sorted descending" : "sorted ascending"}
                 </Box>
               ) : null}
             </TableSortLabel>
@@ -135,17 +138,17 @@ function EnhancedTableHead(props) {
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#00A99D",
-    color: '#fff',
-    borderBottom: '1px solid black'
+    color: "#fff",
+    borderBottom: "1px solid black",
   },
   [`&.${tableCellClasses.body}`]: {
-    borderBottom: '1px solid black'
+    borderBottom: "1px solid black",
   },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:last-child td, &:last-child th': {
-    borderBottom: '1px solid black'
+  "&:last-child td, &:last-child th": {
+    borderBottom: "1px solid black",
   },
 }));
 
@@ -170,40 +173,41 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 function getComparator(order, orderBy) {
-  return order === 'desc'
+  return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-
 export default function BranchInsurance({ closeModalDetail }) {
-  const [order,] = useState('asc');
-  const [orderBy,] = useState('calories');
+  const [order] = useState("asc");
+  const [orderBy] = useState("calories");
   const [selected, setSelected] = useState([]);
-  const [page,] = useState(0);
-  const [rowsPerPage,] = useState(10);
+  const [page] = useState(0);
+  const [rowsPerPage] = useState(10);
   const [openModal, setOpenModal] = useState(false);
   const [editableRows, setEditableRows] = useState(rows);
   const [rows1, setRows] = useState(rows);
   const [totalMonto, setTotalMonto] = useState(0);
   const [totalPrima, setTotalPrima] = useState(0);
-
+  const [idSelectedSeccion, setSelectedSeccion] = useState(0);
   const producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
   const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
-  console.log(rows1);
+
   useEffect(() => {
     printDetalleAsegurado();
   }, []);
 
-  // function createData(id, ramo, descripcion, monto, tasa, prima) 
+  // function createData(id, ramo, descripcion, monto, tasa, prima)
   const printDetalleAsegurado = async () => {
-
     try {
-      const detalleAsegurado = await IncendioService.fetchDetalleAsegurado(ramo, producto);
+      const detalleAsegurado = await IncendioService.fetchDetalleAsegurado(
+        ramo,
+        producto
+      );
 
       console.log(detalleAsegurado);
       if (detalleAsegurado && detalleAsegurado.data) {
-        const newItems = detalleAsegurado.data.map(detalleAsegurado => {
+        const newItems = detalleAsegurado.data.map((detalleAsegurado) => {
           return {
             id: detalleAsegurado.codigo,
             ramo: detalleAsegurado.descripcion,
@@ -211,27 +215,34 @@ export default function BranchInsurance({ closeModalDetail }) {
             monto: detalleAsegurado.monto,
             tasa: detalleAsegurado.tasa,
             prima: detalleAsegurado.prima,
-            codigo: detalleAsegurado.codigo
+            codigo: detalleAsegurado.codigo,
           };
         });
         console.log(newItems);
         setRows(newItems);
         setEditableRows(newItems);
-        const newTotalMonto = newItems.reduce((sum, row) => sum + parseFloat(row.monto), 0);
+        const newTotalMonto = newItems.reduce(
+          (sum, row) => sum + parseFloat(row.monto),
+          0
+        );
         setTotalMonto(newTotalMonto);
 
         // Calcular el total de Prima
-        const newTotalPrima = newItems.reduce((sum, row) => sum + parseFloat(row.prima), 0);
+        const newTotalPrima = newItems.reduce(
+          (sum, row) => sum + parseFloat(row.prima),
+          0
+        );
         setTotalPrima(newTotalPrima);
+        localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(newItems));
       }
     } catch (error) {
-      console.error('Error al obtener Detalle Asegurado:', error);
+      console.error("Error al obtener Detalle Asegurado:", error);
     }
   };
 
-
   const handleOpenModal = (codigo) => {
     console.log(codigo);
+    setSelectedSeccion(codigo);
     localStorage.setItem(LS_CLASIFICACIONAMPARO, codigo);
     setOpenModal(true);
   };
@@ -239,7 +250,29 @@ export default function BranchInsurance({ closeModalDetail }) {
   // Manejador para cerrar el modal
   const handleCloseModal = () => {
     setOpenModal(false);
+    tablaSeccionesMap();
   };
+
+  function tablaSeccionesMap() {
+    const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    console.log(tablaSecciones);
+    const newTotalMonto = tablaSecciones.reduce(
+      (sum, row) => sum + parseFloat(row.monto),
+      0
+    );
+    setTotalMonto(newTotalMonto);
+
+    // Calcular el total de Prima
+    const newTotalPrima = tablaSecciones.reduce(
+      (sum, row) => sum + parseFloat(row.prima),
+      0
+    );
+    setTotalPrima(newTotalPrima);
+    //mapear id seccion con tabla secciones
+    setEditableRows(tablaSecciones);
+    setEditableValues(tablaSecciones);
+    setRows(tablaSecciones);
+  }
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
@@ -261,13 +294,15 @@ export default function BranchInsurance({ closeModalDetail }) {
   React.useEffect(() => {
     setEditableValues(
       rows.map((rows1) => ({
-        monto: rows1.monto, tasa: rows1.tasa, prima: rows1.prima
+        monto: rows1.monto,
+        tasa: rows1.tasa,
+        prima: rows1.prima,
       }))
     );
   }, []);
 
   const closeModal = () => {
-    closeModalDetail('true');
+    closeModalDetail("true");
   };
 
   const handleClick = (event, id) => {
@@ -283,7 +318,7 @@ export default function BranchInsurance({ closeModalDetail }) {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selected.slice(selectedIndex + 1)
       );
     }
     setSelected(newSelected);
@@ -299,87 +334,118 @@ export default function BranchInsurance({ closeModalDetail }) {
   // };
 
   const visibleRows = React.useMemo(
-    () => stableSort(rows1, getComparator(order, orderBy)).slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage,
-    ),
-    [order, orderBy, page, rowsPerPage, rows1], // Asegúrate de incluir rows1 aquí
+    () =>
+      stableSort(rows1, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      ),
+    [order, orderBy, page, rowsPerPage, rows1] // Asegúrate de incluir rows1 aquí
   );
 
   return (
-    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <div style={{ backgroundColor: '#00a99e', color: 'white', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px', display: 'flex', justifyContent: 'space-between' }}>
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: "5px",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#00a99e",
+          color: "white",
+          paddingTop: "5px",
+          paddingLeft: "15px",
+          paddingRight: "15px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <div>Descripcion de Sección</div>
-        <div onClick={closeModal}> <CloseIcon /></div>
+        <div onClick={closeModal}>
+          {" "}
+          <CloseIcon />
+        </div>
       </div>
 
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" className='dialog-height'
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="xl"
+        className="dialog-height"
         PaperProps={{
           style: {
-            backgroundColor: '#ffffff',
-            boxShadow: 'none',
-            overflow: 'hidden',
-            zIndex: '2000'
+            backgroundColor: "#ffffff",
+            boxShadow: "none",
+            overflow: "hidden",
+            zIndex: "2000",
           },
-        }}>
-        <DialogContent style={{ overflow: 'scroll', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
+        }}
+      >
+        <DialogContent
+          style={{ overflow: "scroll", padding: "0px", paddingBottom: "20px" }}
+          className="dialog-height-content"
+        >
           {/* Componente del formulario */}
-          <DetailObjectsTable closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
+          <DetailObjectsTable
+            closeModalDetail={handleCloseModal}
+            idSeccion={idSelectedSeccion}
+            style={{ width: "80%" }}
+          />
         </DialogContent>
       </Dialog>
 
-
-      <TableContainer style={{ overflow: 'auto', height: '100%', padding: '20px' }}>
+      <TableContainer
+        style={{ overflow: "auto", height: "100%", padding: "20px" }}
+      >
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
           size="small"
           style={{ height: 150 }}
         >
-          <EnhancedTableHead
-            rowCount={rows1.length}
-          />
+          <EnhancedTableHead rowCount={rows1.length} />
           <TableBody>
             {visibleRows.map((row, index) => {
               const isItemSelected = isSelected(row.id);
               const labelId = `enhanced-table-checkbox-${index}`;
 
-
-              return (
-                !row.titulo ? (
-                  <StyledTableRow
-                    hover
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    sx={{ cursor: 'pointer' }}
-                    key={row.id}
+              return !row.titulo ? (
+                <StyledTableRow
+                  hover
+                  aria-checked={isItemSelected}
+                  tabIndex={-1}
+                  sx={{ cursor: "pointer" }}
+                  key={row.id}
+                >
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      onClick={(event) => handleClick(event, row.id)}
+                      color="primary"
+                      checked={isItemSelected}
+                      inputProps={{
+                        "aria-labelledby": labelId,
+                      }}
+                      key={row.id}
+                    />
+                  </TableCell>
+                  <TableCell
+                    component="th"
+                    id={labelId}
+                    scope="row"
+                    padding="none"
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        onClick={(event) => handleClick(event, row.id)}
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                        key={row.id}
-                      />
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      {row.id}
-                    </TableCell>
-                    <TableCell align="left">
-                      {/* Campo editable con CurrencyInput */}
-                      <div className='input-table' style={{ textAlign: 'left' }}>
-                        {row.ramo}
-                      </div>
-                    </TableCell>
-                    {/* <TableCell align="left">
+                    {row.id}
+                  </TableCell>
+                  <TableCell align="left">
+                    {/* Campo editable con CurrencyInput */}
+                    <div className="input-table" style={{ textAlign: "left" }}>
+                      {row.ramo}
+                    </div>
+                  </TableCell>
+                  {/* <TableCell align="left">
                       <input
                         className='input-table'
                         style={{textAlign:'left'}}
@@ -389,72 +455,116 @@ export default function BranchInsurance({ closeModalDetail }) {
                         }
                       />
                     </TableCell> */}
-                    <TableCell align="right"
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      <CurrencyInput className='input-table' disabled value={row.monto} />
-                    </TableCell>
-                    <TableCell align="right"
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      <input className='input-table' disabled value={row.tasa + '%'} />
-                    </TableCell>
-                    <TableCell align="right"
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      <CurrencyInput className='input-table' disabled value={row.prima} />
-                    </TableCell>
-                    <TableCell align="right">
-                      <EventAvailableIcon
-                        onClick={() => handleOpenModal(row.codigo)}
-                      />
-                    </TableCell>
-                  </StyledTableRow>
-                ) : (
-                  <StyledTableRow>
-                    <TableCell colSpan={7} style={{ backgroundColor: '#00A99D', color: '#fff' }}>
-                      {row.cobertura}
-                    </TableCell>
-                  </StyledTableRow>
-                )
+                  <TableCell
+                    align="right"
+                    component="th"
+                    id={labelId}
+                    scope="row"
+                    padding="none"
+                  >
+                    <CurrencyInput
+                      className="input-table"
+                      disabled
+                      value={row.monto}
+                    />
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    component="th"
+                    id={labelId}
+                    scope="row"
+                    padding="none"
+                  >
+                    <input
+                      className="input-table"
+                      disabled
+                      value={row.tasa + "%"}
+                    />
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    component="th"
+                    id={labelId}
+                    scope="row"
+                    padding="none"
+                  >
+                    <CurrencyInput
+                      className="input-table"
+                      disabled
+                      value={row.prima}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <EventAvailableIcon
+                      onClick={() => handleOpenModal(row.codigo)}
+                    />
+                  </TableCell>
+                </StyledTableRow>
+              ) : (
+                <StyledTableRow>
+                  <TableCell
+                    colSpan={7}
+                    style={{ backgroundColor: "#00A99D", color: "#fff" }}
+                  >
+                    {row.cobertura}
+                  </TableCell>
+                </StyledTableRow>
               );
             })}
           </TableBody>
-
         </Table>
-        <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+          }}
+        >
           {/* ... (resto del código de tu componente) */}
 
-          <div className='' style={{ display: 'flex', justifyContent: 'end' }}>
-            <div className='elementsModal' style={{ marginRight: '10px', gap: '5px' }}>
+          <div className="" style={{ display: "flex", justifyContent: "end" }}>
+            <div
+              className="elementsModal"
+              style={{ marginRight: "10px", gap: "5px" }}
+            >
               <div>Monto: </div>
               <div>
-                <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={totalMonto.toFixed(2)} />
+                <CurrencyInput
+                  style={{ width: "105px" }}
+                  className="input-table"
+                  disabled
+                  value={totalMonto.toFixed(2)}
+                />
               </div>
             </div>
-            <div className='elementsModal elementRight' style={{ gap: '5px' }}>
+            <div className="elementsModal elementRight" style={{ gap: "5px" }}>
+              <div>Prima:</div>
               <div>
-                Prima:
-              </div>
-              <div>
-                <CurrencyInput style={{ width: '105px' }} className='input-table' disabled value={totalPrima.toFixed(2)} />
+                <CurrencyInput
+                  style={{ width: "105px" }}
+                  className="input-table"
+                  disabled
+                  value={totalPrima.toFixed(2)}
+                />
               </div>
             </div>
           </div>
-
         </div>
       </TableContainer>
-      <div style={{ display: 'flex', marginLeft: '5px', marginRight: '20px', alignItems: 'center', justifyContent: 'center' }}>
-        <Button variant="contained" color="primary" onClick={closeModal}>Aceptar</Button>
+      <div
+        style={{
+          display: "flex",
+          marginLeft: "5px",
+          marginRight: "20px",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Button variant="contained" color="primary" onClick={closeModal}>
+          Aceptar
+        </Button>
       </div>
     </div>
   );
