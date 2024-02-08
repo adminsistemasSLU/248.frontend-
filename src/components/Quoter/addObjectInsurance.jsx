@@ -65,12 +65,17 @@ const AddObjectInsurance = ({ closeModal }) => {
   // Manejador para cerrar el modal
   const handleCloseModal = () => {
     setOpenModal(false);
-
+    const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    let sumaAsegurada = secciones.reduce((sum, row) => {
+      return row.checked ? sum + parseFloat(row.monto) : sum;
+    }, 0);
+    setFormData(formData => ({ ...formData, sumInsure: sumaAsegurada }));
   };
 
 
   const cerrarModal = () => {
     closeModal(true);
+   
   };
 
 
@@ -99,6 +104,12 @@ const AddObjectInsurance = ({ closeModal }) => {
     const formattedTime = dayjs(timeInspecction).format('HH:mm');
   
     const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    let sumaAsegurada = secciones.reduce((sum,item) =>
+      sum + parseFloat(item.monto),
+      0
+    );
+    console.log('Suma Asegurada: '+sumaAsegurada);
+
     const objetoSeguro = {
       contactoInspeccion:formData.agentInspection,
       manzana:formData.block,

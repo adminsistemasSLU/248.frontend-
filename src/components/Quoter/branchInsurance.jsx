@@ -197,17 +197,42 @@ export default function BranchInsurance({ closeModalDetail }) {
     printDetalleAsegurado();
   }, []);
 
+  useEffect(() => {
+    const newTotalMonto = editableRows.reduce((sum, row) => {
+      return row.checked ? sum + parseFloat(row.monto) : sum;
+    }, 0);
+    setTotalMonto(newTotalMonto);
+
+    // Calcular el total de Prima
+    const newTotalPrima = editableRows.reduce((sum, row) => {
+      return row.checked ? sum + parseFloat(row.prima) : sum;
+    }, 0);
+    setTotalPrima(newTotalPrima);
+
+  }, [editableRows])
+
+
   // function createData(id, ramo, descripcion, monto, tasa, prima)
   const printDetalleAsegurado = async () => {
     try {
-      const detalleAsegurado = await IncendioService.fetchDetalleAsegurado(
-        ramo,
-        producto
-      );
 
-      console.log(detalleAsegurado);
+      let newItems =[];
+
+      newItems = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+      let detalleAsegurado = [];
+      if(!newItems){
+         detalleAsegurado = await IncendioService.fetchDetalleAsegurado(
+          ramo,
+          producto
+        );
+        console.log(detalleAsegurado);
+      }else{
+        detalleAsegurado.codigo =200;
+        detalleAsegurado.data = newItems;
+      }
+
       if (detalleAsegurado && detalleAsegurado.data) {
-        const newItems = detalleAsegurado.data.map((detalleAsegurado) => {
+         newItems = detalleAsegurado.data.map((detalleAsegurado) => {
           return {
             id: detalleAsegurado.codigo,
             ramo: detalleAsegurado.descripcion,
@@ -216,22 +241,22 @@ export default function BranchInsurance({ closeModalDetail }) {
             tasa: detalleAsegurado.tasa,
             prima: detalleAsegurado.prima,
             codigo: detalleAsegurado.codigo,
+            checked: false,
+            Amparo:detalleAsegurado.Amparo||[]
           };
         });
         console.log(newItems);
         setRows(newItems);
         setEditableRows(newItems);
-        const newTotalMonto = newItems.reduce(
-          (sum, row) => sum + parseFloat(row.monto),
-          0
-        );
+        const newTotalMonto = newItems.reduce((sum, row) => {
+          return row.checked ? sum + parseFloat(row.monto) : sum;
+        }, 0);
         setTotalMonto(newTotalMonto);
 
         // Calcular el total de Prima
-        const newTotalPrima = newItems.reduce(
-          (sum, row) => sum + parseFloat(row.prima),
-          0
-        );
+        const newTotalPrima = newItems.reduce((sum, row) => {
+          return row.checked ? sum + parseFloat(row.prima) : sum;
+        }, 0);
         setTotalPrima(newTotalPrima);
         localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(newItems));
       }
@@ -244,6 +269,21 @@ export default function BranchInsurance({ closeModalDetail }) {
     console.log(codigo);
     setSelectedSeccion(codigo);
     localStorage.setItem(LS_CLASIFICACIONAMPARO, codigo);
+    const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    console.log(tablaSecciones);
+    // const newTotalMonto = tablaSecciones.map((item, index) => {
+    //   if (index < editableValues.length && editableValues[index] != null) {
+    //     return {
+    //       ...item,
+    //       checked: editableValues[index].checked,
+    //       Amparo: item.Amparo
+    //     };
+    //   }
+    //   return item; // Retorna el item sin cambios si no hay un valor correspondiente en editableValues
+    // });
+
+    localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(editableRows));
+
     setOpenModal(true);
   };
 
@@ -256,17 +296,15 @@ export default function BranchInsurance({ closeModalDetail }) {
   function tablaSeccionesMap() {
     const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
     console.log(tablaSecciones);
-    const newTotalMonto = tablaSecciones.reduce(
-      (sum, row) => sum + parseFloat(row.monto),
-      0
-    );
+    const newTotalMonto = tablaSecciones.reduce((sum, row) => {
+      return row.checked ? sum + parseFloat(row.monto) : sum;
+    }, 0);
     setTotalMonto(newTotalMonto);
 
     // Calcular el total de Prima
-    const newTotalPrima = tablaSecciones.reduce(
-      (sum, row) => sum + parseFloat(row.prima),
-      0
-    );
+    const newTotalPrima = tablaSecciones.reduce((sum, row) => {
+      return row.checked ? sum + parseFloat(row.prima) : sum;
+    }, 0);
     setTotalPrima(newTotalPrima);
     //mapear id seccion con tabla secciones
     setEditableRows(tablaSecciones);
@@ -279,17 +317,27 @@ export default function BranchInsurance({ closeModalDetail }) {
     rows.map((rows1) => ({ descripcion: rows1.descripcion }))
   );
 
-  // const handleSaveChanges = () => {
-  //   // Actualizar los valores editables en el estado principal (editableRows)
-  //   const newEditableRows = editableRows.map((row, index) => ({
-  //     ...row,
-  //     monto: editableValues[index].monto,
-  //     tasa: editableValues[index].tasa,
-  //     prima: editableValues[index].prima,
-  //   }));
-  //   setEditableRows(newEditableRows);
-  //   console.log(newEditableRows);
-  // };
+  const handleSaveChanges = () => {
+
+    const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    console.log(tablaSecciones);
+    const newTotalMonto = tablaSecciones.map((item, index) => {
+      if (index < editableValues.length && editableValues[index] != null) {
+        return {
+          ...item,
+          checked: editableValues[index].checked,
+          Amparo: item.Amparo
+        };
+      }
+      return item; // Retorna el item sin cambios si no hay un valor correspondiente en editableValues
+    });
+
+    localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(editableRows));
+
+
+
+
+  };
 
   React.useEffect(() => {
     setEditableValues(
@@ -297,11 +345,13 @@ export default function BranchInsurance({ closeModalDetail }) {
         monto: rows1.monto,
         tasa: rows1.tasa,
         prima: rows1.prima,
+        checked: rows1.checked,
       }))
     );
   }, []);
 
   const closeModal = () => {
+    handleSaveChanges();
     closeModalDetail("true");
   };
 
@@ -322,6 +372,19 @@ export default function BranchInsurance({ closeModalDetail }) {
       );
     }
     setSelected(newSelected);
+    // Encuentra la fila correspondiente y actualiza 'checked'
+    const newEditableRows = editableRows.map((row) =>
+      row.id === id ? { ...row, checked: !row.checked } : row
+    );
+    setEditableRows(newEditableRows);
+
+    // Asegúrate de que 'editableValues' también refleje este cambio
+    const newEditableValues = editableValues.map((value, index) =>
+      newEditableRows[index].id === id
+        ? { ...value, checked: !value.checked }
+        : value
+    );
+    setEditableValues(newEditableValues);
   };
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
@@ -425,6 +488,7 @@ export default function BranchInsurance({ closeModalDetail }) {
                       onClick={(event) => handleClick(event, row.id)}
                       color="primary"
                       checked={isItemSelected}
+                      value={row.checked}
                       inputProps={{
                         "aria-labelledby": labelId,
                       }}

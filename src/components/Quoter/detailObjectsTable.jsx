@@ -621,8 +621,9 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
 
     if (amparo === grupoAmparo) {
       // Lógica si el amparo es el mismo que el grupo de amparo
-      // Implementa tu lógica aquí...
-      // getValTasaAmparoIncendio(amparo, monto, $(this));
+      console.log('entro');
+
+      // IncendioService.getValTasaAmparoIncendio(amparo, monto);
       permitirCambio = true;
     } else if (montofijo === "N" && valmaximo > 0) {
       if (grupoAmparo !== "") {
@@ -733,9 +734,11 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     );
     const amparo = event.target.getAttribute("data-amparo");
     const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
-
+      console.log('New Tasa: '+newTasa);
+      console.log('Tasa minima: '+tasaMinima);
     // Verificar si la nueva tasa es menor que la tasa mínima
-    if (newTasa < tasaMinima && tasaMinima !== 0) {
+    if (newTasa < tasaMinima && tasaMinima) {
+
       Swal.fire({
         title: "Error!",
         text: `La tasa no puede ser menor que ${tasaMinima.toFixed(2)}`,
