@@ -282,7 +282,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         if (value.inventarioDetalleAmparo) {
           // Asegúrate de que protectionDetailMonto está correctamente definido
           const inventarioDetalleAmparo = value.inventarioDetalleAmparo; // Debes obtener este valor de alguna parte
-          console.log(inventarioDetalleAmparo);
           return {
             ...value,
             monto: inventarioDetalleAmparo.MontoDetalleAmparo,
@@ -333,7 +332,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
             result.map((row) => ({
               monto: row.monto,
               tasa: row.tasa,
-              prima: row.monto * row.tasa/100,
+              prima: (row.monto * row.tasa) / 100,
             }))
           );
           setRows(result);
@@ -449,12 +448,14 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         );
         setTotalMonto(newTotalMonto);
         const newTotalPrima = result.reduce(
-          (sum, row) => sum + (parseFloat(row.prima)||0),
+          (sum, row) => sum + (parseFloat(row.prima) || 0),
           0
         );
-        const newTotalPrima2 = result.map((row) => {console.log(row.prima||0)});
+        const newTotalPrima2 = result.map((row) => {
+          console.log(row.prima || 0);
+        });
         setTotalPrima(newTotalPrima);
-        console.log('total Pimra: ' +newTotalPrima);
+        console.log("total Pimra: " + newTotalPrima);
       } else {
         console.error(
           "Datos recibidos no son válidos: ",
@@ -476,7 +477,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         ...item,
         monto: editableValues[index].monto,
         tasa: editableValues[index].tasa,
-        prima: editableValues[index].monto * editableValues[index].tasa/100,
+        prima: (editableValues[index].monto * editableValues[index].tasa) / 100,
       }));
 
       if (tablaSecciones[index].id === idSelected) {
@@ -594,36 +595,47 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     });
   };
 
+  const obtenerTasa = async (amparo, ramo, newMonto) => {
+    try {
+      return await IncendioService.getValTasaAmparoIncendio(amparo, newMonto);
+    } catch (error) {
+      return "Error al obtener tasa";
+    }
+  };
+
   const handleCellValueChange = (event, index, field) => {
     if (field === "monto") {
       handleMontoChange(event, index, field);
     }
   };
 
-  const handleMontoChange = (event, index, field) => {
-    let newMonto = parseFloat(event.target.value);
+  const handleMontoChange = async (event, index, field) => {
     const amparo = event.target.getAttribute("data-amparo");
     const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
     const montofijo = event.target.getAttribute("data-montofijo");
     const valmaximo = parseFloat(event.target.getAttribute("data-valmaximo"));
-
-    const currentMonto = parseFloat(event.target.value);
-
+    const newValue = event.target.value;
+    let numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
+    console.log("******************* Monto:" + numericValue);
     // Guarda el valor anterior
 
     // Asegúrate de que newMonto no es NaN
-    if (isNaN(newMonto)) {
-      newMonto = 0;
+    if (isNaN(numericValue)) {
+      numericValue = 0;
     }
 
     let montoPrincipal = 0;
     let permitirCambio = true;
-
+    let newTasa = 0;
     if (amparo === grupoAmparo) {
       // Lógica si el amparo es el mismo que el grupo de amparo
-      console.log('entro');
+      
 
-      // IncendioService.getValTasaAmparoIncendio(amparo, monto);
+      const tasa = await obtenerTasa(amparo, ramo, numericValue);
+      console.log(tasa);
+      newTasa = tasa.data.tasa;
+      console.log('Tasa de fetch:'+newTasa);
+
       permitirCambio = true;
     } else if (montofijo === "N" && valmaximo > 0) {
       if (grupoAmparo !== "") {
@@ -635,7 +647,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           : 0;
       }
 
-      if (grupoAmparo === "" && newMonto > valmaximo) {
+      if (grupoAmparo === "" && numericValue > valmaximo) {
         console.log(`El monto no puede ser mayor a ${valmaximo.toFixed(2)}`);
 
         Swal.fire({
@@ -659,7 +671,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         permitirCambio = false;
       } else {
         const valMaximoCalculado = montoPrincipal * (valmaximo / 100);
-        if (newMonto > valMaximoCalculado) {
+        if (numericValue > valMaximoCalculado) {
           console.log(
             `El monto no puede superar el ${valmaximo}% del cobertura principal`
           );
@@ -680,28 +692,28 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       setEditableValues((currentValues) => {
         const newValues = [...currentValues];
         newValues[index][field] = numericValue;
+        newValues[index]["tasa"] = newTasa;
         setJsonData((currentJsonData) => {
           const newJsonData = [...currentJsonData];
           newJsonData[index][field] = numericValue;
+          newJsonData[index]["tasa"] = newTasa;
           // Puedes poner aquí tus console.log para verificar los datos actualizados
-
+          setEditableRows((currentEditableRows) => {
+            const newEditableRows = [...currentEditableRows];
+            newEditableRows[index][field] = numericValue;
+            newEditableRows[index]["tasa"] = newTasa;
+            console.log(newEditableRows);
+            return newEditableRows;
+          });
+          console.log(newJsonData);
           return newJsonData;
         });
+        console.log(newValues);
         return newValues;
       });
 
-      const newValue = event.target.value;
-
-      const numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
       const newEditableValues = [...editableValues];
-      isNaN(numericValue)
-        ? (newEditableValues[index][field] = newValue)
-        : (newEditableValues[index][field] = numericValue);
-      setEditableValues(newEditableValues);
 
-      const newJsonData = [...jsonData];
-      newJsonData[index][field] = numericValue;
-      setJsonData(newJsonData);
       setEditableRows(newEditableValues);
       const total = jsonData.reduce(
         (acc, item) => parseFloat(acc) + parseFloat(item.monto),
@@ -715,12 +727,33 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       setTotalPrima(totalPrima);
       // Llamar a calculaTblAmparos para recalcular los totales
       calculaTblAmparos();
+      const campoTasa = document.getElementById("idTasa" + index);
+      const eventoSimulado = {
+        target: campoTasa,
+      };
+
+      handleTasaBlur(eventoSimulado, index);
     } else {
       const newEditableValues = [...editableValues];
       newEditableValues[index][field] = 0;
       setEditableValues(newEditableValues);
     }
   };
+
+
+
+  React.useEffect(() => {
+    if (!openModal && currentId) {
+      console.log("*************************");
+      const campoMonto = document.getElementById("idMonto" + currentId);
+      const eventoSimulado = {
+        target: campoMonto,
+      };
+      console.log(campoMonto);
+      console.log(eventoSimulado);
+      handleMontoChange(eventoSimulado, currentId, "monto");
+    }
+  }, [openModal, currentId]);
 
   const handleTasaBlur = (event, index) => {
     let newTasa = parseFloat(event.target.value);
@@ -734,11 +767,10 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     );
     const amparo = event.target.getAttribute("data-amparo");
     const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
-      console.log('New Tasa: '+newTasa);
-      console.log('Tasa minima: '+tasaMinima);
+    console.log("New Tasa: " + newTasa);
+    console.log("Tasa minima: " + tasaMinima);
     // Verificar si la nueva tasa es menor que la tasa mínima
     if (newTasa < tasaMinima && tasaMinima) {
-
       Swal.fire({
         title: "Error!",
         text: `La tasa no puede ser menor que ${tasaMinima.toFixed(2)}`,
@@ -874,7 +906,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       ...row,
       monto: editableValues[index].monto,
       tasa: editableValues[index].tasa,
-      prima: editableValues[index].monto * editableValues[index].tasa/100,
+      prima: (editableValues[index].monto * editableValues[index].tasa) / 100,
     }));
     setEditableRows(newEditableRows);
     console.log(newEditableRows);
@@ -882,7 +914,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       ...item,
       monto: editableValues[index].monto,
       tasa: editableValues[index].tasa,
-      prima: editableValues[index].monto * editableValues[index].tasa/100,
+      prima: (editableValues[index].monto * editableValues[index].tasa) / 100,
     }));
     console.log(newJsonData);
     tablaSeccionesMap();
@@ -890,11 +922,12 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   };
 
   // Manejador para cerrar el modal
-  const handleCloseModal = () => {
+  const  handleCloseModal = async () => {
+    const tablaAmparoModal = JSON.parse(localStorage.getItem(LS_TABLAAMPARO));
+    await setJsonData(tablaAmparoModal);
+    await setEditableRows(tablaAmparoModal);
+    await setEditableValues(tablaAmparoModal);
     setOpenModal(false);
-    setJsonData(JSON.parse(localStorage.getItem(LS_TABLAAMPARO)));
-    setEditableRows(JSON.parse(localStorage.getItem(LS_TABLAAMPARO)));
-    setEditableValues(JSON.parse(localStorage.getItem(LS_TABLAAMPARO)));
   };
 
   const visibleRows = React.useMemo(
@@ -1019,6 +1052,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                     <CurrencyInput
                       className="input-table inpTblAmpIncBscMonto"
                       value={editableValues[index].monto.toFixed(2)}
+                      id={"idMonto" + index}
                       onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }
@@ -1035,6 +1069,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                     <input
                       type="text"
                       className="input-table"
+                      id={"idTasa" + index}
                       data-tasa-minima={row.tasaMinima}
                       data-amparo={row.amparo}
                       data-grupo-amparo={row.grupoAmparo}
@@ -1054,6 +1089,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                     {/* Campo editable con CurrencyInput */}
                     <CurrencyInput
                       className="input-table"
+                      id={"idPrima" + index}
                       value={
                         editableValues[index].prima
                           ? editableValues[index].prima

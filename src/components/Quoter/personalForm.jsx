@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
+import Button from '@mui/material/Button';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -63,6 +64,8 @@ const PersonalForm = () => {
       }
     }
     setFormData({ ...formData, [name]: modifiedValue });
+
+   
   };
 
   const verifyIdentification = async (e) => {
@@ -96,9 +99,7 @@ const PersonalForm = () => {
       if (cedulaData.codigo === 200 && cedulaData.data) {
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
-        console.log(dateString);
 
-        console.log(dateObject);
         setAge(dateObject);
         setFormData({
           ...formData, // Conserva los valores actuales
@@ -128,8 +129,21 @@ const PersonalForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const formattedDate = dayjs(age).format('DD/MM/YYYY');
+    const objetoSeguro = {
+      nombre:formData.name,
+      apellido: formData.lastname,
+      correo: formData.email,
+      telefono: formData.phone,
+      tipoDocumento: formData.documentType,
+      identificacion: formData.identification,
+      fechaNacimiento:formattedDate,
+      direccion:formData.address,
+      // ramo:ramo,
+      // producto:producto
+    }
 
-    console.log('Formulario enviado:', formData);
+    console.log('Formulario enviado:', objetoSeguro);
   };
 
   return (
@@ -276,9 +290,9 @@ const PersonalForm = () => {
           </Grid>
 
           {/* Botón de envío */}
-          {/* <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
+          <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
             Registrarse
-          </Button> */}
+          </Button>
           {error && <Alert severity="error">{error}</Alert>}
         </FormControl >
       </Paper>

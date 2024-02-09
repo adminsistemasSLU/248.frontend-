@@ -103,10 +103,10 @@ function Header(props) {
   const drawer = (
     <Box ref={drawerRef} sx={{ textAlign: 'center' }}>
       <List>
-        {navItemsMob?.map((item) => (
-          <React.Fragment key={item.descripcion}>
+        {navItemsMob?.map((item, index) => (
+          <React.Fragment key={'navItems'+index}>
             <ListItem disablePadding>
-              <ListItemButton sx={{ textDecoration: 'none', color: '#00a99e', fontSize: '12px', cursor: 'pointer', textAlign: 'left' }} onClick={() => {
+              <ListItemButton key={'navItems'+index} sx={{ textDecoration: 'none', color: '#00a99e', fontSize: '12px', cursor: 'pointer', textAlign: 'left' }} onClick={() => {
                 handleDrawerToggle(); // Cerrar el Drawer al seleccionar un elemento
                 if (item.Submenu) {
                   handleClick(item.descripcion); // Manejar submenús si existen
@@ -119,8 +119,8 @@ function Header(props) {
             {item.Submenu && (
               <Collapse in={open[item.descripcion]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  {item.Submenu.map((childItem) => (
-                    <ListItemButton key={childItem.descripcion} sx={{ pl: 4 }} onClick={() => {
+                  {item.Submenu.map((childItem, index) => (
+                    <ListItemButton key={index} sx={{ pl: 4 }} onClick={() => {
                       handleDrawerToggle(); // Cierra el Drawer también aquí
                     }}>
                       <Link to={childItem.path} style={{ textDecoration: 'none', color: '#00a99e', fontSize: '12px', cursor: 'pointer', textAlign: 'left' }}>
@@ -134,7 +134,7 @@ function Header(props) {
           </React.Fragment>
         ))}
         <ListItem disablePadding>
-          <ListItemButton sx={{ textDecoration: 'none', color: '#00a99e', fontSize: '12px', cursor: 'pointer', textAlign: 'left' }} onClick={() => {
+          <ListItemButton sx={{ textDecoration: 'none', color: '#00a99e', fontSize: '12px', cursor: 'pointer', textAlign: 'left' }} onClick={() => {  
             handleDrawerToggle(); // Cerrar el Drawer al seleccionar un elemento
             handleClick('UsuarioSettings'); // Usar una key específica para manejar la expansión
           }}>
@@ -144,8 +144,8 @@ function Header(props) {
         </ListItem>
         <Collapse in={open['UsuarioSettings']} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {settings.map((childItem) => (
-              <ListItemButton key={childItem.descripcion} sx={{ pl: 4 }} onClick={() => {
+            {settings.map((childItem, index) => (
+              <ListItemButton key={index} sx={{ pl: 4 }} onClick={() => {
                 if (childItem.action) {
                   childItem.action(); // Ejecuta la acción, como signout
                 }
@@ -185,10 +185,10 @@ function Header(props) {
           </Link>
           {/* Menú de escritorio */}
           <Box sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: 1 }}>
-            {navItems?.map((item) => (
-              <React.Fragment key={item.descripcion}>
+            {navItems?.map((item,index) => (
+              <React.Fragment key={index}>
                 <Button
-                  key={item.descripcion}
+                  key={index}
                   sx={{ color: '#00a99e', fontSize: '12px', marginRight: 2 }}
                   onClick={(event) => handleMenuOpen(event, item.descripcion)}
                 >
@@ -203,8 +203,8 @@ function Header(props) {
                     'aria-labelledby': `button-${item.descripcion}`,
                   }}
                 >
-                  {item.Submenu?.map((submenuItem) => (
-                    <MenuItem key={submenuItem.descripcion} onClick={handleMenuClose}>
+                  {item.Submenu?.map((submenuItem,index) => (
+                    <MenuItem key={'SubMenu'+index} onClick={handleMenuClose}>
                       <Link to={submenuItem.path} style={{ color: '#00a99e', fontSize: '12px', cursor: 'pointer', textDecoration: 'none' }}>
                         {submenuItem.descripcion}
                       </Link>
@@ -215,7 +215,7 @@ function Header(props) {
             ))}
             {/* Configuración de usuario y otros botones */}
             <Tooltip title="Open settings">
-              <Button key="users" onClick={handleOpenUserMenu} sx={{ color: '#00a99e', fontSize: '12px', cursor: 'pointer' }}>
+              <Button  onClick={handleOpenUserMenu} sx={{ color: '#00a99e', fontSize: '12px', cursor: 'pointer' }}>
                 Usuario
               </Button>
             </Tooltip>
@@ -236,15 +236,15 @@ function Header(props) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting.text} onClick={() => {
+              {settings.map((setting,index) => (
+                <MenuItem key={index} onClick={() => {
                   if (setting.action) {
                     setting.action(); // Ejecuta la acción, como signout
                   }
                   handleCloseUserMenu();
                 }}>
-                  <Link to={setting.url} style={{ textDecoration: 'none', color: '#00a99e' }}>
-                    <Button sx={{ color: '#00a99e', fontSize: '12px' }}>
+                  <Link key={index} to={setting.url} style={{ textDecoration: 'none', color: '#00a99e' }}>
+                    <Button key={index} sx={{ color: '#00a99e', fontSize: '12px' }}>
                       {setting.descripcion}
                     </Button>
                   </Link>

@@ -1,6 +1,7 @@
+import { TOKEN_STORAGE_KEY } from "../utils/constantes";
+
+
 const API_URL = process.env.REACT_APP_API_URL || 'default_url';
-export const TOKEN_STORAGE_KEY = 'authToken';
-export const USER_STORAGE_KEY = 'user';
 
 const getToken = () => {
   return localStorage.getItem(TOKEN_STORAGE_KEY);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService, { TOKEN_STORAGE_KEY , USER_STORAGE_KEY } from './authServices'; // Asegúrate de importar authService correctamente
+import authService from './authServices'; // Asegúrate de importar authService correctamente
+import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY,MENU_STORAGE_KEY,PARAMETROS_STORAGE_KEY,PARAMETROS_RAMO_STORAGE_KEY} from '../utils/constantes';
 
 export const AuthContext = React.createContext({
     user: null, // Proporciona una estructura inicial
@@ -60,9 +61,12 @@ export const AuthProvider = ({ children }) => {
         try {
             const userData = await authService.fetchWithAuth(endpoint, method, data, additionalHeaders);
             if(userData.codigo===200){
-                localStorage.setItem('authToken', userData.token);
-                localStorage.setItem('user',JSON.stringify (userData.data.usuario) );
-                localStorage.setItem('menu',JSON.stringify (userData.data.menu) );
+                console.log(userData);
+                localStorage.setItem(TOKEN_STORAGE_KEY, userData.token);
+                localStorage.setItem(USER_STORAGE_KEY,JSON.stringify (userData.data.usuario) );
+                localStorage.setItem(MENU_STORAGE_KEY,JSON.stringify (userData.data.menu) );
+                localStorage.setItem(PARAMETROS_STORAGE_KEY,JSON.stringify (userData.data.parametros) );
+                localStorage.setItem(PARAMETROS_RAMO_STORAGE_KEY,JSON.stringify (userData.data.parametros_ramo) );
                 setUser(userData); // Asumiendo que la información del usuario viene en la respuesta
                 setMenu(JSON.stringify (userData.data.menu));
                 navigate('/quoter/dashboard');

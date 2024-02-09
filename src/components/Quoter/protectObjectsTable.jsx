@@ -411,8 +411,8 @@ export default function ProtectObjectsTable() {
                         </TableCell>
                         <TableCell align="right">
                           <div style={{ display: 'flex', justifyContent: 'end' }}>
-                            <IconButton>
-                              <EditIcon onClick={handleOpenModal} />
+                            <IconButton  onClick={handleOpenModal} >
+                              <EditIcon/>
                             </IconButton>
                             <IconButton>
                               <DeleteIcon />

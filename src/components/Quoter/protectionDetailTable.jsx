@@ -401,7 +401,7 @@ export default function ProtectionDetailTable({
                       className="input-table"
                       style={{ textAlign: "right" }}
                       value={row.monto.toFixed(2)}
-                      onChange={(event) =>
+                      onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }
                     />
