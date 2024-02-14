@@ -183,12 +183,15 @@ export default function ProtectionDetailTable({
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   const handleCellValueChange = (event, index, field) => {
-    const newValue = event.target.value;
+    let newValue = event.target.value;
     let valueToSet = newValue; // Valor por defecto
     
     // Solo procesar como número si el campo no es 'descripcion'
     if (field !== 'descripcion') {
-      const numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
+      console.log(newValue);
+      console.log(field);
+      let numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
+      numericValue = isNaN(numericValue) ? 0.00 : numericValue;
       valueToSet = isNaN(numericValue) ? newValue : numericValue; // Usa el valor numérico si no es NaN, de lo contrario usa el valor original
     }
   
@@ -400,7 +403,7 @@ export default function ProtectionDetailTable({
                     <CurrencyInput
                       className="input-table"
                       style={{ textAlign: "right" }}
-                      value={row.monto.toFixed(2)}
+                      value={row.monto.toFixed(2)||0}
                       onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }

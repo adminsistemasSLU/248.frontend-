@@ -1,47 +1,55 @@
-import React, { useState, useRef, useEffect } from 'react';
-import dayjs from 'dayjs';
-import { Button, Container, Paper } from '@mui/material';
-import MapContainer from './mapContainer';
-import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
-import CloseIcon from '@mui/icons-material/Close';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import BranchInsurance from './branchInsurance';
-import Tooltip from '@mui/material/Tooltip';
-import '../../styles/moddalForm.scss';
-import '../../styles/dialogForm.scss';
-import '../../styles/form.scss';
-import '../../styles/button.scss';
-import '../../styles/objectInsuranceTable.scss';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import ComboService from '../../services/ComboService/ComboService';
-import { LS_PRODUCTO,LS_RAMO,LS_TABLASECCIONES } from '../../utils/constantes';
+import React, { useState, useRef, useEffect } from "react";
+import dayjs from "dayjs";
+import { Button, Container, Paper } from "@mui/material";
+import MapContainer from "./mapContainer";
+import AddLocationAltRoundedIcon from "@mui/icons-material/AddLocationAltRounded";
+import CloseIcon from "@mui/icons-material/Close";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import BranchInsurance from "./branchInsurance";
+import Tooltip from "@mui/material/Tooltip";
+import "../../styles/moddalForm.scss";
+import "../../styles/dialogForm.scss";
+import "../../styles/form.scss";
+import "../../styles/button.scss";
+import "../../styles/objectInsuranceTable.scss";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import ComboService from "../../services/ComboService/ComboService";
+import {
+  LS_PRODUCTO,
+  LS_RAMO,
+  LS_TABLASECCIONES,
+  LS_COTIZACION
+} from "../../utils/constantes";
+import IncendioService from "../../services/IncencioService/IncendioService";
+
+
 
 const AddObjectInsurance = ({ closeModal }) => {
   const [formData, setFormData] = useState({
-    province: '',
-    city: '',
-    parish: '',
-    direccion: '',
-    block: '',
-    house: '',
-    floor: '',
-    buildingAge: '',
-    constructionType: '',
-    riskType: '',
-    destiny: '',
-    sumInsure: '',
-    lat: '',
-    lng: '',
+    province: "",
+    city: "",
+    parish: "",
+    direccion: "",
+    block: "",
+    house: "",
+    floor: "",
+    buildingAge: "",
+    constructionType: "",
+    riskType: "",
+    destiny: "",
+    sumInsure: "",
+    lat: "",
+    lng: "",
     inspection: false,
-    direcctionInspection: '',
-    phoneInspection: '',
-    agentInspection: '',
+    direcctionInspection: "",
+    phoneInspection: "",
+    agentInspection: "",
   });
 
   const [openModal, setOpenModal] = React.useState(false);
@@ -53,8 +61,8 @@ const AddObjectInsurance = ({ closeModal }) => {
   const [construccion, setConstruccion] = useState([]);
   const [riesgo, setRiesgo] = useState([]);
   const [destinado, setDestinado] = useState([]);
-  const ramo = (localStorage.getItem(LS_RAMO));
-  const producto = (localStorage.getItem(LS_PRODUCTO));
+  const ramo = localStorage.getItem(LS_RAMO);
+  const producto = localStorage.getItem(LS_PRODUCTO);
   const [dateInspecction, setdateInspecction] = useState([]);
   const [timeInspecction, setTimeInspecction] = useState([]);
 
@@ -69,25 +77,22 @@ const AddObjectInsurance = ({ closeModal }) => {
     let sumaAsegurada = secciones.reduce((sum, row) => {
       return row.checked ? sum + parseFloat(row.monto) : sum;
     }, 0);
-    setFormData(formData => ({ ...formData, sumInsure: sumaAsegurada }));
+    setFormData((formData) => ({ ...formData, sumInsure: sumaAsegurada }));
   };
-
 
   const cerrarModal = () => {
     closeModal(true);
-   
   };
-
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    if(e.target.name==='province'){
+    if (e.target.name === "province") {
       cargarCiudad(e.target.value);
     }
-    if(e.target.name==='riskType'){
+    if (e.target.name === "riskType") {
       cargarDestinado(e.target.value);
     }
-    if(e.target.name==='city'){
+    if (e.target.name === "city") {
       cargarParroquia(e.target.value);
     }
   };
@@ -96,60 +101,82 @@ const AddObjectInsurance = ({ closeModal }) => {
   };
   const mapContainerRef = useRef(null);
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    let objetoSeguro = obtenerFormulario();
+    console.log(objetoSeguro);
+    if(!objetoSeguro){
+      console.log("No existe datos para cotizar");
+      return;
+    }
+    try {
+      const response = await IncendioService.guardarCotizacionIncendio(objetoSeguro);
+      if (response.codigo === 200) {
+        console.log(response);
+      } else {
+       
+        console.error("Error en la respuesta del servidor:", response.message);
+      }
+    } catch (error) {
+      // Manejar errores de red/otros errores
+      console.error("Error al realizar la solicitud:", error);
+    }
+  };
 
-    const formattedDate = dayjs(dateInspecction).format('DD/MM/YYYY');
-    const formattedTime = dayjs(timeInspecction).format('HH:mm');
-  
-    const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
-    let sumaAsegurada = secciones.reduce((sum,item) =>
-      sum + parseFloat(item.monto),
-      0
-    );
-    console.log('Suma Asegurada: '+sumaAsegurada);
-
-    const objetoSeguro = {
-      contactoInspeccion:formData.agentInspection,
-      manzana:formData.block,
-      antiguedad:formData.buildingAge,
-      ciudad:formData.city,
-      tConstruccion:formData.constructionType,
-      destinado:formData.destiny,
-      direccion:formData.direccion,
-      direccionInspeccion:formData.direcctionInspection,
-      piso:formData.floor,
-      villa:formData.house,
-      inspeccion: formData.inspection,
-      latitud:formData.lat,
-      longitud:formData.lng,
-      parroqua:formData.parish,
-      telefonoContacto:formData.phoneInspection,
-      provincia:formData.province,
-      riesgo:formData.riskType,
-      sumaAsegurada:formData.sumInsure,
-      producto:producto,
-      ramo:ramo,
-      tablaSumaAsegurada:secciones,
-      fechaInspeccion:formattedDate,
-      horaInspeccion:formattedTime
+  const obtenerFormulario = () => {
+    const idCotizacion = localStorage.getItem(LS_COTIZACION);
+    if(!idCotizacion){
+      console.log("No existe cotizacion generada");
+      return;
     }
 
-    console.log(objetoSeguro);
+
+    const formattedDate = dayjs(dateInspecction).format("DD/MM/YYYY");
+    const formattedTime = dayjs(timeInspecction).format("HH:mm");
+    const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    let sumaAsegurada = secciones.reduce(
+      (sum, item) => sum + parseFloat(item.monto),
+      0
+    );  
+    return {
+      id_CotiGeneral:idCotizacion,
+      contactoInspeccion: formData.agentInspection,
+      manzana: formData.block,
+      antiguedad: formData.buildingAge,
+      ciudad: formData.city,
+      tConstruccion: formData.constructionType,
+      destinado: formData.destiny,
+      direccion: formData.direccion,
+      direccionInspeccion: formData.direcctionInspection,
+      piso: formData.floor,
+      villa: formData.house,
+      inspeccion: formData.inspection,
+      latitud: formData.lat,
+      longitud: formData.lng,
+      parroqua: formData.parish,
+      telefonoContacto: formData.phoneInspection,
+      provincia: formData.province,
+      riesgo: formData.riskType,
+      sumaAsegurada: sumaAsegurada,
+      producto: producto,
+      ramo: ramo,
+      tablaSumaAsegurada: secciones,
+      fechaInspeccion: formattedDate,
+      horaInspeccion: formattedTime,
+    };
   };
 
   const onMarkerDragEnd = ({ lat, lng, direccion }) => {
     setFormData({ ...formData, lat, lng, direccion });
-    console.log('Marcador actualizado:', formData);
+    console.log("Marcador actualizado:", formData);
   };
 
   const updateLocation = (lat, lng, direccion) => {
-    setFormData(prevFormData => ({
+    setFormData((prevFormData) => ({
       ...prevFormData,
       lat: lat,
       lng: lng,
-      direccion: direccion
+      direccion: direccion,
     }));
   };
 
@@ -166,22 +193,26 @@ const AddObjectInsurance = ({ closeModal }) => {
     cargarProvincias();
   }, []);
 
-
-
-
   const cargarAntiguedad = async () => {
     setIsLoading(true);
     setAntiguedad([]);
     try {
-      const antiguedad = await ComboService.fetchComboAntiguedad(ramo, producto,1);
+      const antiguedad = await ComboService.fetchComboAntiguedad(
+        ramo,
+        producto,
+        1
+      );
       setIsLoading(false);
       if (antiguedad && antiguedad.data) {
         setAntiguedad(antiguedad.data);
         console.log(antiguedad.data[0].Codigo);
-        setFormData(formData => ({ ...formData, buildingAge: antiguedad.data[0].Codigo }));
+        setFormData((formData) => ({
+          ...formData,
+          buildingAge: antiguedad.data[0].Codigo,
+        }));
       }
     } catch (error) {
-      console.error('Error al obtener antiguedad:', error);
+      console.error("Error al obtener antiguedad:", error);
     }
   };
 
@@ -189,13 +220,17 @@ const AddObjectInsurance = ({ closeModal }) => {
     setIsLoading(true);
     setCiudades([]);
     try {
-      const ciudades = await ComboService.fetchComboCiudad(ramo, producto,value);
+      const ciudades = await ComboService.fetchComboCiudad(
+        ramo,
+        producto,
+        value
+      );
       setIsLoading(false);
       if (ciudades && ciudades.data) {
         setCiudades(ciudades.data);
       }
     } catch (error) {
-      console.error('Error al obtener ciudad:', error);
+      console.error("Error al obtener ciudad:", error);
     }
   };
 
@@ -209,7 +244,7 @@ const AddObjectInsurance = ({ closeModal }) => {
         setParroquia(parroquia.data);
       }
     } catch (error) {
-      console.error('Error al obtener ciudad:', error);
+      console.error("Error al obtener ciudad:", error);
     }
   };
 
@@ -217,15 +252,23 @@ const AddObjectInsurance = ({ closeModal }) => {
     setIsLoading(true);
     setDestinado([]);
     try {
-      const destinado = await ComboService.fetchTipDestino(ramo,producto,1,value);
+      const destinado = await ComboService.fetchTipDestino(
+        ramo,
+        producto,
+        1,
+        value
+      );
       setIsLoading(false);
       if (destinado && destinado.data) {
         setDestinado(destinado.data);
-        setFormData(formData => ({ ...formData, destiny: destinado.data[0].Codigo }));
+        setFormData((formData) => ({
+          ...formData,
+          destiny: destinado.data[0].Codigo,
+        }));
         console.log(destinado);
       }
     } catch (error) {
-      console.error('Error al obtener destinado:', error);
+      console.error("Error al obtener destinado:", error);
     }
   };
 
@@ -233,14 +276,14 @@ const AddObjectInsurance = ({ closeModal }) => {
     setIsLoading(true);
     setRiesgo([]);
     try {
-      const riesgo = await ComboService.fetchComboTipoRiesgos(ramo,producto);
+      const riesgo = await ComboService.fetchComboTipoRiesgos(ramo, producto);
       setIsLoading(false);
       if (riesgo && riesgo.data) {
         setRiesgo(riesgo.data);
-        //setFormData(formData => ({ ...formData, riskType: riesgo.data[0].Codigo }));
+        
       }
     } catch (error) {
-      console.error('Error al obtener riesgo:', error);
+      console.error("Error al obtener riesgo:", error);
     }
   };
 
@@ -252,119 +295,167 @@ const AddObjectInsurance = ({ closeModal }) => {
       setIsLoading(false);
       if (construccion && construccion.data) {
         setConstruccion(construccion.data);
-        setFormData(formData => ({ ...formData, constructionType: construccion.data[0].Codigo }));
+        setFormData((formData) => ({
+          ...formData,
+          constructionType: construccion.data[0].Codigo,
+        }));
       }
     } catch (error) {
-      console.error('Error al obtener antiguedad:', error);
+      console.error("Error al obtener antiguedad:", error);
     }
   };
-
-  
 
   const cargarProvincias = async () => {
     setIsLoading(true);
     try {
-      const provincias = await ComboService.fetchComboProvincias(ramo, producto);
+      const provincias = await ComboService.fetchComboProvincias(
+        ramo,
+        producto
+      );
       setIsLoading(false);
       if (provincias && provincias.data) {
         setProvinces(provincias.data);
       }
     } catch (error) {
-      console.error('Error al obtener provincias:', error);
+      console.error("Error al obtener provincias:", error);
     }
   };
-
 
   return (
     <Container
       component="main"
-      className='dialog-Form'
-      style={{ padding: 0, minHeight: '80vh', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center' }}
+      className="dialog-Form"
+      style={{
+        padding: 0,
+        minHeight: "80vh",
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
     >
-
-
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" className='dialog-height'
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="xl"
+        className="dialog-height"
         PaperProps={{
           style: {
-            backgroundColor: '#ffffff',
-            boxShadow: 'none',
+            backgroundColor: "#ffffff",
+            boxShadow: "none",
 
-            overflow: 'hidden',
-            zIndex: '2000'
+            overflow: "hidden",
+            zIndex: "2000",
           },
-        }}>
-        <DialogContent style={{ overflow: 'scroll', padding: '0px', paddingBottom: '20px' }} className='dialog-height-content'>
+        }}
+      >
+        <DialogContent
+          style={{ overflow: "scroll", padding: "0px", paddingBottom: "20px" }}
+          className="dialog-height-content"
+        >
           {/* Componente del formulario */}
-          <BranchInsurance closeModalDetail={handleCloseModal} style={{ width: '80%' }} />
+          <BranchInsurance
+            closeModalDetail={handleCloseModal}
+            style={{ width: "80%" }}
+          />
         </DialogContent>
       </Dialog>
 
-      <div className='modalForm' style={{ backgroundColor: '#fff', display: 'flex', flexDirection: 'column' }}>
-        <div style={{
-          width: '100%', paddingTop: '5px', paddingLeft: '15px', paddingRight: '15px',
-          backgroundColor: '#00a99e', color: 'white', position: 'relative', top: '0px',
-          display: 'flex', justifyContent: 'space-between'
-        }}>
-          <div>
-            Objeto del seguro
-          </div>
+      <div
+        className="modalForm"
+        style={{
+          backgroundColor: "#fff",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            paddingTop: "5px",
+            paddingLeft: "15px",
+            paddingRight: "15px",
+            backgroundColor: "#00a99e",
+            color: "white",
+            position: "relative",
+            top: "0px",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>Objeto del seguro</div>
 
-          <div style={{ cursor: 'pointer' }} >
+          <div style={{ cursor: "pointer" }}>
             <CloseIcon onClick={cerrarModal} />
           </div>
         </div>
 
-        <div className='modalFormColumn'>
-
-
-          <Paper elevation={3} className='modalContent' style={{ overflowY: 'scroll', height: '50vh', paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-            <form component="form" onSubmit={handleSubmit} className='form'>
-              <table container spacing={3} >
+        <div className="modalFormColumn">
+          <Paper
+            elevation={3}
+            className="modalContent"
+            style={{
+              overflowY: "scroll",
+              height: "50vh",
+              paddingBottom: 20,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <form component="form" onSubmit={handleSubmit} className="form">
+              <table container spacing={3}>
                 <tbody>
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent' >
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="province-Label"> <b>Provincia:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="province-Label">
+                          {" "}
+                          <b>Provincia:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <select
                           id="province"
                           name="province"
                           value={formData.province}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
-                          style={{ border: '1px solid #A1A8AE' }}
-                          
+                          style={{ border: "1px solid #A1A8AE" }}
                         >
-                          <option  value="--">SELECCIONE UNA OPCION</option>
+                          <option value="--">SELECCIONE UNA OPCION</option>
                           {provinces.map((province) => (
-                            <option key={province.Codigo} value={province.Codigo}>
+                            <option
+                              key={province.Codigo}
+                              value={province.Codigo}
+                            >
                               {province.Nombre}
                             </option>
                           ))}
                         </select>
                       </td>
                     </div>
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="city-Label"> <b>Ciudad:</b>  </label>
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="city-Label">
+                          {" "}
+                          <b>Ciudad:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <select
-
                           id="city"
                           name="city"
                           value={formData.city}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
-                          style={{ border: '1px solid #A1A8AE' }}
+                          style={{ border: "1px solid #A1A8AE" }}
                         >
-                          <option  value="--">SELECCIONE UNA PROVINCIA</option>
+                          <option value="--">SELECCIONE UNA PROVINCIA</option>
                           {ciudades.map((ciudad) => (
                             <option key={ciudad.Codigo} value={ciudad.Codigo}>
                               {ciudad.Nombre}
@@ -375,23 +466,25 @@ const AddObjectInsurance = ({ closeModal }) => {
                     </div>
                   </tr>
 
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent' >
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="parish-Label"> <b>Parroquia:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="parish-Label">
+                          {" "}
+                          <b>Parroquia:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <select
-
                           id="parish"
                           name="parish"
                           value={formData.parish}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
                         >
-                         <option  value="--">SELECCIONE UNA CIUDAD</option>
+                          <option value="--">SELECCIONE UNA CIUDAD</option>
                           {parroquia.map((ciudad) => (
                             <option key={ciudad.Codigo} value={ciudad.Codigo}>
                               {ciudad.Nombre}
@@ -400,11 +493,20 @@ const AddObjectInsurance = ({ closeModal }) => {
                         </select>
                       </td>
                     </div>
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="direction-Label"> <b>Dirección:</b>  </label>
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label
+                          style={{ fontSize: "13px" }}
+                          id="direction-Label"
+                        >
+                          {" "}
+                          <b>Dirección:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData' style={{ display: 'flex', alignItems: 'center' }} >
+                      <td
+                        className="tdTableData"
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
                         <input
                           label="direction-Label"
                           type="text"
@@ -413,20 +515,23 @@ const AddObjectInsurance = ({ closeModal }) => {
                           onChange={handleChange}
                           variant="standard"
                           required
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                         />
-                        <div onClick={SearchLocation} >
+                        <div onClick={SearchLocation}>
                           <AddLocationAltRoundedIcon />
                         </div>
                       </td>
                     </div>
                   </tr>
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="number-Label"> <b>Manzana:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="number-Label">
+                          {" "}
+                          <b>Manzana:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <input
                           label="number"
                           type="text"
@@ -435,67 +540,71 @@ const AddObjectInsurance = ({ closeModal }) => {
                           onChange={handleChange}
                           variant="standard"
                           required
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                         />
                       </td>
                     </div>
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="house-Label"> <b>Villa:</b>  </label>
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="house-Label">
+                          {" "}
+                          <b>Villa:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <input
-
                           id="house"
                           name="house"
                           value={formData.house}
                           onChange={handleChange}
                           variant="standard"
-
                           required
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                         />
-
                       </td>
                     </div>
                   </tr>
 
-
-
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="floor-Label"> <b>Pisos:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="floor-Label">
+                          {" "}
+                          <b>Pisos:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <input
-
                           id="floor"
                           name="floor"
                           value={formData.floor}
                           onChange={handleChange}
                           variant="standard"
                           required
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                         />
-
                       </td>
                     </div>
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="buildingAge-Label"> <b>Antiguedad:</b>  </label>
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label
+                          style={{ fontSize: "13px" }}
+                          id="buildingAge-Label"
+                        >
+                          {" "}
+                          <b>Antiguedad:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <select
-
                           id="buildingAge"
                           name="buildingAge"
                           value={formData.buildingAge}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
-                          style={{ border: '1px solid #A1A8AE' }}
+                          style={{ border: "1px solid #A1A8AE" }}
                         >
                           {antiguedad.map((antig) => (
                             <option key={antig.Codigo} value={antig.Codigo}>
@@ -507,290 +616,360 @@ const AddObjectInsurance = ({ closeModal }) => {
                     </div>
                   </tr>
 
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="constructionType-Label"> <b>T. Construcción:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label
+                          style={{ fontSize: "13px" }}
+                          id="constructionType-Label"
+                        >
+                          {" "}
+                          <b>T. Construcción:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <select
-
                           id="constructionType"
                           name="constructionType"
                           value={formData.constructionType}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
-                          style={{ border: '1px solid #A1A8AE' }}
+                          style={{ border: "1px solid #A1A8AE" }}
                         >
                           {construccion.map((province) => (
-                            <option key={province.Codigo} value={province.Codigo}>
+                            <option
+                              key={province.Codigo}
+                              value={province.Codigo}
+                            >
                               {province.Nombre}
                             </option>
                           ))}
                         </select>
                       </td>
                     </div>
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="riskType-Label"> <b>T. Riesgo:</b>  </label>
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="riskType-Label">
+                          {" "}
+                          <b>T. Riesgo:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <select
-
                           id="riskType"
                           name="riskType"
                           value={formData.riskType}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
-                          style={{ border: '1px solid #A1A8AE' }}
+                          style={{ border: "1px solid #A1A8AE" }}
                         >
-                          <option  value="--">SELECCIONE UNA OPCION</option>
+                          <option value="--">SELECCIONE UNA OPCION</option>
                           {riesgo.map((province) => (
-                            <option key={province.Codigo} value={province.Codigo}>
+                            <option
+                              key={province.Codigo}
+                              value={province.Codigo}
+                            >
                               {province.Nombre}
                             </option>
                           ))}
                         </select>
                       </td>
                     </div>
-
                   </tr>
 
-
-
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="destiny-Label"> <b>Destinado a:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label style={{ fontSize: "13px" }} id="destiny-Label">
+                          {" "}
+                          <b>Destinado a:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <select
-
                           id="destiny"
                           name="destiny"
                           value={formData.destiny}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
-                          style={{ border: '1px solid #A1A8AE' }}
+                          style={{ border: "1px solid #A1A8AE" }}
                         >
-                           {destinado.map((province) => (
-                            <option key={province.Codigo} value={province.Codigo}>
+                          {destinado.map((province) => (
+                            <option
+                              key={province.Codigo}
+                              value={province.Codigo}
+                            >
                               {province.Nombre}
                             </option>
                           ))}
                         </select>
                       </td>
                     </div>
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="sumInsure-Label"> <b>Suma Aseg:</b>  </label>
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label
+                          style={{ fontSize: "13px" }}
+                          id="sumInsure-Label"
+                        >
+                          {" "}
+                          <b>Suma Aseg:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData' style={{ display: 'flex', alignItems: 'center' }}>
+                      <td
+                        className="tdTableData"
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
                         <input
                           label="sumInsure-Label"
                           type="text"
                           name="umInsure"
                           value={formData.sumInsure}
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           variant="standard"
-                          
                         />
-                        <div onClick={handleOpenModal}  >
+                        <div onClick={handleOpenModal}>
                           <CalendarMonthIcon />
                         </div>
                       </td>
                     </div>
                   </tr>
 
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="latituded-Label"> <b>Latitud:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label
+                          style={{ fontSize: "13px" }}
+                          id="latituded-Label"
+                        >
+                          {" "}
+                          <b>Latitud:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <input
-
                           id="lat"
                           name="lat"
                           value={formData.lat}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
                           disabled
-                          style={{ border: '1px solid #A1A8AE' }}
-                        >
-
-                        </input>
+                          style={{ border: "1px solid #A1A8AE" }}
+                        ></input>
                       </td>
                     </div>
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Longitud:</b>  </label>
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label
+                          style={{ fontSize: "13px" }}
+                          id="longitude-Label"
+                        >
+                          {" "}
+                          <b>Longitud:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <input
-
                           id="lng"
                           name="lng"
                           value={formData.lng}
                           onChange={handleChange}
                           variant="standard"
-                          className='modalFormInputs'
+                          className="modalFormInputs"
                           required
                           disabled
-                          style={{ border: '1px solid #A1A8AE' }}
-                        >
-
-                        </input>
+                          style={{ border: "1px solid #A1A8AE" }}
+                        ></input>
                       </td>
                     </div>
                   </tr>
 
-
-                  <tr className='modalFormRow' >
-                    <div className='modalFormContent'>
-                      <td className='tdTableTitle'>
-                        <label style={{ fontSize: '13px' }} id="longitude-Label"> <b>Inspección:</b>  </label>
+                  <tr className="modalFormRow">
+                    <div className="modalFormContent">
+                      <td className="tdTableTitle">
+                        <label
+                          style={{ fontSize: "13px" }}
+                          id="longitude-Label"
+                        >
+                          {" "}
+                          <b>Inspección:</b>{" "}
+                        </label>
                       </td>
-                      <td className='tdTableData'>
+                      <td className="tdTableData">
                         <input
-
                           id="inspection"
                           name="inspection"
                           checked={formData.inspection}
                           onChange={toggleInspection}
                           variant="standard"
-                          className='modalFormInputs'
-                          type='checkbox'
-                          style={{ border: '1px solid #A1A8AE' }}
-                        >
-                        </input>
+                          className="modalFormInputs"
+                          type="checkbox"
+                          style={{ border: "1px solid #A1A8AE" }}
+                        ></input>
                       </td>
                     </div>
                   </tr>
 
-
                   {formData.inspection && ( // Verificar si inspection es true
-                    <tr className='modalFormRow' >
+                    <tr className="modalFormRow">
                       <Tooltip title="Agente de inspeccion" placement="left">
-                        <div className='modalFormContent'>
-                          <td className='tdTableTitle'>
-
-                            <label style={{ fontSize: '13px' }} id="longitude-Label">
+                        <div className="modalFormContent">
+                          <td className="tdTableTitle">
+                            <label
+                              style={{ fontSize: "13px" }}
+                              id="longitude-Label"
+                            >
                               <b>Contacto:</b>
                             </label>
-
                           </td>
-                          <td className='tdTableData'>
+                          <td className="tdTableData">
                             <input
                               id="agentInspection"
                               name="agentInspection"
                               value={formData.agentInspection}
                               onChange={handleChange}
                               variant="standard"
-                              className='modalFormInputs'
-                              style={{ border: '1px solid #A1A8AE' }}
-                            >
-                            </input>
+                              className="modalFormInputs"
+                              style={{ border: "1px solid #A1A8AE" }}
+                            ></input>
                           </td>
                         </div>
                       </Tooltip>
 
                       <Tooltip title="Telefono de inspeccion" placement="left">
-                        <div className='modalFormContent'>
-
-                          <td className='tdTableTitle'>
-
-                            <label style={{ fontSize: '13px' }} id="longitude-Label">
+                        <div className="modalFormContent">
+                          <td className="tdTableTitle">
+                            <label
+                              style={{ fontSize: "13px" }}
+                              id="longitude-Label"
+                            >
                               <b>Teléfono:</b>
                             </label>
-
                           </td>
-                          <td className='tdTableData'>
+                          <td className="tdTableData">
                             <input
                               id="phoneInspection"
                               name="phoneInspection"
                               value={formData.phoneInspection}
                               onChange={handleChange}
                               variant="standard"
-                              className='modalFormInputs'
-                              style={{ border: '1px solid #A1A8AE' }}
-                            >
-                            </input>
+                              className="modalFormInputs"
+                              style={{ border: "1px solid #A1A8AE" }}
+                            ></input>
                           </td>
-
                         </div>
                       </Tooltip>
                     </tr>
-
                   )}
 
                   {formData.inspection && ( // Verificar si inspection es true
-
-                    <tr className='modalFormRow' >
-
+                    <tr className="modalFormRow">
                       <Tooltip title="Fecha Tentativa" placement="left">
-                        <div className='modalFormContent'>
-                          <td className=' tdTableTitle dateTimePickerForm'>
-                            <label style={{ fontSize: '13px' }} id="longitude-Label">
+                        <div className="modalFormContent">
+                          <td className=" tdTableTitle dateTimePickerForm">
+                            <label
+                              style={{ fontSize: "13px" }}
+                              id="longitude-Label"
+                            >
                               <b>Fecha:</b>
                             </label>
                           </td>
-                          <td className='tdTableData'>
+                          <td className="tdTableData">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                              <DemoContainer components={['DatePicker']} sx={{ overflow: 'hidden' }}>
-                                <DatePicker value={dateInspecction} onChange={setdateInspecction} className='hourPicker' style={{ overflow: 'hidden' }} slotProps={{ textField: { variant: 'standard', size: 'small' } }} />
+                              <DemoContainer
+                                components={["DatePicker"]}
+                                sx={{ overflow: "hidden" }}
+                              >
+                                <DatePicker
+                                  value={dateInspecction}
+                                  onChange={setdateInspecction}
+                                  className="hourPicker"
+                                  style={{ overflow: "hidden" }}
+                                  slotProps={{
+                                    textField: {
+                                      variant: "standard",
+                                      size: "small",
+                                    },
+                                  }}
+                                />
                               </DemoContainer>
                             </LocalizationProvider>
                           </td>
                         </div>
                       </Tooltip>
 
-                      <Tooltip title="Hora tentativa" placement="left" style={{ display: 'flex' }}>
-                        <div className='modalFormContent'>
-
-                          <td className=' tdTableTitle dateTimePickerForm'>
-                            <label className='tdTableTitle' style={{ fontSize: '13px' }} id="longitude-Label">
+                      <Tooltip
+                        title="Hora tentativa"
+                        placement="left"
+                        style={{ display: "flex" }}
+                      >
+                        <div className="modalFormContent">
+                          <td className=" tdTableTitle dateTimePickerForm">
+                            <label
+                              className="tdTableTitle"
+                              style={{ fontSize: "13px" }}
+                              id="longitude-Label"
+                            >
                               <b>Hora:</b>
                             </label>
                           </td>
-                          <td className='tdTableData'>
-                            <LocalizationProvider dateAdapter={AdapterDayjs} style={{ overflow: 'hidden' }}>
-                              <DemoContainer components={['TimePicker']} sx={{ overflow: 'hidden' }}>
+                          <td className="tdTableData">
+                            <LocalizationProvider
+                              dateAdapter={AdapterDayjs}
+                              style={{ overflow: "hidden" }}
+                            >
+                              <DemoContainer
+                                components={["TimePicker"]}
+                                sx={{ overflow: "hidden" }}
+                              >
                                 <TimePicker
-                                  value={timeInspecction} onChange={setTimeInspecction}
-                                  className='hourPicker'
-                                  slotProps={{ textField: { variant: 'standard', size: 'small' } }}
+                                  value={timeInspecction}
+                                  onChange={setTimeInspecction}
+                                  className="hourPicker"
+                                  slotProps={{
+                                    textField: {
+                                      variant: "standard",
+                                      size: "small",
+                                    },
+                                  }}
                                 />
-
                               </DemoContainer>
                             </LocalizationProvider>
                           </td>
-
                         </div>
                       </Tooltip>
                     </tr>
                   )}
-
-
                 </tbody>
               </table>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Button type="submit" className='btnStepper' variant="contained" style={{ top: '0', backgroundColor: 'rgb(0, 169, 158)' }} fullWidth>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <Button
+                  type="submit"
+                  className="btnStepper"
+                  variant="contained"
+                  style={{ top: "0", backgroundColor: "rgb(0, 169, 158)" }}
+                  fullWidth
+                >
                   Agregar
                 </Button>
               </div>
-
-            </form >
+            </form>
           </Paper>
-          <div className='modalContent' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            className="modalContent"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <MapContainer
               ref={mapContainerRef}
               lat={formData.lat}
@@ -804,11 +983,6 @@ const AddObjectInsurance = ({ closeModal }) => {
       </div>
     </Container>
   );
-
-
 };
-
-
-
 
 export default AddObjectInsurance;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,forwardRef,useImperativeHandle  } from 'react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { TextField, Container, Grid, Paper, Alert } from '@mui/material';
@@ -15,9 +15,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import '../../styles/form.scss';
 import ValidationUtils from '../../utils/ValiationsUtils';
 import UsuarioService from '../../services/UsuarioService/UsuarioService';
+import { DATOS_PERSONALES_STORAGE_KEY } from '../../utils/constantes';
+
+
 
 dayjs.extend(customParseFormat);
-const PersonalForm = () => {
+const PersonalForm = forwardRef((props, ref) =>{
   const [formData, setFormData] = useState({
     name: '',
     lastname: '',
@@ -67,6 +70,10 @@ const PersonalForm = () => {
 
    
   };
+
+  useImperativeHandle(ref, () => ({
+    handleSubmitExternally: handleSubmit,
+  }));
 
   const verifyIdentification = async (e) => {
     const { value } = e.target;
@@ -128,7 +135,6 @@ const PersonalForm = () => {
 
 
   const handleSubmit = (e) => {
-    e.preventDefault();
     const formattedDate = dayjs(age).format('DD/MM/YYYY');
     const objetoSeguro = {
       nombre:formData.name,
@@ -139,9 +145,8 @@ const PersonalForm = () => {
       identificacion: formData.identification,
       fechaNacimiento:formattedDate,
       direccion:formData.address,
-      // ramo:ramo,
-      // producto:producto
     }
+    localStorage.setItem(DATOS_PERSONALES_STORAGE_KEY,JSON.stringify(objetoSeguro));
 
     console.log('Formulario enviado:', objetoSeguro);
   };
@@ -290,14 +295,14 @@ const PersonalForm = () => {
           </Grid>
 
           {/* Botón de envío */}
-          <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
+          {/* <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
             Registrarse
-          </Button>
+          </Button> */}
           {error && <Alert severity="error">{error}</Alert>}
         </FormControl >
       </Paper>
     </Container>
   );
-};
+});
 
 export default PersonalForm;

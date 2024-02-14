@@ -236,7 +236,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   const [totalPrima, setTotalPrima] = React.useState(0);
 
   React.useEffect(() => {
-    let result;
     console.log("Id Seccion: " + idSelected);
     printClasificacionAmparo(ramo, producto, clasificacionAmparo);
     setEditableValues(
@@ -431,7 +430,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         }
 
         //Mapear result al id de la seccion actual
-
         setEditableValues(
           result.map((row) => ({
             monto: row.monto,
@@ -451,9 +449,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           (sum, row) => sum + (parseFloat(row.prima) || 0),
           0
         );
-        const newTotalPrima2 = result.map((row) => {
-          console.log(row.prima || 0);
-        });
         setTotalPrima(newTotalPrima);
         console.log("total Pimra: " + newTotalPrima);
       } else {
@@ -616,7 +611,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     const valmaximo = parseFloat(event.target.getAttribute("data-valmaximo"));
     const newValue = event.target.value;
     let numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
-    console.log("******************* Monto:" + numericValue);
     // Guarda el valor anterior
 
     // Asegúrate de que newMonto no es NaN
@@ -633,7 +627,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
 
       const tasa = await obtenerTasa(amparo, ramo, numericValue);
       console.log(tasa);
-      newTasa = tasa.data.tasa;
+      newTasa = tasa.data;
       console.log('Tasa de fetch:'+newTasa);
 
       permitirCambio = true;
@@ -702,13 +696,10 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
             const newEditableRows = [...currentEditableRows];
             newEditableRows[index][field] = numericValue;
             newEditableRows[index]["tasa"] = newTasa;
-            console.log(newEditableRows);
             return newEditableRows;
           });
-          console.log(newJsonData);
           return newJsonData;
         });
-        console.log(newValues);
         return newValues;
       });
 
@@ -1056,7 +1047,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                       onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }
-                      disabled={row.objCheck ? false : true}
+                      disabled={row.objCheck  && !row.inventario ? false : true}
                       data-amparo={row.amparo}
                       data-grupo-amparo={row.grupoAmparo}
                       data-montofijo={row.montoFijo}
@@ -1081,7 +1072,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                       }
                       onBlur={(event) => handleTasaBlur(event, index)}
                       onChange={(event) => handleTasaChange(event, index)}
-                      disabled={row.objCheck ? false : true}
+                      disabled={row.objCheck && !row.inventario ? false : true}
                       readOnly={row.tasaReadOnly}
                     />
                   </TableCell>

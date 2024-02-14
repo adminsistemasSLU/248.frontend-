@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
@@ -110,31 +110,48 @@ ColorlibStepIcon.propTypes = {
 };
 
 export default function Steppers() {
-  const handleNext = (formData) => {
-    // Actualiza el estado formData con los datos recibidos
-    setFormData(formData);
-
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
-  };
-
-
-  const steps = [
-    { label: 'Datos Personales', formComponent: <PersonalForm /> },
-    { label: 'Producto', formComponent: <ProductListCards onNext={handleNext} /> },
-    { label: 'Riesgo', formComponent: <ProtectObjectsTable onNext={handleNext} /> },
-    { label: 'Pago', formComponent: <PaidForm onNext={handleNext} /> },
-    { label: 'Pasarela de Pago', formComponent: <PaymentMethods onNext={handleNext} /> },
-  ];
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed] = React.useState({});
   const [formData, setFormData] = React.useState({});
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState('');
+
+  const personalFormRef = useRef();
+
+  const handleNext = (formData) => {
+    // Actualiza el estado formData con los datos recibidos
+    setFormData(formData);
+
+    //Accion para Datos Personales
+    if(steps[activeStep].label==='Datos Personales'){
+      personalFormRef.current.handleSubmitExternally();
+    }
+    
+
+    //Accion para Riesgo
+    if(steps[activeStep].label==='Riesgo'){
+      
+    } 
+
+    const newActiveStep =
+      isLastStep() && !allStepsCompleted()
+        ? steps.findIndex((step, i) => !(i in completed))
+        : activeStep + 1;
+    setActiveStep(newActiveStep);
+
+
+
+  };
+
+  const steps = [
+    { label: 'Datos Personales', formComponent: <PersonalForm ref={personalFormRef} /> },
+    { label: 'Producto', formComponent: <ProductListCards onNext={handleNext} /> },
+    { label: 'Riesgo', formComponent: <ProtectObjectsTable onNext={handleNext} /> },
+    { label: 'Pago', formComponent: <PaidForm onNext={handleNext} /> },
+    { label: 'Pasarela de Pago', formComponent: <PaymentMethods onNext={handleNext} /> },
+  ];
+
 
   const totalSteps = () => {
     return steps.length;

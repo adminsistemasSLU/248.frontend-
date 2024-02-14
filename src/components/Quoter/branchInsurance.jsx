@@ -215,9 +215,7 @@ export default function BranchInsurance({ closeModalDetail }) {
   // function createData(id, ramo, descripcion, monto, tasa, prima)
   const printDetalleAsegurado = async () => {
     try {
-
       let newItems =[];
-
       newItems = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
       let detalleAsegurado = [];
       if(!newItems){
@@ -246,6 +244,9 @@ export default function BranchInsurance({ closeModalDetail }) {
           };
         });
         console.log(newItems);
+
+        newItems = calcularPrima(newItems);
+
         setRows(newItems);
         setEditableRows(newItems);
         const newTotalMonto = newItems.reduce((sum, row) => {
@@ -263,6 +264,16 @@ export default function BranchInsurance({ closeModalDetail }) {
     } catch (error) {
       console.error("Error al obtener Detalle Asegurado:", error);
     }
+  };
+
+  const calcularPrima = (tablaSecciones)=>{
+    const newEditableRows = tablaSecciones.map((row) =>{
+    return {
+      ...row,
+      tasa: (row.prima/row.monto*100).toFixed(2), // Cambia el estado de objPCheck
+    }
+  })
+  return newEditableRows;
   };
 
   const handleOpenModal = (codigo) => {
@@ -289,8 +300,8 @@ export default function BranchInsurance({ closeModalDetail }) {
 
   // Manejador para cerrar el modal
   const handleCloseModal = () => {
-    setOpenModal(false);
     tablaSeccionesMap();
+    setOpenModal(false);
   };
 
   function tablaSeccionesMap() {
@@ -310,6 +321,9 @@ export default function BranchInsurance({ closeModalDetail }) {
     setEditableRows(tablaSecciones);
     setEditableValues(tablaSecciones);
     setRows(tablaSecciones);
+    //Validar que se haya seleccionado un objeto
+    const existeSeleccion = tablaSecciones.some( seccion => seccion.checked === true);
+    console.log(existeSeleccion);
   }
 
   // Nuevo estado para rastrear los valores editables
@@ -321,7 +335,7 @@ export default function BranchInsurance({ closeModalDetail }) {
 
     const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
     console.log(tablaSecciones);
-    const newTotalMonto = tablaSecciones.map((item, index) => {
+    tablaSecciones.map((item, index) => {
       if (index < editableValues.length && editableValues[index] != null) {
         return {
           ...item,
@@ -529,7 +543,7 @@ export default function BranchInsurance({ closeModalDetail }) {
                     <CurrencyInput
                       className="input-table"
                       disabled
-                      value={row.monto}
+                      value={parseFloat(row.monto).toFixed(2)}
                     />
                   </TableCell>
                   <TableCell
