@@ -79,7 +79,6 @@ const IncendioService = {
     }
   },
 
-
   guardarCotizacion: async (cotizacion) => {
     const endpoint = "api/guardarCotizacion";
     const method = "POST";
@@ -88,7 +87,7 @@ const IncendioService = {
       const response = await authService.fetchWithAuth(endpoint, method, data);
       return response;
     } catch (error) {
-      console.error("Error fetching Val Tasa Amparo Incendio:", error);
+      console.error("Error fetching guardar Cotizacion:", error);
       throw error;
     }
   },
@@ -101,12 +100,40 @@ const IncendioService = {
       const response = await authService.fetchWithAuth(endpoint, method, data);
       return response;
     } catch (error) {
-      console.error("Error fetching Val Tasa Amparo Incendio:", error);
+      console.error("Error fetching guardar Cotizacion Incendio:", error);
       throw error;
     }
   },
 
-
+  consultaCotizacionIncendio: async (ramo, producto, id_CotiGeneral) => {
+    const endpoint = "api/ConsultaCotizacionIncendio";
+    const method = "POST";
+    const data = {
+      ramo: ramo,
+      producto: producto,
+      id_CotiGeneral: id_CotiGeneral,
+    };
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching consulta Cotizacion Incendio:", error);
+      throw error;
+    }
+  },
+  //  editarCotizacionIncendio
+  editarCotizacionIncendio: async (cotizacionIncendio) => {
+    const endpoint = "api/editarCotizacionIncendio";
+    const method = "POST";
+    const data = cotizacionIncendio;
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching guardar Cotizacion Incendio:", error);
+      throw error;
+    }
+  },
 };
 
 export default IncendioService;

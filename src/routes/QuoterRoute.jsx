@@ -4,7 +4,8 @@ import { Route, Routes } from 'react-router-dom';
 import NotFound from '../pages/NotFound';
 import Steppers from '../components/steppers';
 import RequireAuth from '../services/RoutesService/RequireAuth';
-import AddObjectInsurance from '../components/Quoter/addObjectInsurance';
+import ProtectObjectsTable from '../components/Quoter/protectObjectsTable';
+  
 
 
 const HomePage = lazy(() => import('../pages/HomePage'));
@@ -17,7 +18,7 @@ const QuoterRoutes = () => {
       <Route path="*" element={<NotFound />} />
 
 
-      <Route path="/Pymes/product" element={<RequireAuth> <AddObjectInsurance /> </RequireAuth>} />
+      <Route path="/Pymes/product" element={<RequireAuth> <ProtectObjectsTable /> </RequireAuth>} />
 
       <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
 

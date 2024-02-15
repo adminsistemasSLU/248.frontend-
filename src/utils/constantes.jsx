@@ -7,6 +7,7 @@ export const LS_CLASIFICACIONAMPARO = 'ClasificacionAmparo';
 export const LS_DETALLEAMPARO = 'DetalleAmparo';
 export const LS_TABLAAMPARO = 'TablaAmparo';
 export const LS_TABLASECCIONES = 'TablaSecciones';
+export const LS_TABLAOBJETOSEGURO = 'TablaObjetoSeguro';
 export const TOKEN_STORAGE_KEY = 'authToken';
 export const USER_STORAGE_KEY = 'user';
 export const MENU_STORAGE_KEY = 'menu';

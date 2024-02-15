@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -31,11 +31,22 @@ import {
   LS_RAMO,
   LS_PRODUCTO,
   LS_COTIZACION,
+  LS_TABLAOBJETOSEGURO
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 
-function createData(number, province, city, direction, amount, prima, rate) {
+function createData(
+  id,
+  number,
+  province,
+  city,
+  direction,
+  amount,
+  prima,
+  rate
+) {
   return {
+    id,
     number,
     province,
     city,
@@ -45,18 +56,6 @@ function createData(number, province, city, direction, amount, prima, rate) {
     rate,
   };
 }
-
-const rows = [
-  createData(
-    1,
-    "Guayas",
-    "Guayaquil",
-    "Av 9 de Octubre",
-    958000.0,
-    0.52,
-    495.0
-  ),
-];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -95,19 +94,19 @@ const headCells = [
   },
   {
     id: "province",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "Provincia",
   },
   {
     id: "city",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "Ciudad",
   },
   {
     id: "direction",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "Dirección",
   },
@@ -268,10 +267,71 @@ export default function ProtectObjectsTable() {
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(50);
   const [openModal, setOpenModal] = React.useState(false);
+  const [rows, setRows] = React.useState([]);
+  const [selectedId, setselectedId] = React.useState(-1);
+  const [cotizacion, setCotizacion] = React.useState([]);
 
-  const handleOpenModal = async () => {
+  useEffect(() => {
+    async function cargarTabla() {
+      const objetoSeguro = await cargarObjetoSeguro();
+      let number = 1;
+      const rowsObjetoAmparo = objetoSeguro.map((item, index) => {
+        item.arrMontos = JSON.parse(item.arrMontos);
+        return createData(
+          item.id,
+          number++,
+          item.provincia,
+          item.ciudad,
+          item.direccion,
+          item.monto || 0.0,
+          item.tasa || 0.0,
+          item.prima || 0.0
+        );
+      });
+      console.log(rowsObjetoAmparo);
+      setRows(rowsObjetoAmparo);
+      setCotizacion(objetoSeguro);
+    }
+
+    cargarTabla();
+  }, []);
+
+  const cargarObjetoSeguro = async () => {
+    let ramo = localStorage.getItem(LS_RAMO);
+    let producto = localStorage.getItem(LS_PRODUCTO);
+    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    try {
+      const cotizacion = await IncendioService.consultaCotizacionIncendio(
+        ramo,
+        producto,
+        idCotizacion
+      );
+
+      if (cotizacion && cotizacion.data) {
+        console.log(cotizacion.data);
+        return cotizacion.data;
+      }
+    } catch (error) {
+      console.error("Error al obtener antiguedad:", error);
+    }
+  };
+
+  const handleOpenModal = async (id) => {
+    
+    setselectedId(id);
+    if(id!==''){
+      setselectedId(id);
+      console.log(rows);
+      const element = cotizacion.find((item) => {
+        return item.id === id;
+      });
+      console.log(element);
+      localStorage.setItem(LS_TABLAOBJETOSEGURO,JSON.stringify(element));
+    }
+    
+
     const idCotizacion = localStorage.getItem("LS_COTIZACION");
     if (idCotizacion) {
       setOpenModal(true);
@@ -290,21 +350,24 @@ export default function ProtectObjectsTable() {
       tippoliza: 1,
     };
 
-    // try {
-    //   const response = await IncendioService.guardarCotizacion(personalData);
-    //   if (response.codigo === 200) {
-    //     console.log(response);
-    //     localStorage.setItem(LS_COTIZACION, response.data); // Asumiendo que se recibe una clave
-
-    //     setOpenModal(true);
-    //   } else {
-    //     // Manejar la respuesta de error
-    //     console.error("Error en la respuesta del servidor:", response.message);
-    //   }
-    // } catch (error) {
-    //   // Manejar errores de red/otros errores
-    //   console.error("Error al realizar la solicitud:", error);
-    // }
+    if(id===''){
+      try {
+        const response = await IncendioService.guardarCotizacion(personalData);
+        if (response.codigo === 200) {
+          console.log(response);
+          localStorage.setItem(LS_COTIZACION, response.data); // Asumiendo que se recibe una clave
+  
+          setOpenModal(true);
+        } else {
+          // Manejar la respuesta de error
+          console.error("Error en la respuesta del servidor:", response.message);
+        }
+      } catch (error) {
+        // Manejar errores de red/otros errores
+        console.error("Error al realizar la solicitud:", error);
+      }
+    }
+   
 
     setOpenModal(true);
   };
@@ -369,7 +432,7 @@ export default function ProtectObjectsTable() {
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage]
+    [rows, order, orderBy, page, rowsPerPage]
   );
 
   return (
@@ -391,7 +454,10 @@ export default function ProtectObjectsTable() {
       >
         <DialogContent className="dialog-content">
           {/* Componente del formulario */}
-          <AddObjectInsurance closeModal={handleCloseModal} />
+          <AddObjectInsurance
+            idObjectSelected={selectedId}
+            closeModal={handleCloseModal}
+          />
         </DialogContent>
       </Dialog>
 
@@ -399,7 +465,7 @@ export default function ProtectObjectsTable() {
         <Paper sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
           <Button
             variant="contained"
-            onClick={handleOpenModal}
+            onClick={() => handleOpenModal('')}
             sx={{ marginRight: "20px" }}
           >
             Nuevo
@@ -453,27 +519,27 @@ export default function ProtectObjectsTable() {
                         >
                           {row.number}
                         </TableCell>
-                        <TableCell align="right">{row.province}</TableCell>
-                        <TableCell align="right">{row.city}</TableCell>
-                        <TableCell align="right">{row.direction}</TableCell>
+                        <TableCell align="left">{row.province}</TableCell>
+                        <TableCell align="left">{row.city}</TableCell>
+                        <TableCell align="left">{row.direction}</TableCell>
 
                         <TableCell align="right">
                           <CurrencyInput
-                            value={row.amount.toFixed(2)}
+                            value={row.amount}
                             className="input-table"
                             disabled
                           />
                         </TableCell>
                         <TableCell align="right">
                           <input
-                            value={row.prima.toFixed(2) + "%"}
+                            value={row.prima + "%"}
                             className="input-table"
                             disabled
                           />
                         </TableCell>
                         <TableCell align="right">
                           <CurrencyInput
-                            value={row.rate.toFixed(2)}
+                            value={row.rate}
                             className="input-table"
                             disabled
                           />
@@ -482,7 +548,7 @@ export default function ProtectObjectsTable() {
                           <div
                             style={{ display: "flex", justifyContent: "end" }}
                           >
-                            <IconButton onClick={handleOpenModal}>
+                            <IconButton onClick={() => handleOpenModal(row.id)}>
                               <EditIcon />
                             </IconButton>
                             <IconButton>
@@ -507,7 +573,7 @@ export default function ProtectObjectsTable() {
             </TableContainer>
           )}
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[5, 10, 25, 50]}
             component="div"
             count={rows.length}
             rowsPerPage={rowsPerPage}

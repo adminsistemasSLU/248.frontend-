@@ -403,12 +403,6 @@ export default function BranchInsurance({ closeModalDetail }) {
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
-  // const handleCellValueChange = (event, index, field) => {
-  //   const newValue = event.target.value;
-  //   const newEditableValues = [...editableValues];
-  //   newEditableValues[index][field] = newValue;
-  //   setEditableValues(newEditableValues);
-  // };
 
   const visibleRows = React.useMemo(
     () =>
