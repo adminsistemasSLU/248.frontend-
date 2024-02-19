@@ -1,31 +1,33 @@
-import React, {useRef} from 'react';
-import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
-import Stack from '@mui/material/Stack';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
-import PersonIcon from '@mui/icons-material/Person';
-import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
-import PaidIcon from '@mui/icons-material/Paid';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import '../styles/button.scss';
-import '../styles/form.scss';
-import PersonalForm from './Quoter/personalForm';
-import ProtectObjectsTable from './Quoter/protectObjectsTable';
-import PaidForm from './Quoter/paidForm';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import ProductListCards from './Quoter/productListCards';
-import PaymentMethods from './Quoter/paymentMethods';
-import { TextField, Grid } from '@mui/material';
+import React, { useRef } from "react";
+import PropTypes from "prop-types";
+import { styled } from "@mui/material/styles";
+import Stack from "@mui/material/Stack";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepConnector, {
+  stepConnectorClasses,
+} from "@mui/material/StepConnector";
+import PersonIcon from "@mui/icons-material/Person";
+import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import PaidIcon from "@mui/icons-material/Paid";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import "../styles/button.scss";
+import "../styles/form.scss";
+import PersonalForm from "./Quoter/personalForm";
+import ProtectObjectsTable from "./Quoter/protectObjectsTable";
+import PaidForm from "./Quoter/paidForm";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import ProductListCards from "./Quoter/productListCards";
+import PaymentMethods from "./Quoter/paymentMethods";
+import { TextField, Grid } from "@mui/material";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -34,42 +36,43 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
       backgroundImage:
-        'linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)',
+        "linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)",
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
       backgroundImage:
-        'linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)',
+        "linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)",
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
     height: 3,
     border: 0,
     backgroundColor:
-      theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#eaeaf0',
+      theme.palette.mode === "dark" ? theme.palette.grey[800] : "#eaeaf0",
     borderRadius: 1,
   },
 }));
 
-const ColorlibStepIconRoot = styled('div')(({ theme, ownerState }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#ccc',
+const ColorlibStepIconRoot = styled("div")(({ theme, ownerState }) => ({
+  backgroundColor:
+    theme.palette.mode === "dark" ? theme.palette.grey[700] : "#ccc",
   zIndex: 1,
-  color: '#fff',
+  color: "#fff",
   width: 40,
   height: 40,
-  display: 'flex',
-  borderRadius: '50%',
-  justifyContent: 'center',
-  alignItems: 'center',
+  display: "flex",
+  borderRadius: "50%",
+  justifyContent: "center",
+  alignItems: "center",
   ...(ownerState.active && {
     backgroundImage:
-      'linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)',
-    boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
+      "linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)",
+    boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
   }),
   ...(ownerState.completed && {
     backgroundImage:
-      'linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)',
+      "linear-gradient( 136deg, #3cf1d9 0%, #00a99e 50%, rgb(74 101 172) 100%)",
   }),
 }));
 
@@ -81,11 +84,15 @@ function ColorlibStepIcon(props) {
     2: <ProductionQuantityLimitsIcon />,
     3: <LocalFireDepartmentIcon />,
     4: <PaidIcon />,
-    5: <AddShoppingCartIcon />
+    5: <AddShoppingCartIcon />,
   };
 
   return (
-    <ColorlibStepIconRoot style={{ aspectRatio: '1/1' }} ownerState={{ completed, active }} className={className}>
+    <ColorlibStepIconRoot
+      style={{ aspectRatio: "1/1" }}
+      ownerState={{ completed, active }}
+      className={className}
+    >
       {icons[String(props.icon)]}
     </ColorlibStepIconRoot>
   );
@@ -110,48 +117,55 @@ ColorlibStepIcon.propTypes = {
 };
 
 export default function Steppers() {
-
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed] = React.useState({});
   const [formData, setFormData] = React.useState({});
   const [open, setOpen] = React.useState(false);
-  const [email, setEmail] = React.useState('');
+  const [email, setEmail] = React.useState("");
 
   const personalFormRef = useRef();
 
   const handleNext = (formData) => {
     // Actualiza el estado formData con los datos recibidos
     setFormData(formData);
-
+    let continuar = true;
     //Accion para Datos Personales
-    if(steps[activeStep].label==='Datos Personales'){
-      personalFormRef.current.handleSubmitExternally();
+    if (steps[activeStep].label === "Datos Personales") {
+      continuar = personalFormRef.current.handleSubmitExternally();
     }
     
-
     //Accion para Riesgo
-    if(steps[activeStep].label==='Riesgo'){
-      
-    } 
+    if (steps[activeStep].label === "Riesgo") {
+    }
 
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
-
-
-
+    if (continuar) {
+      const newActiveStep =
+        isLastStep() && !allStepsCompleted()
+          ? steps.findIndex((step, i) => !(i in completed))
+          : activeStep + 1;
+      setActiveStep(newActiveStep);
+    }
   };
 
   const steps = [
-    { label: 'Datos Personales', formComponent: <PersonalForm ref={personalFormRef} /> },
-    { label: 'Producto', formComponent: <ProductListCards onNext={handleNext} /> },
-    { label: 'Riesgo', formComponent: <ProtectObjectsTable onNext={handleNext} /> },
-    { label: 'Pago', formComponent: <PaidForm onNext={handleNext} /> },
-    { label: 'Pasarela de Pago', formComponent: <PaymentMethods onNext={handleNext} /> },
+    {
+      label: "Datos Personales",
+      formComponent: <PersonalForm ref={personalFormRef} />,
+    },
+    {
+      label: "Producto",
+      formComponent: <ProductListCards onNext={handleNext} />,
+    },
+    {
+      label: "Riesgo",
+      formComponent: <ProtectObjectsTable onNext={handleNext} />,
+    },
+    { label: "Pago", formComponent: <PaidForm onNext={handleNext} /> },
+    {
+      label: "Pasarela de Pago",
+      formComponent: <PaymentMethods onNext={handleNext} />,
+    },
   ];
-
 
   const totalSteps = () => {
     return steps.length;
@@ -187,7 +201,7 @@ export default function Steppers() {
   };
 
   return (
-    <Stack className={'stack-content'} spacing={4}>
+    <Stack className={"stack-content"} spacing={4}>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -221,7 +235,11 @@ export default function Steppers() {
         </DialogActions>
       </Dialog>
 
-      <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
+      <Stepper
+        alternativeLabel
+        activeStep={activeStep}
+        connector={<ColorlibConnector />}
+      >
         {steps.map((step, index) => (
           <Step key={index}>
             <StepLabel StepIconComponent={ColorlibStepIcon}>
@@ -230,33 +248,53 @@ export default function Steppers() {
           </Step>
         ))}
       </Stepper>
-      <div style={{ display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'center', marginBottom: '10%' }}>
-        <Box style={{ width: '90%' }} >
-        {steps[activeStep].label === 'Producto' && (
-             <h3 style={{color:'#00a99e'}}> 
-              SELECCIONE UN PRODUCTO
-             </h3> )}
-          {React.cloneElement(steps[activeStep].formComponent, { formData, onNext: handleNext })}
-          <div className='btnDisplay'>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          pt: 2,
+          justifyContent: "center",
+          marginBottom: "10%",
+        }}
+      >
+        <Box style={{ width: "90%" }}>
+          {steps[activeStep].label === "Producto" && (
+            <h3 style={{ color: "#00a99e" }}>SELECCIONE UN PRODUCTO</h3>
+          )}
+          {React.cloneElement(steps[activeStep].formComponent, {
+            formData,
+            onNext: handleNext,
+          })}
+          <div className="btnDisplay">
             <Button
               disabled={activeStep === 0}
               onClick={handleBack}
               sx={{ mr: 1 }}
-              className='btnStepper btnBack'
+              className="btnStepper btnBack"
             >
               Regresar
             </Button>
 
-            {steps[activeStep].label === 'Pago' && (
-              <Button onClick={handleClickOpen} sx={{ mr: 1 }} className='btnPaid'>
+            {steps[activeStep].label === "Pago" && (
+              <Button
+                onClick={handleClickOpen}
+                sx={{ mr: 1 }}
+                className="btnPaid"
+              >
                 Enviar Cotización
               </Button>
             )}
 
-            {steps[activeStep].label !== 'Producto' && (
-              <Button onClick={handleNext} sx={{ mr: 1 }} className='btnStepper' style={{top:'20%'}}>
+            {steps[activeStep].label !== "Producto" && (
+              <Button
+                onClick={handleNext}
+                sx={{ mr: 1 }}
+                className="btnStepper"
+                style={{ top: "20%" }}
+              >
                 Siguiente
-              </Button>)}
+              </Button>
+            )}
           </div>
         </Box>
       </div>

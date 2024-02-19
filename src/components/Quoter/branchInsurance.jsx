@@ -27,8 +27,6 @@ import {
   LS_TABLASECCIONES,
 } from "../../utils/constantes";
 
-const rows = [];
-
 const headCells = [
   {
     id: "id",
@@ -178,21 +176,21 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-export default function BranchInsurance({ closeModalDetail }) {
+export default function BranchInsurance({ closeModalDetail, isEditMode }) {
   const [order] = useState("asc");
-  const [orderBy] = useState("calories");
+  const [orderBy] = useState("");
   const [selected, setSelected] = useState([]);
   const [page] = useState(0);
   const [rowsPerPage] = useState(10);
   const [openModal, setOpenModal] = useState(false);
-  const [editableRows, setEditableRows] = useState(rows);
-  const [rows1, setRows] = useState(rows);
+  const [editableRows, setEditableRows] = useState([]);
+  const [rows1, setRows] = useState([]);
   const [totalMonto, setTotalMonto] = useState(0);
   const [totalPrima, setTotalPrima] = useState(0);
   const [idSelectedSeccion, setSelectedSeccion] = useState(0);
   const producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
   const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
-
+  const editMode = isEditMode;
   useEffect(() => {
     printDetalleAsegurado();
   }, []);
@@ -208,29 +206,30 @@ export default function BranchInsurance({ closeModalDetail }) {
       return row.checked ? sum + parseFloat(row.prima) : sum;
     }, 0);
     setTotalPrima(newTotalPrima);
-
-  }, [editableRows])
-
+  }, [editableRows]);
 
   // function createData(id, ramo, descripcion, monto, tasa, prima)
   const printDetalleAsegurado = async () => {
     try {
-      let newItems =[];
-      newItems = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
       let detalleAsegurado = [];
-      if(!newItems){
-         detalleAsegurado = await IncendioService.fetchDetalleAsegurado(
+      let newItems = [];
+      if (editMode) {
+        newItems = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+      }
+      if (newItems.length === 0) {
+        detalleAsegurado = await IncendioService.fetchDetalleAsegurado(
           ramo,
           producto
         );
         console.log(detalleAsegurado);
-      }else{
-        detalleAsegurado.codigo =200;
+      } else {
+        detalleAsegurado.codigo = 200;
         detalleAsegurado.data = newItems;
       }
 
       if (detalleAsegurado && detalleAsegurado.data) {
-         newItems = detalleAsegurado.data.map((detalleAsegurado) => {
+        newItems = detalleAsegurado.data.map((detalleAsegurado) => {
+          console.log(detalleAsegurado);
           return {
             id: detalleAsegurado.codigo,
             ramo: detalleAsegurado.descripcion,
@@ -239,8 +238,8 @@ export default function BranchInsurance({ closeModalDetail }) {
             tasa: detalleAsegurado.tasa,
             prima: detalleAsegurado.prima,
             codigo: detalleAsegurado.codigo,
-            checked: false,
-            Amparo:detalleAsegurado.Amparo||[]
+            checked: editMode ? detalleAsegurado.checked : false,
+            Amparo: detalleAsegurado.Amparo || [],
           };
         });
         console.log(newItems);
@@ -266,14 +265,14 @@ export default function BranchInsurance({ closeModalDetail }) {
     }
   };
 
-  const calcularPrima = (tablaSecciones)=>{
-    const newEditableRows = tablaSecciones.map((row) =>{
-    return {
-      ...row,
-      tasa: (row.prima/row.monto*100).toFixed(2), // Cambia el estado de objPCheck
-    }
-  })
-  return newEditableRows;
+  const calcularPrima = (tablaSecciones) => {
+    const newEditableRows = tablaSecciones.map((row) => {
+      return {
+        ...row,
+        tasa: ((row.prima / row.monto) * 100).toFixed(2),
+      };
+    });
+    return newEditableRows;
   };
 
   const handleOpenModal = (codigo) => {
@@ -282,17 +281,6 @@ export default function BranchInsurance({ closeModalDetail }) {
     localStorage.setItem(LS_CLASIFICACIONAMPARO, codigo);
     const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
     console.log(tablaSecciones);
-    // const newTotalMonto = tablaSecciones.map((item, index) => {
-    //   if (index < editableValues.length && editableValues[index] != null) {
-    //     return {
-    //       ...item,
-    //       checked: editableValues[index].checked,
-    //       Amparo: item.Amparo
-    //     };
-    //   }
-    //   return item; // Retorna el item sin cambios si no hay un valor correspondiente en editableValues
-    // });
-
     localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(editableRows));
 
     setOpenModal(true);
@@ -322,17 +310,18 @@ export default function BranchInsurance({ closeModalDetail }) {
     setEditableValues(tablaSecciones);
     setRows(tablaSecciones);
     //Validar que se haya seleccionado un objeto
-    const existeSeleccion = tablaSecciones.some( seccion => seccion.checked === true);
+    const existeSeleccion = tablaSecciones.some(
+      (seccion) => seccion.checked === true
+    );
     console.log(existeSeleccion);
   }
 
   // Nuevo estado para rastrear los valores editables
   const [editableValues, setEditableValues] = React.useState(
-    rows.map((rows1) => ({ descripcion: rows1.descripcion }))
+    rows1.map((rows1) => ({ checked: rows1.checked }))
   );
 
   const handleSaveChanges = () => {
-
     const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
     console.log(tablaSecciones);
     tablaSecciones.map((item, index) => {
@@ -340,22 +329,29 @@ export default function BranchInsurance({ closeModalDetail }) {
         return {
           ...item,
           checked: editableValues[index].checked,
-          Amparo: item.Amparo
+          Amparo: item.Amparo,
         };
       }
       return item; // Retorna el item sin cambios si no hay un valor correspondiente en editableValues
     });
 
-    localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(editableRows));
+    const updatedSecciones = tablaSecciones.map((item, index) => {
+      return {
+        ...item,
+        checked: rows1[index].checked,
+        monto: rows1[index].monto,
+        tasa: rows1[index].tasa,
+        prima: rows1[index].prima,
+      };
+    });
 
-
-
-
+    localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(updatedSecciones));
+    closeModalDetail("true");
   };
 
   React.useEffect(() => {
     setEditableValues(
-      rows.map((rows1) => ({
+      rows1.map((rows1) => ({
         monto: rows1.monto,
         tasa: rows1.tasa,
         prima: rows1.prima,
@@ -392,17 +388,16 @@ export default function BranchInsurance({ closeModalDetail }) {
     );
     setEditableRows(newEditableRows);
 
-    // Asegúrate de que 'editableValues' también refleje este cambio
     const newEditableValues = editableValues.map((value, index) =>
       newEditableRows[index].id === id
         ? { ...value, checked: !value.checked }
         : value
     );
     setEditableValues(newEditableValues);
+    setRows(newEditableRows);
   };
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
-
 
   const visibleRows = React.useMemo(
     () =>
@@ -493,10 +488,9 @@ export default function BranchInsurance({ closeModalDetail }) {
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
-                      onClick={(event) => handleClick(event, row.id)}
+                      onChange={(event) => handleClick(event, row.id)}
                       color="primary"
-                      checked={isItemSelected}
-                      value={row.checked}
+                      checked={row.checked}
                       inputProps={{
                         "aria-labelledby": labelId,
                       }}
@@ -517,16 +511,6 @@ export default function BranchInsurance({ closeModalDetail }) {
                       {row.ramo}
                     </div>
                   </TableCell>
-                  {/* <TableCell align="left">
-                      <input
-                        className='input-table'
-                        style={{textAlign:'left'}}
-                        value={editableValues[index].descripcion}
-                        onChange={(event) =>
-                        handleCellValueChange(event, index, 'descripcion')
-                        }
-                      />
-                    </TableCell> */}
                   <TableCell
                     align="right"
                     component="th"
@@ -634,7 +618,7 @@ export default function BranchInsurance({ closeModalDetail }) {
           justifyContent: "center",
         }}
       >
-        <Button variant="contained" color="primary" onClick={closeModal}>
+        <Button variant="contained" color="primary" onClick={handleSaveChanges}>
           Aceptar
         </Button>
       </div>

@@ -20,6 +20,8 @@ import Tooltip from "@mui/material/Tooltip";
 import CurrencyInput from "../../utils/currencyInput";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import { visuallyHidden } from "@mui/utils";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -31,9 +33,10 @@ import {
   LS_RAMO,
   LS_PRODUCTO,
   LS_COTIZACION,
-  LS_TABLAOBJETOSEGURO
+  LS_TABLAOBJETOSEGURO,
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
+import ComboService from "../../services/ComboService/ComboService";
 
 function createData(
   id,
@@ -143,14 +146,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -272,18 +268,44 @@ export default function ProtectObjectsTable() {
   const [rows, setRows] = React.useState([]);
   const [selectedId, setselectedId] = React.useState(-1);
   const [cotizacion, setCotizacion] = React.useState([]);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   useEffect(() => {
-    async function cargarTabla() {
-      const objetoSeguro = await cargarObjetoSeguro();
-      let number = 1;
+    
+
+    cargarTabla();
+  }, []);
+
+
+  async function cargarTabla() {
+    handleOpenBackdrop();
+    const provincias = await cargarProvincias();
+    const objetoSeguro = await cargarObjetoSeguro();
+    const ciudades = await cargarCiudades(objetoSeguro[0].zona);
+    console.log(objetoSeguro);
+    console.log(provincias);
+    console.log(ciudades);
+    let number = 1;
+    if (provincias && objetoSeguro) {
       const rowsObjetoAmparo = objetoSeguro.map((item, index) => {
         item.arrMontos = JSON.parse(item.arrMontos);
+        let ciud;
+        let prov;
+        if (item.zona) {
+          prov = provincias.find(
+            (provincia) => provincia.Codigo === item.zona
+          );
+        }
+        if (ciudades && item.ciudad) {
+          ciud = ciudades.find((ciudad) => ciudad.Codigo === item.ciudad);
+        }
+        console.log(prov);
+
         return createData(
           item.id,
           number++,
-          item.provincia,
-          item.ciudad,
+          prov?.Nombre || "",
+          ciud?.Nombre || "",
           item.direccion,
           item.monto || 0.0,
           item.tasa || 0.0,
@@ -294,9 +316,8 @@ export default function ProtectObjectsTable() {
       setRows(rowsObjetoAmparo);
       setCotizacion(objetoSeguro);
     }
-
-    cargarTabla();
-  }, []);
+    handleCloseBackdrop();
+  }
 
   const cargarObjetoSeguro = async () => {
     let ramo = localStorage.getItem(LS_RAMO);
@@ -318,21 +339,57 @@ export default function ProtectObjectsTable() {
     }
   };
 
+  const cargarProvincias = async () => {
+    let ramo = localStorage.getItem(LS_RAMO);
+    let producto = localStorage.getItem(LS_PRODUCTO);
+    try {
+      const provincias = await ComboService.fetchComboProvincias(
+        ramo,
+        producto
+      );
+
+      if (provincias && provincias.data) {
+        console.log(provincias.data);
+        return provincias.data;
+      }
+    } catch (error) {
+      console.error("Error al obtener provincias:", error);
+    }
+  };
+
+  const cargarCiudades = async (provincia) => {
+    let ramo = localStorage.getItem(LS_RAMO);
+    let producto = localStorage.getItem(LS_PRODUCTO);
+    try {
+      const ciudades = await ComboService.fetchComboCiudad(
+        ramo,
+        producto,
+        provincia
+      );
+
+      if (ciudades && ciudades.data) {
+        console.log(ciudades.data);
+        return ciudades.data;
+      }
+    } catch (error) {
+      console.error("Error al obtener ciudad:", error);
+    }
+  };
+
   const handleOpenModal = async (id) => {
-    
     setselectedId(id);
-    if(id!==''){
+    if (id !== "") {
       setselectedId(id);
       console.log(rows);
       const element = cotizacion.find((item) => {
         return item.id === id;
       });
       console.log(element);
-      localStorage.setItem(LS_TABLAOBJETOSEGURO,JSON.stringify(element));
+      localStorage.setItem(LS_TABLAOBJETOSEGURO, JSON.stringify(element));
     }
-    
 
-    const idCotizacion = localStorage.getItem("LS_COTIZACION");
+    const idCotizacion = localStorage.getItem(LS_COTIZACION);
+    console.log(idCotizacion);
     if (idCotizacion) {
       setOpenModal(true);
       return;
@@ -349,31 +406,37 @@ export default function ProtectObjectsTable() {
       ramo: ramo,
       tippoliza: 1,
     };
-
-    if(id===''){
+    console.log(idCotizacion);
+    if (id === "" && (idCotizacion === null || idCotizacion === "")) {
       try {
+        handleOpenBackdrop();
         const response = await IncendioService.guardarCotizacion(personalData);
         if (response.codigo === 200) {
           console.log(response);
           localStorage.setItem(LS_COTIZACION, response.data); // Asumiendo que se recibe una clave
-  
+          handleCloseBackdrop();
           setOpenModal(true);
         } else {
           // Manejar la respuesta de error
-          console.error("Error en la respuesta del servidor:", response.message);
+          handleCloseBackdrop();
+          console.error(
+            "Error en la respuesta del servidor:",
+            response.message
+          );
         }
       } catch (error) {
         // Manejar errores de red/otros errores
+        handleCloseBackdrop();
         console.error("Error al realizar la solicitud:", error);
       }
     }
-   
 
     setOpenModal(true);
   };
 
   // Manejador para cerrar el modal
   const handleCloseModal = () => {
+    cargarTabla();
     setOpenModal(false);
   };
 
@@ -435,8 +498,21 @@ export default function ProtectObjectsTable() {
     [rows, order, orderBy, page, rowsPerPage]
   );
 
+  const handleCloseBackdrop = () => {
+    setOpenBackdrop(false);
+  };
+  const handleOpenBackdrop = () => {
+    setOpenBackdrop(true);
+  };
+
   return (
     <div style={{ width: "100%" }}>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openBackdrop}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {/* Modal */}
       <Dialog
         open={openModal}
@@ -465,7 +541,7 @@ export default function ProtectObjectsTable() {
         <Paper sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
           <Button
             variant="contained"
-            onClick={() => handleOpenModal('')}
+            onClick={() => handleOpenModal("")}
             sx={{ marginRight: "20px" }}
           >
             Nuevo

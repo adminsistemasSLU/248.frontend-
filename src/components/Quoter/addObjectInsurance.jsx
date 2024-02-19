@@ -14,6 +14,8 @@ import "../../styles/dialogForm.scss";
 import "../../styles/form.scss";
 import "../../styles/button.scss";
 import "../../styles/objectInsuranceTable.scss";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -52,7 +54,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   });
 
   const [openModal, setOpenModal] = React.useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [provinces, setProvinces] = useState([]);
   const [ciudades, setCiudades] = useState([]);
   const [parroquia, setParroquia] = useState([]);
@@ -66,7 +67,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   const [timeInspecction, setTimeInspecction] = useState([]);
   const idObject = idObjectSelected;
   const editMode = idObject !== "" ? true : false;
-
+  const [openBackdrop1, setOpenBackdrop] = React.useState(false);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -114,12 +115,36 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       console.log("No existe datos para cotizar");
       return;
     }
+
+    if (editMode) {
+      try {
+        const response = await IncendioService.editarCotizacionIncendio(
+          objetoSeguro
+        );
+        if (response.codigo === 200) {
+          console.log(response);
+          //CREAR ALERTA DE INGRESADO CORRECTAMENTE
+          closeModal(true);
+        } else {
+          console.error(
+            "Error en la respuesta del servidor:",
+            response.message
+          );
+        }
+      } catch (error) {
+        // Manejar errores de red/otros errores
+        console.error("Error al realizar la solicitud:", error);
+      }
+      return;
+    }
     try {
       const response = await IncendioService.guardarCotizacionIncendio(
         objetoSeguro
       );
       if (response.codigo === 200) {
         console.log(response);
+        //CREAR ALERTA DE INGRESADO CORRECTAMENTE
+        closeModal(true);
       } else {
         console.error("Error en la respuesta del servidor:", response.message);
       }
@@ -151,7 +176,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
 
     let tasa = (primaAsegudara / sumaAsegurada) * 100;
 
-    return {
+    let formDatas = {
       id_CotiGeneral: idCotizacion,
       contactoInspeccion: formData.agentInspection,
       manzana: formData.block,
@@ -179,6 +204,15 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       tasa: tasa.toFixed(2),
       prima: primaAsegudara,
     };
+
+    if (editMode) {
+      formDatas = {
+        ...formDatas,
+        id: idObject,
+      };
+    }
+    console.log(formDatas);
+    return formDatas;
   };
 
   const onMarkerDragEnd = ({ lat, lng, direccion }) => {
@@ -202,55 +236,101 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   useEffect(() => {
-    cargarConstruccion();
-    cargarAntiguedad();
-    cargarRiesgo();
-    cargarProvincias();
-  }, []);
-
-  useEffect(() => {
-    const cargarDatosEditar = () => {
-      let tablaObjetoSeguro;
-      if (idObject) {
-        console.log(idObject);
-        tablaObjetoSeguro = JSON.parse(
-          localStorage.getItem(LS_TABLAOBJETOSEGURO)
-        );
-      }
-      if (tablaObjetoSeguro && idObject) {
-        setFormData((formData) => ({
-          ...formData,
-          province: tablaObjetoSeguro.zona,
-          city: tablaObjetoSeguro.ciudad,
-          parish: tablaObjetoSeguro.parroquia,
-          direccion: tablaObjetoSeguro.direccion,
-          block: tablaObjetoSeguro.manzana,
-          house: tablaObjetoSeguro.villa,
-          floor: tablaObjetoSeguro.pisos,
-          buildingAge: tablaObjetoSeguro.antiguedad,
-          constructionType: tablaObjetoSeguro.tipconstruccion,
-          riskType: tablaObjetoSeguro.riesgo,
-          destiny: tablaObjetoSeguro.tipdestino,
-          sumInsure: tablaObjetoSeguro.monto,
-          lat: tablaObjetoSeguro.latitud,
-          lng: tablaObjetoSeguro.longitud,
-          inspection: tablaObjetoSeguro.inspeccion === 0 ? false : true,
-          direcctionInspection: tablaObjetoSeguro.longitud,
-          phoneInspection: tablaObjetoSeguro.longitud,
-          agentInspection: tablaObjetoSeguro.longitud,
-        }));
+    const cargarData = async () => {
+      console.log(editMode);
+      if (editMode) {
+        handleOpenBackdrop();
+        console.log("entro");
+        await cargarDatosEditar();
+        return;
+      } else {
+        handleOpenBackdrop();
+        await cargarConstruccion();
+        await cargarAntiguedad();
+        await cargarRiesgo();
+        await cargarProvincias();
+        handleCloseBackdrop();
       }
     };
+    cargarData();
+  }, []);
 
-    cargarDatosEditar();
-  }, [provinces, parroquia, antiguedad,construccion]);
+  const cargarDatosEditar = async () => {
+    let tablaObjetoSeguro;
+    tablaObjetoSeguro = JSON.parse(localStorage.getItem(LS_TABLAOBJETOSEGURO));
+    localStorage.setItem(
+      LS_TABLASECCIONES,
+      JSON.stringify(tablaObjetoSeguro.arrMontos)
+    );
+    if (tablaObjetoSeguro && idObject) {
+      try {
+        await cargarProvincias();
+      } catch (error) {
+        console.error("Error al cargar las ciudades:", error);
+      }
+      try {
+        await cargarCiudad(tablaObjetoSeguro.zona);
+      } catch (error) {
+        console.error("Error al cargar las ciudad:", error);
+      }
+      try {
+        await cargarParroquia(tablaObjetoSeguro.ciudad);
+      } catch (error) {
+        console.error("Error al cargar las parroquia:", error);
+      }
+      try {
+        await cargarRiesgo();
+      } catch (error) {
+        console.error("Error al cargar las Riesgo:", error);
+      }
+      try {
+        await cargarDestinado(tablaObjetoSeguro.riesgo);
+      } catch (error) {
+        console.error("Error al cargar las Destinado:", error);
+      }
+      try {
+        await cargarAntiguedad();
+      } catch (error) {
+        console.error("Error al cargar las Antiguedad:", error);
+      }
+      try {
+        await cargarConstruccion();
+      } catch (error) {
+        console.error("Error al cargar las Construccion:", error);
+      }
+
+      setFormData((formData) => ({
+        ...formData,
+        province: tablaObjetoSeguro.zona,
+        city: tablaObjetoSeguro.ciudad,
+        parish: tablaObjetoSeguro.parroquia,
+        direccion: tablaObjetoSeguro.direccion,
+        block: tablaObjetoSeguro.manzana,
+        house: tablaObjetoSeguro.villa,
+        floor: tablaObjetoSeguro.pisos,
+        buildingAge: tablaObjetoSeguro.antiguedad,
+        constructionType: tablaObjetoSeguro.tipconstruccion,
+        riskType: tablaObjetoSeguro.riesgo,
+        destiny: tablaObjetoSeguro.tipdestino,
+        sumInsure: tablaObjetoSeguro.monto,
+        lat: tablaObjetoSeguro.latitud,
+        lng: tablaObjetoSeguro.longitud,
+        inspection: tablaObjetoSeguro.inspeccion === 0 ? false : true,
+        direcctionInspection: tablaObjetoSeguro.longitud,
+        phoneInspection: tablaObjetoSeguro.longitud,
+        agentInspection: tablaObjetoSeguro.longitud,
+      }));
+    }
+    SearchLocation();
+    handleCloseBackdrop();
+  };
+
 
   useEffect(() => {
     cargarDestinado(formData.riskType);
     const cargarDatosRiesgo = () => {
       let tablaObjetoSeguro;
       if (idObject) {
-        console.log(idObject);
         tablaObjetoSeguro = JSON.parse(
           localStorage.getItem(LS_TABLAOBJETOSEGURO)
         );
@@ -266,7 +346,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   }, [riesgo]);
 
   const cargarAntiguedad = async () => {
-
     setAntiguedad([]);
     try {
       const antiguedad = await ComboService.fetchComboAntiguedad(
@@ -288,7 +367,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const cargarCiudad = async (value) => {
-
     setCiudades([]);
     try {
       const ciudades = await ComboService.fetchComboCiudad(
@@ -306,21 +384,21 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const cargarParroquia = async (ciudad) => {
-    
     setParroquia([]);
     try {
       const parroquia = await ComboService.fetchComboParroquia(ciudad);
-      
+
       if (parroquia && parroquia.data) {
         setParroquia(parroquia.data);
+        
       }
     } catch (error) {
       console.error("Error al obtener ciudad:", error);
+      
     }
   };
 
   const cargarDestinado = async (value) => {
-   
     setDestinado([]);
     try {
       const destinado = await ComboService.fetchTipDestino(
@@ -329,7 +407,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
         1,
         value
       );
-      
+
       if (destinado && destinado.data) {
         setDestinado(destinado.data);
         setFormData((formData) => ({
@@ -344,11 +422,10 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const cargarRiesgo = async () => {
-   
     setRiesgo([]);
     try {
       const riesgo = await ComboService.fetchComboTipoRiesgos(ramo, producto);
-      
+
       if (riesgo && riesgo.data) {
         setRiesgo(riesgo.data);
       }
@@ -358,11 +435,10 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const cargarConstruccion = async (value) => {
-  
+    console.log(openBackdrop1);
     setConstruccion([]);
     try {
       const construccion = await ComboService.fetchComboTipConstruccion();
-      
       if (construccion && construccion.data) {
         setConstruccion(construccion.data);
         setFormData((formData) => ({
@@ -376,19 +452,27 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const cargarProvincias = async () => {
-   
     try {
       const provincias = await ComboService.fetchComboProvincias(
         ramo,
         producto
       );
-      
+
       if (provincias && provincias.data) {
         setProvinces(provincias.data);
+
       }
     } catch (error) {
       console.error("Error al obtener provincias:", error);
+
     }
+  };
+
+  const handleCloseBackdrop = () => {
+    setOpenBackdrop(false);
+  };
+  const handleOpenBackdrop = () => {
+    setOpenBackdrop(true);
   };
 
   return (
@@ -404,6 +488,9 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
         justifyContent: "center",
       }}
     >
+      <Backdrop sx={{ color: "#fff", zIndex: "3000" }} open={openBackdrop1}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Dialog
         open={openModal}
         onClose={handleCloseModal}
@@ -426,6 +513,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
           {/* Componente del formulario */}
           <BranchInsurance
             closeModalDetail={handleCloseModal}
+            isEditMode={editMode}
             style={{ width: "80%" }}
           />
         </DialogContent>
@@ -795,7 +883,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                         <div onClick={handleOpenModal}>
                           <CalendarMonthIcon />
                         </div>
-                      </div>  
+                      </div>
                     </td>
                   </tr>
 
@@ -879,7 +967,11 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <tr className="modalFormRow">
                       <td className="modalFormContent">
-                        <Tooltip title="Agente de inspeccion" placement="left">
+                        <Tooltip
+                          title="Agente de inspeccion"
+                          style={{ width: "100%", display: "flex" }}
+                          placement="left"
+                        >
                           <div className="tdTableTitle">
                             <label
                               style={{ fontSize: "13px" }}
@@ -906,6 +998,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                         <Tooltip
                           title="Telefono de inspeccion"
                           placement="left"
+                          style={{ width: "100%", display: "flex" }}
                         >
                           <div className="tdTableTitle">
                             <label
@@ -934,7 +1027,11 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                   {formData.inspection && ( // Verificar si inspection es true
                     <tr className="modalFormRow">
                       <td className="modalFormContent">
-                        <Tooltip title="Fecha Tentativa" placement="left">
+                        <Tooltip
+                          title="Fecha Tentativa"
+                          placement="left"
+                          style={{ width: "100%", display: "flex" }}
+                        >
                           <div className=" tdTableTitle dateTimePickerForm">
                             <label
                               style={{ fontSize: "13px" }}
@@ -971,7 +1068,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                         <Tooltip
                           title="Hora tentativa"
                           placement="left"
-                          style={{ display: "flex" }}
+                          style={{ width: "100%", display: "flex" }}
                         >
                           <div className=" tdTableTitle dateTimePickerForm">
                             <label
