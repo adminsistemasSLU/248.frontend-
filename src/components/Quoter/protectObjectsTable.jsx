@@ -271,37 +271,40 @@ export default function ProtectObjectsTable() {
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   useEffect(() => {
-    
-
     cargarTabla();
   }, []);
-
 
   async function cargarTabla() {
     handleOpenBackdrop();
     const provincias = await cargarProvincias();
     const objetoSeguro = await cargarObjetoSeguro();
-    const ciudades = await cargarCiudades(objetoSeguro[0].zona);
+
     console.log(objetoSeguro);
     console.log(provincias);
-    console.log(ciudades);
-    let number = 1;
+
     if (provincias && objetoSeguro) {
-      const rowsObjetoAmparo = objetoSeguro.map((item, index) => {
+      let number = 1;
+      const rowsObjetoAmparo = [];
+
+      for (let item of objetoSeguro) {
+        let ciudades = await cargarCiudades(item.zona);
         item.arrMontos = JSON.parse(item.arrMontos);
         let ciud;
         let prov;
+
         if (item.zona) {
-          prov = provincias.find(
-            (provincia) => provincia.Codigo === item.zona
-          );
+          prov = provincias.find((provincia) => provincia.Codigo === item.zona);
         }
+
+        console.log(ciudades);
+
         if (ciudades && item.ciudad) {
           ciud = ciudades.find((ciudad) => ciudad.Codigo === item.ciudad);
         }
+
         console.log(prov);
 
-        return createData(
+        const row = createData(
           item.id,
           number++,
           prov?.Nombre || "",
@@ -311,11 +314,15 @@ export default function ProtectObjectsTable() {
           item.tasa || 0.0,
           item.prima || 0.0
         );
-      });
+
+        rowsObjetoAmparo.push(row);
+      }
+
       console.log(rowsObjetoAmparo);
       setRows(rowsObjetoAmparo);
       setCotizacion(objetoSeguro);
     }
+
     handleCloseBackdrop();
   }
 
@@ -432,6 +439,33 @@ export default function ProtectObjectsTable() {
     }
 
     setOpenModal(true);
+  };
+
+  const handleDeleteCotizacion = async (id) => {
+    setselectedId(id);
+
+
+
+    if (id !== "" || id !== null) {
+      try {
+        handleOpenBackdrop();
+        const response = await IncendioService.eliminarCotizacionIncendio(id);
+        if (response.codigo === 200) {
+          console.log(response);
+          handleCloseBackdrop();
+        } else {
+          handleCloseBackdrop();
+          console.error(
+            "Error en la respuesta del servidor:",
+            response.message
+          );
+        }
+      } catch (error) {
+        handleCloseBackdrop();
+        console.error("Error al realizar la solicitud:", error);
+      }
+    }
+    cargarTabla();
   };
 
   // Manejador para cerrar el modal
@@ -627,7 +661,7 @@ export default function ProtectObjectsTable() {
                             <IconButton onClick={() => handleOpenModal(row.id)}>
                               <EditIcon />
                             </IconButton>
-                            <IconButton>
+                            <IconButton onClick={() => handleDeleteCotizacion(row.id)}>
                               <DeleteIcon />
                             </IconButton>
                           </div>

@@ -134,6 +134,21 @@ const IncendioService = {
       throw error;
     }
   },
+
+  eliminarCotizacionIncendio: async (id_CotiIncendio) => {
+    const endpoint = "api/EliminarCotizacionIncendio";
+    const method = "POST";
+    const data = {
+      id_CotiIncendio: id_CotiIncendio,
+    };
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching guardar Cotizacion Incendio:", error);
+      throw error;
+    }
+  },
 };
 
 export default IncendioService;
