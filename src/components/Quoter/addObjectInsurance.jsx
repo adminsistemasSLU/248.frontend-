@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { Button, Container, Paper } from "@mui/material";
 import MapContainer from "./mapContainer";
 import AddLocationAltRoundedIcon from "@mui/icons-material/AddLocationAltRounded";
@@ -30,6 +31,7 @@ import {
   LS_TABLAOBJETOSEGURO,
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
+dayjs.extend(customParseFormat);
 
 const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   const [formData, setFormData] = useState({
@@ -48,7 +50,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     lat: "",
     lng: "",
     inspection: false,
-    direcctionInspection: "",
     phoneInspection: "",
     agentInspection: "",
   });
@@ -185,7 +186,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       tConstruccion: formData.constructionType,
       destinado: formData.destiny,
       direccion: formData.direccion,
-      direccionInspeccion: formData.direcctionInspection,
       piso: formData.floor,
       villa: formData.house,
       inspeccion: formData.inspection,
@@ -316,10 +316,13 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
         lat: tablaObjetoSeguro.latitud,
         lng: tablaObjetoSeguro.longitud,
         inspection: tablaObjetoSeguro.inspeccion === 0 ? false : true,
-        direcctionInspection: tablaObjetoSeguro.longitud,
-        phoneInspection: tablaObjetoSeguro.longitud,
-        agentInspection: tablaObjetoSeguro.longitud,
+        phoneInspection: tablaObjetoSeguro.telefono,
+        agentInspection: tablaObjetoSeguro.contacto,
       }));
+      const dateObject = dayjs(tablaObjetoSeguro.fecha, "DD/MM/YYYY");
+      const timeObject = dayjs(tablaObjetoSeguro.hora, "HH:mm");
+      setdateInspecction(dateObject);
+      setTimeInspecction(timeObject);
     }
     SearchLocation();
     handleCloseBackdrop();
@@ -414,7 +417,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
           ...formData,
           destiny: destinado.data[0].Codigo,
         }));
-        console.log(destinado);
       }
     } catch (error) {
       console.error("Error al obtener destinado:", error);

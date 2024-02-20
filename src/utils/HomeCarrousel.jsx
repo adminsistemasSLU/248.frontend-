@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/carrousel.scss';
 import BaldosasService from '../services/BaldosasService/BaldosasService';
 import Loading from './loading';
-import { API_BALDOSAS,LS_RAMO } from './constantes';
+import { API_BALDOSAS,LS_COTIZACION,LS_RAMO } from './constantes';
 
 
 function HomeCarrousel(props) {
@@ -35,10 +35,15 @@ function HomeCarrousel(props) {
     ];
     
     useEffect(() => {
+        console.log('Error al obtener baldosas:',)
+        localStorage.removeItem(LS_COTIZACION);
+        const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
+        console.error('Cotizacion: '+cotizacion)
         if(baldosas){
             setItems(baldosas);
             return;
-        }
+        }        
+        
         const printBaldosas = async () => {
             try {
                 setIsLoading(true);
@@ -65,6 +70,7 @@ function HomeCarrousel(props) {
             }
         };
         printBaldosas();
+        
     }, []);
 
     const groupItems = (items, groupSize) => {
