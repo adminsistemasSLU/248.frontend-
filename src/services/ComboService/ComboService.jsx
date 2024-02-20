@@ -135,6 +135,42 @@ const ComboService = {
         }
     },
 
+
+    fetchComboTipoCredito: async () => {
+        const endpoint = 'api/cb_TipoCredito';
+        const method = 'POST';
+        const data = {
+            Alias: "TIPCRE"
+        };
+
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method, data);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar Combo TipoCredito:', error);
+            throw error;
+        }
+    },
+
+    fetchComboFormaPago: async (zona_usuario, filtro,estado_zona) => {
+        const endpoint = 'api/cb_FormaPago';
+        const method = 'POST';
+        const data = {
+            Alias: "FORPAG"
+        };
+
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method, data);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar Combo FormaPago:', error);
+            throw error;
+        }
+    },
+
+
+
+
 }
 
 export default ComboService;

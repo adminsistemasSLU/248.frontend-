@@ -149,6 +149,22 @@ const IncendioService = {
       throw error;
     }
   },
+
+
+  cargarDatosPago: async (id_CotiGeneral) => {
+    const endpoint = "api/formas_Pagos";
+    const method = "POST";
+    const data = {
+      id_CotiGeneral: id_CotiGeneral,
+    };
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching guardar Cotizacion Incendio:", error);
+      throw error;
+    }
+  },
 };
 
 export default IncendioService;

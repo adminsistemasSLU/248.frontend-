@@ -5,6 +5,7 @@ import NotFound from '../pages/NotFound';
 import Steppers from '../components/steppers';
 import RequireAuth from '../services/RoutesService/RequireAuth';
 import ProtectObjectsTable from '../components/Quoter/protectObjectsTable';
+import PaidForm from '../components/Quoter/paidForm';
   
 
 
@@ -18,7 +19,7 @@ const QuoterRoutes = () => {
       <Route path="*" element={<NotFound />} />
 
 
-      <Route path="/Pymes/product" element={<RequireAuth> <ProtectObjectsTable /> </RequireAuth>} />
+      <Route path="/Pymes/product" element={<RequireAuth> <PaidForm /> </RequireAuth>} />
 
       <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
 

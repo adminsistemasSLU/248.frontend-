@@ -293,8 +293,16 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
   };
 
   function tablaSeccionesMap() {
-    const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+    let tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
     console.log(tablaSecciones);
+    tablaSecciones = tablaSecciones.map((seccion)=>{
+      return{
+        ...seccion,
+        tasa: (parseFloat(seccion.prima)/parseFloat(seccion.monto)).toFixed(2)
+      }
+    }
+    )
+
     const newTotalMonto = tablaSecciones.reduce((sum, row) => {
       return row.checked ? sum + parseFloat(row.monto) : sum;
     }, 0);
