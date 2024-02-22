@@ -12,6 +12,9 @@ import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import CurrencyInput from "../../utils/currencyInput";
 import { visuallyHidden } from "@mui/utils";
 import "../../styles/moddalForm.scss";
@@ -188,6 +191,9 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
   const [totalMonto, setTotalMonto] = useState(0);
   const [totalPrima, setTotalPrima] = useState(0);
   const [idSelectedSeccion, setSelectedSeccion] = useState(0);
+  const [openSnack, setOpenSnack] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
   const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
   const editMode = isEditMode;
@@ -295,13 +301,14 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
   function tablaSeccionesMap() {
     let tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
     console.log(tablaSecciones);
-    tablaSecciones = tablaSecciones.map((seccion)=>{
-      return{
+    tablaSecciones = tablaSecciones.map((seccion) => {
+      return {
         ...seccion,
-        tasa: (parseFloat(seccion.prima)/parseFloat(seccion.monto)).toFixed(2)
-      }
-    }
-    )
+        tasa: (parseFloat(seccion.prima) / parseFloat(seccion.monto)).toFixed(
+          2
+        ),
+      };
+    });
 
     const newTotalMonto = tablaSecciones.reduce((sum, row) => {
       return row.checked ? sum + parseFloat(row.monto) : sum;
@@ -352,6 +359,16 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
         prima: rows1[index].prima,
       };
     });
+
+    const alMenosUnoTieneAmparo = tablaSecciones.some((item, index) => {
+      return item.Amparo && item.Amparo.length > 0;
+    });
+    console.log(alMenosUnoTieneAmparo);
+    if (!alMenosUnoTieneAmparo) {
+      setOpenSnack(true);
+      setErrorMessage("Se debe agregar un detalle de Amparo");
+      return;
+    }
 
     localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(updatedSecciones));
     closeModalDetail("true");
@@ -470,6 +487,18 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
           />
         </DialogContent>
       </Dialog>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={openSnack}
+        autoHideDuration={5000}
+        onClose={() => setOpenSnack(false)}
+      >
+        <Alert style={{ fontSize: "1.2em" }} severity="error">
+          <AlertTitle>Error</AlertTitle>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
 
       <TableContainer
         style={{ overflow: "auto", height: "100%", padding: "20px" }}

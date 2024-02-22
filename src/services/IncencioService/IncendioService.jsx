@@ -150,7 +150,6 @@ const IncendioService = {
     }
   },
 
-
   cargarDatosPago: async (id_CotiGeneral) => {
     const endpoint = "api/formas_Pagos";
     const method = "POST";
@@ -160,6 +159,29 @@ const IncendioService = {
     try {
       const response = await authService.fetchWithAuth(endpoint, method, data);
       return response;
+    } catch (error) {
+      console.error("Error fetching guardar Cotizacion Incendio:", error);
+      throw error;
+    }
+  },
+
+  descargarPdf: async (id_CotiGeneral) => {
+    const endpoint = "api/reporteCotizacionPdf";
+    const method = "POST";
+    const data = {
+      id_CotiGeneral: id_CotiGeneral,
+    };
+    try {
+      const response = await authService.fetchWithAuthPDF(endpoint, method, data);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      // Crear un enlace temporal para descargar el archivo
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", "reporteCotizacion.pdf"); // O cualquier otro nombre de archivo
+      document.body.appendChild(link);
+      link.click();
+      link.remove(); // Limpiar el enlace temporal
     } catch (error) {
       console.error("Error fetching guardar Cotizacion Incendio:", error);
       throw error;

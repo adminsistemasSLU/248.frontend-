@@ -28,6 +28,10 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ProductListCards from "./Quoter/productListCards";
 import PaymentMethods from "./Quoter/paymentMethods";
 import { TextField, Grid } from "@mui/material";
+import IncendioService from "../services/IncencioService/IncendioService";
+import { LS_COTIZACION } from "../utils/constantes";
+
+
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -167,6 +171,20 @@ export default function Steppers() {
     },
   ];
 
+
+  const descargarPdf = async () => {
+    try {
+      const idCotizacion = localStorage.getItem(LS_COTIZACION);
+      await IncendioService.descargarPdf(idCotizacion);
+    } catch (error) {
+      console.error("Error al obtener Tipo Credito: ", error);
+    }
+  };
+
+  const handleDownloadPdf = ()=>{
+    descargarPdf();
+  }
+
   const totalSteps = () => {
     return steps.length;
   };
@@ -228,6 +246,7 @@ export default function Steppers() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+        <Button onClick={handleDownloadPdf}>Visualizar Cotizacion</Button>
           <Button onClick={handleClose}>Cancelar</Button>
           <Button onClick={handleClose} autoFocus>
             Aceptar

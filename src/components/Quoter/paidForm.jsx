@@ -88,14 +88,12 @@ const PaidForm = () => {
     }
   };
 
-  const formatedInput = (valor) => {
-    const valorFormateado = new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "USD",
-    }).format(valor);
-
-    return valorFormateado; // Salida: €12,345.67
-  };
+  function formatedInput(numero) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(numero);
+  }
 
   const cargarFormaPago = async () => {
     try {
@@ -315,7 +313,7 @@ const PaidForm = () => {
                   label="Prima"
                   type="text"
                   name="prima"
-                  value={formData.prima}
+                  value={formatedInput(formData.prima)}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -327,7 +325,7 @@ const PaidForm = () => {
                   label="Imp SCVS"
                   type="text"
                   name="impScvs"
-                  value={formData.impScvs}
+                  value={formatedInput(formData.impScvs)}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -339,7 +337,7 @@ const PaidForm = () => {
                   label="Imp SSC"
                   type="text"
                   name="impSsc"
-                  value={formData.impSsc}
+                  value={formatedInput(formData.impSsc)}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -351,7 +349,7 @@ const PaidForm = () => {
                   label="Derecho de Emisión"
                   type="text"
                   name="admision"
-                  value={formData.admision}
+                  value={formatedInput(formData.admision)}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth
@@ -363,7 +361,7 @@ const PaidForm = () => {
                   label="SubTotal"
                   type="text"
                   name="subtotal"
-                  value={formData.subtotal}
+                  value={formatedInput(formData.subtotal)}
                   onChange={handleChange}
                   variant="standard"
                   fullWidth

@@ -748,7 +748,9 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
 
   const handleTasaBlur = (event, index) => {
     let newTasa = parseFloat(event.target.value);
-
+    if( isNaN(newTasa)){
+      newTasa = 0;
+    }
     if (jsonData[index].tasa === "Sin Costo") {
       return;
     }
@@ -873,6 +875,11 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   };
 
   const handleTasaChange = (event, index) => {
+    let numericValue = parseFloat(event.target.value.replace(/[^\d.-]/g, ""));
+    if (isNaN(numericValue)) {
+      numericValue = 0;
+    }
+
     if (jsonData[index].tasa === "Sin Costo") {
       return;
     }

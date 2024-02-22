@@ -302,6 +302,7 @@ const PersonalForm = forwardRef((props, ref) => {
                       textField: { variant: "standard", size: "small" },
                     }}
                     value={age}
+                    format="DD/MM/YYYY"
                     disabled={errorCedula}
                     className="datePicker"
                     onChange={(newValue) => {

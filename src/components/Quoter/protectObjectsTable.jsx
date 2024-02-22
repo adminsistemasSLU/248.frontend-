@@ -37,6 +37,7 @@ import {
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import ComboService from "../../services/ComboService/ComboService";
+import Swal from "sweetalert2";
 
 function createData(
   id,
@@ -269,6 +270,8 @@ export default function ProtectObjectsTable() {
   const [selectedId, setselectedId] = React.useState(-1);
   const [cotizacion, setCotizacion] = React.useState([]);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [totalMonto, setTotalMonto] = React.useState(0);
+  const [totalPrima, setTotalPrima] = React.useState(0);
 
   useEffect(() => {
     cargarTabla();
@@ -278,9 +281,6 @@ export default function ProtectObjectsTable() {
     handleOpenBackdrop();
     const provincias = await cargarProvincias();
     const objetoSeguro = await cargarObjetoSeguro();
-
-    console.log(objetoSeguro);
-    console.log(provincias);
 
     if (provincias && objetoSeguro) {
       let number = 1;
@@ -296,13 +296,11 @@ export default function ProtectObjectsTable() {
           prov = provincias.find((provincia) => provincia.Codigo === item.zona);
         }
 
-        console.log(ciudades);
 
         if (ciudades && item.ciudad) {
           ciud = ciudades.find((ciudad) => ciudad.Codigo === item.ciudad);
         }
 
-        console.log(prov);
 
         const row = createData(
           item.id,
@@ -318,9 +316,21 @@ export default function ProtectObjectsTable() {
         rowsObjetoAmparo.push(row);
       }
 
-      console.log(rowsObjetoAmparo);
       setRows(rowsObjetoAmparo);
       setCotizacion(objetoSeguro);
+     
+      const newTotalMonto = objetoSeguro.reduce(
+        (sum, row) => sum + parseFloat(row.monto),
+        0
+      );
+      setTotalMonto(newTotalMonto);
+      const newTotalPrima = objetoSeguro.reduce(
+        (sum, row) => sum + parseFloat(row.prima),
+        0
+      );
+      setTotalPrima(newTotalPrima);
+      console.log(totalMonto);
+      console.log(totalPrima);
     }
 
     handleCloseBackdrop();
@@ -338,7 +348,6 @@ export default function ProtectObjectsTable() {
       );
 
       if (cotizacion && cotizacion.data) {
-        console.log(cotizacion.data);
         return cotizacion.data;
       }
     } catch (error) {
@@ -356,7 +365,7 @@ export default function ProtectObjectsTable() {
       );
 
       if (provincias && provincias.data) {
-        console.log(provincias.data);
+
         return provincias.data;
       }
     } catch (error) {
@@ -375,7 +384,7 @@ export default function ProtectObjectsTable() {
       );
 
       if (ciudades && ciudades.data) {
-        console.log(ciudades.data);
+
         return ciudades.data;
       }
     } catch (error) {
@@ -387,16 +396,14 @@ export default function ProtectObjectsTable() {
     setselectedId(id);
     if (id !== "") {
       setselectedId(id);
-      console.log(rows);
       const element = cotizacion.find((item) => {
         return item.id === id;
       });
-      console.log(element);
       localStorage.setItem(LS_TABLAOBJETOSEGURO, JSON.stringify(element));
     }
 
     const idCotizacion = localStorage.getItem(LS_COTIZACION);
-    console.log(idCotizacion);
+
     if (idCotizacion) {
       setOpenModal(true);
       return;
@@ -413,13 +420,12 @@ export default function ProtectObjectsTable() {
       ramo: ramo,
       tippoliza: 1,
     };
-    console.log(idCotizacion);
+
     if (id === "" && (idCotizacion === null || idCotizacion === "")) {
       try {
         handleOpenBackdrop();
         const response = await IncendioService.guardarCotizacion(personalData);
         if (response.codigo === 200) {
-          console.log(response);
           localStorage.setItem(LS_COTIZACION, response.data); // Asumiendo que se recibe una clave
           handleCloseBackdrop();
           setOpenModal(true);
@@ -437,35 +443,57 @@ export default function ProtectObjectsTable() {
         console.error("Error al realizar la solicitud:", error);
       }
     }
-
     setOpenModal(true);
   };
 
   const handleDeleteCotizacion = async (id) => {
     setselectedId(id);
-
-
-
-    if (id !== "" || id !== null) {
+  
+    // Verifica que el ID sea válido.
+    if (id !== "" && id !== null) {
       try {
-        handleOpenBackdrop();
-        const response = await IncendioService.eliminarCotizacionIncendio(id);
-        if (response.codigo === 200) {
-          console.log(response);
+        // Mostrar diálogo de confirmación.
+        const result = await Swal.fire({
+          title: "¿Está seguro que desea eliminar la cotización?",
+          text: "",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Confirmar"
+        });
+  
+        if (result.isConfirmed) {
+          handleOpenBackdrop();
+          const response = await IncendioService.eliminarCotizacionIncendio(id);
+  
           handleCloseBackdrop();
-        } else {
-          handleCloseBackdrop();
-          console.error(
-            "Error en la respuesta del servidor:",
-            response.message
-          );
+  
+          if (response.codigo === 200) {
+            // Cotización eliminada con éxito.
+            await cargarTabla();
+            Swal.fire(
+              "La cotización se ha eliminado correctamente.",
+              "",
+              "success"
+            );
+            // Recargar la tabla después de eliminar la cotización.
+            
+          } else {
+            console.error("Error en la respuesta del servidor:", response.message);
+            await cargarTabla();
+            Swal.fire(
+              "Error en la respuesta del servidor:", response.message,
+              "",
+              "error"
+            );
+          }
         }
       } catch (error) {
         handleCloseBackdrop();
         console.error("Error al realizar la solicitud:", error);
       }
     }
-    cargarTabla();
   };
 
   // Manejador para cerrar el modal
@@ -479,6 +507,9 @@ export default function ProtectObjectsTable() {
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
+
+
+
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -642,7 +673,7 @@ export default function ProtectObjectsTable() {
                         </TableCell>
                         <TableCell align="right">
                           <input
-                            value={row.prima + "%"}
+                            value={(parseFloat(row.prima).toFixed(2)||0) + "%"}
                             className="input-table"
                             disabled
                           />
@@ -680,6 +711,8 @@ export default function ProtectObjectsTable() {
                   )}
                 </TableBody>
               </Table>
+                      
+
             </TableContainer>
           )}
           <TablePagination
@@ -694,6 +727,34 @@ export default function ProtectObjectsTable() {
           />
         </Paper>
       </Box>
+
+      <div className="" style={{ display: "flex", justifyContent: "end", marginRight:'5%' }}>
+            <div
+              className="elementsModal"
+              style={{ marginRight: "10px", gap: "5px" }}
+            >
+              <div>Monto: </div>
+              <div>
+                <CurrencyInput
+                  style={{ width: "105px" }}
+                  className="input-table"
+                  disabled
+                  value={totalMonto.toFixed(2)}
+                />
+              </div>
+            </div>
+            <div className="elementsModal elementRight" style={{ gap: "5px" }}>
+              <div>Prima:</div>
+              <div>
+                <CurrencyInput
+                  style={{ width: "105px" }}
+                  className="input-table"
+                  disabled
+                  value={totalPrima.toFixed(2)}
+                />
+              </div>
+            </div>
+          </div>
     </div>
   );
 }
