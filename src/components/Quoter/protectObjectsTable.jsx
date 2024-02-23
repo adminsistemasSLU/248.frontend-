@@ -739,7 +739,7 @@ export default function ProtectObjectsTable() {
               <div>Monto: </div>
               <div>
                 <CurrencyInput
-                  style={{ width: "105px" }}
+                  style={{ width: "150px" }}
                   className="input-table"
                   disabled
                   value={totalMonto.toFixed(2)}
@@ -750,7 +750,7 @@ export default function ProtectObjectsTable() {
               <div>Prima:</div>
               <div>
                 <CurrencyInput
-                  style={{ width: "105px" }}
+                  style={{ width: "150px" }}
                   className="input-table"
                   disabled
                   value={totalPrima.toFixed(2)}
