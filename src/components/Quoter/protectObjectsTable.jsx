@@ -731,10 +731,10 @@ export default function ProtectObjectsTable() {
         </Paper>
       </Box>
 
-      <div className="" style={{ display: "flex", justifyContent: "end", marginRight:'5%' }}>
+      <div className="" style={{ display: "flex", justifyContent: "end", marginRight:'1%',gap: "20px"  }}>
             <div
               className="elementsModal"
-              style={{ marginRight: "10px", gap: "5px" }}
+              style={{ marginRight: "10px", gap: "30px" }}
             >
               <div>Monto: </div>
               <div>
@@ -746,7 +746,7 @@ export default function ProtectObjectsTable() {
                 />
               </div>
             </div>
-            <div className="elementsModal elementRight" style={{ gap: "5px" }}>
+            <div className="elementsModal elementRight" style={{ gap: "30px" }}>
               <div>Prima:</div>
               <div>
                 <CurrencyInput
