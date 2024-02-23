@@ -34,6 +34,7 @@ import {
   LS_PRODUCTO,
   LS_COTIZACION,
   LS_TABLAOBJETOSEGURO,
+  USER_STORAGE_KEY
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import ComboService from "../../services/ComboService/ComboService";
@@ -414,11 +415,13 @@ export default function ProtectObjectsTable() {
     );
     let ramo = localStorage.getItem(LS_RAMO);
     let producto = localStorage.getItem(LS_PRODUCTO);
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     personalData = {
       ...personalData,
       producto: producto,
       ramo: ramo,
       tippoliza: 1,
+      usuario: userId.id
     };
 
     if (id === "" && (idCotizacion === null || idCotizacion === "")) {

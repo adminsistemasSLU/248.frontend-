@@ -1,4 +1,9 @@
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+} from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { TextField, Container, Grid, Paper, Alert } from "@mui/material";
@@ -16,9 +21,15 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
-import { DATOS_PERSONALES_STORAGE_KEY } from "../../utils/constantes";
+import {
+  DATOS_PERSONALES_STORAGE_KEY,
+  LS_COTIZACION,
+  USER_STORAGE_KEY,
+} from "../../utils/constantes";
+import QuoterService from "../../services/QuoterService/QuoterService";
 
 dayjs.extend(customParseFormat);
+
 const PersonalForm = forwardRef((props, ref) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -36,6 +47,54 @@ const PersonalForm = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
   const [age, setAge] = useState(dayjs());
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+
+  const cargarDatos = async () => {
+    const dataPersonal = await cargarCotizacion();
+
+    setFormData((formData) => ({
+      ...formData,
+      name: dataPersonal[0].clinombre,
+      lastname: dataPersonal[0].cliapellido,
+      email: dataPersonal[0].clicorreo,
+      phone: dataPersonal[0].clitelefono,
+      documentType: dataPersonal[0].clitipcedula,
+      identification: dataPersonal[0].clicedula,
+      address: dataPersonal[0].clidireccion,
+    }));
+    const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
+    setAge(dateObject);
+  };
+
+  const cargarCotizacion = async () => {
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    let dato = {
+      usuario: userId,
+      id_CotiGeneral: idCotizacion,
+    };
+    try {
+      const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
+        dato
+      );
+
+      if (cotizacion && cotizacion.data) {
+        return cotizacion.data;
+      }
+    } catch (error) {
+      console.error("Error al obtener antiguedad:", error);
+    }
+  };
+
+  useEffect(() => {
+    const modoEditar = async () => {
+      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      if (idCotizacion) {
+        await cargarDatos();
+      }
+    };
+
+    modoEditar();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -6,6 +6,7 @@ export const LS_COTIZACION = 'IdCotizacion';
 export const LS_CLASIFICACIONAMPARO = 'ClasificacionAmparo';
 export const LS_DETALLEAMPARO = 'DetalleAmparo';
 export const LS_TABLAAMPARO = 'TablaAmparo';
+export const LS_PERSONALDATA = 'DatosPersonales';
 export const LS_TABLASECCIONES = 'TablaSecciones';
 export const LS_TABLAOBJETOSEGURO = 'TablaObjetoSeguro';
 export const TOKEN_STORAGE_KEY = 'authToken';

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef,useEffect } from "react";
 import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
 import Stack from "@mui/material/Stack";
@@ -130,12 +130,26 @@ export default function Steppers() {
   const [email, setEmail] = React.useState("");
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
+
+
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
   };
   const handleOpenBackdrop = () => {
     setOpenBackdrop(true);
   };
+
+  const modoEditar =()=>{
+    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    if(idCotizacion){
+      setActiveStep(2);
+    }
+    
+  }
+
+  useEffect(() => {
+    modoEditar();
+  }, []);
 
   const personalFormRef = useRef();
 

@@ -15,7 +15,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import CurrencyInput from "../../utils/currencyInput";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,35 +25,32 @@ import { visuallyHidden } from "@mui/utils";
 import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
 import {
-  DATOS_PERSONALES_STORAGE_KEY,
-  LS_RAMO,
-  LS_PRODUCTO,
-  LS_COTIZACION,
-  LS_TABLAOBJETOSEGURO,
+    LS_COTIZACION,
+  USER_STORAGE_KEY
 } from "../../utils/constantes";
-import IncendioService from "../../services/IncencioService/IncendioService";
-import ComboService from "../../services/ComboService/ComboService";
-import Swal from "sweetalert2";
+import QuoterService from "../../services/QuoterService/QuoterService";
 
 function createData(
   id,
   number,
-  province,
-  city,
-  direction,
+  ramo,
+  producto,
+  cliente,
   amount,
   prima,
-  rate
+  rate,
+  createdDate
 ) {
   return {
     id,
     number,
-    province,
-    city,
-    direction,
+    ramo,
+    producto,
+    cliente,
     amount,
     prima,
     rate,
+    createdDate
   };
 }
 
@@ -94,22 +90,22 @@ const headCells = [
     label: "#",
   },
   {
-    id: "province",
+    id: "ramo",
     numeric: false,
     disablePadding: false,
-    label: "Provincia",
+    label: "Ramo",
   },
   {
-    id: "city",
+    id: "producto",
     numeric: false,
     disablePadding: false,
-    label: "Ciudad",
+    label: "Producto",
   },
   {
-    id: "direction",
+    id: "cliente",
     numeric: false,
     disablePadding: false,
-    label: "Dirección",
+    label: "Cliente",
   },
   // {
   //   id: 'risk',
@@ -134,6 +130,12 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: "Prima",
+  },
+  {
+    id: "fechaCreacion",
+    numeric: true,
+    disablePadding: false,
+    label: "Fecha Creacion",
   },
   {
     id: "action",
@@ -190,6 +192,7 @@ EnhancedTableHead.propTypes = {
 
 function EnhancedTableToolbar(props) {
   const { numSelected } = props;
+  let user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
 
   return (
     <Toolbar
@@ -217,7 +220,7 @@ function EnhancedTableToolbar(props) {
         component="div"
         style={{ textAlign: "start", fontSize: "14px", color: "#00a99e" }}
       >
-        Objeto del Seguro
+        Usuario: {user.des_usuario}
       </Typography>
 
       {numSelected > 0 ? (
@@ -276,46 +279,34 @@ export default function MyQuoters() {
 
   async function cargarTabla() {
     handleOpenBackdrop();
-    const provincias = await cargarProvincias();
-    const objetoSeguro = await cargarObjetoSeguro();
 
-    if (provincias && objetoSeguro) {
+    const objetoSeguro = await cargarCotizacion();
+
+    if (objetoSeguro) {
       let number = 1;
       const rowsObjetoAmparo = [];
-
+      console.log(objetoSeguro);
       for (let item of objetoSeguro) {
-        let ciudades = await cargarCiudades(item.zona);
-        item.arrMontos = JSON.parse(item.arrMontos);
-        let ciud;
-        let prov;
-
-        if (item.zona) {
-          prov = provincias.find((provincia) => provincia.Codigo === item.zona);
-        }
-
-
-        if (ciudades && item.ciudad) {
-          ciud = ciudades.find((ciudad) => ciudad.Codigo === item.ciudad);
-        }
-
-
+        let tasa = parseFloat((item.total_prima) / (item.total_monto)*100).toFixed(2);
+        tasa = isNaN(tasa)?0.0:tasa;
         const row = createData(
           item.id,
           number++,
-          prov?.Nombre || "",
-          ciud?.Nombre || "",
-          item.direccion,
-          item.monto || 0.0,
-          item.tasa || 0.0,
-          item.prima || 0.0
+          item.nomram || "",
+          item.descripcion || "",
+          item.clinombre + ' '+ item.cliapellido,
+          item.total_monto || 0.0,
+          item.total_prima || 0.0,
+          tasa,
+          item.created_at
         );
 
         rowsObjetoAmparo.push(row);
       }
 
       setRows(rowsObjetoAmparo);
+      
       setCotizacion(objetoSeguro);
-     
       const newTotalMonto = objetoSeguro.reduce(
         (sum, row) => sum + parseFloat(row.monto),
         0
@@ -333,163 +324,27 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const cargarObjetoSeguro = async () => {
-    let ramo = localStorage.getItem(LS_RAMO);
-    let producto = localStorage.getItem(LS_PRODUCTO);
-    let idCotizacion = localStorage.getItem(LS_COTIZACION);
-    try {
-      const cotizacion = await IncendioService.consultaCotizacionIncendio(
-        ramo,
-        producto,
-        idCotizacion
-      );
+  const handleOpenQuoter = (id)=>{
+    localStorage.setItem(LS_COTIZACION,id);
+    window.location.href = `/quoter/pymes/`;
+  } 
 
+
+  const cargarCotizacion = async () => {
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    let dato = {
+        usuario: userId
+    }
+    try {
+      const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
+        dato
+      );
+      
       if (cotizacion && cotizacion.data) {
         return cotizacion.data;
       }
     } catch (error) {
       console.error("Error al obtener antiguedad:", error);
-    }
-  };
-
-  const cargarProvincias = async () => {
-    let ramo = localStorage.getItem(LS_RAMO);
-    let producto = localStorage.getItem(LS_PRODUCTO);
-    try {
-      const provincias = await ComboService.fetchComboProvincias(
-        ramo,
-        producto
-      );
-
-      if (provincias && provincias.data) {
-
-        return provincias.data;
-      }
-    } catch (error) {
-      console.error("Error al obtener provincias:", error);
-    }
-  };
-
-  const cargarCiudades = async (provincia) => {
-    let ramo = localStorage.getItem(LS_RAMO);
-    let producto = localStorage.getItem(LS_PRODUCTO);
-    try {
-      const ciudades = await ComboService.fetchComboCiudad(
-        ramo,
-        producto,
-        provincia
-      );
-
-      if (ciudades && ciudades.data) {
-
-        return ciudades.data;
-      }
-    } catch (error) {
-      console.error("Error al obtener ciudad:", error);
-    }
-  };
-
-  const handleOpenModal = async (id) => {
-    setselectedId(id);
-    if (id !== "") {
-      setselectedId(id);
-      const element = cotizacion.find((item) => {
-        return item.id === id;
-      });
-      localStorage.setItem(LS_TABLAOBJETOSEGURO, JSON.stringify(element));
-    }
-
-    const idCotizacion = localStorage.getItem(LS_COTIZACION);
-
-    if (idCotizacion) {
-      setOpenModal(true);
-      return;
-    }
-
-    let personalData = JSON.parse(
-      localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
-    );
-    let ramo = localStorage.getItem(LS_RAMO);
-    let producto = localStorage.getItem(LS_PRODUCTO);
-    personalData = {
-      ...personalData,
-      producto: producto,
-      ramo: ramo,
-      tippoliza: 1,
-    };
-
-    if (id === "" && (idCotizacion === null || idCotizacion === "")) {
-      try {
-        handleOpenBackdrop();
-        const response = await IncendioService.guardarCotizacion(personalData);
-        if (response.codigo === 200) {
-          localStorage.setItem(LS_COTIZACION, response.data); // Asumiendo que se recibe una clave
-          handleCloseBackdrop();
-          setOpenModal(true);
-        } else {
-          // Manejar la respuesta de error
-          handleCloseBackdrop();
-          console.error(
-            "Error en la respuesta del servidor:",
-            response.message
-          );
-        }
-      } catch (error) {
-        // Manejar errores de red/otros errores
-        handleCloseBackdrop();
-        console.error("Error al realizar la solicitud:", error);
-      }
-    }
-    setOpenModal(true);
-  };
-
-  const handleDeleteCotizacion = async (id) => {
-    setselectedId(id);
-  
-    // Verifica que el ID sea válido.
-    if (id !== "" && id !== null) {
-      try {
-        // Mostrar diálogo de confirmación.
-        const result = await Swal.fire({
-          title: "¿Está seguro que desea eliminar la cotización?",
-          text: "",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Confirmar"
-        });
-  
-        if (result.isConfirmed) {
-          handleOpenBackdrop();
-          const response = await IncendioService.eliminarCotizacionIncendio(id);
-  
-          handleCloseBackdrop();
-  
-          if (response.codigo === 200) {
-            // Cotización eliminada con éxito.
-            await cargarTabla();
-            Swal.fire(
-              "La cotización se ha eliminado correctamente.",
-              "",
-              "success"
-            );
-            // Recargar la tabla después de eliminar la cotización.
-            
-          } else {
-            console.error("Error en la respuesta del servidor:", response.message);
-            await cargarTabla();
-            Swal.fire(
-              "Error en la respuesta del servidor:", response.message,
-              "",
-              "error"
-            );
-          }
-        }
-      } catch (error) {
-        handleCloseBackdrop();
-        console.error("Error al realizar la solicitud:", error);
-      }
     }
   };
 
@@ -517,24 +372,6 @@ export default function MyQuoters() {
     setSelected([]);
   };
 
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -629,9 +466,9 @@ export default function MyQuoters() {
                         >
                           {row.number}
                         </TableCell>
-                        <TableCell align="left">{row.province}</TableCell>
-                        <TableCell align="left">{row.city}</TableCell>
-                        <TableCell align="left">{row.direction}</TableCell>
+                        <TableCell align="left">{row.ramo}</TableCell>
+                        <TableCell align="left">{row.producto}</TableCell>
+                        <TableCell align="left">{row.cliente}</TableCell>
 
                         <TableCell align="right">
                           <CurrencyInput
@@ -642,14 +479,21 @@ export default function MyQuoters() {
                         </TableCell>
                         <TableCell align="right">
                           <input
-                            value={(parseFloat(row.prima).toFixed(2)||0) + "%"}
+                            value={(parseFloat(row.rate).toFixed(2)||0) + "%"}
                             className="input-table"
                             disabled
                           />
                         </TableCell>
                         <TableCell align="right">
                           <CurrencyInput
-                            value={row.rate}
+                            value={row.prima}
+                            className="input-table"
+                            disabled
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <input
+                            value={row.createdDate}
                             className="input-table"
                             disabled
                           />
@@ -658,10 +502,10 @@ export default function MyQuoters() {
                           <div
                             style={{ display: "flex", justifyContent: "end" }}
                           >
-                            <IconButton onClick={() => handleOpenModal(row.id)}>
+                            <IconButton  onClick={() => handleOpenQuoter(row.id)} >
                               <EditIcon />
                             </IconButton>
-                            <IconButton onClick={() => handleDeleteCotizacion(row.id)}>
+                            <IconButton >
                               <DeleteIcon />
                             </IconButton>
                           </div>
@@ -697,33 +541,7 @@ export default function MyQuoters() {
         </Paper>
       </Box>
 
-      <div className="" style={{ display: "flex", justifyContent: "end", marginRight:'5%' }}>
-            <div
-              className="elementsModal"
-              style={{ marginRight: "10px", gap: "5px" }}
-            >
-              <div>Monto: </div>
-              <div>
-                <CurrencyInput
-                  style={{ width: "105px" }}
-                  className="input-table"
-                  disabled
-                  value={totalMonto.toFixed(2)}
-                />
-              </div>
-            </div>
-            <div className="elementsModal elementRight" style={{ gap: "5px" }}>
-              <div>Prima:</div>
-              <div>
-                <CurrencyInput
-                  style={{ width: "105px" }}
-                  className="input-table"
-                  disabled
-                  value={totalPrima.toFixed(2)}
-                />
-              </div>
-            </div>
-          </div>
+     
     </div>
   );
 }
