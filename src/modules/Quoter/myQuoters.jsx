@@ -333,7 +333,7 @@ export default function MyQuoters() {
   const cargarCotizacion = async () => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let dato = {
-        usuario: userId
+        usuario: userId.id
     }
     try {
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(

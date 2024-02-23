@@ -19,8 +19,8 @@ const QuoterRoutes = () => {
       <Route path="/Pymes" element={<RequireAuth> <Steppers /> </RequireAuth>} />
       <Route path="*" element={<NotFound />} />
 
-
-      <Route path="/Pymes/product" element={<RequireAuth> <MyQuoters /> </RequireAuth>} />
+      <Route path="/Pymes/MyQuotes" element={<RequireAuth> <MyQuoters /> </RequireAuth>} />
+      <Route path="/Pymes/product" element={<RequireAuth> <PaidForm /> </RequireAuth>} />
 
       <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
 

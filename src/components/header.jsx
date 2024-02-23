@@ -188,7 +188,7 @@ function Header(props) {
           <Button
                   key={'-1'}
                   sx={{ color: '#00a99e', fontSize: '12px', marginRight: 2 }}
-                  href={'/quoter/Pymes/product'}
+                  href={'/quoter/Pymes/MyQuotes'}
                 >
                   Mis Cotizaciones
                 </Button>
