@@ -3,6 +3,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
+  useRef,
 } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -47,29 +48,32 @@ const PersonalForm = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
   const [age, setAge] = useState(dayjs());
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const isMounted = useRef(false);
 
   const cargarDatos = async () => {
     const dataPersonal = await cargarCotizacion();
-
-    setFormData((formData) => ({
-      ...formData,
-      name: dataPersonal[0].clinombre,
-      lastname: dataPersonal[0].cliapellido,
-      email: dataPersonal[0].clicorreo,
-      phone: dataPersonal[0].clitelefono,
-      documentType: dataPersonal[0].clitipcedula,
-      identification: dataPersonal[0].clicedula,
-      address: dataPersonal[0].clidireccion,
-    }));
-    const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
-    setAge(dateObject);
+    console.log(dataPersonal);
+    if (isMounted.current) {
+      setFormData((formData) => ({
+        ...formData,
+        name: dataPersonal[0].clinombre,
+        lastname: dataPersonal[0].cliapellido,
+        email: dataPersonal[0].clicorreo,
+        phone: dataPersonal[0].clitelefono,
+        documentType: dataPersonal[0].clitipcedula,
+        identification: dataPersonal[0].clicedula,
+        address: dataPersonal[0].clidireccion,
+      }));
+      const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
+      setAge(dateObject);
+    }
   };
 
   const cargarCotizacion = async () => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let idCotizacion = localStorage.getItem(LS_COTIZACION);
     let dato = {
-      usuario: userId,
+      usuario: userId.id,
       id_CotiGeneral: idCotizacion,
     };
     try {
@@ -86,6 +90,7 @@ const PersonalForm = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
+    isMounted.current = true; // Establecer a true cuando el componente está montado
     const modoEditar = async () => {
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
       if (idCotizacion) {
@@ -94,6 +99,10 @@ const PersonalForm = forwardRef((props, ref) => {
     };
 
     modoEditar();
+
+    return () => {
+      isMounted.current = false; // Establecer a false cuando el componente se desmonta
+    };
   }, []);
 
   const handleChange = (e) => {

@@ -1,4 +1,4 @@
-import React, { useRef,useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
 import Stack from "@mui/material/Stack";
@@ -32,8 +32,6 @@ import PaymentMethods from "./Quoter/paymentMethods";
 import { TextField, Grid } from "@mui/material";
 import IncendioService from "../services/IncencioService/IncendioService";
 import { LS_COTIZACION } from "../utils/constantes";
-
-
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -130,8 +128,6 @@ export default function Steppers() {
   const [email, setEmail] = React.useState("");
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
-
-
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
   };
@@ -139,13 +135,12 @@ export default function Steppers() {
     setOpenBackdrop(true);
   };
 
-  const modoEditar =()=>{
+  const modoEditar = () => {
     let idCotizacion = localStorage.getItem(LS_COTIZACION);
-    if(idCotizacion){
+    if (idCotizacion) {
       setActiveStep(2);
     }
-    
-  }
+  };
 
   useEffect(() => {
     modoEditar();
@@ -161,7 +156,7 @@ export default function Steppers() {
     if (steps[activeStep].label === "Datos Personales") {
       continuar = personalFormRef.current.handleSubmitExternally();
     }
-    
+
     //Accion para Riesgo
     if (steps[activeStep].label === "Riesgo") {
     }
@@ -195,7 +190,6 @@ export default function Steppers() {
     },
   ];
 
-
   const descargarPdf = async () => {
     try {
       handleOpenBackdrop();
@@ -208,10 +202,9 @@ export default function Steppers() {
     }
   };
 
-  const handleDownloadPdf = ()=>{
-    
+  const handleDownloadPdf = () => {
     descargarPdf();
-  }
+  };
 
   const totalSteps = () => {
     return steps.length;
@@ -254,12 +247,12 @@ export default function Steppers() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-         <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackdrop}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={openBackdrop}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
 
         <DialogTitle id="alert-dialog-title">
           {"Enviar cotización por correo"}
@@ -281,7 +274,7 @@ export default function Steppers() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-        <Button onClick={handleDownloadPdf}>Visualizar Cotizacion</Button>
+          <Button onClick={handleDownloadPdf}>Visualizar Cotizacion</Button>
           <Button onClick={handleClose}>Cancelar</Button>
           <Button onClick={handleClose} autoFocus>
             Aceptar
