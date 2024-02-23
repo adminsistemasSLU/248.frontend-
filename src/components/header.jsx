@@ -185,6 +185,14 @@ function Header(props) {
           </Link>
           {/* Menú de escritorio */}
           <Box sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: 1 }}>
+          <Button
+                  key={'-1'}
+                  sx={{ color: '#00a99e', fontSize: '12px', marginRight: 2 }}
+                  href={'/quoter/Pymes/product'}
+                >
+                  Mis Cotizaciones
+                </Button>
+
             {navItems?.map((item,index) => (
               <React.Fragment key={index}>
                 <Button

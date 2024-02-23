@@ -17,6 +17,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import DialogTitle from "@mui/material/DialogTitle";
 import "../styles/button.scss";
 import "../styles/form.scss";
@@ -126,6 +128,14 @@ export default function Steppers() {
   const [formData, setFormData] = React.useState({});
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+
+  const handleCloseBackdrop = () => {
+    setOpenBackdrop(false);
+  };
+  const handleOpenBackdrop = () => {
+    setOpenBackdrop(true);
+  };
 
   const personalFormRef = useRef();
 
@@ -174,14 +184,18 @@ export default function Steppers() {
 
   const descargarPdf = async () => {
     try {
+      handleOpenBackdrop();
       const idCotizacion = localStorage.getItem(LS_COTIZACION);
       await IncendioService.descargarPdf(idCotizacion);
+      handleCloseBackdrop();
     } catch (error) {
+      handleCloseBackdrop();
       console.error("Error al obtener Tipo Credito: ", error);
     }
   };
 
   const handleDownloadPdf = ()=>{
+    
     descargarPdf();
   }
 
@@ -226,6 +240,13 @@ export default function Steppers() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
+         <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openBackdrop}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
         <DialogTitle id="alert-dialog-title">
           {"Enviar cotización por correo"}
         </DialogTitle>

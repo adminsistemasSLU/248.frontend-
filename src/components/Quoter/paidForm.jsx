@@ -248,7 +248,9 @@ const PaidForm = () => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={12}>
+              
+              {formData.paidForm ==='2' && (
+                <Grid item xs={12} md={12}>
                 <TextField
                   label="Entrada"
                   type="text"
@@ -260,6 +262,8 @@ const PaidForm = () => {
                   required
                 />
               </Grid>
+                )
+              }
             </Grid>
             <Button
               type="submit"

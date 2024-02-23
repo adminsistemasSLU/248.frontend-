@@ -37,8 +37,6 @@ const PersonalForm = forwardRef((props, ref) => {
   const [age, setAge] = useState(dayjs());
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -106,7 +104,6 @@ const PersonalForm = forwardRef((props, ref) => {
 
   const consultUserData = async (documentType, identification) => {
     try {
-    
       const cedulaData = await UsuarioService.fetchConsultarUsuario(
         documentType,
         identification
@@ -127,7 +124,6 @@ const PersonalForm = forwardRef((props, ref) => {
       }
     } catch (error) {
       console.error("Error al verificar cédula:", error);
-
     }
   };
 
@@ -141,20 +137,27 @@ const PersonalForm = forwardRef((props, ref) => {
 
   const handleSubmit = (e) => {
     const formattedDate = dayjs(age).format("DD/MM/YYYY");
-    const requiredFields = ['name', 'lastname', 'email', 'phone', 'documentType', 'identification', 'address'];
+    const requiredFields = [
+      "name",
+      "lastname",
+      "email",
+      "phone",
+      "documentType",
+      "identification",
+      "address",
+    ];
     let next = false;
     for (const field of requiredFields) {
-      if (!formData[field] || formData[field].trim() === '') {
+      if (!formData[field] || formData[field].trim() === "") {
         next = false;
         return next;
-      }
-      else{
+      } else {
         next = true;
       }
     }
 
     //VALIDAR MENOR DE EDAD
-    next = age !== ''? true: false;
+    next = age !== "" ? true : false;
 
     const objetoSeguro = {
       nombre: formData.name,
@@ -170,7 +173,7 @@ const PersonalForm = forwardRef((props, ref) => {
       DATOS_PERSONALES_STORAGE_KEY,
       JSON.stringify(objetoSeguro)
     );
-    
+
     console.log("Formulario enviado:", objetoSeguro, next);
     return next;
   };
@@ -181,7 +184,6 @@ const PersonalForm = forwardRef((props, ref) => {
   const handleOpenBackdrop = () => {
     setOpenBackdrop(true);
   };
-
 
   return (
     <Container
@@ -219,7 +221,12 @@ const PersonalForm = forwardRef((props, ref) => {
           className="form"
         >
           <Grid container spacing={2}>
-            <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+            <Snackbar
+              open={open}
+              autoHideDuration={5000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
               <Alert severity="warning">{messageError}</Alert>
             </Snackbar>
             <Grid item xs={12}>

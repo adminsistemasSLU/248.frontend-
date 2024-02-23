@@ -172,21 +172,43 @@ const IncendioService = {
       id_CotiGeneral: id_CotiGeneral,
     };
     try {
-      const response = await authService.fetchWithAuthPDF(endpoint, method, data);
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      // Crear un enlace temporal para descargar el archivo
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.setAttribute("download", "reporteCotizacion.pdf"); // O cualquier otro nombre de archivo
-      document.body.appendChild(link);
-      link.click();
-      link.remove(); // Limpiar el enlace temporal
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      console.log(response);
+      if (response.codigo===200 && response.data) {
+        // Decodificar el PDF en base64 y convertirlo 
+        console.log(response);
+        const pdfBlob = base64ToBlob(response.data, 'application/pdf');
+        console.log(pdfBlob)
+        // Crear un enlace temporal para descargar el archivo
+        const downloadUrl = window.URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", "reporteCotizacion.pdf"); // O cualquier otro nombre de archivo
+        document.body.appendChild(link);
+        link.click();
+        link.remove(); // Limpiar el enlace temporal
+
+
+      } else {
+        console.error("Error en la respuesta del servidor:", response.message);
+        throw new Error(response.message);
+      }
     } catch (error) {
       console.error("Error fetching guardar Cotizacion Incendio:", error);
       throw error;
     }
   },
-};
+}
+
+
+function base64ToBlob(base64, type = 'application/octet-stream') {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], {type: type});
+}
 
 export default IncendioService;
