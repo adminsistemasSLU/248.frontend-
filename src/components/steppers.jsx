@@ -19,6 +19,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
 import DialogTitle from "@mui/material/DialogTitle";
 import "../styles/button.scss";
 import "../styles/form.scss";
@@ -29,9 +30,11 @@ import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ProductListCards from "./Quoter/productListCards";
 import PaymentMethods from "./Quoter/paymentMethods";
-import { TextField, Grid } from "@mui/material";
+import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../services/IncencioService/IncendioService";
-import { LS_COTIZACION } from "../utils/constantes";
+import { LS_COTIZACION, USER_STORAGE_KEY } from "../utils/constantes";
+import EmailService from "../services/EmailService/EmailService";
+import Swal from "sweetalert2";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -126,8 +129,10 @@ export default function Steppers() {
   const [formData, setFormData] = React.useState({});
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
+  const [emailError, setEmailError] = React.useState("");
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
-
+  const [openSnack, setOpenSnack] = React.useState(false);
+  
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
   };
@@ -238,6 +243,72 @@ export default function Steppers() {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleCloseSnack = () => {
+    setOpenSnack(false);
+  };
+
+
+  const enviarCorreo = async () => {
+    try {
+      handleOpenBackdrop();
+      let user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+
+      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
+      let emailValido = validateEmail(email);
+      console.log(emailValido);
+      if(!emailValido){
+        handleCloseBackdrop();
+        Swal.fire({
+          title: "Error!",
+          text: `Correo no valido`,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        setEmailError('El Correo no es valido');
+        
+        return;
+      }
+
+      const response = await EmailService.fetchEnvioCorreoCotizacion(
+        idCotizacion,
+        user.des_usuario,
+        email
+      );
+      
+      if(response.codigo===200){
+        handleCloseBackdrop();
+        Swal.fire({
+          title: "Exito!",
+          text: response.data,
+          icon: "success",
+          confirmButtonText: "Ok",
+        }).then(()=>{
+  
+          setOpen(false);
+  
+        });
+      }else {
+        handleCloseBackdrop();
+        setOpen(false);
+      }
+     
+    } catch (error) {
+      // Manejar errores de la petición
+      console.error("Error al realizar la solicitud:", error);
+      handleCloseBackdrop();
+    }
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSendQuoter = () => {
+    enviarCorreo();
+   
+  };
 
   return (
     <Stack className={"stack-content"} spacing={4}>
@@ -253,6 +324,15 @@ export default function Steppers() {
         >
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <Snackbar
+              open={openSnack}
+              autoHideDuration={5000}
+              onClose={handleCloseSnack}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert severity="warning">{emailError}</Alert>
+            </Snackbar>
 
         <DialogTitle id="alert-dialog-title">
           {"Enviar cotización por correo"}
@@ -276,7 +356,7 @@ export default function Steppers() {
         <DialogActions>
           <Button onClick={handleDownloadPdf}>Visualizar Cotizacion</Button>
           <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={handleClose} autoFocus>
+          <Button onClick={handleSendQuoter} autoFocus>
             Aceptar
           </Button>
         </DialogActions>

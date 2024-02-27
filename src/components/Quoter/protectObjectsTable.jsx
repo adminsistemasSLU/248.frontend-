@@ -421,7 +421,8 @@ export default function ProtectObjectsTable() {
       producto: producto,
       ramo: ramo,
       tippoliza: 1,
-      usuario: userId.id
+      usuario: userId.id,
+      zona:userId.usu_zona
     };
 
     if (id === "" && (idCotizacion === null || idCotizacion === "")) {
@@ -463,7 +464,8 @@ export default function ProtectObjectsTable() {
           showCancelButton: true,
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
-          confirmButtonText: "Confirmar"
+          confirmButtonText: "Confirmar",
+          cancelButtonText: "Cancelar",
         });
   
         if (result.isConfirmed) {

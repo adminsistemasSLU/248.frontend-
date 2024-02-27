@@ -303,74 +303,56 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   const printClasificacionAmparo = async (ramo, producto, amparo) => {
     let result = [];
     try {
-      const clasificacionAmparo = await IncendioService.fetchAmparoIncendios(
-        ramo,
-        producto,
-        amparo
-      );
+      let clasificacionAmparo = [];
       let count = 0;
-
       let tablaAmparo = [];
 
       let tablaA = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
 
       tablaA = tablaA.find((row) => row.id === amparo);
       console.log(tablaA);
+
       if (Array.isArray(tablaA.Amparo)) {
         tablaAmparo = tablaA.Amparo;
       }
-
-      if (
-        clasificacionAmparo &&
-        clasificacionAmparo.data &&
-        clasificacionAmparo.data.length > 0
-      ) {
-        if (tablaAmparo.length !== 0) {
-          result = tablaAmparo;
-          setEditableValues(
-            result.map((row) => ({
-              monto: row.monto,
-              tasa: row.tasa,
-              prima: (row.monto * row.tasa) / 100,
-            }))
+      
+      clasificacionAmparo = await IncendioService.fetchAmparoIncendios(
+        ramo,
+        producto,
+        amparo
+      );
+      
+      if (tablaAmparo.length !== 0) {
+        result = tablaAmparo;
+      } else {
+        console.log(clasificacionAmparo);
+        Object.keys(clasificacionAmparo.data[0]).forEach((key) => {
+          const tituloObj = createData(
+            count++,
+            key.replace("&nbsp;", " ").trim(),
+            0,
+            "",
+            0,
+            true,
+            "",
+            false,
+            false,
+            0,
+            "",
+            "",
+            "",
+            0,
+            false,
+            false,
+            false
           );
-          setRows(result);
-          setJsonData(result);
-          const newTotalMonto = result.reduce(
-            (sum, row) => sum + parseFloat(row.monto),
-            0
-          );
-          setTotalMonto(newTotalMonto);
-          const newTotalPrima = result.reduce(
-            (sum, row) => sum + parseFloat(row.prima),
-            0
-          );
-          setTotalPrima(newTotalPrima);
-        } else {
-          Object.keys(clasificacionAmparo.data[0]).forEach((key) => {
-            const tituloObj = createData(
-              count++,
-              key.replace("&nbsp;", " ").trim(),
-              0,
-              "",
-              0,
-              true,
-              "",
-              false,
-              false,
-              0,
-              "",
-              "",
-              "",
-              0,
-              false,
-              false,
-              false
-            );
-            result.push(tituloObj);
-
+          result.push(tituloObj);
+          console.log(key);
+          if (clasificacionAmparo.data[0][key]) {
             const items = clasificacionAmparo.data[0][key].map(
               (item, index) => {
+                console.log(item);
+
                 const montoValue =
                   item.inpMonto && isNaN(item.inpMonto.value)
                     ? parseFloat(item.inpMonto.value.replace(/,/g, ""))
@@ -403,6 +385,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                   item.inpMonto.readonly === "true" ? true : false;
                 const tasaReadOnly =
                   item.inpTasa.readonly === "true" ? true : false;
+
                 return createData(
                   count++,
                   item.inpDetalle.value,
@@ -419,44 +402,56 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                   montoFijo,
                   valMaximo,
                   inventario,
-                  montoReadOnly,
-                  tasaReadOnly
+                  tasaReadOnly,
+                  montoReadOnly
                 );
               }
             );
-
+            console.log(items);
             result.push(...items);
-          });
-        }
+          }
+        });
 
-        //Mapear result al id de la seccion actual
-        setEditableValues(
-          result.map((row) => ({
-            monto: row.monto,
-            tasa: row.tasa,
-            prima: row.prima,
-          }))
-        );
-        console.log(result);
-        setRows(result);
-        setJsonData(result);
-        const newTotalMonto = result.reduce(
-          (sum, row) => sum + parseFloat(row.monto),
-          0
-        );
-        setTotalMonto(newTotalMonto);
-        const newTotalPrima = result.reduce(
-          (sum, row) => sum + (parseFloat(row.prima) || 0),
-          0
-        );
-        setTotalPrima(newTotalPrima);
-        console.log("total Pimra: " + newTotalPrima);
-      } else {
-        console.error(
-          "Datos recibidos no son válidos: ",
-          clasificacionAmparo.data
-        );
+        
       }
+      console.log(result);
+      //Mapear result al id de la seccion actual
+      setEditableValues(
+        result.map((row) => ({
+          monto: row.monto,
+          tasa: row.tasa,
+          prima: row.prima,
+        }))
+      );
+      console.log(result);
+      setEditableRows(result);
+      setRows(result);
+      setJsonData(result);
+      const newTotalMonto = result.reduce(
+        (sum, row) => sum + parseFloat(row.monto),
+        0
+      );
+      setTotalMonto(newTotalMonto);
+      const newTotalPrima = result.reduce(
+        (sum, row) => sum + (parseFloat(row.prima) || 0),
+        0
+      );
+      setTotalPrima(newTotalPrima);
+      console.log("total Pimra: " + newTotalPrima);
+
+      return;
+
+      // console.log(clasificacionAmparo);
+      // if( clasificacionAmparo.codigo ===500){
+      //   Swal.fire({
+      //     title: "Error!",
+      //     text: clasificacionAmparo.message ,
+      //     icon: "error",
+      //     confirmButtonText: "Ok",
+      //   });
+      //   closeModalDetail("true");
+      //   return;
+      // }
     } catch (error) {
       console.error("Error al obtener Amparo Incendio:", error);
     }
@@ -612,7 +607,10 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     const newValue = event.target.value;
     let numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
     // Guarda el valor anterior
-
+    console.log(numericValue);
+    console.log(valmaximo);
+    console.log(montofijo);
+    console.log(grupoAmparo);
     // Asegúrate de que newMonto no es NaN
     if (isNaN(numericValue)) {
       numericValue = 0;
@@ -623,15 +621,16 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     let newTasa = 0;
     if (amparo === grupoAmparo) {
       // Lógica si el amparo es el mismo que el grupo de amparo
-      
 
       const tasa = await obtenerTasa(amparo, ramo, numericValue);
       console.log(tasa);
       newTasa = tasa.data;
-      console.log('Tasa de fetch:'+newTasa);
+      console.log("Tasa de fetch:" + newTasa);
 
       permitirCambio = true;
     } else if (montofijo === "N" && valmaximo > 0) {
+
+      console.log('entro en monto fijo n');
       if (grupoAmparo !== "") {
         const montoPrincipalRow = editableRows.find(
           (row) => row.amparo === grupoAmparo
@@ -731,8 +730,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     }
   };
 
-
-
   React.useEffect(() => {
     if (!openModal && currentId) {
       console.log("*************************");
@@ -748,7 +745,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
 
   const handleTasaBlur = (event, index) => {
     let newTasa = parseFloat(event.target.value);
-    if( isNaN(newTasa)){
+    if (isNaN(newTasa)) {
       newTasa = 0;
     }
     if (jsonData[index].tasa === "Sin Costo") {
@@ -920,7 +917,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   };
 
   // Manejador para cerrar el modal
-  const  handleCloseModal = async () => {
+  const handleCloseModal = async () => {
     const tablaAmparoModal = JSON.parse(localStorage.getItem(LS_TABLAAMPARO));
     await setJsonData(tablaAmparoModal);
     await setEditableRows(tablaAmparoModal);
@@ -1054,7 +1051,8 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                       onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }
-                      disabled={row.objCheck  && !row.inventario ? false : true}
+                      
+                      disabled={row.objCheck && !row.inventario ? false : true}
                       data-amparo={row.amparo}
                       data-grupo-amparo={row.grupoAmparo}
                       data-montofijo={row.montoFijo}

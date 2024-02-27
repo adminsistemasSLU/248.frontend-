@@ -1,0 +1,25 @@
+import authService from '../authServices'; 
+
+const EmailService = {
+
+  fetchEnvioCorreoCotizacion: async (id_CotiGeneral,cliente,correo) => {
+    const endpoint = 'api/EnvioCorreoIncendio';
+    const method = 'POST'; 
+    const data = {
+        "id_CotiGeneral":id_CotiGeneral,
+        "cliente": cliente,
+        "Correo": correo
+      };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Consultar Cotizacion General:', error);
+      throw error;
+    }
+  },
+
+};
+
+export default EmailService;

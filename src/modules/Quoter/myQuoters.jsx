@@ -24,11 +24,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { visuallyHidden } from "@mui/utils";
 import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-    LS_COTIZACION,
-  USER_STORAGE_KEY
-} from "../../utils/constantes";
+import { LS_COTIZACION, USER_STORAGE_KEY } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
+import Swal from "sweetalert2";
 
 function createData(
   id,
@@ -39,6 +37,7 @@ function createData(
   amount,
   prima,
   rate,
+  state,
   createdDate
 ) {
   return {
@@ -50,7 +49,8 @@ function createData(
     amount,
     prima,
     rate,
-    createdDate
+    state,
+    createdDate,
   };
 }
 
@@ -136,6 +136,12 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: "Fecha Creacion",
+  },
+  {
+    id: "state",
+    numeric: true,
+    disablePadding: false,
+    label: "Estado",
   },
   {
     id: "action",
@@ -265,7 +271,6 @@ export default function MyQuoters() {
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(50);
-  const [openModal, setOpenModal] = React.useState(false);
   const [rows, setRows] = React.useState([]);
   const [selectedId, setselectedId] = React.useState(-1);
   const [cotizacion, setCotizacion] = React.useState([]);
@@ -287,25 +292,27 @@ export default function MyQuoters() {
       const rowsObjetoAmparo = [];
       console.log(objetoSeguro);
       for (let item of objetoSeguro) {
-        let tasa = parseFloat((item.total_prima) / (item.total_monto)*100).toFixed(2);
-        tasa = isNaN(tasa)?0.0:tasa;
+        let tasa = parseFloat(
+          (item.total_prima / item.total_monto) * 100
+        ).toFixed(2);
+        tasa = isNaN(tasa) ? 0.0 : tasa;
         const row = createData(
           item.id,
           number++,
           item.nomram || "",
           item.descripcion || "",
-          item.clinombre + ' '+ item.cliapellido,
+          item.clinombre + " " + item.cliapellido,
           item.total_monto || 0.0,
           item.total_prima || 0.0,
           tasa,
+          item.estado,
           item.created_at
         );
-
         rowsObjetoAmparo.push(row);
       }
 
       setRows(rowsObjetoAmparo);
-      
+
       setCotizacion(objetoSeguro);
       const newTotalMonto = objetoSeguro.reduce(
         (sum, row) => sum + parseFloat(row.monto),
@@ -324,34 +331,62 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const handleOpenQuoter = (id)=>{
-    localStorage.setItem(LS_COTIZACION,id);
+  const handleOpenQuoter = (id) => {
+    localStorage.setItem(LS_COTIZACION, id);
     window.location.href = `/quoter/pymes/`;
-  } 
+  };
 
+  const handleDeleteQuoter = async (id) => {
+    await eliminarCotizacion(id);
+  };
 
   const cargarCotizacion = async () => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let dato = {
-        usuario: userId.id
-    }
+      usuario: userId.id,
+    };
     try {
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
         dato
       );
-      
+
       if (cotizacion && cotizacion.data) {
         return cotizacion.data;
       }
     } catch (error) {
-      console.error("Error al obtener antiguedad:", error);
+      console.error("Error al obtener Consultar Cotizacion General:", error);
     }
   };
 
-  // Manejador para cerrar el modal
-  const handleCloseModal = () => {
-    cargarTabla();
-    setOpenModal(false);
+  const eliminarCotizacion = async (id) => {
+    const result = await Swal.fire({
+      title: "¿Está seguro que desea eliminar la cotización?",
+      text: "",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+    });
+
+    try {
+      if (result.isConfirmed) {
+        handleOpenBackdrop();
+        const cotizacion = await QuoterService.fetchEliminarCotizacionGeneral(
+          id
+        );
+
+        if (cotizacion && cotizacion.data) {
+          await cargarTabla();
+          return cotizacion.data;
+        }
+
+        handleCloseBackdrop();
+      }
+    } catch (error) {
+      console.error("Error al Eliminar Cotizacion General:", error);
+    }
   };
 
   const handleRequestSort = (event, property) => {
@@ -359,9 +394,6 @@ export default function MyQuoters() {
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
-
-
-
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -371,7 +403,6 @@ export default function MyQuoters() {
     }
     setSelected([]);
   };
-
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -414,10 +445,9 @@ export default function MyQuoters() {
       </Backdrop>
       {/* Modal */}
 
-      <h2 style={{ color: '#00a99e' }}>Mis Cotizaciones</h2>
+      <h2 style={{ color: "#00a99e" }}>Mis Cotizaciones</h2>
 
       <Box style={{ width: "100%" }} sx={{ width: "100%", marginTop: "12px" }}>
-        
         <Paper sx={{ width: "100%", mb: 2 }}>
           <EnhancedTableToolbar numSelected={selected.length} />
           {visibleRows.length === 0 ? (
@@ -479,7 +509,7 @@ export default function MyQuoters() {
                         </TableCell>
                         <TableCell align="right">
                           <input
-                            value={(parseFloat(row.rate).toFixed(2)||0) + "%"}
+                            value={(parseFloat(row.rate).toFixed(2) || 0) + "%"}
                             className="input-table"
                             disabled
                           />
@@ -499,16 +529,29 @@ export default function MyQuoters() {
                           />
                         </TableCell>
                         <TableCell align="right">
-                          <div
-                            style={{ display: "flex", justifyContent: "end" }}
-                          >
-                            <IconButton  onClick={() => handleOpenQuoter(row.id)} >
-                              <EditIcon />
-                            </IconButton>
-                            <IconButton >
-                              <DeleteIcon />
-                            </IconButton>
-                          </div>
+                          <input
+                            value={row.state}
+                            className="input-table"
+                            disabled
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          {row.state !== "Cancelado" && (
+                            <div
+                              style={{ display: "flex", justifyContent: "end" }}
+                            >
+                              <IconButton
+                                onClick={() => handleOpenQuoter(row.id)}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                              <IconButton
+                                onClick={() => handleDeleteQuoter(row.id)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </div>
+                          )}
                         </TableCell>
                       </StyledTableRow>
                     );
@@ -524,8 +567,6 @@ export default function MyQuoters() {
                   )}
                 </TableBody>
               </Table>
-                      
-
             </TableContainer>
           )}
           <TablePagination
@@ -540,8 +581,6 @@ export default function MyQuoters() {
           />
         </Paper>
       </Box>
-
-     
     </div>
   );
 }

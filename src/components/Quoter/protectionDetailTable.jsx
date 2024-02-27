@@ -139,13 +139,11 @@ export default function ProtectionDetailTable({
 
     if (Array.isArray(amparo)) {
       const amparoDetails = amparo.find((amp) => amp.id === idProtectionDetail);
-      console.log("Amparo Details:", amparoDetails);
       if (
         amparoDetails &&
         amparoDetails.inventarioDetalleAmparo &&
         amparoDetails.inventarioDetalleAmparo.InventarioDetalleAmparo
       ) {
-        console.log("entro");
         const newInitialRows =
           amparoDetails.inventarioDetalleAmparo.InventarioDetalleAmparo.map((item, index) =>
             createData(index + 1, item.descripcion, item.monto)
