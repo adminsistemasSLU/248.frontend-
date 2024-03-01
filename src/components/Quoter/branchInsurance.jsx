@@ -241,7 +241,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
             ramo: detalleAsegurado.descripcion,
             descripcion: detalleAsegurado.descripcion,
             monto: detalleAsegurado.monto,
-            tasa: detalleAsegurado.tasa,
+            tasa: 0.00,
             prima: detalleAsegurado.prima,
             codigo: detalleAsegurado.codigo,
             checked: editMode ? detalleAsegurado.checked : true,
@@ -303,7 +303,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
     console.log(tablaSecciones);
     tablaSecciones = tablaSecciones.map((seccion) => {
       let tasaMap = (
-        parseFloat(seccion.prima) / parseFloat(seccion.monto)
+        parseFloat(seccion.prima) / parseFloat(seccion.monto)*100
       ).toFixed(2);
       return {
         ...seccion,
@@ -573,7 +573,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
                     <input
                       className="input-table"
                       disabled
-                      value={row.tasa + "%"}
+                      value={ isNaN(row.tasa)?'0.00 %' :row.tasa + "%"}
                     />
                   </TableCell>
                   <TableCell
