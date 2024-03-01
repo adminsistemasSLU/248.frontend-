@@ -219,10 +219,11 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
     try {
       let detalleAsegurado = [];
       let newItems = [];
-      if (editMode) {
-        newItems = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
-      }
-      if (newItems.length === 0) {
+      let isfetch = false;
+      newItems = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+      
+      if (!newItems) {
+        isfetch = true;
         detalleAsegurado = await IncendioService.fetchDetalleAsegurado(
           ramo,
           producto
@@ -232,10 +233,13 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
         detalleAsegurado.codigo = 200;
         detalleAsegurado.data = newItems;
       }
-
+console.log(detalleAsegurado);
       if (detalleAsegurado && detalleAsegurado.data) {
         newItems = detalleAsegurado.data.map((detalleAsegurado) => {
           console.log(detalleAsegurado);
+
+          const checked = isfetch ? detalleAsegurado.estado === 1 ?true:false : detalleAsegurado.checked;
+          
           return {
             id: detalleAsegurado.codigo,
             ramo: detalleAsegurado.descripcion,
@@ -244,7 +248,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
             tasa: 0.00,
             prima: detalleAsegurado.prima,
             codigo: detalleAsegurado.codigo,
-            checked: editMode ? detalleAsegurado.checked : true,
+            checked:  checked,
             Amparo: detalleAsegurado.Amparo || [],
           };
         });
@@ -388,7 +392,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
   }, []);
 
   const closeModal = () => {
-    handleSaveChanges();
+    
     closeModalDetail("true");
   };
 

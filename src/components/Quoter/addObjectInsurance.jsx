@@ -106,6 +106,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const cerrarModal = () => {
+    localStorage.removeItem(LS_TABLASECCIONES);
     closeModal(true);
   };
 
@@ -184,6 +185,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       console.log(response);
 
       if (response.codigo === 200) {
+        localStorage.removeItem(LS_TABLASECCIONES);
         handleCloseBackdrop();
         closeModal(true);
       } else {
@@ -308,10 +310,13 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   const cargarDatosEditar = async () => {
     let tablaObjetoSeguro;
     tablaObjetoSeguro = JSON.parse(localStorage.getItem(LS_TABLAOBJETOSEGURO));
-    localStorage.setItem(
-      LS_TABLASECCIONES,
-      JSON.stringify(tablaObjetoSeguro.arrMontos)
-    );
+    if(tablaObjetoSeguro){
+      localStorage.setItem(
+        LS_TABLASECCIONES,
+        JSON.stringify(tablaObjetoSeguro.arrMontos)
+      );
+    }
+    
     if (tablaObjetoSeguro && idObject) {
       try {
         await cargarProvincias();

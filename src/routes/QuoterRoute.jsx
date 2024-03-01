@@ -9,6 +9,7 @@ import PaidForm from '../components/Quoter/paidForm';
 import MyQuoters from '../modules/Quoter/myQuoters';
 import DetailObjectsTable from '../components/Quoter/detailObjectsTable';
 import BranchInsurance from '../components/Quoter/branchInsurance';
+import AddObjectInsurance from '../components/Quoter/addObjectInsurance';
   
 
 
@@ -22,7 +23,7 @@ const QuoterRoutes = () => {
       <Route path="*" element={<NotFound />} />
 
       <Route path="/Pymes/MyQuotes" element={<RequireAuth> <MyQuoters /> </RequireAuth>} />
-      <Route path="/Pymes/product" element={<RequireAuth> <BranchInsurance /> </RequireAuth>} />
+      <Route path="/Pymes/product" element={<RequireAuth> <AddObjectInsurance /> </RequireAuth>} />
 
       <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
 

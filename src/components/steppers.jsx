@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
+import { useNavigate } from 'react-router-dom';
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
@@ -132,7 +133,8 @@ export default function Steppers() {
   const [emailError, setEmailError] = React.useState("");
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [openSnack, setOpenSnack] = React.useState(false);
-  
+  const navigate = useNavigate();
+
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
   };
@@ -161,6 +163,20 @@ export default function Steppers() {
     if (steps[activeStep].label === "Datos Personales") {
       continuar = personalFormRef.current.handleSubmitExternally();
     }
+
+
+    if (steps[activeStep].label === "Pasarela de Pago") {
+      Swal.fire({
+        title: "Exito!",
+        text: `El proceso ha terminado`,
+        icon: "success",
+        confirmButtonText: "Ok",
+      }).then(()=>{
+        navigate('/quoter/Pymes/MyQuotes');
+      });
+      return ;
+    }
+    
 
     //Accion para Riesgo
     if (steps[activeStep].label === "Riesgo") {

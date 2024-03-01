@@ -90,6 +90,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem(TOKEN_STORAGE_KEY);
             localStorage.removeItem(USER_STORAGE_KEY);
             localStorage.removeItem('menu');
+            localStorage.clear();
             setUser(null); // Asumiendo que la información del usuario viene en la respuesta
             setMenu(null);
             setIsLoading(false);

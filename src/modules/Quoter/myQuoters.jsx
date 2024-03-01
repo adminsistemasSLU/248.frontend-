@@ -24,7 +24,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { visuallyHidden } from "@mui/utils";
 import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
-import { LS_COTIZACION, USER_STORAGE_KEY } from "../../utils/constantes";
+import { LS_COTIZACION, LS_PRODUCTO, LS_RAMO, USER_STORAGE_KEY } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
 
@@ -38,7 +38,9 @@ function createData(
   prima,
   rate,
   state,
-  createdDate
+  createdDate,
+  productoId,
+  ramoId
 ) {
   return {
     id,
@@ -51,6 +53,8 @@ function createData(
     rate,
     state,
     createdDate,
+    productoId,
+    ramoId
   };
 }
 
@@ -306,7 +310,9 @@ export default function MyQuoters() {
           item.total_prima || 0.0,
           tasa,
           item.estado,
-          item.created_at
+          item.created_at,
+          item.producto,
+          item.ramo
         );
         rowsObjetoAmparo.push(row);
       }
@@ -331,8 +337,10 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const handleOpenQuoter = (id) => {
+  const handleOpenQuoter = (id,product,ramo) => {
     localStorage.setItem(LS_COTIZACION, id);
+    localStorage.setItem(LS_PRODUCTO, product);
+    localStorage.setItem(LS_RAMO, ramo);
     window.location.href = `/quoter/pymes/`;
   };
 
@@ -541,7 +549,7 @@ export default function MyQuoters() {
                               style={{ display: "flex", justifyContent: "end" }}
                             >
                               <IconButton
-                                onClick={() => handleOpenQuoter(row.id)}
+                                onClick={() => handleOpenQuoter(row.id,row.productoId,row.ramoId)}
                               >
                                 <EditIcon />
                               </IconButton>
