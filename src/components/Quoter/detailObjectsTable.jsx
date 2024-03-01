@@ -315,17 +315,28 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       if (Array.isArray(tablaA.Amparo)) {
         tablaAmparo = tablaA.Amparo;
       }
-      
+
       clasificacionAmparo = await IncendioService.fetchAmparoIncendios(
         ramo,
         producto,
         amparo
       );
-      
+
       if (tablaAmparo.length !== 0) {
         result = tablaAmparo;
       } else {
         console.log(clasificacionAmparo);
+        if (clasificacionAmparo.codigo === 500) {
+          Swal.fire({
+            title: "Error!",
+            text: clasificacionAmparo.message,
+            icon: "error",
+            confirmButtonText: "Ok",
+          });
+          closeModalDetail("true");
+          return;
+        }
+
         Object.keys(clasificacionAmparo.data[0]).forEach((key) => {
           const tituloObj = createData(
             count++,
@@ -411,8 +422,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
             result.push(...items);
           }
         });
-
-        
       }
       console.log(result);
       //Mapear result al id de la seccion actual
@@ -440,18 +449,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       console.log("total Pimra: " + newTotalPrima);
 
       return;
-
-      // console.log(clasificacionAmparo);
-      // if( clasificacionAmparo.codigo ===500){
-      //   Swal.fire({
-      //     title: "Error!",
-      //     text: clasificacionAmparo.message ,
-      //     icon: "error",
-      //     confirmButtonText: "Ok",
-      //   });
-      //   closeModalDetail("true");
-      //   return;
-      // }
     } catch (error) {
       console.error("Error al obtener Amparo Incendio:", error);
     }
@@ -630,7 +627,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       permitirCambio = true;
     } else if (montofijo === "N" && valmaximo > 0) {
 
-      console.log('entro en monto fijo n');
       if (grupoAmparo !== "") {
         const montoPrincipalRow = editableRows.find(
           (row) => row.amparo === grupoAmparo
@@ -639,19 +635,23 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           ? parseFloat(montoPrincipalRow.monto)
           : 0;
       }
-
-      if (grupoAmparo === "" && numericValue > valmaximo) {
-        console.log(`El monto no puede ser mayor a ${valmaximo.toFixed(2)}`);
-
-        Swal.fire({
-          title: "Error!",
-          text: `El monto no puede ser mayor a ${valmaximo.toFixed(2)}`,
-          icon: "error",
-          confirmButtonText: "Ok",
-        });
-
-        permitirCambio = false;
-      } else if (montoPrincipal === 0) {
+      console.log(grupoAmparo);
+      console.log(amparo);
+      if (grupoAmparo === "" ) {
+        if(numericValue > valmaximo){
+          Swal.fire({
+            title: "Error!",
+            text: `El monto no puede ser mayor a ${valmaximo.toFixed(2)}`,
+            icon: "error",
+            confirmButtonText: "Ok",
+          });
+          permitirCambio = true;
+          numericValue=valmaximo;
+          console.log(`El monto no puede ser mayor a ${valmaximo.toFixed(2)}`);
+        }
+       
+      } 
+      else if (montoPrincipal === 0) {
         console.log("El valor principal es 0.00");
 
         Swal.fire({
@@ -662,7 +662,8 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         });
 
         permitirCambio = false;
-      } else {
+      } 
+      else {
         const valMaximoCalculado = montoPrincipal * (valmaximo / 100);
         if (numericValue > valMaximoCalculado) {
           console.log(
@@ -1051,7 +1052,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                       onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }
-                      
                       disabled={row.objCheck && !row.inventario ? false : true}
                       data-amparo={row.amparo}
                       data-grupo-amparo={row.grupoAmparo}

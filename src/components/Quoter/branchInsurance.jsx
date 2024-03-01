@@ -244,7 +244,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
             tasa: detalleAsegurado.tasa,
             prima: detalleAsegurado.prima,
             codigo: detalleAsegurado.codigo,
-            checked: editMode ? detalleAsegurado.checked : false,
+            checked: editMode ? detalleAsegurado.checked : true,
             Amparo: detalleAsegurado.Amparo || [],
           };
         });
@@ -302,11 +302,13 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
     let tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
     console.log(tablaSecciones);
     tablaSecciones = tablaSecciones.map((seccion) => {
+      let tasaMap = (
+        parseFloat(seccion.prima) / parseFloat(seccion.monto)
+      ).toFixed(2);
       return {
         ...seccion,
-        tasa: (parseFloat(seccion.prima) / parseFloat(seccion.monto)).toFixed(
-          2
-        ),
+        tasa:
+          isNaN(tasaMap)?0.0:tasaMap,
       };
     });
 
@@ -584,7 +586,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
                     <CurrencyInput
                       className="input-table"
                       disabled
-                      value={row.prima}
+                      value={parseFloat(row.prima).toFixed(2)}
                     />
                   </TableCell>
                   <TableCell align="right">

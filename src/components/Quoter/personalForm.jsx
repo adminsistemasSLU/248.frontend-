@@ -42,11 +42,12 @@ const PersonalForm = forwardRef((props, ref) => {
     age: "",
     address: "",
   });
+  const maxDate = dayjs().subtract(18, "years");
   const [error, setError] = useState("");
   const [messageError, setmessageError] = useState("");
   const [errorCedula, setErrorCedula] = useState(false);
   const [open, setOpen] = useState(false);
-  const [age, setAge] = useState(dayjs());
+  const [age, setAge] = useState(maxDate);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const isMounted = useRef(false);
 
@@ -380,6 +381,7 @@ const PersonalForm = forwardRef((props, ref) => {
                     format="DD/MM/YYYY"
                     disabled={errorCedula}
                     className="datePicker"
+                    maxDate={maxDate}
                     onChange={(newValue) => {
                       setAge(newValue);
                     }}
