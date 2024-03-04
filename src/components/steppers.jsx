@@ -154,8 +154,9 @@ export default function Steppers() {
   }, []);
 
   const personalFormRef = useRef();
+  const paidFormRef = useRef();
 
-  const handleNext = (formData) => {
+  const handleNext = async (formData) => {
     // Actualiza el estado formData con los datos recibidos
     setFormData(formData);
     let continuar = true;
@@ -176,10 +177,20 @@ export default function Steppers() {
       });
       return ;
     }
+
+
+     //Accion para Riesgo
+     if (steps[activeStep].label === "Pago") {
+      continuar = false;
+      continuar = await paidFormRef.current.handleSubmitExternally();
+
+     }
     
 
     //Accion para Riesgo
     if (steps[activeStep].label === "Riesgo") {
+
+
     }
 
     if (continuar) {
@@ -204,7 +215,7 @@ export default function Steppers() {
       label: "Riesgo",
       formComponent: <ProtectObjectsTable onNext={handleNext} />,
     },
-    { label: "Pago", formComponent: <PaidForm onNext={handleNext} /> },
+    { label: "Pago", formComponent: <PaidForm ref={paidFormRef} onNext={handleNext} /> },
     {
       label: "Pasarela de Pago",
       formComponent: <PaymentMethods onNext={handleNext} />,

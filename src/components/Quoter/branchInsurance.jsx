@@ -221,7 +221,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
       let newItems = [];
       let isfetch = false;
       newItems = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
-      
+
       if (!newItems) {
         isfetch = true;
         detalleAsegurado = await IncendioService.fetchDetalleAsegurado(
@@ -233,22 +233,26 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
         detalleAsegurado.codigo = 200;
         detalleAsegurado.data = newItems;
       }
-console.log(detalleAsegurado);
+      console.log(detalleAsegurado);
       if (detalleAsegurado && detalleAsegurado.data) {
         newItems = detalleAsegurado.data.map((detalleAsegurado) => {
           console.log(detalleAsegurado);
 
-          const checked = isfetch ? detalleAsegurado.estado === 1 ?true:false : detalleAsegurado.checked;
-          
+          const checked = isfetch
+            ? detalleAsegurado.estado === 1
+              ? true
+              : false
+            : detalleAsegurado.checked;
+
           return {
             id: detalleAsegurado.codigo,
             ramo: detalleAsegurado.descripcion,
             descripcion: detalleAsegurado.descripcion,
             monto: detalleAsegurado.monto,
-            tasa: 0.00,
+            tasa: 0.0,
             prima: detalleAsegurado.prima,
             codigo: detalleAsegurado.codigo,
-            checked:  checked,
+            checked: checked,
             Amparo: detalleAsegurado.Amparo || [],
           };
         });
@@ -307,12 +311,12 @@ console.log(detalleAsegurado);
     console.log(tablaSecciones);
     tablaSecciones = tablaSecciones.map((seccion) => {
       let tasaMap = (
-        parseFloat(seccion.prima) / parseFloat(seccion.monto)*100
+        (parseFloat(seccion.prima) / parseFloat(seccion.monto)) *
+        100
       ).toFixed(2);
       return {
         ...seccion,
-        tasa:
-          isNaN(tasaMap)?0.0:tasaMap,
+        tasa: isNaN(tasaMap) ? 0.0 : tasaMap,
       };
     });
 
@@ -392,7 +396,6 @@ console.log(detalleAsegurado);
   }, []);
 
   const closeModal = () => {
-    
     closeModalDetail("true");
   };
 
@@ -577,7 +580,7 @@ console.log(detalleAsegurado);
                     <input
                       className="input-table"
                       disabled
-                      value={ isNaN(row.tasa)?'0.00 %' :row.tasa + "%"}
+                      value={isNaN(row.tasa) ? "0.00 %" : row.tasa + "%"}
                     />
                   </TableCell>
                   <TableCell
@@ -594,9 +597,11 @@ console.log(detalleAsegurado);
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <EventAvailableIcon
-                      onClick={() => handleOpenModal(row.codigo)}
-                    />
+                    {row.checked && (
+                      <EventAvailableIcon
+                        onClick={() => handleOpenModal(row.codigo)}
+                      />
+                    )}
                   </TableCell>
                 </StyledTableRow>
               ) : (

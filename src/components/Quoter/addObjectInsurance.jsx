@@ -10,6 +10,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import BranchInsurance from "./branchInsurance";
 import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import Tooltip from "@mui/material/Tooltip";
 import "../../styles/moddalForm.scss";
 import "../../styles/dialogForm.scss";
@@ -30,6 +31,7 @@ import {
   LS_TABLASECCIONES,
   LS_COTIZACION,
   LS_TABLAOBJETOSEGURO,
+  LS_TABLAAMPARO,
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 dayjs.extend(customParseFormat);
@@ -90,6 +92,8 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   const idObject = idObjectSelected;
   const editMode = idObject !== "" ? true : false;
   const [openBackdrop1, setOpenBackdrop] = React.useState(false);
+  const [messageError, setmessageError] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -164,19 +168,30 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     // Verificar si alguno de los campos requeridos está vacío y ha sido "tocado"
     const campoInvalido = camposRequeridos.some((campo) => formData[campo] === '' && formDataTouched[campo]);
 
-    console.log(campoInvalido);
+   
     if (campoInvalido) {
       handleCloseBackdrop();
       return  ;
       //return; // Salir de la función si algún campo requerido es inválido
     }
 
+   
     let objetoSeguro = obtenerFormulario();
     console.log(objetoSeguro);
     if (!objetoSeguro) {
-      console.log("No existe datos para cotizar");
+      handleCloseBackdrop();
+      setmessageError("No existe datos para cotizar agregue una suma asegurada");
+      setOpen(true);
       return;
     }
+
+    if(objetoSeguro.sumaAsegurada === 0 ){
+      setmessageError("No existe suma asegurada");
+      setOpen(true);
+      handleCloseBackdrop();
+      return  ;
+    }
+
 
     const accionCotizacion = editMode ? IncendioService.editarCotizacionIncendio : IncendioService.guardarCotizacionIncendio;
 
@@ -186,6 +201,8 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
 
       if (response.codigo === 200) {
         localStorage.removeItem(LS_TABLASECCIONES);
+        localStorage.removeItem(LS_TABLAOBJETOSEGURO);
+        localStorage.removeItem(LS_TABLAAMPARO);
         handleCloseBackdrop();
         closeModal(true);
       } else {
@@ -211,12 +228,17 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     const idCotizacion = localStorage.getItem(LS_COTIZACION);
     if (!idCotizacion) {
       console.log("No existe cotizacion generada");
-      return;
+      return null;
     }
 
     const formattedDate = dayjs(dateInspecction).format("DD/MM/YYYY");
     const formattedTime = dayjs(timeInspecction).format("HH:mm");
     const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
+
+    if(!secciones){
+      return null;
+    }
+
     let sumaAsegurada = secciones.reduce(
       (sum, item) => (item.checked ? sum + parseFloat(item.monto) : sum),
       0
@@ -268,11 +290,20 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const onMarkerDragEnd = ({ lat, lng, direccion }) => {
+    
+    console.log(direccion);
+    if(direccion){
+      if(direccion.code ===500){
+        console.log("error api");
+        direccion = ''; 
+      }
+    }
     setFormData({ ...formData, lat, lng, direccion });
     console.log("Marcador actualizado:", formData);
   };
 
   const updateLocation = (lat, lng, direccion) => {
+    console.log(direccion);
     setFormData((prevFormData) => ({
       ...prevFormData,
       lat: lat,
@@ -520,6 +551,14 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     }
   };
 
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
   };
@@ -613,6 +652,14 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
               alignItems: "center",
             }}
           >
+          <Snackbar
+              open={open}
+              autoHideDuration={5000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert severity="warning">{messageError}</Alert>
+            </Snackbar>
             <form component="form" onSubmit={handleSubmit} className="form">
               <table spacing={3}>
                 <tbody>
@@ -962,6 +1009,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                           required
                           style={{ border: "1px solid #A1A8AE" }}
                         >
+                          <option value="--">SELECCIONE UN T. RIESGO</option>
                           {destinado.map((destin, index) => (
                             <option key={index} value={destin.Codigo}>
                               {destin.Nombre}
@@ -988,6 +1036,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                           label="sumInsure-Label"
                           type="text"
                           name="umInsure"
+                          onClick={handleOpenModal}
                           value={formatearEnDolares(formData.sumInsure)}
                           className="modalFormInputs"
                           variant="standard"

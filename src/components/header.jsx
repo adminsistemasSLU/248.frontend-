@@ -45,7 +45,7 @@ function Header(props) {
   };
   let menu1 = null;
   if (!isLoading && menu != null) {
-    menu1 = JSON.parse(menu);
+    //menu1 = JSON.parse(menu);
   }
 
   const drawerRef = useRef();

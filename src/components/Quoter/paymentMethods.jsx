@@ -8,6 +8,9 @@ import {
   Box,
   Container,
   Paper,
+  Button,
+  TextField,
+  Modal,
   Grid,
 } from '@mui/material';
 
@@ -21,6 +24,18 @@ const safetypayIcon = process.env.PUBLIC_URL + '/assets/images/carousel/icon/saf
 
 const PaymentMethods = () => {
   const [selectedMethod, setSelectedMethod] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState('');
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  // Función para manejar el envío del correo
+  const handleSubmit = () => {
+    // Aquí deberías implementar la lógica para enviar el correo
+    console.log(email);
+    handleClose();
+  };
 
   const handlePaymentMethodChange = (method) => {
     setSelectedMethod(method);
@@ -75,9 +90,36 @@ const PaymentMethods = () => {
           <Box mt={2}>
             {/* Renderizar contenido específico para la pasarela de pago seleccionada */}
             {selectedMethod === 'paypal' && (
-              <div>
-                {/* Aquí puedes mostrar información adicional para PayPal */}
-              </div>
+             <div>
+             <Button variant="contained" onClick={handleOpen}>
+               Enviar Link de Pago
+             </Button>
+             <Modal
+               open={open}
+               onClose={handleClose}
+               aria-labelledby="modal-modal-title"
+               aria-describedby="modal-modal-description"
+             >
+               <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4 }}>
+                 <Typography id="modal-modal-title" variant="h6" component="h2">
+                   Enviar Link de Pago PayPal
+                 </Typography>
+                 <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                   Ingresa el correo electrónico para enviar el link de pago:
+                 </Typography>
+                 <TextField
+                   fullWidth
+                   margin="normal"
+                   label="Correo Electrónico"
+                   value={email}
+                   onChange={(e) => setEmail(e.target.value)}
+                 />
+                 <Button fullWidth variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>
+                   Enviar
+                 </Button>
+               </Box>
+             </Modal>
+           </div>
             )}
             {selectedMethod === 'stripe' && (
               <div>

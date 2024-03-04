@@ -47,6 +47,23 @@ const QuoterService = {
       throw error;
     }
   },
+
+  fetchGuardarFormaDePago: async (dato) => {
+    const endpoint = 'api/guardarFormaDePago';
+    const method = 'POST'; 
+    const data = dato;
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Guardar Forma de Pago:', error);
+      throw error;
+    }
+  },
+
+
+
 };
 
 export default QuoterService;

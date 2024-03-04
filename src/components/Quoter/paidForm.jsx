@@ -1,5 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { TextField, Button, Container, Grid, Paper } from "@mui/material";
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import {
+  TextField,
+  Button,
+  Container,
+  Grid,
+  Paper,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
@@ -10,8 +23,10 @@ import "../../styles/form.scss";
 import { PARAMETROS_STORAGE_KEY, LS_COTIZACION } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import ComboService from "../../services/ComboService/ComboService";
+import QuoterService from "../../services/QuoterService/QuoterService";
 
-const PaidForm = () => {
+
+const PaidForm = forwardRef((props, ref) => {
   const [formData, setFormData] = useState({
     paidType: "",
     paidForm: "",
@@ -29,6 +44,10 @@ const PaidForm = () => {
   const [formaPago, setformaPago] = useState([]);
   const [tipoCredito, settipoCredito] = useState([]);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [formPago, setFormPago] = React.useState([]);
+  const [errorMessage, seterrorMessage] = React.useState([]);
+  const [OpenSnackAlert, setOpenSnackAlert] = React.useState(false);
+  const [validate, setvalidate] = React.useState(false);
 
   useEffect(() => {
     const cargarData = async () => {
@@ -45,6 +64,10 @@ const PaidForm = () => {
     console.log(tipoCredito);
   }, [tipoCredito]);
 
+  useImperativeHandle(ref,  () => ({
+    handleSubmitExternally:  handleSubmit,
+  }));
+
   const cargarDatosCotizacion = async () => {
     try {
       const idCotizacion = localStorage.getItem(LS_COTIZACION);
@@ -53,7 +76,7 @@ const PaidForm = () => {
       const parametros = JSON.parse(
         localStorage.getItem(PARAMETROS_STORAGE_KEY)
       );
-
+      setFormPago(formaPago);
       console.log(formaPago);
       let monto = parseFloat(formaPago.totalmonto);
       let prima = parseFloat(formaPago.totalprima);
@@ -89,9 +112,9 @@ const PaidForm = () => {
   };
 
   function formatedInput(numero) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(numero);
   }
 
@@ -135,10 +158,72 @@ const PaidForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Agregar lógica de envío del formulario si es necesario
-    console.log("Formulario enviado:", formData);
+  const validarformulario = () => {
+    let valido = true;
+    if (formData.paidType === "") {
+      valido = false;
+      seterrorMessage("Debe llenar el campo Tipo de Crédito");
+      setOpenSnackAlert(true);
+    }
+
+    if (formData.firstPaid === "" && formData.paidForm === "2") {
+      valido = false;
+      seterrorMessage("Debe llenar el campo Entrada");
+      setOpenSnackAlert(true);
+    }
+
+    if (formData.paidForm === "") {
+      valido = false;
+      seterrorMessage("Debe llenar el campo Forma de Pago");
+      setOpenSnackAlert(true);
+    }
+
+    if (formData.numberPaid === "") {
+      valido = false;
+      seterrorMessage("Debe llenar el campo Números de pagos");
+      setOpenSnackAlert(true);
+    }
+
+    return valido;
+  };
+
+  const handleSubmit = async (e) => {
+    setvalidate(true);
+    let enviarFormulario = false;
+    const idCotizacion = localStorage.getItem(LS_COTIZACION);
+
+    enviarFormulario = validarformulario();
+    if (enviarFormulario) {
+      enviarFormulario = false;
+      let envioPago = {
+        id_CotiGeneral: idCotizacion,
+        enviado: 1,
+        tipfacturacion: formData.paidType,
+        formapago: formData.paidForm,
+        numpagos: formData.numberPaid,
+        valentrada: formData.firstPaid,
+        valprima: formData.prima,
+        porsibs: formPago.por_sbs,
+        valsibs: formData.impScvs,
+        porssc: formPago.por_ssc,
+        porsscnc: formPago.por_sscnc,
+        valsscnc: formData.impSsc,
+        poriva: formPago.por_iva,
+        valiva: formData.iva,
+      };
+
+      const response = await QuoterService.fetchGuardarFormaDePago(envioPago);
+      enviarFormulario =  response.codigo === 200 ? true : false;
+     
+
+      return enviarFormulario;
+    }
+
+    return enviarFormulario;
+  };
+
+  const handleCloseSnack = () => {
+    setOpenSnackAlert(false);
   };
 
   return (
@@ -169,6 +254,14 @@ const PaidForm = () => {
         }}
         className="paidForm"
       >
+        <Snackbar
+          open={OpenSnackAlert}
+          autoHideDuration={5000}
+          onClose={handleCloseSnack}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert severity="warning">{errorMessage}</Alert>
+        </Snackbar>
         <Paper
           elevation={3}
           style={{
@@ -188,6 +281,7 @@ const PaidForm = () => {
                 <FormControl
                   sx={{ margin: "0px", minWidth: 290, width: "100%" }}
                   variant="standard"
+                  error={!formData.paidType && validate}
                 >
                   <InputLabel id="paidType-Label">Tipo de crédito</InputLabel>
                   <Select
@@ -214,6 +308,7 @@ const PaidForm = () => {
                 <FormControl
                   sx={{ margin: "0px", minWidth: 290, width: "100%" }}
                   variant="standard"
+                  error={!formData.paidForm && validate}
                 >
                   <InputLabel id="paidForm-Label">Forma de pago</InputLabel>
                   <Select
@@ -243,27 +338,28 @@ const PaidForm = () => {
                   name="numberPaid"
                   value={formData.numberPaid}
                   onChange={handleChange}
+                  error={!formData.numberPaid && validate}
                   variant="standard"
                   fullWidth
                   required
                 />
               </Grid>
-              
-              {formData.paidForm ==='2' && (
+
+              {formData.paidForm === "2" && (
                 <Grid item xs={12} md={12}>
-                <TextField
-                  label="Entrada"
-                  type="text"
-                  name="firstPaid"
-                  value={formData.firstPaid}
-                  onChange={handleChange}
-                  variant="standard"
-                  fullWidth
-                  required
-                />
-              </Grid>
-                )
-              }
+                  <TextField
+                    label="Entrada"
+                    type="text"
+                    name="firstPaid"
+                    value={formData.firstPaid}
+                    error={!formData.firstPaid && validate}
+                    onChange={handleChange}
+                    variant="standard"
+                    fullWidth
+                    required
+                  />
+                </Grid>
+              )}
             </Grid>
             <Button
               type="submit"
@@ -407,5 +503,5 @@ const PaidForm = () => {
       </form>
     </Container>
   );
-};
+});
 export default PaidForm;
