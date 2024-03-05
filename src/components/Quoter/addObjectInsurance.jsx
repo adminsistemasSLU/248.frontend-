@@ -179,9 +179,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     let objetoSeguro = obtenerFormulario();
     console.log(objetoSeguro);
     if (!objetoSeguro) {
-      handleCloseBackdrop();
-      setmessageError("No existe datos para cotizar agregue una suma asegurada");
-      setOpen(true);
       return;
     }
 
@@ -207,6 +204,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
         closeModal(true);
       } else {
         handleCloseBackdrop();
+
         console.error("Error en la respuesta del servidor:", response.message);
       }
     } catch (error) {
@@ -236,6 +234,19 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
 
     if(!secciones){
+      setmessageError("No existe suma asegurada");
+      setOpen(true);
+      handleCloseBackdrop();
+      return null;
+    }
+    if(!formData.direccion){
+      setmessageError('La direccion debe ser llenada');
+      setFormData({
+          ...formData,
+          direccion:''
+      });
+      handleCloseBackdrop();
+      setOpen(true);
       return null;
     }
 
