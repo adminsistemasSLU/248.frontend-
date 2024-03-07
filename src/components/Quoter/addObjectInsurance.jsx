@@ -128,12 +128,16 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       cargarParroquia(e.target.value);
     }
     console.log(e.target.name);
-    if (e.target.name === "block" || e.target.name === "house" || e.target.name === "floor") {
+    if (
+      e.target.name === "block" ||
+      e.target.name === "house" ||
+      e.target.name === "floor"
+    ) {
       if (isNaN(e.target.value)) {
         return;
       }
     }
-    
+
     if (e.target.name === "phoneInspection") {
       if (isNaN(e.target.value)) {
         return;
@@ -147,6 +151,10 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
 
   const handleBlur = (e) => {
     setFormDataTouched({ ...formDataTouched, [e.target.name]: true });
+
+    if (e.target.name === "direccion") {
+      SearchLocation();
+    }
   };
 
   const toggleInspection = () => {
@@ -158,39 +166,42 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     handleOpenBackdrop();
     e.preventDefault();
 
-    const camposRequeridos = ['city', 'province', 'parish', 'direccion'];
+    const camposRequeridos = ["city", "province", "parish", "direccion"];
 
-    setFormDataTouched((prevFormData) => Object.keys(prevFormData).reduce((acc, key) => {
-      acc[key] = true;
-      return acc;
-    }, {}));
+    setFormDataTouched((prevFormData) =>
+      Object.keys(prevFormData).reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+      }, {})
+    );
 
     // Verificar si alguno de los campos requeridos está vacío y ha sido "tocado"
-    const campoInvalido = camposRequeridos.some((campo) => formData[campo] === '' && formDataTouched[campo]);
+    const campoInvalido = camposRequeridos.some(
+      (campo) => formData[campo] === "" && formDataTouched[campo]
+    );
 
-   
     if (campoInvalido) {
       handleCloseBackdrop();
-      return  ;
+      return;
       //return; // Salir de la función si algún campo requerido es inválido
     }
 
-   
     let objetoSeguro = obtenerFormulario();
     console.log(objetoSeguro);
     if (!objetoSeguro) {
       return;
     }
 
-    if(objetoSeguro.sumaAsegurada === 0 ){
+    if (objetoSeguro.sumaAsegurada === 0) {
       setmessageError("No existe suma asegurada");
       setOpen(true);
       handleCloseBackdrop();
-      return  ;
+      return;
     }
 
-
-    const accionCotizacion = editMode ? IncendioService.editarCotizacionIncendio : IncendioService.guardarCotizacionIncendio;
+    const accionCotizacion = editMode
+      ? IncendioService.editarCotizacionIncendio
+      : IncendioService.guardarCotizacionIncendio;
 
     try {
       const response = await accionCotizacion(objetoSeguro);
@@ -212,7 +223,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       console.error("Error al realizar la solicitud:", error);
       handleCloseBackdrop();
     }
-
   };
 
   function formatearEnDolares(numero) {
@@ -233,17 +243,17 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     const formattedTime = dayjs(timeInspecction).format("HH:mm");
     const secciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
 
-    if(!secciones){
+    if (!secciones) {
       setmessageError("No existe suma asegurada");
       setOpen(true);
       handleCloseBackdrop();
       return null;
     }
-    if(!formData.direccion){
-      setmessageError('La direccion debe ser llenada');
+    if (!formData.direccion) {
+      setmessageError("La direccion debe ser llenada");
       setFormData({
-          ...formData,
-          direccion:''
+        ...formData,
+        direccion: "",
       });
       handleCloseBackdrop();
       setOpen(true);
@@ -290,6 +300,16 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       prima: primaAsegudara,
     };
 
+    if (!formData.inspection) {
+      formDatas = {
+        ...formDatas,
+        contactoInspeccion: "",
+        fechaInspeccion: '',
+        horaInspeccion: '',
+        telefonoContacto: '',
+      };
+    }
+
     if (editMode) {
       formDatas = {
         ...formDatas,
@@ -301,12 +321,11 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const onMarkerDragEnd = ({ lat, lng, direccion }) => {
-    
     console.log(direccion);
-    if(direccion){
-      if(direccion.code ===500){
+    if (direccion) {
+      if (direccion.code === 500) {
         console.log("error api");
-        direccion = ''; 
+        direccion = "";
       }
     }
     setFormData({ ...formData, lat, lng, direccion });
@@ -352,13 +371,13 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   const cargarDatosEditar = async () => {
     let tablaObjetoSeguro;
     tablaObjetoSeguro = JSON.parse(localStorage.getItem(LS_TABLAOBJETOSEGURO));
-    if(tablaObjetoSeguro){
+    if (tablaObjetoSeguro) {
       localStorage.setItem(
         LS_TABLASECCIONES,
         JSON.stringify(tablaObjetoSeguro.arrMontos)
       );
     }
-    
+
     if (tablaObjetoSeguro && idObject) {
       try {
         await cargarProvincias();
@@ -663,7 +682,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
               alignItems: "center",
             }}
           >
-          <Snackbar
+            <Snackbar
               open={open}
               autoHideDuration={5000}
               onClose={handleClose}
@@ -746,7 +765,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                             onBlur={handleBlur}
                             variant="standard"
                             className="modalFormInputs"
-                            
                             style={{ border: "1px solid #A1A8AE" }}
                           >
                             <option value="">SELECCIONE UNA PROVINCIA</option>
@@ -790,7 +808,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                             onChange={handleChange}
                             variant="standard"
                             className="modalFormInputs"
-                            
                           >
                             <option value="">SELECCIONE UNA CIUDAD</option>
                             {parroquia.map((parroq, index) => (
@@ -806,11 +823,12 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                       className="modalFormContent"
                       style={{ display: "flex", flexDirection: "column" }}
                     >
-                      {formData.direccion === "" && formDataTouched.direccion && (
-                        <Alert severity="error" color="error">
-                          El campo direccion es requerido
-                        </Alert>
-                      )}
+                      {formData.direccion === "" &&
+                        formDataTouched.direccion && (
+                          <Alert severity="error" color="error">
+                            El campo direccion es requerido
+                          </Alert>
+                        )}
                       <div
                         className="modalFormContent"
                         style={{ width: "100%" }}
@@ -1304,14 +1322,16 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
               justifyContent: "center",
             }}
           >
-            <MapContainer
-              ref={mapContainerRef}
-              lat={formData.lat}
-              lng={formData.lng}
-              direccion={formData.direccion}
-              onMarkerDragEnd={onMarkerDragEnd}
-              onUpdateLocation={updateLocation}
-            ></MapContainer>
+            <div style={{ width: "50%" }}>
+              <MapContainer
+                ref={mapContainerRef}
+                lat={formData.lat}
+                lng={formData.lng}
+                direccion={formData.direccion}
+                onMarkerDragEnd={onMarkerDragEnd}
+                onUpdateLocation={updateLocation}
+              ></MapContainer>
+            </div>
           </div>
         </div>
       </div>

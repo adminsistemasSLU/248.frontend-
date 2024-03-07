@@ -314,9 +314,12 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
         (parseFloat(seccion.prima) / parseFloat(seccion.monto)) *
         100
       ).toFixed(2);
+
+      console.log(tasaMap);
+      
       return {
         ...seccion,
-        tasa: isNaN(tasaMap) ? 0.0 : tasaMap,
+        tasa: isNaN(tasaMap)|| tasaMap==='Infinity' ? 0.0 : tasaMap,
       };
     });
 

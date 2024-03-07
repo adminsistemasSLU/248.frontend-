@@ -34,7 +34,8 @@ import {
   LS_PRODUCTO,
   LS_COTIZACION,
   LS_TABLAOBJETOSEGURO,
-  USER_STORAGE_KEY
+  USER_STORAGE_KEY,
+  LS_TOTAL_PRIMA_RIESGO
 } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import ComboService from "../../services/ComboService/ComboService";
@@ -316,10 +317,8 @@ export default function ProtectObjectsTable() {
 
         rowsObjetoAmparo.push(row);
       }
-
       setRows(rowsObjetoAmparo);
       setCotizacion(objetoSeguro);
-     
       const newTotalMonto = objetoSeguro.reduce(
         (sum, row) => sum + parseFloat(row.monto),
         0
@@ -330,8 +329,7 @@ export default function ProtectObjectsTable() {
         0
       );
       setTotalPrima(newTotalPrima);
-      console.log(totalMonto);
-      console.log(totalPrima);
+      localStorage.setItem(LS_TOTAL_PRIMA_RIESGO,newTotalPrima);
     }
 
     handleCloseBackdrop();

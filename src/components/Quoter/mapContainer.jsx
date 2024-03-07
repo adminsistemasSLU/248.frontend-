@@ -33,7 +33,7 @@ const MapContainer = forwardRef(
     });
 
     const mapContainerStyle = {
-      width: "50%",
+      width: "100%",
       height: "300px",
       margin: "50px",
     };

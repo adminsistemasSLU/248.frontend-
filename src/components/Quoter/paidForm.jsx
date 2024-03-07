@@ -24,7 +24,7 @@ import { PARAMETROS_STORAGE_KEY, LS_FORMAPAGO, LS_COTIZACION } from "../../utils
 import IncendioService from "../../services/IncencioService/IncendioService";
 import ComboService from "../../services/ComboService/ComboService";
 import QuoterService from "../../services/QuoterService/QuoterService";
-
+import Swal from "sweetalert2";
 
 const PaidForm = forwardRef((props, ref) => {
   const [formData, setFormData] = useState({
@@ -164,34 +164,38 @@ const PaidForm = forwardRef((props, ref) => {
       valido = false;
       seterrorMessage("Debe llenar el campo Tipo de Crédito");
       setOpenSnackAlert(true);
+      handleCloseBackdrop();
     }
 
     if (formData.firstPaid === "" && formData.paidForm === "2") {
       valido = false;
       seterrorMessage("Debe llenar el campo Entrada");
       setOpenSnackAlert(true);
+      handleCloseBackdrop();
     }
 
     if (formData.paidForm === "") {
       valido = false;
       seterrorMessage("Debe llenar el campo Forma de Pago");
       setOpenSnackAlert(true);
+      handleCloseBackdrop();
     }
 
     if (formData.numberPaid === "") {
       valido = false;
       seterrorMessage("Debe llenar el campo Números de pagos");
       setOpenSnackAlert(true);
+      handleCloseBackdrop();
     }
-    handleCloseBackdrop();
+    
     return valido;
   };
 
   const handleSubmit = async (e) => {
     setvalidate(true);
+    handleOpenBackdrop();
     let enviarFormulario = false;
     const idCotizacion = localStorage.getItem(LS_COTIZACION);
-    handleOpenBackdrop();
     enviarFormulario = validarformulario();
     if (enviarFormulario) {
       enviarFormulario = false;
@@ -212,10 +216,27 @@ const PaidForm = forwardRef((props, ref) => {
         valiva: formData.iva,
       };
 
-      const response = await QuoterService.fetchGuardarFormaDePago(envioPago);
-      enviarFormulario =  response.codigo === 200 ? true : false;
-      handleCloseBackdrop();
-      localStorage.setItem(LS_FORMAPAGO,formData.paidForm)
+      try {
+        const response = await QuoterService.fetchGuardarFormaDePago(envioPago);
+        if(response.codigo === 200  ){
+          enviarFormulario = true;
+          localStorage.setItem(LS_FORMAPAGO,formData.paidForm)
+          handleCloseBackdrop();
+        }else {
+          handleCloseBackdrop();
+          enviarFormulario = false;
+          Swal.fire({
+            title: "Exito!",
+            text: response.message,
+            icon: "error",
+            confirmButtonText: "Ok",
+          });
+        }         
+      }catch (error){
+        handleCloseBackdrop();
+
+      }
+      
       return enviarFormulario;
     }
 

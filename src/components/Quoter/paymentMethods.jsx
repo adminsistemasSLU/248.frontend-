@@ -78,7 +78,6 @@ const PaymentMethods = () => {
         cliente,
         email
       );
-
       if (response.codigo === 200) {
         handleCloseBackdrop();
         Swal.fire({
@@ -90,7 +89,18 @@ const PaymentMethods = () => {
           handleClose();
           
         });
+      }else{
+        Swal.fire({
+          title: "Exito!",
+          text: response.message,
+          icon: "error",
+          confirmButtonText: "Ok",
+        }).then(() => {
+          handleClose();
+          
+        });
       }
+      handleClose();
     } catch (error) {
       handleCloseBackdrop();
       console.error("Error al enviar correo:", error);
@@ -107,7 +117,7 @@ const PaymentMethods = () => {
             Enviar Link de Pago
           </Button>
           <Backdrop
-            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            sx={{ color: "#fff", zIndex: 3000 }}
             open={openBackdrop}
           >
             <CircularProgress color="inherit" />

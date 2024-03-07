@@ -37,6 +37,7 @@ import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   LS_FORMAPAGO,
+  LS_TOTAL_PRIMA_RIESGO,
   USER_STORAGE_KEY,
 } from "../utils/constantes";
 import EmailService from "../services/EmailService/EmailService";
@@ -197,6 +198,8 @@ export default function Steppers() {
           navigate("/quoter/Pymes/MyQuotes");
         });
       }
+
+      
     }
 
     let datosPersonales = JSON.parse(
@@ -208,7 +211,10 @@ export default function Steppers() {
     }
     //Accion para Riesgo
     if (steps[activeStep].label === "Riesgo") {
-      
+      let totalPrima = localStorage.getItem(LS_TOTAL_PRIMA_RIESGO);
+      if(totalPrima ==='0'){
+        return;
+      }
     }
 
     if (continuar) {
