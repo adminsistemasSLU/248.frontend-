@@ -20,7 +20,7 @@ import Select from "@mui/material/Select";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import "../../styles/form.scss";
-import { PARAMETROS_STORAGE_KEY, LS_COTIZACION } from "../../utils/constantes";
+import { PARAMETROS_STORAGE_KEY, LS_FORMAPAGO, LS_COTIZACION } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import ComboService from "../../services/ComboService/ComboService";
 import QuoterService from "../../services/QuoterService/QuoterService";
@@ -191,7 +191,7 @@ const PaidForm = forwardRef((props, ref) => {
     setvalidate(true);
     let enviarFormulario = false;
     const idCotizacion = localStorage.getItem(LS_COTIZACION);
-
+    handleOpenBackdrop();
     enviarFormulario = validarformulario();
     if (enviarFormulario) {
       enviarFormulario = false;
@@ -214,8 +214,8 @@ const PaidForm = forwardRef((props, ref) => {
 
       const response = await QuoterService.fetchGuardarFormaDePago(envioPago);
       enviarFormulario =  response.codigo === 200 ? true : false;
-     
-
+      handleCloseBackdrop();
+      localStorage.setItem(LS_FORMAPAGO,formData.paidForm)
       return enviarFormulario;
     }
 

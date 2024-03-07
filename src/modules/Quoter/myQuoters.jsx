@@ -24,7 +24,13 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { visuallyHidden } from "@mui/utils";
 import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
-import { LS_COTIZACION, LS_PRODUCTO, LS_RAMO, USER_STORAGE_KEY } from "../../utils/constantes";
+import {
+  DATOS_PERSONALES_STORAGE_KEY,
+  LS_COTIZACION,
+  LS_PRODUCTO,
+  LS_RAMO,
+  USER_STORAGE_KEY,
+} from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
 
@@ -54,7 +60,7 @@ function createData(
     state,
     createdDate,
     productoId,
-    ramoId
+    ramoId,
   };
 }
 
@@ -337,10 +343,30 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const handleOpenQuoter = (id,product,ramo) => {
+  const handleOpenQuoter = (id, product, ramo) => {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
+    const resultadoFiltrado = rows.filter((item) => item.id === id);
+    console.log(resultadoFiltrado);
+    // Luego mapeas los datos filtrados para transformarlos a la estructura deseada
+    const data = cotizacion.map((item) => ({
+      correo: item.clicorreo,
+      apellido: item.cliapellido,
+      identificacion: item.clicedula,
+      nombre: item.clinombre,
+      id: item.id,
+    }));
+    console.log(data);
+    let datosPersonales = data.length > 0 ? data[0] : null;
+    // Si encontraste un objeto correspondiente, guárdalo en localStorage
+    if (datosPersonales) {
+      localStorage.setItem(
+        DATOS_PERSONALES_STORAGE_KEY,
+        JSON.stringify(datosPersonales)
+      );
+    }
+
     window.location.href = `/quoter/pymes/`;
   };
 
@@ -544,22 +570,32 @@ export default function MyQuoters() {
                           />
                         </TableCell>
                         <TableCell align="right">
-                          {row.state !== "Cancelado" && (
-                            <div
-                              style={{ display: "flex", justifyContent: "end" }}
-                            >
-                              <IconButton
-                                onClick={() => handleOpenQuoter(row.id,row.productoId,row.ramoId)}
+                          {row.state !== "Cancelado" &&
+                            row.state !== "Emitida" && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "end",
+                                }}
                               >
-                                <EditIcon />
-                              </IconButton>
-                              <IconButton
-                                onClick={() => handleDeleteQuoter(row.id)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </div>
-                          )}
+                                <IconButton
+                                  onClick={() =>
+                                    handleOpenQuoter(
+                                      row.id,
+                                      row.productoId,
+                                      row.ramoId
+                                    )
+                                  }
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                  onClick={() => handleDeleteQuoter(row.id)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </div>
+                            )}
                         </TableCell>
                       </StyledTableRow>
                     );

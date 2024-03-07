@@ -1,144 +1,172 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
   Typography,
   Box,
   Container,
-  Paper,
   Button,
   TextField,
   Modal,
-  Grid,
-} from '@mui/material';
+} from "@mui/material";
+import {
+  LS_FORMAPAGO,
+  DATOS_PERSONALES_STORAGE_KEY,
+  LS_COTIZACION,
+} from "../../utils/constantes";
+import ValidationUtils from "../../utils/ValiationsUtils";
+import QuoterService from "../../services/QuoterService/QuoterService";
+import Swal from "sweetalert2";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
-
-const paypalIcon = process.env.PUBLIC_URL + '/assets/images/carousel/icon/paypal.png';
-const stripeIcon = process.env.PUBLIC_URL + '/assets/images/carousel/icon/stripe.webp';
-const mercadopagoIcon = process.env.PUBLIC_URL + '/assets/images/carousel/icon/mercadopago.png';
-const safetypayIcon = process.env.PUBLIC_URL + '/assets/images/carousel/icon/safety.png';
-
-
+// const paypalIcon =
+//   process.env.PUBLIC_URL + "/assets/images/carousel/icon/paypal.png";
+// const stripeIcon =
+//   process.env.PUBLIC_URL + "/assets/images/carousel/icon/stripe.webp";
+// const mercadopagoIcon =
+//   process.env.PUBLIC_URL + "/assets/images/carousel/icon/mercadopago.png";
+// const safetypayIcon =
+//   process.env.PUBLIC_URL + "/assets/images/carousel/icon/safety.png";
 
 const PaymentMethods = () => {
-  const [selectedMethod, setSelectedMethod] = useState(null);
+  // const [selectedMethod, setSelectedMethod] = useState(null);
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState('');
-
+  const [email, setEmail] = useState("");
+  const [cliente, setCLiente] = useState("");
+  const [fPago, setFpago] = useState("");
+  const [Error, setError] = useState("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
+  useEffect(() => {
+    let pagoID = localStorage.getItem(LS_FORMAPAGO);
+    let datosPersonales = JSON.parse(
+      localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
+    );
+    console.log(datosPersonales);
+    if (datosPersonales) {
+      setEmail(datosPersonales.correo);
+      setCLiente(datosPersonales.nombre + " " + datosPersonales.apellido);
+    }
+    setFpago(pagoID);
+
+    console.log(fPago);
+  }, []);
   // Función para manejar el envío del correo
-  const handleSubmit = () => {
-    // Aquí deberías implementar la lógica para enviar el correo
-    console.log(email);
+
+  const handleCloseBackdrop = () => {
+    setOpenBackdrop(false);
+  };
+  const handleOpenBackdrop = () => {
+    setOpenBackdrop(true);
+  };
+
+  const handleSubmit = async () => {
+    let idCotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
+    if (!ValidationUtils.validateEmail(email)) {
+      setError("Se debe ingresar un correo electrónico válido.");
+      return;
+    }
+    if (cliente === "") {
+      setError("El campo nombre no puede estar vacio.");
+      return;
+    }
+    handleOpenBackdrop();
+    try {
+      const response = await QuoterService.fetchEnvioCorreoFormCuenta(
+        idCotizacion,
+        cliente,
+        email
+      );
+
+      if (response.codigo === 200) {
+        handleCloseBackdrop();
+        Swal.fire({
+          title: "Exito!",
+          text: response.data,
+          icon: "success",
+          confirmButtonText: "Ok",
+        }).then(() => {
+          handleClose();
+          
+        });
+      }
+    } catch (error) {
+      handleCloseBackdrop();
+      console.error("Error al enviar correo:", error);
+    }
+    handleCloseBackdrop();
     handleClose();
   };
 
-  const handlePaymentMethodChange = (method) => {
-    setSelectedMethod(method);
-    // Aquí puedes agregar lógica adicional según la pasarela de pago seleccionada.
-  };
-
-  // Define un objeto que asocie cada método de pago con su icono
-  const paymentIcons = {
-    paypal: paypalIcon,
-    stripe: stripeIcon,
-    mercadopago: mercadopagoIcon,
-    safetypay: safetypayIcon,
-  };
-
   return (
-    <Container maxWidth="sm" style={{ marginBottom: '20px' }}>
-      <Paper elevation={3} style={{ padding: '20px' }}>
-        <Typography variant="h5" gutterBottom>
-          Selecciona un método de pago:
-        </Typography>
-        <FormControl component="fieldset">
-          <RadioGroup
-            aria-label="paymentMethod"
-            name="paymentMethod"
-            value={selectedMethod}
-            onChange={(e) => handlePaymentMethodChange(e.target.value)}
+    <Container maxWidth="sm" style={{ marginBottom: "20px" }}>
+      {fPago !== "1" && (
+        <div>
+          <Button variant="contained" onClick={handleOpen}>
+            Enviar Link de Pago
+          </Button>
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={openBackdrop}
           >
-            {Object.keys(paymentIcons).map((method) => (
-              <Grid container key={method} alignItems="center">
-                <Grid item xs>
-                  <FormControlLabel
-                    value={method}
-                    control={<Radio color="primary" />}
-                    //label={`${method.charAt(0).toUpperCase() + method.slice(1)}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat, quam id volutpat venenatis, quam quam commodo odio.`}
-                  />
-                </Grid>
-                <Grid item>
-                  <img
-                    src={paymentIcons[method]}
-                    alt={`${method} icon`}
-                    style={{ width: '32px', marginRight: '16px' }}
-                  />
-                </Grid>
-                
-              </Grid>
-            ))}
-          </RadioGroup>
-        </FormControl>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                border: "2px solid #000",
+                boxShadow: 24,
+                p: 4,
+              }}
+            >
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Enviar Link de Pago
+              </Typography>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                Ingresa el Nombre del Cliente:
+              </Typography>
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Nombre Cliente"
+                value={cliente}
+                onChange={(e) => setCLiente(e.target.value)}
+              />
 
-        {/* Aquí puedes agregar lógica adicional según la pasarela de pago seleccionada */}
-        {selectedMethod && (
-          <Box mt={2}>
-            {/* Renderizar contenido específico para la pasarela de pago seleccionada */}
-            {selectedMethod === 'paypal' && (
-             <div>
-             <Button variant="contained" onClick={handleOpen}>
-               Enviar Link de Pago
-             </Button>
-             <Modal
-               open={open}
-               onClose={handleClose}
-               aria-labelledby="modal-modal-title"
-               aria-describedby="modal-modal-description"
-             >
-               <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4 }}>
-                 <Typography id="modal-modal-title" variant="h6" component="h2">
-                   Enviar Link de Pago PayPal
-                 </Typography>
-                 <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                   Ingresa el correo electrónico para enviar el link de pago:
-                 </Typography>
-                 <TextField
-                   fullWidth
-                   margin="normal"
-                   label="Correo Electrónico"
-                   value={email}
-                   onChange={(e) => setEmail(e.target.value)}
-                 />
-                 <Button fullWidth variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>
-                   Enviar
-                 </Button>
-               </Box>
-             </Modal>
-           </div>
-            )}
-            {selectedMethod === 'stripe' && (
-              <div>
-                {/* Aquí puedes mostrar información adicional para Stripe */}
-              </div>
-            )}
-            {selectedMethod === 'mercadopago' && (
-              <div>
-                {/* Aquí puedes mostrar información adicional para MercadoPago */}
-              </div>
-            )}
-            {selectedMethod === 'safetypay' && (
-              <div>
-                {/* Aquí puedes mostrar información adicional para SafetyPay */}
-              </div>
-            )}
-          </Box>
-        )}
-      </Paper>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                Ingresa el correo electrónico para enviar el link de pago:
+              </Typography>
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Correo Electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handleSubmit}
+                sx={{ mt: 2 }}
+              >
+                Enviar
+              </Button>
+            </Box>
+          </Modal>
+        </div>
+      )}
     </Container>
   );
 };

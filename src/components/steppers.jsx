@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
@@ -33,7 +33,11 @@ import ProductListCards from "./Quoter/productListCards";
 import PaymentMethods from "./Quoter/paymentMethods";
 import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../services/IncencioService/IncendioService";
-import { LS_COTIZACION, USER_STORAGE_KEY } from "../utils/constantes";
+import {
+  LS_COTIZACION,
+  LS_FORMAPAGO,
+  USER_STORAGE_KEY,
+} from "../utils/constantes";
 import EmailService from "../services/EmailService/EmailService";
 import Swal from "sweetalert2";
 
@@ -155,6 +159,7 @@ export default function Steppers() {
 
   const personalFormRef = useRef();
   const paidFormRef = useRef();
+ 
 
   const handleNext = async (formData) => {
     // Actualiza el estado formData con los datos recibidos
@@ -165,32 +170,36 @@ export default function Steppers() {
       continuar = personalFormRef.current.handleSubmitExternally();
     }
 
-
     if (steps[activeStep].label === "Pasarela de Pago") {
       Swal.fire({
         title: "Exito!",
         text: `El proceso ha terminado`,
         icon: "success",
         confirmButtonText: "Ok",
-      }).then(()=>{
-        navigate('/quoter/Pymes/MyQuotes');
+      }).then(() => {
+        navigate("/quoter/Pymes/MyQuotes");
       });
-      return ;
+      return;
     }
 
-
-     //Accion para Riesgo
-     if (steps[activeStep].label === "Pago") {
+    //Accion para Riesgo
+    if (steps[activeStep].label === "Pago") {
       continuar = false;
       continuar = await paidFormRef.current.handleSubmitExternally();
-
-     }
-    
+      if (localStorage.getItem(LS_FORMAPAGO) === "1") {
+        Swal.fire({
+          title: "Exito!",
+          text: `El proceso ha terminado`,
+          icon: "success",
+          confirmButtonText: "Ok",
+        }).then(() => {
+          navigate("/quoter/Pymes/MyQuotes");
+        });
+      }
+    }
 
     //Accion para Riesgo
     if (steps[activeStep].label === "Riesgo") {
-
-
     }
 
     if (continuar) {
@@ -215,7 +224,10 @@ export default function Steppers() {
       label: "Riesgo",
       formComponent: <ProtectObjectsTable onNext={handleNext} />,
     },
-    { label: "Pago", formComponent: <PaidForm ref={paidFormRef} onNext={handleNext} /> },
+    {
+      label: "Pago",
+      formComponent: <PaidForm ref={paidFormRef} onNext={handleNext} />,
+    },
     {
       label: "Pasarela de Pago",
       formComponent: <PaymentMethods onNext={handleNext} />,
@@ -274,7 +286,6 @@ export default function Steppers() {
     setOpenSnack(false);
   };
 
-
   const enviarCorreo = async () => {
     try {
       handleOpenBackdrop();
@@ -284,7 +295,7 @@ export default function Steppers() {
 
       let emailValido = validateEmail(email);
       console.log(emailValido);
-      if(!emailValido){
+      if (!emailValido) {
         handleCloseBackdrop();
         Swal.fire({
           title: "Error!",
@@ -292,8 +303,8 @@ export default function Steppers() {
           icon: "error",
           confirmButtonText: "Ok",
         });
-        setEmailError('El Correo no es valido');
-        
+        setEmailError("El Correo no es valido");
+
         return;
       }
 
@@ -302,24 +313,21 @@ export default function Steppers() {
         user.des_usuario,
         email
       );
-      
-      if(response.codigo===200){
+
+      if (response.codigo === 200) {
         handleCloseBackdrop();
         Swal.fire({
           title: "Exito!",
           text: response.data,
           icon: "success",
           confirmButtonText: "Ok",
-        }).then(()=>{
-  
+        }).then(() => {
           setOpen(false);
-  
         });
-      }else {
+      } else {
         handleCloseBackdrop();
         setOpen(false);
       }
-     
     } catch (error) {
       // Manejar errores de la petición
       console.error("Error al realizar la solicitud:", error);
@@ -334,7 +342,6 @@ export default function Steppers() {
 
   const handleSendQuoter = () => {
     enviarCorreo();
-   
   };
 
   return (
@@ -353,13 +360,13 @@ export default function Steppers() {
         </Backdrop>
 
         <Snackbar
-              open={openSnack}
-              autoHideDuration={5000}
-              onClose={handleCloseSnack}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-              <Alert severity="warning">{emailError}</Alert>
-            </Snackbar>
+          open={openSnack}
+          autoHideDuration={5000}
+          onClose={handleCloseSnack}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert severity="warning">{emailError}</Alert>
+        </Snackbar>
 
         <DialogTitle id="alert-dialog-title">
           {"Enviar cotización por correo"}

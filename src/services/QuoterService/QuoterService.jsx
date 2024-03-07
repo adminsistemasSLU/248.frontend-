@@ -63,6 +63,25 @@ const QuoterService = {
   },
 
 
+  fetchEnvioCorreoFormCuenta: async (id_CotiGeneral,cliente,Correo) => {
+    const endpoint = 'api/EnvioCorreoFormCuenta';
+    const method = 'POST'; 
+    const data = {
+      id_CotiGeneral: id_CotiGeneral,
+      cliente: cliente,
+      Correo:Correo
+    };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Envio Correo Cuenta:', error);
+      throw error;
+    }
+  },
+
+
 
 };
 

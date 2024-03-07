@@ -3,6 +3,7 @@ export const API_SUBBALDOSAS = 'apiSubBaldosas';
 export const LS_PRODUCTO = 'IdProducto';
 export const LS_RAMO = 'IdRamo';
 export const LS_COTIZACION = 'IdCotizacion';
+export const LS_FORMAPAGO = 'FormaPagoId';
 export const LS_CLASIFICACIONAMPARO = 'ClasificacionAmparo';
 export const LS_DETALLEAMPARO = 'DetalleAmparo';
 export const LS_TABLAAMPARO = 'TablaAmparo';
