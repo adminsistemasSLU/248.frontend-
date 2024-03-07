@@ -183,7 +183,7 @@ const PaidForm = forwardRef((props, ref) => {
       seterrorMessage("Debe llenar el campo Números de pagos");
       setOpenSnackAlert(true);
     }
-
+    handleCloseBackdrop();
     return valido;
   };
 

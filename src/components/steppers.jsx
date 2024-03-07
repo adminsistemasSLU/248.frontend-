@@ -34,6 +34,7 @@ import PaymentMethods from "./Quoter/paymentMethods";
 import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../services/IncencioService/IncendioService";
 import {
+  DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   LS_FORMAPAGO,
   USER_STORAGE_KEY,
@@ -198,8 +199,16 @@ export default function Steppers() {
       }
     }
 
+    let datosPersonales = JSON.parse(
+      localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
+    );
+
+    if (datosPersonales) {
+      setEmail(datosPersonales.correo);
+    }
     //Accion para Riesgo
     if (steps[activeStep].label === "Riesgo") {
+      
     }
 
     if (continuar) {
