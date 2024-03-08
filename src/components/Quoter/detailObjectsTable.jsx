@@ -229,6 +229,8 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   const [rows1, setRows] = React.useState(rows);
   const producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
   const [openBackdrop2, setOpenBackdrop] = React.useState(false);
+  const [currentMontoFijo, setcurrentMontoFijo] = React.useState(false);
+  const [currentMontoaximo, setcurrentMontoaximo] = React.useState(false);
   const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
   const clasificacionAmparo = JSON.parse(
     localStorage.getItem(LS_CLASIFICACIONAMPARO)
@@ -910,8 +912,10 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     handleCloseBackdrop();
   };
 
-  const handleOpenModal = (id) => {
+  const handleOpenModal = (id,montoFijo,montoMaximo) => {
     localStorage.setItem(LS_TABLAAMPARO, JSON.stringify(jsonData));
+    setcurrentMontoFijo(montoFijo);
+    setcurrentMontoaximo(montoMaximo);
     setCurrentId(id);
     setOpenModal(true);
   };
@@ -997,6 +1001,8 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           <ProtectionDetailTable
             closeModalDetail={handleCloseModal}
             idProtectionDetail={currentId}
+            MontoFijo={currentMontoFijo}
+            MontoMaximo={currentMontoaximo}
             style={{ width: "80%" }}
           />
         </DialogContent>
@@ -1060,7 +1066,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                   </TableCell>
                   <TableCell align="left">
                     {row.inventario ? (
-                      <EditIcon onClick={() => handleOpenModal(row.id)} />
+                      <EditIcon onClick={() => handleOpenModal(row.id,row.montoFijo,row.valMaximo)} />
                     ) : null}
                   </TableCell>
 
