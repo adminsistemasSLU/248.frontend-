@@ -16,7 +16,7 @@ import "../../styles/detailQuoter.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { LS_TABLAAMPARO } from "../../utils/constantes";
-
+import Swal from "sweetalert2";
 
 function createData(id, descripcion, monto) {
   return {
@@ -105,6 +105,8 @@ function getComparator(order, orderBy) {
 export default function ProtectionDetailTable({
   closeModalDetail,
   idProtectionDetail,
+  MontoFijo,
+  MontoMaximo,
 }) {
   const [order] = React.useState("asc");
   const [orderBy] = React.useState("calories");
@@ -115,7 +117,8 @@ export default function ProtectionDetailTable({
   const [editableValues, setEditableValues] = React.useState([]);
   const [tablaAmparo, setTablaAmparo] = React.useState([]);
   const [initialRows, setInitialRows] = React.useState([]);
-
+  const montoF = MontoFijo;
+  const montoMax = MontoMaximo;
   const amparo = JSON.parse(localStorage.getItem(LS_TABLAAMPARO));
   const id = idProtectionDetail;
   // Datos iniciales para la tabla
@@ -145,8 +148,8 @@ export default function ProtectionDetailTable({
         amparoDetails.inventarioDetalleAmparo.InventarioDetalleAmparo
       ) {
         const newInitialRows =
-          amparoDetails.inventarioDetalleAmparo.InventarioDetalleAmparo.map((item, index) =>
-            createData(index + 1, item.descripcion, item.monto)
+          amparoDetails.inventarioDetalleAmparo.InventarioDetalleAmparo.map(
+            (item, index) => createData(index + 1, item.descripcion, item.monto)
           );
         console.log(newInitialRows);
         setRowsPerPage(newInitialRows.length);
@@ -183,36 +186,55 @@ export default function ProtectionDetailTable({
   const handleCellValueChange = (event, index, field) => {
     let newValue = event.target.value;
     let valueToSet = newValue; // Valor por defecto
-    
+    let flag = true;
+
     // Solo procesar como número si el campo no es 'descripcion'
-    if (field !== 'descripcion') {
+    if (field !== "descripcion") {
       console.log(newValue);
       console.log(field);
       let numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
-      numericValue = isNaN(numericValue) ? 0.00 : numericValue;
+      numericValue = isNaN(numericValue) ? 0.0 : numericValue;
       valueToSet = isNaN(numericValue) ? newValue : numericValue; // Usa el valor numérico si no es NaN, de lo contrario usa el valor original
     }
-  
-    // Actualizar editableValues
-    const newEditableValues = [...editableValues];
+
+    // Preparar la actualización sin aplicarla aún
+    let newEditableValues = [...editableValues];
     newEditableValues[index][field] = valueToSet;
-    setEditableValues(newEditableValues);
-  
-    // Actualizar jsonData
-    const newJsonData = [...jsonData];
+
+    let newJsonData = [...jsonData];
     newJsonData[index][field] = valueToSet;
-    setJsonData(newJsonData);
-  
-    // Si necesitas recalcular el total basado en el campo 'monto', asegúrate de hacerlo aquí
-    if (field === 'monto') {
-      const total = newJsonData.reduce(
-        (acc, item) => acc + (parseFloat(item.monto) || 0), // Asegurarse de que el monto es un número, si no es así, usar 0
-        0
-      );
-      setTotalMonto(total);
+
+    // Calcular el total tentativo
+    const total = newJsonData.reduce(
+      (acc, item) => acc + (parseFloat(item.monto) || 0),
+      0
+    );
+
+    // Verificar si el total excede el valor máximo
+    if (total > montoMax && montoMax !==0) {
+      flag = false;
+      // Revertir al estado anterior, eliminando la última entrada
+      newEditableValues.pop();
+      newJsonData.pop();
+      Swal.fire({
+        title: "Error!",
+        text: `El monto no puede ser mayor a ${montoMax.toFixed(2)}`,
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+      
     }
+
+    // Actualizar estados si no se ha excedido el valor máximo
+   
+      setEditableValues(newEditableValues);
+      setJsonData(newJsonData);
+
+      if (flag) {
+        setTotalMonto(total);
+      }
+    
   };
-  
 
   const handleDeleteRow = (index) => {
     const newEditableValues = [...editableValues];
@@ -401,7 +423,7 @@ export default function ProtectionDetailTable({
                     <CurrencyInput
                       className="input-table"
                       style={{ textAlign: "right" }}
-                      value={row.monto.toFixed(2)||0}
+                      value={row.monto.toFixed(2) || 0}
                       onBlur={(event) =>
                         handleCellValueChange(event, index, "monto")
                       }
