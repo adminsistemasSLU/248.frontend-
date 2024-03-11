@@ -210,10 +210,12 @@ const PaidForm = forwardRef((props, ref) => {
         porsibs: formPago.por_sbs,
         valsibs: formData.impScvs,
         porssc: formPago.por_ssc,
+        valssc: formData.impSsc,
         porsscnc: formPago.por_sscnc,
-        valsscnc: formData.impSsc,
+        valsscnc: 0,
         poriva: formPago.por_iva,
         valiva: formData.iva,
+        valDerecho: formData.admision,
       };
 
       try {

@@ -521,7 +521,8 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   };
 
   const closeModal = () => {
-    handleSaveChanges();
+    setOpenModal(false);
+    closeModalDetail("true");
   };
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
@@ -845,7 +846,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     const newJsonData = jsonData.map((row) => {
       let { monto, tasa, prima, objCheck, primaFija } = row;
 
-
       // Calcular la prima solo si objCheck es true
       let calculatedPrima = 0;
 
@@ -859,8 +859,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         newTotalMonto += monto;
         newTotalPrima += calculatedPrima;
       }
-
-    
 
       if (primaFija) {
         return {
@@ -912,12 +910,45 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     handleCloseBackdrop();
   };
 
-  const handleOpenModal = (id,montoFijo,montoMaximo) => {
+  const handleOpenModal = (id, montoFijo, montoMaximo) => {
     localStorage.setItem(LS_TABLAAMPARO, JSON.stringify(jsonData));
     setcurrentMontoFijo(montoFijo);
     setcurrentMontoaximo(montoMaximo);
     setCurrentId(id);
     setOpenModal(true);
+  };
+
+  const validarCamposRequeridos = () => {
+    console.log(rows1);
+    console.log(editableValues);
+    let NroAmparo = "";
+    let permitir = true;
+    rows1.forEach((row,index) => {
+      console.log(row);
+      if (row.titulo === false) {
+        console.log('Entro por titulo');
+        if (row.objCheck) {
+          console.log('Entro por check');
+          if (editableValues[index].monto === 0) {
+            console.log('Entro por monto');
+            permitir = false;
+            NroAmparo = NroAmparo + " " + row.id;
+            console.log(row.id);
+          }
+        }
+      }
+    });
+    if(!permitir){
+      Swal.fire({
+        title: "Error!",
+        text: "Los amparos Nro: " +
+        NroAmparo +
+        " deben tener ingresados valores en Monto ",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+    }
+    return permitir;
   };
 
   const handleSaveChanges = () => {
@@ -937,18 +968,22 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       prima: (editableValues[index].monto * editableValues[index].tasa) / 100,
     }));
     console.log(newJsonData);
+
+    if (!validarCamposRequeridos()) {
+      return;
+    }
+
     tablaSeccionesMap();
     closeModalDetail("true");
   };
 
   // Manejador para cerrar el modal
   const handleCloseModal = async () => {
-  
     const tablaAmparoModal = JSON.parse(localStorage.getItem(LS_TABLAAMPARO));
     await setJsonData(tablaAmparoModal);
     await setEditableRows(tablaAmparoModal);
     await setEditableValues(tablaAmparoModal);
-   
+
     setOpenModal(false);
   };
 
@@ -1066,7 +1101,11 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                   </TableCell>
                   <TableCell align="left">
                     {row.inventario ? (
-                      <EditIcon onClick={() => handleOpenModal(row.id,row.montoFijo,row.valMaximo)} />
+                      <EditIcon
+                        onClick={() =>
+                          handleOpenModal(row.id, row.montoFijo, row.valMaximo)
+                        }
+                      />
                     ) : null}
                   </TableCell>
 
@@ -1205,7 +1244,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           justifyContent: "center",
         }}
       >
-        <Button variant="contained" color="primary" onClick={closeModal}>
+        <Button variant="contained" color="primary" onClick={handleSaveChanges}>
           Aceptar
         </Button>
       </div>

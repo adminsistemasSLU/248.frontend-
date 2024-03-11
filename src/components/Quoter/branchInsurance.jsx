@@ -319,7 +319,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
       
       return {
         ...seccion,
-        tasa: isNaN(tasaMap)|| tasaMap==='Infinity' ? 0.0 : tasaMap,
+        tasa: isNaN(tasaMap)|| tasaMap==='Infinity' || tasaMap==='NaN' ? 0.0 : tasaMap,
       };
     });
 
