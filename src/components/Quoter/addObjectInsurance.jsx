@@ -260,6 +260,27 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       return null;
     }
 
+    if (!formData.riskType || formData.riskType ==="") {
+      setmessageError("El campo T.Riesgo debe ser llenado");
+      setFormData({
+        ...formData,
+        riskType: "",
+      });
+      handleCloseBackdrop();
+      setOpen(true);
+      return null;
+    }
+
+    if (!formData.destiny || formData.destiny ==="") {
+      setmessageError("El campo destinado a debe ser llenado");
+      setFormData({
+        ...formData,
+        destiny: "",
+      });
+      handleCloseBackdrop();
+      setOpen(true);
+      return null;
+    }
     let sumaAsegurada = secciones.reduce(
       (sum, item) => (item.checked ? sum + parseFloat(item.monto) : sum),
       0
