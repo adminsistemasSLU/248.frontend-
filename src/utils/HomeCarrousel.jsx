@@ -55,7 +55,7 @@ function HomeCarrousel(props) {
                         return {
                             name: baldosa.titulo,
                             description: baldosa.descripcion,
-                            imageUrl: process.env.REACT_APP_API_URL + '/Imagen/' + baldosa.nombre_imagen,
+                            imageUrl: process.env.REACT_APP_API_URL + '/api/Imagen/' + baldosa.nombre_imagen,
                             url: matchedItem ? matchedItem.url : '/default-url',
                             enable: baldosa.titulo === 'PYMES' ? true : false,
                             ramo:baldosa.ramo,

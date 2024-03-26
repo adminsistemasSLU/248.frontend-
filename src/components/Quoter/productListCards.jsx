@@ -28,7 +28,7 @@ const ProductListCards = ({ onNext }) => {
             return {
               titulo: baldosa.titulo,
               descripcion: baldosa.descripcion,
-              imagen: process.env.REACT_APP_API_URL + '/Imagen/' + baldosa.nombre_imagen,
+              imagen: process.env.REACT_APP_API_URL + '/api/Imagen/' + baldosa.nombre_imagen,
               producto:baldosa.producto,
             };
           });
