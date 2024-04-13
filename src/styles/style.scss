@@ -1,0 +1,88 @@
+.form {
+    max-width: 400px;
+    margin: auto;
+  }
+  
+  .form-group {
+    margin-bottom: 1em;
+  }
+  
+  .form-control {
+    width: 100%;
+    height: 25px;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .textField {
+    width: 100%;
+    height: 15px;
+  }
+  
+  .form-link {
+    display: block;
+    margin-top: 0.5em;
+    text-align: right;
+    color: #02545C;
+    font-size: small;
+    text-decoration: none;
+    text-decoration: underline;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    padding: 1em;
+    border: none;
+    background-color: #02545C;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 1em;
+  }
+  
+  .alert-error {
+    color: red;
+    margin-bottom: 1em;
+  }
+
+  .left-aligned-label {
+    text-align: left;
+    margin-bottom: 8px;
+  }
+  
+  .input-container label {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .input-container {
+    padding-left: 0;
+  }
+
+  .button-styled {
+    background-color: #02545C; 
+    color: white; 
+    padding: 10px 20px;
+    border: none; 
+    border-radius: 25px;
+    font-weight: bold;
+    text-transform: uppercase; 
+    font-size: 16px; 
+    cursor: pointer; 
+    outline: none; 
+    width: 190px !important;
+    height: 50px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+  
+  .button-styled:hover {
+    background-color: #008f7a; 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .button-styled:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
