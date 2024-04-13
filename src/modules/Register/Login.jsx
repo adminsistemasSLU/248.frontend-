@@ -1,8 +1,10 @@
 import React, { useContext,useState } from 'react';
-import { TextField, Button, Container, Grid, Paper, Alert } from '@mui/material';
-import '../../styles/form.scss'; 
+import '../../styles/style.scss'; 
+import { TextField, InputAdornment, IconButton, Container, Grid, Paper, Alert } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 import { AuthContext }  from  '../../services/AuthProvider';
-import Swal from "sweetalert2";
 import Snackbar from "@mui/material/Snackbar";
 import AlertTitle from "@mui/material/AlertTitle";
 
@@ -14,11 +16,21 @@ const Login = () => {
     password: '',
   });
   const [error, setError] = useState('');
-  const setAuth = useContext(AuthContext);
   const { signin } = useContext(AuthContext);
   const [errorPassword, setErrorPassword] = useState('');
   const [openSnack, setOpenSnack] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [values, setValues] = useState({
+    showPassword: false,
+  });
+
+  const handleClickShowPassword = () => {
+    setValues({ ...values, showPassword: !values.showPassword });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handleChange = (e) => {
     
@@ -58,59 +70,84 @@ const Login = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs" style={{ marginTop: '70px',marginBottom: '90px',display:'flex',alignItems:'center', flexDirection:'column', justifyContent:'center'}}>
-       <h2 style={{color:'#00a99e'}}>Login</h2>
-       <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={openSnack}
-        autoHideDuration={5000}
-        onClose={() => setOpenSnack(false)}
-      >
-        <Alert style={{ fontSize: "1em" }} severity="error">
-          <AlertTitle style={{ textAlign: "left" }}>Error</AlertTitle>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
-      <Paper elevation={3} style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center',margin:'20px' }}>
-        <form onSubmit={handleSubmit} className='form'>
-        {error && <Alert severity="error">{error}</Alert>}
-          <Grid container spacing={2}>
-            {/* Componentes de campo de entrada de Material-UI */}
-            <Grid item xs={12}>
-              <TextField
-                label="Username"
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                variant="standard"
-                required
-                fullWidth
-              />
-            </Grid>
-            {errorPassword && <Alert severity="error">{errorPassword}</Alert>}
-            <Grid item xs={12}>
-              <TextField
-                label="Password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                variant="standard"
-                required
-                fullWidth
-              />
-            </Grid>
-          </Grid>
+    <Container maxWidth={false} style={{ height: '100vh', width: '100vw', padding: 0, margin: 0 }}>
+      <Grid container style={{ height: '100%' }}>
+        <Grid item xs={false} md={7} style={{ height: '100vh', overflow: 'hidden' }}>
+          <img src={process.env.PUBLIC_URL + '/assets/images/login.png'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Background" />
+        </Grid>
+        <Grid item xs={12} sm={8} md={5} component={Paper} square style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <Container component="main" maxWidth="md" style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent:'center' }}>
+              <h2 style={{color:'#02545C'}}>Iniciar Sesión</h2>
+              <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                open={openSnack}
+                autoHideDuration={5000}
+                onClose={() => setOpenSnack(false)}
+              >
+                <Alert style={{ fontSize: "1em" }} severity="error">
+                  <AlertTitle style={{ textAlign: "left" }}>Error</AlertTitle>
+                  {errorMessage}
+                </Alert>
+              </Snackbar>
+              <form onSubmit={handleSubmit} className="form">
+                {error && <div className="alert alert-error">{error}</div>}
+                <div className="input-container">
+                  <label htmlFor="username" className="left-aligned-label"><b>Usuario o e-mail</b></label>
+                  <TextField
+                    id="username"
+                    type="text"
+                    name="username"
+                    placeholder="Usuario o e-mail"
+                    value={formData.username}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                  />
+                </div>
 
-          {/* Botón de envío */}
-          <Button type="submit" variant="contained" style={{backgroundColor:'#00a99e'}} fullWidth>
-            Enviar
-          </Button>
-        </form>
-      </Paper>
+                {errorPassword && <div className="alert alert-error">{errorPassword}</div>}
+                <div className="input-container ">
+                  <label htmlFor="password" className="left-aligned-label"><b>Contraseña</b></label>
+                  <TextField
+                    id="password"
+                    type={values.showPassword ? 'text' : 'password'}
+                    name="password"
+                    placeholder='Contraseña'
+                    value={formData.password}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <a href="/forgot-password" style={{paddingTop: 5}} className="form-link left-aligned-label"><b>Olvidé mi contraseña</b></a>
+                </div>
+                <center>
+                  <button type="submit" className="button-styled">
+                    Iniciar Sesión
+                  </button>
+                </center>
+              </form>
+            </Container>
+          </div>
+        </Grid>
+      </Grid>
     </Container>
+
   );
 };
 
 export default Login;
+
