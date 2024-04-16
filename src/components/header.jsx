@@ -219,9 +219,8 @@ function Header(props) {
 
   return (
     <Box sx={{ display: "flex", height: "100px" }}>
-      <CssBaseline />
       <AppBar component="nav">
-        <Toolbar sx={{ backgroundColor: "#fff" }}>
+        <Toolbar sx={{ backgroundColor: "#02545C" }}>
           {/* Botón para el menú móvil */}
           <IconButton
             color="inherit"
@@ -242,23 +241,13 @@ function Header(props) {
             style={{ textDecoration: "none", color: "inherit" }}
           >
             <img
-              src={process.env.PUBLIC_URL + "/assets/images/LogoSLU.jpg"}
+              src={process.env.PUBLIC_URL + "/assets/images/LogoUnionBlanco.png"}
               alt="Icono"
-              style={{ height: "100px" }}
+              style={{ height: "60px", paddingTop: "10px", paddingBottom: "10px" }}
             />
           </Link>
           {/* Menú de escritorio */}
           <Box sx={{ display: { xs: "none", sm: "block" }, flexGrow: 1 }}>
-            {menu && (
-              <Button
-                key={"-1"}
-                sx={{ color: "#00a99e", fontSize: "12px", marginRight: 2 }}
-                href={"/quoter/Pymes/MyQuotes"}
-              >
-                Mis Cotizaciones
-              </Button>
-            )}
-
             {navItems?.map((item, index) => (
               <React.Fragment key={index}>
                 <Button
@@ -297,12 +286,7 @@ function Header(props) {
             ))}
             {/* Configuración de usuario y otros botones */}
             <Tooltip title="Open settings">
-              <Button
-                onClick={handleOpenUserMenu}
-                sx={{ color: "#00a99e", fontSize: "12px", cursor: "pointer" }}
-              >
-                Usuario
-              </Button>
+
             </Tooltip>
             <Menu
               onMouseLeave={handleCloseUserMenu}

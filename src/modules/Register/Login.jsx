@@ -1,5 +1,5 @@
 import React, { useContext,useState } from 'react';
-import '../../styles/style.scss'; 
+import "../../styles/button.scss";
 import { TextField, InputAdornment, IconButton, Container, Grid, Paper, Alert } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -91,7 +91,6 @@ const Login = () => {
                 </Alert>
               </Snackbar>
               <form onSubmit={handleSubmit} className="form">
-                {error && <div className="alert alert-error">{error}</div>}
                 <div className="input-container">
                   <label htmlFor="username" className="left-aligned-label"><b>Usuario o e-mail</b></label>
                   <TextField
@@ -105,8 +104,8 @@ const Login = () => {
                     required
                   />
                 </div>
-
-                {errorPassword && <div className="alert alert-error">{errorPassword}</div>}
+                {error && <div className="alert alert-error">{error}</div>}
+                
                 <div className="input-container ">
                   <label htmlFor="password" className="left-aligned-label"><b>Contraseña</b></label>
                   <TextField
@@ -132,7 +131,8 @@ const Login = () => {
                       ),
                     }}
                   />
-                  <a href="/forgot-password" style={{paddingTop: 5}} className="form-link left-aligned-label"><b>Olvidé mi contraseña</b></a>
+                  {errorPassword && <div className="alert alert-error">{errorPassword}</div>}
+                  {/* <a href="/forgot-password" style={{paddingTop: 5}} className="form-link left-aligned-label"><b>Olvidé mi contraseña</b></a> */}
                 </div>
                 <center>
                   <button type="submit" className="button-styled">

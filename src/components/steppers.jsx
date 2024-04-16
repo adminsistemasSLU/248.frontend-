@@ -5,6 +5,8 @@ import Stack from "@mui/material/Stack";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import { useNavigate } from "react-router-dom";
 import StepConnector, {
   stepConnectorClasses,
@@ -411,19 +413,23 @@ export default function Steppers() {
         </DialogActions>
       </Dialog>
 
-      <Stepper
-        alternativeLabel
-        activeStep={activeStep}
-        connector={<ColorlibConnector />}
-      >
-        {steps.map((step, index) => (
-          <Step key={index}>
-            <StepLabel StepIconComponent={ColorlibStepIcon}>
-              {step.label}
-            </StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+      <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto' }}>
+        <CardContent sx={{ bgcolor: 'background.default' }}>
+          <Stepper
+          alternativeLabel
+          activeStep={activeStep}
+          connector={<ColorlibConnector />}
+          >
+            {steps.map((step, index) => (
+              <Step key={index}>
+                <StepLabel StepIconComponent={ColorlibStepIcon}>
+                  {step.label}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </CardContent>
+      </Card>
       <div
         style={{
           display: "flex",
@@ -433,9 +439,13 @@ export default function Steppers() {
           marginBottom: "10%",
         }}
       >
-        <Box style={{ width: "90%" }}>
+        <Box style={{ width: "100%" }}>
           {steps[activeStep].label === "Producto" && (
-            <h3 style={{ color: "#00a99e" }}>SELECCIONE UN PRODUCTO</h3>
+            <div style={{paddingLeft: '9%', textAlign: 'left'}}>
+              <span style={{ color: "#02545C", }}><b>PRODUCTOS</b></span>
+              <br />
+            <div style={{paddingTop: '5px', paddingBottom: '30px'}}><span>Seleccione el producto a cotizar</span></div>
+            </div>
           )}
           {React.cloneElement(steps[activeStep].formComponent, {
             formData,
@@ -446,7 +456,8 @@ export default function Steppers() {
               disabled={activeStep === 0}
               onClick={handleBack}
               sx={{ mr: 1 }}
-              className="btnStepper btnBack"
+              className="button-styled-back"
+              style={{ top: "20%", backgroundColor: 'white', color: "#02545C", borderRadius: '20px' }}
             >
               Regresar
             </Button>
@@ -465,8 +476,8 @@ export default function Steppers() {
               <Button
                 onClick={handleNext}
                 sx={{ mr: 1 }}
-                className="btnStepper"
-                style={{ top: "20%" }}
+                className="button-styled-primary"
+                style={{ top: "20%", backgroundColor: '#02545C', color: "white", borderRadius: '20px' }}
               >
                 Siguiente
               </Button>

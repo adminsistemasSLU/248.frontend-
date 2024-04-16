@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     const signin = async (endpoint, method, data, additionalHeaders) => {
         setIsLoading(true);
         try {
+            console.log(data);
             const userData = await authService.fetchWithAuth(endpoint, method, data, additionalHeaders);
             if(userData.codigo===200){
                 console.log(userData);

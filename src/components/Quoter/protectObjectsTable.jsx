@@ -144,7 +144,7 @@ const headCells = [
     id: "action",
     numeric: true,
     disablePadding: false,
-    label: "Acción",
+    label: "Acciones",
   },
 ];
 
@@ -155,7 +155,7 @@ function EnhancedTableHead(props) {
   };
 
   return (
-    <TableHead>
+    <TableHead sx={{ backgroundColor: '#C0E5E9' }}>
       <TableRow>
         <StyledTableCell padding="checkbox"></StyledTableCell>
         {headCells.map((headCell) => (
@@ -164,6 +164,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
+            style={{color: '#02545C', fontWeight: '600'}}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -215,15 +216,6 @@ function EnhancedTableToolbar(props) {
         minHeight: "0px",
       }}
     >
-      <Typography
-        sx={{ flex: "1 1 100%" }}
-        variant="h6"
-        id="tableTitle"
-        component="div"
-        style={{ textAlign: "start", fontSize: "14px", color: "#00a99e" }}
-      >
-        Objeto del Seguro
-      </Typography>
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
@@ -606,24 +598,26 @@ export default function ProtectObjectsTable() {
       </Dialog>
 
       <Box style={{ width: "100%" }} sx={{ width: "100%", marginTop: "12px" }}>
-        <Paper sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
+        <div style={{textAlign: 'right', paddingBottom: '15px'}}>
           <Button
             variant="contained"
             onClick={() => handleOpenModal("")}
-            sx={{ marginRight: "20px" }}
+            sx={{ marginRight: "10px", width: '120px !important'}}
+            className="button-styled-primary"
+            style={{ backgroundColor: '#0099A8', color: "white", borderRadius: '20px',  }}
           >
-            Nuevo
+            AGREGAR
           </Button>
-        </Paper>
+        </div>
         <Paper sx={{ width: "100%", mb: 2 }}>
-          <EnhancedTableToolbar numSelected={selected.length} />
+
           {visibleRows.length === 0 ? (
             <Typography variant="body2" style={{ padding: "16px" }}>
               No hay registros en la tabla.
             </Typography>
           ) : (
             <TableContainer
-              style={{ overflow: "auto", height: 300, padding: "20px" }}
+              style={{ overflow: "auto", height: 300 }}
             >
               <Table
                 sx={{ minWidth: 750 }}

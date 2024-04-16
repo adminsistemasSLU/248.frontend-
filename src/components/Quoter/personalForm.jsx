@@ -22,6 +22,9 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
+
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
@@ -37,7 +40,7 @@ const PersonalForm = forwardRef((props, ref) => {
     lastname: "",
     email: "",
     phone: "",
-    documentType: "",
+    documentType: "C",
     identification: "",
     age: "",
     address: "",
@@ -255,190 +258,187 @@ const PersonalForm = forwardRef((props, ref) => {
   };
 
   return (
-    <Container
-      component="main"
-      maxWidth="xs"
-      style={{
-        marginBottom: "20px",
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}
-    >
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackdrop}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
-      <Paper
-        elevation={3}
-        style={{
-          padding: 20,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          margin: "20px",
-        }}
-      >
-        <FormControl
-          component="form"
-          variant="standard"
-          onSubmit={handleSubmit}
-          className="form"
+      <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px' }}>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={openBackdrop}
         >
-          <Grid container spacing={2}>
-            <Snackbar
-              open={open}
-              autoHideDuration={5000}
-              onClose={handleClose}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-              <Alert severity="warning">{messageError}</Alert>
-            </Snackbar>
-            <Grid item xs={12}>
-              <InputLabel id="documentType-Label">
-                Seleccione documento
-              </InputLabel>
-              <Select
-                labelId="documentType-Label"
-                id="documentType"
-                name="documentType"
-                value={formData.documentType}
-                onChange={handleChange}
-                style={{ textAlign: "left" }}
-                variant="standard"
-                fullWidth
-                required
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '40px', fontWeight: 'bold' }}>
+          DATOS PERSONALES
+        </Typography>
+          <FormControl
+            component="form"
+            variant="standard"
+            onSubmit={handleSubmit}
+            className="form"
+            sx={{width: '90%', padding: '30px'}}
+          >
+            <Grid container spacing={2}>
+              <Snackbar
+                open={open}
+                autoHideDuration={5000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
               >
-                <MenuItem value="C">Cédula</MenuItem>
-                <MenuItem value="R">RUC</MenuItem>
-                <MenuItem value="P">Pasaporte</MenuItem>
-              </Select>
-            </Grid>
-            <Grid item xs={12}>
-              {errorCedula ? (
-                <Alert
-                  severity="error"
-                  style={{ fontSize: "10px", textAlign: "start" }}
+                <Alert severity="warning">{messageError}</Alert>
+              </Snackbar>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Seleccione Documento <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <Select
+                  labelId="documentType-Label"
+                  id="documentType"
+                  name="documentType"
+                  value={formData.documentType}
+                  onChange={handleChange}
+                  style={{ textAlign: "left" }}
+                  variant="standard"
+                  placeholder="Seleccione documento"
+                  fullWidth
+                  required
                 >
-                  El documento de identificación no es valido.
-                </Alert>
-              ) : null}
-
-              <TextField
-                label="Documento de identificación"
-                type={formData.documentType === "P" ? "text" : "text"}
-                name="identification"
-                value={formData.identification}
-                onChange={handleChange}
-                onBlur={verifyIdentification}
-                variant="standard"
-                fullWidth
-                required
-              />
+                  <MenuItem value="C">Cédula</MenuItem>
+                  <MenuItem value="R">RUC</MenuItem>
+                  <MenuItem value="P">Pasaporte</MenuItem>
+                </Select>
+              </Grid>
+              <Grid item xs={12} md={3} >
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Documento de identificación <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <TextField
+                  type={formData.documentType === "P" ? "text" : "text"}
+                  name="identification"
+                  value={formData.identification}
+                  placeholder="Documento de identificación"
+                  onChange={handleChange}
+                  onBlur={verifyIdentification}
+                  variant="standard"
+                  fullWidth
+                  required
+                />
+                {errorCedula ? (
+                  <Alert
+                    severity="error"
+                    style={{ fontSize: "10px", textAlign: "start" }}
+                  >
+                    El documento de identificación no es valido.
+                  </Alert>
+                ) : null}
+              </Grid>
+              <Grid item xs={12} md={3} >
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Nombres <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <TextField
+                  placeholder="Nombres"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  variant="standard"
+                  fullWidth
+                  disabled={errorCedula}
+                  inputProps={{ maxLength: 30 }}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3} >
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Apellidos <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <TextField
+                  placeholder="Apellidos"
+                  type="text"
+                  name="lastname"
+                  value={formData.lastname}
+                  onChange={handleChange}
+                  disabled={errorCedula}
+                  variant="standard"
+                  fullWidth
+                  inputProps={{ maxLength: 30 }}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Fecha de nacimiento <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={["DatePicker"]}>
+                    <DatePicker
+                      placeholder="Fecha de nacimiento"
+                      slotProps={{
+                        textField: { variant: "standard", size: "small" },
+                      }}
+                      value={age}
+                      format="DD/MM/YYYY"
+                      disabled={errorCedula}
+                      className="datePicker"
+                      maxDate={maxDate}
+                      onChange={(newValue) => {
+                        setAge(newValue);
+                      }}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+              </Grid>
+              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Teléfono <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <TextField
+                  placeholder="Teléfono"
+                  type="number"
+                  disabled={errorCedula}
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  variant="standard"
+                  fullWidth
+                  inputProps={{ maxLength: 10 }}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Dirección <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <TextField
+                  placeholder="Dirección"
+                  type="text"
+                  disabled={errorCedula}
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  variant="standard"
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                Email <span style={{ color: 'red' }}>*</span>
+                </Typography>
+                <TextField
+                  placeholder="Email"
+                  type="email"
+                  name="email"
+                  disabled={errorCedula}
+                  value={formData.email}
+                  onChange={handleChange}
+                  variant="standard"
+                  fullWidth
+                  required
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Nombres"
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                variant="standard"
-                fullWidth
-                disabled={errorCedula}
-                inputProps={{ maxLength: 30 }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Apellidos"
-                type="text"
-                name="lastname"
-                value={formData.lastname}
-                onChange={handleChange}
-                disabled={errorCedula}
-                variant="standard"
-                fullWidth
-                inputProps={{ maxLength: 30 }}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={12}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={["DatePicker"]}>
-                  <DatePicker
-                    label="Fecha de nacimiento"
-                    slotProps={{
-                      textField: { variant: "standard", size: "small" },
-                    }}
-                    value={age}
-                    format="DD/MM/YYYY"
-                    disabled={errorCedula}
-                    className="datePicker"
-                    maxDate={maxDate}
-                    onChange={(newValue) => {
-                      setAge(newValue);
-                    }}
-                  />
-                </DemoContainer>
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Teléfono"
-                type="number"
-                disabled={errorCedula}
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                variant="standard"
-                fullWidth
-                inputProps={{ maxLength: 10 }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Dirección"
-                type="text"
-                disabled={errorCedula}
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                variant="standard"
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Email"
-                type="email"
-                name="email"
-                disabled={errorCedula}
-                value={formData.email}
-                onChange={handleChange}
-                variant="standard"
-                fullWidth
-                required
-              />
-            </Grid>
-          </Grid>
-
-          {/* Botón de envío */}
-          {/* <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
-            Registrarse
-          </Button> */}
-          {error && <Alert severity="error">{error}</Alert>}
-        </FormControl>
-      </Paper>
-    </Container>
+            {error && <Alert severity="error">{error}</Alert>}
+          </FormControl>
+      </Card>
   );
 });
 

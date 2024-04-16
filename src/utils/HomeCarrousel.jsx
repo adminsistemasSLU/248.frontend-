@@ -115,11 +115,10 @@ function HomeCarrousel(props) {
 
                 }}
             >
-
                 {groupItems(items, 3).map((group, index) => (
                     <div key={index} className="carousel-container">
                         {group.map((item, i) => (
-                            <Item key={i} item={item} />
+                            <Item key={i} item={item} style={{ flex: 1, maxWidth: '100vw' }} />
                         ))}
                     </div>
                 ))}
@@ -136,16 +135,15 @@ function HomeCarrousel(props) {
 function Item(props) {
     const navigate = useNavigate();
     if (!props.item) {
-        // Manejar elementos nulos si el grupo no tiene suficientes elementos
         return null;
     }
     const handleImageClick = (ramo) => {
         console.log('Ramo elegido: '+ramo);
         localStorage.setItem(LS_RAMO,JSON.stringify(ramo));
-        navigate(props.item.url); // Reemplaza 'url' con la propiedad correcta de tu objeto
+        navigate(props.item.url); 
     };
     return (
-        <Card sx={{ maxWidth: 200 }} >
+        <Card sx={{ maxWidth: 300 }} >
             <Link to={props.item.url} className={props.item.enable ? 'carousel-content' : ''} onClick={(e) => { e.preventDefault(); handleImageClick(props.item.ramo); }}>
                 <CardMedia
                     className={props.item.enable ? '' : 'inactivo'}
@@ -157,10 +155,10 @@ function Item(props) {
                 />
             </Link>
             <CardContent>
-                <Typography variant="h6" color="#018997" >
+                <Typography variant="h6"  style={{ color: "#02545C" }}>
                     {props.item.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" style={{ textAlign: 'justify' }}>
+                <Typography variant="body1" color="text.secondary" style={{ textAlign: 'justify', fontWeight: '400', paddingBottom: '30px' }}>
                     {props.item.description}
                 </Typography>
             </CardContent>
