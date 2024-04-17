@@ -73,7 +73,7 @@ const Login = () => {
   return (
     <Container maxWidth={false} style={{ height: '100vh', width: '100vw', padding: 0, margin: 0 }}>
       <Grid container style={{ height: '100%' }}>
-        <Grid item xs={false} md={7} style={{ height: '100vh', overflow: 'hidden' }}>
+        <Grid item xs={false} md={7} className="hide-on-mobile">
           <img src={process.env.PUBLIC_URL + '/assets/images/login.png'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Background" />
         </Grid>
         <Grid item xs={12} sm={8} md={5} component={Paper} square style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
