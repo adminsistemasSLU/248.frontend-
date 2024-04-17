@@ -602,7 +602,7 @@ export default function ProtectObjectsTable() {
           <Button
             variant="contained"
             onClick={() => handleOpenModal("")}
-            sx={{ marginRight: "10px", width: '120px !important'}}
+            sx={{ marginRight: "10px", width: '120px !important', height: '40px !important'}}
             className="button-styled-primary"
             style={{ backgroundColor: '#0099A8', color: "white", borderRadius: '20px',  }}
           >

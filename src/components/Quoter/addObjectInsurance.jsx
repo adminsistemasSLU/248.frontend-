@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Button, Container, Paper } from "@mui/material";
+import { Button, Container, Paper, Grid, TextField, Select, MenuItem } from "@mui/material";
+import Typography from '@mui/material/Typography';
 import MapContainer from "./mapContainer";
 import AddLocationAltRoundedIcon from "@mui/icons-material/AddLocationAltRounded";
 import CloseIcon from "@mui/icons-material/Close";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import PaidIcon from '@mui/icons-material/Paid';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import BranchInsurance from "./branchInsurance";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import Tooltip from "@mui/material/Tooltip";
 import "../../styles/moddalForm.scss";
 import "../../styles/dialogForm.scss";
 import "../../styles/form.scss";
@@ -649,7 +649,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
         }}
       >
         <DialogContent
-          style={{ overflow: "scroll", padding: "0px", paddingBottom: "20px" }}
+          style={{ overflow: "scroll", paddingBottom: "20px" }}
           className="dialog-height-content"
         >
           {/* Componente del formulario */}
@@ -696,8 +696,8 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
             className="modalContent"
             style={{
               overflowY: "scroll",
-              height: "50vh",
-              paddingBottom: 20,
+              height: "40%",
+              paddingBottom: 10,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -711,623 +711,425 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
             >
               <Alert severity="warning">{messageError}</Alert>
             </Snackbar>
-            <form component="form" onSubmit={handleSubmit} className="form">
-              <table spacing={3}>
-                <tbody>
-                  <tr className="modalFormRow">
-                    <td
-                      className="modalFormContent"
-                      style={{ display: "flex", flexDirection: "column" }}
-                    >
-                      {formData.province === "" && formDataTouched.province && (
-                        <Alert severity="error" color="error">
-                          El campo provincia es requerido
-                        </Alert>
-                      )}
-                      <div
-                        className="modalFormContent"
-                        style={{ width: "100%" }}
-                      >
-                        <div className="tdTableTitle">
-                          <label
-                            style={{ fontSize: "13px" }}
-                            id="province-Label"
-                          >
-                            {" "}
-                            <b>Provincia:</b>{" "}
-                          </label>
-                        </div>
-                        <div className="tdTableData">
-                          <select
-                            id="province"
-                            name="province"
-                            value={formData.province}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            variant="standard"
-                            className="modalFormInputs"
-                            style={{ border: "1px solid #A1A8AE" }}
-                          >
-                            <option value="">SELECCIONE UNA OPCION</option>
-                            {provinces.map((province, index) => (
-                              <option key={index} value={province.Codigo}>
-                                {province.Nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      className="modalFormContent"
-                      style={{ display: "flex", flexDirection: "column" }}
-                    >
-                      {formData.city === "" && formDataTouched.city && (
-                        <Alert severity="error" color="error">
-                          El campo ciudad es requerido
-                        </Alert>
-                      )}
-                      <div
-                        className="modalFormContent"
-                        style={{ width: "100%" }}
-                      >
-                        <div className="tdTableTitle">
-                          <label style={{ fontSize: "13px" }} id="city-Label">
-                            {" "}
-                            <b>Ciudad:</b>{" "}
-                          </label>
-                        </div>
-                        <div className="tdTableData">
-                          <select
-                            id="city"
-                            name="city"
-                            value={formData.city}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            variant="standard"
-                            className="modalFormInputs"
-                            style={{ border: "1px solid #A1A8AE" }}
-                          >
-                            <option value="">SELECCIONE UNA PROVINCIA</option>
-                            {ciudades.map((ciudad, index) => (
-                              <option key={index} value={ciudad.Codigo}>
-                                {ciudad.Nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
+            <form
+              component="form"
+              variant="standard"
+              onSubmit={handleSubmit}
+              className="form"
+              style={{width: '90%', padding: '30px'}} >
+              <Grid container spacing={2}>
+                <Snackbar
+                  open={open}
+                  autoHideDuration={5000}
+                  onClose={handleClose}
+                  anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                >
+                  <Alert severity="warning">{messageError}</Alert>
+                </Snackbar>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Provincia <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="province"
+                    name="province"
+                    value={formData.province}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="Seleccione la provincia"
+                    variant="standard"
+                    fullWidth>
 
-                  <tr className="modalFormRow">
-                    <td
-                      className="modalFormContent"
-                      style={{ display: "flex", flexDirection: "column" }}
-                    >
-                      {formData.parish === "" && formDataTouched.parish && (
-                        <Alert severity="error" color="error">
-                          El campo parroquia es requerido
-                        </Alert>
-                      )}
-                      <div
-                        className="modalFormContent"
-                        style={{ width: "100%" }}
-                      >
-                        <div className="tdTableTitle">
-                          <label style={{ fontSize: "13px" }} id="parish-Label">
-                            {" "}
-                            <b>Parroquia:</b>{" "}
-                          </label>
-                        </div>
-                        <div className="tdTableData">
-                          <select
-                            id="parish"
-                            name="parish"
-                            value={formData.parish}
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            variant="standard"
-                            className="modalFormInputs"
-                          >
-                            <option value="">SELECCIONE UNA CIUDAD</option>
-                            {parroquia.map((parroq, index) => (
-                              <option key={index} value={parroq.Codigo}>
-                                {parroq.Nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                    {provinces.map((province, index) => (
+                      <MenuItem key={index} value={province.Codigo}>
+                        {province.Nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {formData.province === "" && formDataTouched.province && (
+                    <Alert severity="error" color="error">
+                      El campo provincia es requerido
+                    </Alert>
+                  )}
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Ciudad <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    variant="standard"
+                    placeholder="SELECCIONE UNA PROVINCIA"
+                    fullWidth
+                  >
+                    {ciudades.map((ciudad, index) => (
+                      <MenuItem key={index} value={ciudad.Codigo}>
+                        {ciudad.Nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {formData.city === "" && formDataTouched.city && (
+                    <Alert severity="error" color="error">
+                      El campo ciudad es requerido
+                    </Alert>
+                  )}
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Parroquia <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="parish"
+                    name="parish"
+                    value={formData.parish}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    variant="standard"
+                    placeholder="SELECCIONE UNA CIUDAD"
+                    fullWidth
+                  >
+                    {parroquia.map((parroq, index) => (
+                      <MenuItem key={index} value={parroq.Codigo}>
+                        {parroq.Nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {formData.parish === "" && formDataTouched.parish && (
+                    <Alert severity="error" color="error">
+                      El campo parroquia es requerido
+                    </Alert>
+                  )}
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                    Dirección <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Grid container alignItems="center" spacing={1}>
+                    <Grid item xs>
+                      <TextField
+                        type="text"
+                        name="direccion"
+                        value={formData.direccion}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        variant="standard"
+                        placeholder="Av 9 de Octubre"
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item>
+                      <div onClick={SearchLocation}>
+                        <AddLocationAltRoundedIcon style={{ cursor: 'pointer' }} />
                       </div>
-                    </td>
-                    <td
-                      className="modalFormContent"
-                      style={{ display: "flex", flexDirection: "column" }}
-                    >
-                      {formData.direccion === "" &&
-                        formDataTouched.direccion && (
-                          <Alert severity="error" color="error">
-                            El campo direccion es requerido
-                          </Alert>
-                        )}
-                      <div
-                        className="modalFormContent"
-                        style={{ width: "100%" }}
-                      >
-                        <div className="tdTableTitle">
-                          <label
-                            style={{ fontSize: "13px" }}
-                            id="direction-Label"
-                          >
-                            {" "}
-                            <b>Dirección:</b>{" "}
-                          </label>
-                        </div>
-                        <div
-                          className="tdTableData"
-                          style={{ display: "flex", alignItems: "center" }}
+                    </Grid>
+                  </Grid>
+                  {formData.direccion === "" && formDataTouched.direccion && (
+                    <Alert severity="error" color="error">
+                      El campo dirección es requerido
+                    </Alert>
+                  )}
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Manzana <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <TextField
+                    type="text"
+                    name="block"
+                    placeholder="Ingrese la manzana de su casa"
+                    value={formData.block}
+                    onChange={handleChange}
+                    variant="standard"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Villa <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <TextField
+                    id="house"
+                    name="house"
+                    placeholder="Ingrese la villa de su casa"
+                    value={formData.house}
+                    onChange={handleChange}
+                    variant="standard"
+                    required
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Pisos <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <TextField
+                    id="floor"
+                    name="floor"
+                    placeholder="Número de pisos"
+                    value={formData.floor}
+                    onChange={handleChange}
+                    variant="standard"
+                    required
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Antiguedad <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="buildingAge"
+                    name="buildingAge"
+                    value={formData.buildingAge}
+                    onChange={handleChange}
+                    variant="standard"
+                    placeholder="Seleccione la antigueadad"
+                    required
+                    fullWidth
+                  >
+                    {antiguedad.map((antig, index) => (
+                      <MenuItem key={index} value={antig.Codigo}>
+                        {antig.Nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  T. Construcción <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="constructionType"
+                    name="constructionType"
+                    value={formData.constructionType}
+                    onChange={handleChange}
+                    variant="standard"
+                    required
+                    fullWidth
+                  >
+                    {construccion.map((construc, index) => (
+                      <MenuItem key={index} value={construc.Codigo}>
+                        {construc.Nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  T. Riesgo <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="riskType"
+                    name="riskType"
+                    value={formData.riskType}
+                    onChange={handleChange}
+                    variant="standard"
+                    placeholder=""
+                    required
+                    fullWidth
+                  >
+                    {riesgo.map((risk, index) => (
+                      <MenuItem key={index} value={risk.Codigo}>
+                        {risk.Nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Destinado a <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="destiny"
+                    name="destiny"
+                    value={formData.destiny}
+                    onChange={handleChange}
+                    variant="standard"
+                    required
+                    fullWidth
+                  >
+                    {destinado.map((destin, index) => (
+                      <MenuItem key={index} value={destin.Codigo}>
+                        {destin.Nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                    Suma Aseg <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Grid container alignItems="center" spacing={1}>
+                    <Grid item xs>
+                      <TextField
+                        type="text"
+                        name="umInsure"
+                        onClick={handleOpenModal}
+                        value={formatearEnDolares(formData.sumInsure)}
+                        variant="standard"
+                        onChange={handleChange}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item>
+                      <div onClick={handleOpenModal}>
+                        <PaidIcon />
+                      </div>
+                    </Grid>
+                  </Grid>
+                  {formData.direccion === "" && formDataTouched.direccion && (
+                    <Alert severity="error" color="error">
+                      El campo dirección es requerido
+                    </Alert>
+                  )}
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Latitud <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <TextField
+                    id="lat"
+                    name="lat"
+                    value={formData.lat}
+                    onChange={handleChange}
+                    variant="standard"
+                    required
+                    placeholder="Latitud de la ubicación"
+                    disabled
+                    fullWidth
+                  ></TextField>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                  Longitud <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <TextField
+                    id="lng"
+                    name="lng"
+                    value={formData.lng}
+                    onChange={handleChange}
+                    variant="standard"
+                    placeholder="Longitud de la ubicación"
+                    required
+                    disabled
+                    fullWidth
+                  ></TextField>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                   Inspección <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <input
+                    id="inspection"
+                    name="inspection"
+                    checked={formData.inspection}
+                    onChange={toggleInspection}
+                    variant="standard"
+                    type="checkbox"
+                    fullWidth
+                  ></input>
+                </Grid>
+                {formData.inspection && ( // Verificar si inspection es true
+                  <>
+                    <Grid item xs={12} md={3}>
+                      <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                      Contacto <span style={{ color: 'red' }}>*</span>
+                      </Typography>
+                      <TextField
+                        id="agentInspection"
+                        name="agentInspection"
+                        value={formData.agentInspection}
+                        onChange={handleChange}
+                        variant="standard"
+                        placeholder="Nombre de contacto"
+                        fullWidth
+                      ></TextField>
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                      <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                        Teléfono <span style={{ color: 'red' }}>*</span>
+                      </Typography>
+                      <TextField
+                        id="phoneInspection"
+                        name="phoneInspection"
+                        value={formData.phoneInspection}
+                        onChange={handleChange}
+                        variant="standard"
+                        style={{paddingTop: '5px'}}
+                        fullWidth
+                      ></TextField>
+                    </Grid>
+                  </>
+                )}
+                {formData.inspection && ( // Verificar si inspection es true
+                <>
+                  <Grid item xs={12} md={3}>
+                    <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                        Fecha <span style={{ color: 'red' }}>*</span>
+                      </Typography>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer
+                          components={["DatePicker"]}
+                          sx={{ overflow: "hidden" }}
                         >
-                          <input
-                            label="direction-Label"
-                            type="text"
-                            name="direccion"
-                            value={formData.direccion}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            variant="standard"
-                            placeholder="Av 9 de Octubre"
-                            className="modalFormInputs"
+                          <DatePicker
+                            value={dateInspecction}
+                            onChange={setdateInspecction}
+                            format="DD/MM/YYYY"
+                            className="hourPicker"
+                            style={{ overflow: "hidden" }}
+                            fullWidth
+                            slotProps={{
+                              textField: {
+                                variant: "standard",
+                                size: "small",
+                              },
+                            }}
                           />
-                          <div onClick={SearchLocation}>
-                            <AddLocationAltRoundedIcon />
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="modalFormRow">
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label style={{ fontSize: "13px" }} id="number-Label">
-                          {" "}
-                          <b>Manzana:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <input
-                          label="number"
-                          type="text"
-                          name="block"
-                          placeholder="207"
-                          value={formData.block}
-                          onChange={handleChange}
-                          variant="standard"
-                          required
-                          className="modalFormInputs"
-                        />
-                      </div>
-                    </td>
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label style={{ fontSize: "13px" }} id="house-Label">
-                          {" "}
-                          <b>Villa:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <input
-                          id="house"
-                          name="house"
-                          placeholder="11"
-                          value={formData.house}
-                          onChange={handleChange}
-                          variant="standard"
-                          required
-                          className="modalFormInputs"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr className="modalFormRow">
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label style={{ fontSize: "13px" }} id="floor-Label">
-                          {" "}
-                          <b>Pisos:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <input
-                          id="floor"
-                          name="floor"
-                          placeholder="1"
-                          value={formData.floor}
-                          onChange={handleChange}
-                          variant="standard"
-                          required
-                          className="modalFormInputs"
-                        />
-                      </div>
-                    </td>
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label
-                          style={{ fontSize: "13px" }}
-                          id="buildingAge-Label"
-                        >
-                          {" "}
-                          <b>Antiguedad:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <select
-                          id="buildingAge"
-                          name="buildingAge"
-                          value={formData.buildingAge}
-                          onChange={handleChange}
-                          variant="standard"
-                          className="modalFormInputs"
-                          required
-                          style={{ border: "1px solid #A1A8AE" }}
-                        >
-                          {antiguedad.map((antig, index) => (
-                            <option key={index} value={antig.Codigo}>
-                              {antig.Nombre}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr className="modalFormRow">
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label
-                          style={{ fontSize: "13px" }}
-                          id="constructionType-Label"
-                        >
-                          {" "}
-                          <b>T. Construcción:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <select
-                          id="constructionType"
-                          name="constructionType"
-                          value={formData.constructionType}
-                          onChange={handleChange}
-                          variant="standard"
-                          className="modalFormInputs"
-                          required
-                          style={{ border: "1px solid #A1A8AE" }}
-                        >
-                          {construccion.map((construc, index) => (
-                            <option key={index} value={construc.Codigo}>
-                              {construc.Nombre}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label style={{ fontSize: "13px" }} id="riskType-Label">
-                          {" "}
-                          <b>T. Riesgo:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <select
-                          id="riskType"
-                          name="riskType"
-                          value={formData.riskType}
-                          onChange={handleChange}
-                          variant="standard"
-                          className="modalFormInputs"
-                          required
-                          style={{ border: "1px solid #A1A8AE" }}
-                        >
-                          <option value="--">SELECCIONE UNA OPCION</option>
-                          {riesgo.map((risk, index) => (
-                            <option key={index} value={risk.Codigo}>
-                              {risk.Nombre}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr className="modalFormRow">
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label style={{ fontSize: "13px" }} id="destiny-Label">
-                          {" "}
-                          <b>Destinado a:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <select
-                          id="destiny"
-                          name="destiny"
-                          value={formData.destiny}
-                          onChange={handleChange}
-                          variant="standard"
-                          className="modalFormInputs"
-                          required
-                          style={{ border: "1px solid #A1A8AE" }}
-                        >
-                          <option value="--">SELECCIONE UN T. RIESGO</option>
-                          {destinado.map((destin, index) => (
-                            <option key={index} value={destin.Codigo}>
-                              {destin.Nombre}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label
-                          style={{ fontSize: "13px" }}
-                          id="sumInsure-Label"
-                        >
-                          {" "}
-                          <b>Suma Aseg:</b>{" "}
-                        </label>
-                      </div>
-                      <div
-                        className="tdTableData"
-                        style={{ display: "flex", alignItems: "center" }}
+                        </DemoContainer>
+                      </LocalizationProvider>
+                    </Grid>
+                  <Grid item xs={12} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px', paddingLeft: '10px' }}>
+                      Hora <span style={{ color: 'red' }}>*</span>
+                    </Typography>
+                    <LocalizationProvider
+                      dateAdapter={AdapterDayjs}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <DemoContainer
+                        components={["TimePicker"]}
+                        sx={{ overflow: "hidden" }}
                       >
-                        <input
-                          label="sumInsure-Label"
-                          type="text"
-                          name="umInsure"
-                          onClick={handleOpenModal}
-                          value={formatearEnDolares(formData.sumInsure)}
-                          className="modalFormInputs"
-                          variant="standard"
-                          onChange={handleChange}
+                        <TimePicker
+                          format="HH:mm"
+                          value={timeInspecction}
+                          onChange={setTimeInspecction}
+                          className="hourPicker"
+                          fullWidth
+                          slotProps={{
+                            textField: {
+                              variant: "standard",
+                              size: "small",
+                            },
+                          }}
                         />
-                        <div onClick={handleOpenModal}>
-                          <CalendarMonthIcon />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr className="modalFormRow">
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label
-                          style={{ fontSize: "13px" }}
-                          id="latituded-Label"
-                        >
-                          {" "}
-                          <b>Latitud:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <input
-                          id="lat"
-                          name="lat"
-                          value={formData.lat}
-                          onChange={handleChange}
-                          variant="standard"
-                          className="modalFormInputs"
-                          required
-                          disabled
-                          style={{ border: "1px solid #A1A8AE" }}
-                        ></input>
-                      </div>
-                    </td>
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label
-                          style={{ fontSize: "13px" }}
-                          id="longitude-Label"
-                        >
-                          {" "}
-                          <b>Longitud:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <input
-                          id="lng"
-                          name="lng"
-                          value={formData.lng}
-                          onChange={handleChange}
-                          variant="standard"
-                          className="modalFormInputs"
-                          required
-                          disabled
-                          style={{ border: "1px solid #A1A8AE" }}
-                        ></input>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr className="modalFormRow">
-                    <td className="modalFormContent">
-                      <div className="tdTableTitle">
-                        <label
-                          style={{ fontSize: "13px" }}
-                          id="longitude-Label"
-                        >
-                          {" "}
-                          <b>Inspección:</b>{" "}
-                        </label>
-                      </div>
-                      <div className="tdTableData">
-                        <input
-                          id="inspection"
-                          name="inspection"
-                          checked={formData.inspection}
-                          onChange={toggleInspection}
-                          variant="standard"
-                          className="modalFormInputs"
-                          type="checkbox"
-                          style={{ border: "1px solid #A1A8AE" }}
-                        ></input>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {formData.inspection && ( // Verificar si inspection es true
-                    <tr className="modalFormRow">
-                      <td className="modalFormContent">
-                        <Tooltip
-                          title="Agente de inspeccion"
-                          style={{ width: "100%", display: "flex" }}
-                          placement="left"
-                        >
-                          <div className="tdTableTitle">
-                            <label
-                              style={{ fontSize: "13px" }}
-                              id="longitude-Label"
-                            >
-                              <b>Contacto:</b>
-                            </label>
-                          </div>
-                          <div className="tdTableData">
-                            <input
-                              id="agentInspection"
-                              name="agentInspection"
-                              value={formData.agentInspection}
-                              onChange={handleChange}
-                              variant="standard"
-                              className="modalFormInputs"
-                              style={{ border: "1px solid #A1A8AE" }}
-                            ></input>
-                          </div>
-                        </Tooltip>
-                      </td>
-
-                      <td className="modalFormContent">
-                        <Tooltip
-                          title="Telefono de inspeccion"
-                          placement="left"
-                          style={{ width: "100%", display: "flex" }}
-                        >
-                          <div className="tdTableTitle">
-                            <label
-                              style={{ fontSize: "13px" }}
-                              id="longitude-Label"
-                            >
-                              <b>Teléfono:</b>
-                            </label>
-                          </div>
-                          <div className="tdTableData">
-                            <input
-                              id="phoneInspection"
-                              name="phoneInspection"
-                              value={formData.phoneInspection}
-                              onChange={handleChange}
-                              variant="standard"
-                              className="modalFormInputs"
-                              style={{ border: "1px solid #A1A8AE" }}
-                            ></input>
-                          </div>
-                        </Tooltip>
-                      </td>
-                    </tr>
-                  )}
-
-                  {formData.inspection && ( // Verificar si inspection es true
-                    <tr className="modalFormRow">
-                      <td className="modalFormContent">
-                        <Tooltip
-                          title="Fecha Tentativa"
-                          placement="left"
-                          style={{ width: "100%", display: "flex" }}
-                        >
-                          <div className=" tdTableTitle dateTimePickerForm">
-                            <label
-                              style={{ fontSize: "13px" }}
-                              id="longitude-Label"
-                            >
-                              <b>Fecha:</b>
-                            </label>
-                          </div>
-                          <div className="tdTableData">
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                              <DemoContainer
-                                components={["DatePicker"]}
-                                sx={{ overflow: "hidden" }}
-                              >
-                                <DatePicker
-                                  value={dateInspecction}
-                                  onChange={setdateInspecction}
-                                  format="DD/MM/YYYY"
-                                  className="hourPicker"
-                                  style={{ overflow: "hidden" }}
-                                  slotProps={{
-                                    textField: {
-                                      variant: "standard",
-                                      size: "small",
-                                    },
-                                  }}
-                                />
-                              </DemoContainer>
-                            </LocalizationProvider>
-                          </div>
-                        </Tooltip>
-                      </td>
-
-                      <td className="modalFormContent">
-                        <Tooltip
-                          title="Hora tentativa"
-                          placement="left"
-                          style={{ width: "100%", display: "flex" }}
-                        >
-                          <div className=" tdTableTitle dateTimePickerForm">
-                            <label
-                              className="tdTableTitle"
-                              style={{ fontSize: "13px" }}
-                              id="longitude-Label"
-                            >
-                              <b>Hora:</b>
-                            </label>
-                          </div>
-                          <div className="tdTableData">
-                            <LocalizationProvider
-                              dateAdapter={AdapterDayjs}
-                              style={{ overflow: "hidden" }}
-                            >
-                              <DemoContainer
-                                components={["TimePicker"]}
-                                sx={{ overflow: "hidden" }}
-                              >
-                                <TimePicker
-                                  format="HH:mm"
-                                  value={timeInspecction}
-                                  onChange={setTimeInspecction}
-                                  className="hourPicker"
-                                  slotProps={{
-                                    textField: {
-                                      variant: "standard",
-                                      size: "small",
-                                    },
-                                  }}
-                                />
-                              </DemoContainer>
-                            </LocalizationProvider>
-                          </div>
-                        </Tooltip>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  </Grid>
+                </>
+                )}
+              </Grid>
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <Button
                   type="submit"
-                  className="btnStepper"
+                  className="button-styled-primary"
+                  style={{ top: "20%", backgroundColor: '#02545C', color: "white", borderRadius: '10px' }}
                   variant="contained"
-                  style={{ top: "0", backgroundColor: "rgb(0, 169, 158)" }}
                   fullWidth
                 >
                   {editMode ? "Editar" : "Agregar"}
@@ -1340,10 +1142,9 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
             }}
           >
-            <div style={{ width: "50%" }}>
+            <div style={{ width: "90%" }}>
               <MapContainer
                 ref={mapContainerRef}
                 lat={formData.lat}

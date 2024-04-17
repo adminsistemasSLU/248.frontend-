@@ -6,6 +6,7 @@ import {
   Button,
   TextField,
   Modal,
+  Card
 } from "@mui/material";
 import {
   LS_FORMAPAGO,
@@ -110,74 +111,90 @@ const PaymentMethods = () => {
   };
 
   return (
-    <Container maxWidth="sm" style={{ marginBottom: "20px" }}>
-      {fPago !== "1" && (
-        <div>
-          <Button variant="contained" onClick={handleOpen}>
-            Enviar Link de Pago
-          </Button>
-          <Backdrop
-            sx={{ color: "#fff", zIndex: 3000 }}
-            open={openBackdrop}
-          >
-            <CircularProgress color="inherit" />
-          </Backdrop>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: 400,
-                bgcolor: "background.paper",
-                border: "2px solid #000",
-                boxShadow: 24,
-                p: 4,
-              }}
-            >
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Enviar Link de Pago
-              </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Ingresa el Nombre del Cliente:
-              </Typography>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Nombre Cliente"
-                value={cliente}
-                onChange={(e) => setCLiente(e.target.value)}
-              />
 
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Ingresa el correo electrónico para enviar el link de pago:
-              </Typography>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Correo Electrónico"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+    <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px' }}>
+      <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '40px', fontWeight: 'bold' }}>
+        SELECCIONE EL MÉTODO DE PAGO
+      </Typography>
+      <Container >
+        {fPago !== "1" && (
+          <div>
+            <Card elevation={4} sx={{ width: '20%', m: 2, mx: 'auto', paddingTop: '20px', paddingBottom: '20px', borderRadius: '10px' }}>
               <Button
-                fullWidth
-                variant="contained"
-                onClick={handleSubmit}
-                sx={{ mt: 2 }}
+                onClick={handleOpen}
+                style={{
+                  paddingTop: '20px', 
+                  background: `url(${process.env.PUBLIC_URL + "/assets/images/cardsCredit.png"}) no-repeat center center`,
+                  backgroundSize: 'cover', 
+                  width: 220, 
+                  height: 80, 
+                }}
               >
-                Enviar
               </Button>
-            </Box>
-          </Modal>
-        </div>
-      )}
-    </Container>
+            </Card>
+            <Backdrop
+              sx={{ color: "#fff", zIndex: 3000 }}
+              open={openBackdrop}
+            >
+              <CircularProgress color="inherit" />
+            </Backdrop>
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: 400,
+                  bgcolor: "background.paper",
+                  border: "2px solid #000",
+                  boxShadow: 24,
+                  p: 4,
+                }}
+              >
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  Enviar Link de Pago
+                </Typography>
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                  Ingresa el Nombre del Cliente:
+                </Typography>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  label="Nombre Cliente"
+                  value={cliente}
+                  onChange={(e) => setCLiente(e.target.value)}
+                />
+
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                  Ingresa el correo electrónico para enviar el link de pago:
+                </Typography>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  label="Correo Electrónico"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handleSubmit}
+                  sx={{ mt: 2 }}
+                >
+                  Enviar
+                </Button>
+              </Box>
+            </Modal>
+          </div>
+        )}
+      </Container>
+    </Card>
   );
 };
 

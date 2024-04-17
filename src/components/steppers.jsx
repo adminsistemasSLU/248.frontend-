@@ -457,7 +457,7 @@ export default function Steppers() {
               onClick={handleBack}
               sx={{ mr: 1 }}
               className="button-styled-back"
-              style={{ top: "20%", backgroundColor: 'white', color: "#02545C", borderRadius: '20px' }}
+              style={{ top: "20%", backgroundColor: 'white', color: "#02545C" }}
             >
               Regresar
             </Button>
@@ -466,7 +466,8 @@ export default function Steppers() {
               <Button
                 onClick={handleClickOpen}
                 sx={{ mr: 1 }}
-                className="btnPaid"
+                className="button-styled-primary"
+                style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
               >
                 Enviar Cotización
               </Button>
@@ -477,7 +478,7 @@ export default function Steppers() {
                 onClick={handleNext}
                 sx={{ mr: 1 }}
                 className="button-styled-primary"
-                style={{ top: "20%", backgroundColor: '#02545C', color: "white", borderRadius: '20px' }}
+                style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
               >
                 Siguiente
               </Button>
