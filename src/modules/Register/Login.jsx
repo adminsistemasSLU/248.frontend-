@@ -73,12 +73,15 @@ const Login = () => {
   return (
     <Container maxWidth={false} style={{ height: '100vh', width: '100vw', padding: 0, margin: 0 }}>
       <Grid container style={{ height: '100%' }}>
-        <Grid item xs={false} md={7} className="hide-on-mobile">
+        <Grid item xs={false} md={7} className="hide-on-mobile" style={{ height: '100vh', overflow: 'hidden' }}>
           <img src={process.env.PUBLIC_URL + '/assets/images/login.png'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Background" />
         </Grid>
         <Grid item xs={12} sm={8} md={5} component={Paper} square style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
             <Container component="main" maxWidth="md" style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent:'center' }}>
+            <div className="show-on-mobile">
+              <img src={process.env.PUBLIC_URL + '/assets/images/LogoSLU.jpg'} style={{ height: '100px', objectFit: 'cover' }} alt="Background" />
+            </div>
               <h2 style={{color:'#02545C'}}>Iniciar Sesión</h2>
               <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -133,7 +136,6 @@ const Login = () => {
                     }}
                   />
                   {errorPassword && <div className="alert alert-error">{errorPassword}</div>}
-                  {/* <a href="/forgot-password" style={{paddingTop: 5}} className="form-link left-aligned-label"><b>Olvidé mi contraseña</b></a> */}
                 </div>
                 <center>
                   <button type="submit" className="button-styled">
@@ -151,4 +153,3 @@ const Login = () => {
 };
 
 export default Login;
-

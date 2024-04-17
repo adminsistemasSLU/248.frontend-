@@ -57,4 +57,10 @@
     }
   }
 
+  @media (min-width: 600px) {
+    .show-on-mobile {
+      display: none;
+    }
+  }
+
   
