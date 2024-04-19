@@ -257,22 +257,20 @@ const PersonalForm = forwardRef((props, ref) => {
   };
 
   return (
-      <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px' }}>
+      <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px', }}>
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={openBackdrop}
         >
           <CircularProgress color="inherit" />
         </Backdrop>
-        <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '40px', fontWeight: 'bold' }}>
+        <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '30px', fontWeight: 'bold' }}>
           DATOS PERSONALES
         </Typography>
           <FormControl
             component="form"
-            variant="standard"
             onSubmit={handleSubmit}
-            className="form"
-            sx={{width: '100%', padding: '30px'}}
+            style={{width: '100%', paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px'}}
           >
             <Grid container spacing={2}>
               <Snackbar
@@ -283,7 +281,7 @@ const PersonalForm = forwardRef((props, ref) => {
               >
                 <Alert severity="warning">{messageError}</Alert>
               </Snackbar>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={10.5} md={3}>
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                   Seleccione Documento <span style={{ color: 'red' }}>*</span>
                 </Typography>
@@ -293,7 +291,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   name="documentType"
                   value={formData.documentType}
                   onChange={handleChange}
-                  style={{ textAlign: "left" }}
+                  style={{ textAlign: "left", }}
                   variant="standard"
                   placeholder="Seleccione documento"
                   fullWidth
@@ -304,7 +302,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   <MenuItem value="P">Pasaporte</MenuItem>
                 </Select>
               </Grid>
-              <Grid item xs={12} md={3} >
+              <Grid item xs={10.5} md={3} >
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                   Documento de identificación <span style={{ color: 'red' }}>*</span>
                 </Typography>
@@ -328,7 +326,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   </Alert>
                 ) : null}
               </Grid>
-              <Grid item xs={12} md={3} >
+              <Grid item xs={10.5} md={3} >
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                   Nombres <span style={{ color: 'red' }}>*</span>
                 </Typography>
@@ -345,7 +343,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3} >
+              <Grid item xs={10.5} md={2.5}>
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                   Apellidos <span style={{ color: 'red' }}>*</span>
                 </Typography>
@@ -362,7 +360,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+              <Grid item xs={10.5} md={3} >
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                   Fecha de nacimiento <span style={{ color: 'red' }}>*</span>
                 </Typography>
@@ -385,7 +383,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   </DemoContainer>
                 </LocalizationProvider>
               </Grid>
-              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+              <Grid item xs={10.5} md={3} style={{paddingTop: '21px'}} >
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                   Teléfono <span style={{ color: 'red' }}>*</span>
                 </Typography>
@@ -402,7 +400,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+              <Grid item xs={10.5} md={3} style={{paddingTop: '21px'}} >
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                   Dirección <span style={{ color: 'red' }}>*</span>
                 </Typography>
@@ -418,7 +416,7 @@ const PersonalForm = forwardRef((props, ref) => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}  style={{paddingTop: '50px'}}>
+              <Grid item xs={10.5} md={2.5} style={{paddingTop: '21px'}} >
                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                 Email <span style={{ color: 'red' }}>*</span>
                 </Typography>

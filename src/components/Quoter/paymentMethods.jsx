@@ -119,7 +119,7 @@ const PaymentMethods = () => {
       <Container >
         {fPago !== "1" && (
           <div>
-            <Card elevation={4} sx={{ width: '20%', m: 2, mx: 'auto', paddingTop: '20px', paddingBottom: '20px', borderRadius: '10px' }}>
+            <Card elevation={4} sx={{ width: '20%', m: 2, mx: 'auto', padding: '20px', borderRadius: '10px' }}>
               <Button
                 onClick={handleOpen}
                 style={{

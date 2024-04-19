@@ -62,5 +62,10 @@
       display: none;
     }
   }
-
+  
+  @media only screen and (max-width: 600px) {
+    .mobile-padding-top {
+      padding-top: 50px;
+    }
+  }
   
