@@ -448,7 +448,7 @@ export default function Steppers() {
       >
         <Box style={{ width: "100%" }}>
           {steps[activeStep].label === "Producto" && (
-            <div style={{paddingLeft: '9%', textAlign: 'left'}}>
+            <div style={{paddingLeft: '9%', paddingTop: '20px', textAlign: 'left'}}>
               <span style={{ color: "#02545C", }}><b>PRODUCTOS</b></span>
               <br />
             <div style={{paddingTop: '5px', paddingBottom: '30px'}}><span>Seleccione el producto a cotizar</span></div>

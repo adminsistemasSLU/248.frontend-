@@ -51,21 +51,15 @@
     padding-left: 0;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 780px) {
     .hide-on-mobile {
       display: none;
     }
   }
 
-  @media (min-width: 600px) {
+  @media (min-width: 780px) {
     .show-on-mobile {
       display: none;
-    }
-  }
-  
-  @media only screen and (max-width: 600px) {
-    .mobile-padding-top {
-      padding-top: 50px;
     }
   }
   
