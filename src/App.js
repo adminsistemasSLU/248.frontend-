@@ -6,8 +6,6 @@ import { AuthProvider } from './services/AuthProvider';
 
 const App = () => {
   const [isLandscape, setIsLandscape] = useState(window.screen.orientation.type.includes('landscape'));
-  
-  // Inicializamos isMobile una sola vez al montar el componente
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -16,9 +14,6 @@ const App = () => {
     };
 
     window.addEventListener('orientationchange', handleOrientationChange);
-
-    // Este efecto solo se utiliza para establecer el estado inicial y escuchar cambios de orientación.
-    // La verificación de isMobile se hace solo al cargar y no se actualiza con el tamaño de la ventana.
     return () => {
       window.removeEventListener('orientationchange', handleOrientationChange);
     };
