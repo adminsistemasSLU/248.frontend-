@@ -247,7 +247,17 @@ function Header(props) {
             />
           </Link>
           {/* Menú de escritorio */}
-          <Box sx={{ display: { xs: "none", sm: "block" }, flexGrow: 1 }}>
+          <Box sx={{ display: { xs: "none", sm: "block", textAlign: 'right' }, flexGrow: 1 }}>
+            {menu && (
+              <Button
+                key={"-1"}
+                sx={{ color: "white", fontSize: "12px", marginRight: 2 }}
+                href={"/quoter/Pymes/MyQuotes"}
+              >
+                Mis Cotizaciones
+              </Button>
+            )}
+
             {navItems?.map((item, index) => (
               <React.Fragment key={index}>
                 <Button
@@ -286,7 +296,12 @@ function Header(props) {
             ))}
             {/* Configuración de usuario y otros botones */}
             <Tooltip title="Open settings">
-
+              <Button
+                onClick={handleOpenUserMenu}
+                sx={{ color: "white", fontSize: "12px", cursor: "pointer" }}
+              >
+                Usuario
+              </Button>
             </Tooltip>
             <Menu
               onMouseLeave={handleCloseUserMenu}
