@@ -1022,14 +1022,13 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           style: {
             backgroundColor: "#ffffff",
             boxShadow: "none",
-
             overflow: "hidden",
             zIndex: "2000",
           },
         }}
       >
         <DialogContent
-          style={{ overflow: "hidden", padding: "0px", paddingBottom: "20px" }}
+          style={{ overflow: "hidden", padding: "0px" }}
           className="dialog-height-content"
         >
           {/* Componente del formulario */}
@@ -1063,13 +1062,13 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         </div>
       </div>
       <TableContainer
-        style={{ overflow: "auto", height: "100%", padding: "20px" }}
+        style={{ overflow: "auto", height: "100%", paddingTop: "20px" }}
       >
         <Table
           sx={{ minWidth: 750 }}
           aria-labelledby="tableTitle"
           size="small"
-          style={{ height: 50 }}
+          style={{ height: 150 }}
         >
           <EnhancedTableHead rowCount={rows.length} />
           <TableBody>
@@ -1244,7 +1243,11 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           justifyContent: "center",
         }}
       >
-        <Button variant="contained" color="primary" onClick={handleSaveChanges}>
+        <Button
+          variant="contained"
+          className="button-styled-primary"
+          style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
+          onClick={handleSaveChanges}>
           Aceptar
         </Button>
       </div>

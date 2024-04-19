@@ -272,7 +272,7 @@ const PersonalForm = forwardRef((props, ref) => {
             variant="standard"
             onSubmit={handleSubmit}
             className="form"
-            sx={{width: '90%', padding: '30px'}}
+            sx={{width: '100%', padding: '30px'}}
           >
             <Grid container spacing={2}>
               <Snackbar

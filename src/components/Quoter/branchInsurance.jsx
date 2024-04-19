@@ -466,7 +466,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
           justifyContent: "space-between",
         }}
       >
-        <div>Descripcion de Sección</div>
+        <div>Descripción de Sección</div>
         <div onClick={closeModal}>
           {" "}
           <CloseIcon />
@@ -488,14 +488,14 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
         }}
       >
         <DialogContent
-          style={{ overflow: "scroll", padding: "0px", paddingBottom: "20px" }}
+          style={{ overflow: "scroll", padding: "0px", }}
           className="dialog-height-content"
         >
           {/* Componente del formulario */}
           <DetailObjectsTable
             closeModalDetail={handleCloseModal}
             idSeccion={idSelectedSeccion}
-            style={{ width: "80%" }}
+            style={{ width: "100%" }}
           />
         </DialogContent>
       </Dialog>
@@ -513,7 +513,7 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
       </Snackbar>
 
       <TableContainer
-        style={{ overflow: "auto", height: "100%", padding: "20px" }}
+        style={{ overflow: "auto", height: "100%", }}
       >
         <Table
           sx={{ minWidth: 750 }}
@@ -669,7 +669,11 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
           justifyContent: "center",
         }}
       >
-        <Button variant="contained" color="primary" onClick={handleSaveChanges}>
+        <Button
+          variant="contained"
+          className="button-styled-primary"
+          style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
+          onClick={handleSaveChanges}>
           Aceptar
         </Button>
       </div>

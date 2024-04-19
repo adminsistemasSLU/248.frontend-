@@ -622,7 +622,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       component="main"
       className="dialog-Form"
       style={{
-        padding: 0,
         minHeight: "80vh",
         display: "flex",
         alignItems: "center",
@@ -642,7 +641,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
           style: {
             backgroundColor: "#ffffff",
             boxShadow: "none",
-
             overflow: "hidden",
             zIndex: "2000",
           },
@@ -656,7 +654,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
           <BranchInsurance
             closeModalDetail={handleCloseModal}
             isEditMode={editMode}
-            style={{ width: "80%" }}
+            style={{ width: "100%" }}
           />
         </DialogContent>
       </Dialog>
@@ -673,8 +671,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
           style={{
             width: "100%",
             paddingTop: "5px",
-            paddingLeft: "15px",
-            paddingRight: "15px",
             backgroundColor: "#00a99e",
             color: "white",
             position: "relative",
@@ -683,7 +679,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
             justifyContent: "space-between",
           }}
         >
-          <div>Objeto del seguro</div>
+          <div style={{paddingLeft: '20px'}}>Objeto del seguro</div>
 
           <div style={{ cursor: "pointer" }}>
             <CloseIcon onClick={cerrarModal} />

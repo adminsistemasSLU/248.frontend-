@@ -420,7 +420,7 @@ const PaidForm = forwardRef((props, ref) => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label="Suma Agregada"
+                  label="Suma Asegurada"
                   className="disablePaidForm"
                   type="text"
                   name="sumAdd"
@@ -429,6 +429,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -441,6 +446,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -453,6 +463,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -465,6 +480,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -477,6 +497,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -489,6 +514,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -501,6 +531,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -513,6 +548,11 @@ const PaidForm = forwardRef((props, ref) => {
                   variant="standard"
                   fullWidth
                   required
+                  sx={{
+                    '& input': {  
+                      textAlign: 'right'
+                    }
+                  }}
                 />
               </Grid>
             </Grid>

@@ -33,6 +33,7 @@ const headCells = [
     disablePadding: false,
     label: "#",
     visible: true,
+    width: 30
   },
   {
     id: "descripcion",
@@ -47,6 +48,7 @@ const headCells = [
     disablePadding: false,
     label: "Monto",
     visible: true,
+    width: 120
   },
   {
     id: "accion",
@@ -54,6 +56,7 @@ const headCells = [
     disablePadding: false,
     label: "Acción",
     visible: true,
+    width: 100
   },
 ];
 
@@ -330,28 +333,15 @@ export default function ProtectionDetailTable({
           justifyContent: "space-between",
         }}
       >
-        <div>Descripcion de Sección</div>
+        <div>Descripción de Sección</div>
         <div onClick={closeModal}>
           {" "}
           <CloseIcon />
         </div>
       </div>
 
-      {/* Botón para añadir nuevas filas */}
-
-      <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <Button
-          variant="outlined"
-          color="primary"
-          style={{ height: "23px", width: "115px" }}
-          onClick={handleAddRow}
-        >
-          Añadir
-        </Button>
-      </div>
-
       <TableContainer
-        style={{ overflow: "auto", height: "100%", padding: "20px" }}
+        style={{ overflow: "auto", height: "100%", paddingTop: '20px' }}
       >
         <Table
           sx={{ minWidth: 750 }}
@@ -367,6 +357,7 @@ export default function ProtectionDetailTable({
                   align={headCell.numeric ? "right" : "left"}
                   padding={headCell.disablePadding ? "none" : "normal"}
                   sortDirection={orderBy === headCell.id ? order : false}
+                  sx={{ width: headCell.width || 'auto' }}
                 >
                   <TableSortLabel
                     active={orderBy === headCell.id}
@@ -446,9 +437,8 @@ export default function ProtectionDetailTable({
           padding: "20px",
         }}
       >
-        <div style={{ marginRight: "20px" }}>Monto:</div>
+        <div>Monto:</div>
         <div style={{ fontWeight: "bold" }}>
-          {/* Calcula el total del monto desde el JSON */}
           <CurrencyInput
             className="input-table"
             value={totalMonto.toFixed(2)}
@@ -460,7 +450,20 @@ export default function ProtectionDetailTable({
       <div
         style={{ display: "flex", justifyContent: "center", padding: "20px" }}
       >
-        <Button variant="contained" color="primary" onClick={closeModal}>
+        <Button
+          variant="outlined"
+          className="button-styled-primary"
+          style={{ marginRight:'20px', top: "20%", backgroundColor: '#0099A8', color: "white" }}
+          onClick={handleAddRow}
+        >
+          Añadir
+        </Button>
+
+        <Button
+          variant="contained"
+          className="button-styled-primary"
+          style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
+          onClick={closeModal}>
           Aceptar
         </Button>
       </div>

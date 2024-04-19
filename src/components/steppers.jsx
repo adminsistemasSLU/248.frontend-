@@ -284,7 +284,14 @@ export default function Steppers() {
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    console.log(activeStep);
+    if(activeStep < 1){
+      navigate('/quoter/dashboard');
+    }
+    else {
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    }
+
   };
 
   const handleChangeEmail = (event) => {
@@ -362,7 +369,7 @@ export default function Steppers() {
   };
 
   return (
-    <Stack className={"stack-content"} spacing={4}>
+    <Stack className={"stack-content"} spacing={1}>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -453,11 +460,10 @@ export default function Steppers() {
           })}
           <div className="btnDisplay">
             <Button
-              disabled={activeStep === 0}
               onClick={handleBack}
               sx={{ mr: 1 }}
               className="button-styled-back"
-              style={{ top: "20%", backgroundColor: 'white', color: "#02545C" }}
+              style={{ top: "10%", backgroundColor: 'white', color: "#02545C" }}
             >
               Regresar
             </Button>
