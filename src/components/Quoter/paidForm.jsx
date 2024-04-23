@@ -20,7 +20,7 @@ import Select from "@mui/material/Select";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import "../../styles/form.scss";
-import { PARAMETROS_STORAGE_KEY, LS_FORMAPAGO, LS_COTIZACION } from "../../utils/constantes";
+import { PARAMETROS_STORAGE_KEY, LS_FORMAPAGO, LS_COTIZACION,DATOS_PAGO_STORAGE_KEY } from "../../utils/constantes";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import ComboService from "../../services/ComboService/ComboService";
 import QuoterService from "../../services/QuoterService/QuoterService";
@@ -90,13 +90,21 @@ const PaidForm = forwardRef((props, ref) => {
         parseFloat(derechoEmision);
       let iva = (parseFloat(formaPago.por_iva) * subtot) / 100;
       let total = iva + sbs + scc + derechoEmision + parseFloat(prima);
+      
+      const datosPago = JSON.parse(localStorage.getItem(DATOS_PAGO_STORAGE_KEY));
+      console.log(datosPago[0]);
+
+      let formapago = datosPago[0].formapago!=null ?  datosPago[0].formapago : "" ;
+      let numpagos =  datosPago[0].numpagos !=null ?  datosPago[0].numpagos : "";
+      let tipfacturacion =  datosPago[0].tipfacturacion !=null ?  datosPago[0].tipfacturacion : "";
+      let valentrada =  datosPago[0].valentrada !== "0.00" ?  datosPago[0].valentrada : "";
 
       setFormData({
         ...formData,
-        paidType: "",
-        paidForm: "",
-        numberPaid: "",
-        firstPaid: "",
+        paidType: tipfacturacion,
+        paidForm: formapago,
+        numberPaid: numpagos,
+        firstPaid: valentrada,
         sumAdd: parseFloat(monto).toFixed(2),
         iva: iva.toFixed(2),
         prima: parseFloat(prima).toFixed(2),
@@ -523,7 +531,7 @@ const PaidForm = forwardRef((props, ref) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Iva 12%"
+                  label="Iva 15%"
                   type="text"
                   name="iva"
                   value={formatedInput(formData.iva)}

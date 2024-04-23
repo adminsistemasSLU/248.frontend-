@@ -30,6 +30,7 @@ import {
   LS_PRODUCTO,
   LS_RAMO,
   USER_STORAGE_KEY,
+  DATOS_PAGO_STORAGE_KEY
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
@@ -347,9 +348,22 @@ export default function MyQuoters() {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
-    const resultadoFiltrado = rows.filter((item) => item.id === id);
+    const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
     console.log(resultadoFiltrado);
-    // Luego mapeas los datos filtrados para transformarlos a la estructura deseada
+
+    const dataFormaPago = resultadoFiltrado.map((item) => ({
+      numpagos: item.numpagos,
+      tipfacturacion: item.tipfacturacion,
+      valentrada: item.valentrada,
+      formapago: item.formapago,
+      id: item.id,
+    }));
+
+    localStorage.setItem(
+      DATOS_PAGO_STORAGE_KEY,
+      JSON.stringify(dataFormaPago)
+    );
+
     const data = cotizacion.map((item) => ({
       correo: item.clicorreo,
       apellido: item.cliapellido,
@@ -359,7 +373,6 @@ export default function MyQuoters() {
     }));
     console.log(data);
     let datosPersonales = data.length > 0 ? data[0] : null;
-    // Si encontraste un objeto correspondiente, guárdalo en localStorage
     if (datosPersonales) {
       localStorage.setItem(
         DATOS_PERSONALES_STORAGE_KEY,

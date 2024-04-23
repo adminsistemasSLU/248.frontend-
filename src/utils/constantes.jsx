@@ -17,3 +17,4 @@ export const PARAMETROS_STORAGE_KEY = 'parametros';
 export const PARAMETROS_RAMO_STORAGE_KEY = 'parametros_ramo';
 export const DATOS_PERSONALES_STORAGE_KEY = 'datos_personales';
 export const LS_TOTAL_PRIMA_RIESGO = 'total_prima_riesgos';
+export const DATOS_PAGO_STORAGE_KEY = 'datos_pago';
