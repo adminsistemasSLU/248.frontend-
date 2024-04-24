@@ -226,6 +226,20 @@ const PaidForm = forwardRef((props, ref) => {
         valDerecho: formData.admision,
       };
 
+      //Se agrega en ls para mostrar los datos guardados 
+      let envioPagoLS = [{
+        id: idCotizacion,
+        tipfacturacion: formData.paidType,
+        formapago: formData.paidForm,
+        numpagos: formData.numberPaid,
+        valentrada: formData.firstPaid,
+      }];
+  
+      localStorage.setItem(
+        DATOS_PAGO_STORAGE_KEY,
+        JSON.stringify(envioPagoLS)
+      );
+
       try {
         const response = await QuoterService.fetchGuardarFormaDePago(envioPago);
         if(response.codigo === 200  ){
