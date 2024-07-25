@@ -23,7 +23,6 @@ import UsuarioService from "../../services/UsuarioService/UsuarioService";
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import {
-  DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   USER_STORAGE_KEY,
   LS_PRODUCTO,
@@ -226,6 +225,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const vigencia = await LifeService.fetchVidaProducto(ramo, producto);
       setVigencia(vigencia.data.vigencia);
       setFormData((formData) => ({ ...formData, vigencia: vigencia.data.vigencia[0].value }));
+      const newFinVigencia = inicioVigencia.add(vigencia.data.vigencia[0].value, 'month');
+      setFinVigencia(newFinVigencia);
+      
       let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
       let documentosVida = vigencia.data.documentos
       localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
@@ -275,6 +277,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
       cargarCiudad(value);
     }
 
+    if (name === "vigencia") {
+      const newFinVigencia = inicioVigencia.add(value, 'month');
+      console.log(newFinVigencia);
+      setFinVigencia(newFinVigencia);
+    }
+    
     if (name === "identification") {
       if (formData.documentType === "C" && value.length > 10) {
         modifiedValue = value.slice(0, 10);
@@ -337,6 +345,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
       console.error("Error al verificar cédula:", error);
     }
   };
+
+  const actualizarVigencia = (value)=>{
+    setInicioVigencia(value);
+    const newFinVigencia = value.add(formData.vigencia, 'month');
+    setFinVigencia(newFinVigencia);
+  }
 
   const consultUserData = async (documentType, identification) => {
     try {
@@ -848,12 +862,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
                     textField: { variant: "standard", size: "small" },
                   }}
                   value={inicioVigencia}
+                  
                   format="DD/MM/YYYY"
                   disabled={errorCedula}
                   className="datePicker"
                   minDate={maxDate}
                   onChange={(newValue) => {
-                    setInicioVigencia(newValue);
+                    actualizarVigencia(newValue)
                   }}
                 />
               </DemoContainer>
@@ -873,6 +888,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
                   }}
                   value={finVigencia}
                   format="DD/MM/YYYY"
+                  readOnly
                   disabled={errorCedula}
                   className="datePicker"
                   minDate={maxDate}
