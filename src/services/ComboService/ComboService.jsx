@@ -168,6 +168,18 @@ const ComboService = {
         }
     },
 
+    fetchComboEstadoCivil: async () => {
+        const endpoint = 'api/cb_EstadoCivil';
+        const method = 'POST';
+ 
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar Combo Estado Civil:', error);
+            throw error;
+        }
+    },
 
 
 

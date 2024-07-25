@@ -24,26 +24,26 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
 import DialogTitle from "@mui/material/DialogTitle";
-import "../styles/button.scss";
-import "../styles/form.scss";
-import PersonalForm from "./QuoterPymes/personalForm";
-import ProtectObjectsTable from "./QuoterPymes/protectObjectsTable";
-import PaidForm from "./QuoterPymes/paidForm";
+import "../../styles/button.scss";
+import "../../styles/form.scss";
+import PersonalFormLife from ".//../QuoterLife/personalFormLife";
+import PaidForm from "./../QuoterPymes/paidForm";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import ProductListCards from "./QuoterPymes/productListCards";
-import PaymentMethods from "./QuoterPymes/paymentMethods";
+import ProductListCardsLife from "./ProductListCardsLife";
+import PaymentMethods from "./../QuoterPymes/paymentMethods";
 import { TextField, Grid, Alert } from "@mui/material";
-import IncendioService from "../services/IncencioService/IncendioService";
+import IncendioService from "../../services/IncencioService/IncendioService";
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   LS_FORMAPAGO,
   LS_TOTAL_PRIMA_RIESGO,
   USER_STORAGE_KEY,
-} from "../utils/constantes";
-import EmailService from "../services/EmailService/EmailService";
+} from "../../utils/constantes";
+import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
+import QuestionsFormLife from "./questionsFormLife";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -96,8 +96,8 @@ function ColorlibStepIcon(props) {
   const { active, completed, className } = props;
 
   const icons = {
-    1: <PersonIcon />,
-    2: <ProductionQuantityLimitsIcon />,
+    1: <ProductionQuantityLimitsIcon />,
+    2: <PersonIcon />,
     3: <LocalFireDepartmentIcon />,
     4: <PaidIcon />,
     5: <AddShoppingCartIcon />,
@@ -132,7 +132,7 @@ ColorlibStepIcon.propTypes = {
   icon: PropTypes.node,
 };
 
-export default function Steppers() {
+export default function SteppersLife() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed] = React.useState({});
   const [formData, setFormData] = React.useState({});
@@ -163,7 +163,7 @@ export default function Steppers() {
 
   const personalFormRef = useRef();
   const paidFormRef = useRef();
- 
+  const questionFormRef = useRef();
 
   const handleNext = async (formData) => {
     // Actualiza el estado formData con los datos recibidos
@@ -171,8 +171,11 @@ export default function Steppers() {
     let continuar = true;
     //Accion para Datos Personales
     if (steps[activeStep].label === "Datos Personales") {
-      continuar = personalFormRef.current.handleSubmitExternally();
+      //continuar = personalFormRef.current.handleSubmitExternally();
+      continuar = true;
     }
+
+
 
     if (steps[activeStep].label === "Pasarela de Pago") {
       Swal.fire({
@@ -201,7 +204,7 @@ export default function Steppers() {
         });
       }
 
-      
+
     }
 
     let datosPersonales = JSON.parse(
@@ -211,15 +214,16 @@ export default function Steppers() {
     if (datosPersonales) {
       setEmail(datosPersonales.correo);
     }
-    //Accion para Riesgo
+    
+
     if (steps[activeStep].label === "Riesgo") {
-      let totalPrima = localStorage.getItem(LS_TOTAL_PRIMA_RIESGO);
-      if(totalPrima ==='0'){
-        return;
-      }
+      console.log("continuar 1");
+      //continuar = questionFormRef.current.handleSubmitExternally();
+      continuar = true;
     }
 
     if (continuar) {
+      console.log("continuar 2");
       const newActiveStep =
         isLastStep() && !allStepsCompleted()
           ? steps.findIndex((step, i) => !(i in completed))
@@ -230,23 +234,23 @@ export default function Steppers() {
 
   const steps = [
     {
-      label: "Datos Personales",
-      formComponent: <PersonalForm ref={personalFormRef} />,
+        label: "Productos",
+        formComponent: <ProductListCardsLife onNext={handleNext} />,
     },
     {
-      label: "Producto",
-      formComponent: <ProductListCards onNext={handleNext} />,
+      label: "Datos Personales",
+      formComponent: <PersonalFormLife ref={personalFormRef} />,
     },
     {
       label: "Riesgo",
-      formComponent: <ProtectObjectsTable onNext={handleNext} />,
+      formComponent: <QuestionsFormLife ref={questionFormRef} />,
     },
     {
-      label: "Pago",
+      label: "Facturacion",
       formComponent: <PaidForm ref={paidFormRef} onNext={handleNext} />,
     },
     {
-      label: "Pasarela de Pago",
+      label: "Resumen",
       formComponent: <PaymentMethods onNext={handleNext} />,
     },
   ];

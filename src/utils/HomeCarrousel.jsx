@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/carrousel.scss';
 import BaldosasService from '../services/BaldosasService/BaldosasService';
 import Loading from './loading';
-import { API_BALDOSAS,LS_COTIZACION,LS_RAMO } from './constantes';
+import { API_BALDOSAS,LS_COTIZACION,LS_RAMO,API_SUBBALDOSAS} from './constantes';
 
 
 function HomeCarrousel(props) {
@@ -25,7 +25,6 @@ function HomeCarrousel(props) {
         }, {
             name: "VEHICULO",
             url: '/quoter/car',
-
         },
         {
             name: "VIDA",
@@ -57,7 +56,7 @@ function HomeCarrousel(props) {
                             description: baldosa.descripcion,
                             imageUrl: process.env.REACT_APP_API_URL + '/api/Imagen/' + baldosa.nombre_imagen,
                             url: matchedItem ? matchedItem.url : '/default-url',
-                            enable: baldosa.titulo === 'PYMES' ? true : false,
+                            enable: baldosa.titulo === 'PYMES' || baldosa.titulo === 'VIDA' ? true : false,
                             ramo:baldosa.ramo,
                         };
                     });
@@ -140,6 +139,7 @@ function Item(props) {
     const handleImageClick = (ramo) => {
         console.log('Ramo elegido: '+ramo);
         localStorage.setItem(LS_RAMO,JSON.stringify(ramo));
+        localStorage.removeItem(API_SUBBALDOSAS);
         navigate(props.item.url); 
     };
     return (

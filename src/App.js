@@ -19,28 +19,28 @@ const App = () => {
     };
   }, []);
 
-  if (isLandscape && isMobile) {
-    return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: 'white',
-        color: '#02545C',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        fontSize: '24px',
-        zIndex: 1000,
-      }}>
-        <img src={process.env.PUBLIC_URL + '/assets/images/LogoSLU.jpg'} style={{ height: '100px', objectFit: 'cover' }} />
-        <p>Por favor, rota tu dispositivo en modo vertical.</p>
-      </div>
-    );
-  }
+  // if (isLandscape && isMobile) {
+  //   return (
+  //     <div style={{
+  //       position: 'fixed',
+  //       top: 0,
+  //       left: 0,
+  //       width: '100vw',
+  //       height: '100vh',
+  //       backgroundColor: 'white',
+  //       color: '#02545C',
+  //       display: 'flex',
+  //       alignItems: 'center',
+  //       justifyContent: 'center',
+  //       flexDirection: 'column',
+  //       fontSize: '24px',
+  //       zIndex: 1000,
+  //     }}>
+  //       <img src={process.env.PUBLIC_URL + '/assets/images/LogoSLU.jpg'} style={{ height: '100px', objectFit: 'cover' }} />
+  //       <p>Por favor, rota tu dispositivo en modo vertical.</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <AuthProvider>
