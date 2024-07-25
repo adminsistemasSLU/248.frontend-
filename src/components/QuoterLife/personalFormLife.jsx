@@ -116,8 +116,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const [errorCedula, setErrorCedula] = useState(false);
   const [open, setOpen] = useState(false);
   const [age, setAge] = useState(maxDate);
-  const [inicioVigencia, setInicioVigencia] = useState(maxDate);
-  const [finVigencia, setFinVigencia] = useState(maxDate);
+  const [inicioVigencia, setInicioVigencia] = useState(dayjs());
+  const [finVigencia, setFinVigencia] = useState(dayjs());
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const isMounted = useRef(false);
   //Combos
