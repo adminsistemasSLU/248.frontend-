@@ -463,6 +463,7 @@ export default function SteppersLife() {
             onNext: handleNext,
           })}
           <div className="btnDisplay">
+          {steps[activeStep].label !== "Productos" && (
             <Button
               onClick={handleBack}
               sx={{ mr: 1 }}
@@ -471,7 +472,7 @@ export default function SteppersLife() {
             >
               Regresar
             </Button>
-
+          )}
             {steps[activeStep].label === "Pago" && (
               <Button
                 onClick={handleClickOpen}
@@ -483,7 +484,7 @@ export default function SteppersLife() {
               </Button>
             )}
 
-            {steps[activeStep].label !== "Producto" && (
+            {steps[activeStep].label !== "Productos" && (
               <Button
                 onClick={handleNext}
                 sx={{ mr: 1 }}
