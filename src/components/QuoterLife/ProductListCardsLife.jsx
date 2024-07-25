@@ -58,9 +58,20 @@ const ProductListCardsLife = ({ onNext }) => {
       <div>
         {isLoading ? <Loading /> : (<div></div>)}
       </div>
+      <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
+          PRODUCTOS
+      </Typography>
+
+      <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              Seleccione el Producto a cotizar 
+            </Typography>
+
       <Grid container spacing={2}>
+
+
+
         {data.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-container' onClick={() => handleCardClick(index, item.producto)}>
+          <Grid item xs={12} sm={6} md={4} key={index} style={{paddingTop:"20px"}} className='carousel-container' onClick={() => handleCardClick(index, item.producto)}>
             <Card style={{ maxWidth: 240, cursor: 'pointer' }} >
               <CardMedia
                 component="img"
@@ -73,7 +84,7 @@ const ProductListCardsLife = ({ onNext }) => {
                   {item.titulo}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {item.descripcion}
+                  
                 </Typography>
               </CardContent>
             </Card>
