@@ -738,7 +738,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         </Grid>
 
-        {formData.status === CodigoComboCasado && formData.status === CodigoComboUnionLibre && ( // Estado Casado
+        { (formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre)
+         && ( // Estado Casado
           <>
             <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingTop: '30px', fontWeight: 'bold' }}>
               DATOS CONYUGUE
