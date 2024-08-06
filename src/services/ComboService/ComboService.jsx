@@ -182,6 +182,18 @@ const ComboService = {
     },
 
 
+    fetchComboEstado: async () => {
+        const endpoint = 'api/cb_estado';
+        const method = 'POST';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar Combo Estado:', error);
+            throw error;
+        }
+    },
+
 
 }
 

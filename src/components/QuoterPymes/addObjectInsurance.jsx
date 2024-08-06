@@ -374,7 +374,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       console.log(editMode);
       if (editMode) {
         handleOpenBackdrop();
-        console.log("entro");
         await cargarDatosEditar();
         return;
       } else {

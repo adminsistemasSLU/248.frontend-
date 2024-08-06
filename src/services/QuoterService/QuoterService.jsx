@@ -5,7 +5,14 @@ const QuoterService = {
   fetchConsultarCotizacionGeneral: async (dato) => {
     const endpoint = 'api/ConsultaCotizacionGeneral';
     const method = 'POST'; 
-    const data = dato;
+    const data = {
+      usuario:dato.usuario,
+      ramo:dato.ramo,
+      producto:dato.producto,
+      cliente:dato.cliente,
+      estado:dato.estado,
+      fecha:dato.fecha
+    };
 
     try {
       const response = await authService.fetchWithAuth(endpoint, method, data);

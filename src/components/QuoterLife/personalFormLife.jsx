@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { TextField, Grid, Alert,Snackbar } from "@mui/material";
+import { TextField, Grid, Alert,Snackbar,AlertTitle } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Backdrop from "@mui/material/Backdrop";
@@ -109,6 +109,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     impuesto: false,
   });
 
+  const [openSnack, setOpenSnack] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const maxDate = dayjs().subtract(18, "years");
   const [error, setError] = useState("");
@@ -223,18 +225,26 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const cargarVigencia = async () => {
     try {
       const vigencia = await LifeService.fetchVidaProducto(ramo, producto);
-      setVigencia(vigencia.data.vigencia);
-      setFormData((formData) => ({ ...formData, vigencia: vigencia.data.vigencia[0].value }));
-      const newFinVigencia = inicioVigencia.add(vigencia.data.vigencia[0].value, 'month');
-      setFinVigencia(newFinVigencia);
-      
-      let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
-      let documentosVida = vigencia.data.documentos
-      localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
-      localStorage.setItem(LS_DOCUMENTOSVIDA, documentosVida);// se omite el stringify por que de base esta pasado como string
-      console.log(vigencia);
+      if(vigencia && vigencia.data){
+        setVigencia(vigencia.data.vigencia);
+        setFormData((formData) => ({ ...formData, vigencia: vigencia.data.vigencia[0].value }));
+        const newFinVigencia = inicioVigencia.add(vigencia.data.vigencia[0].value, 'month');
+        setFinVigencia(newFinVigencia);
+        
+        let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
+        let documentosVida = vigencia.data.documentos
+        
+        localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+        localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(documentosVida));// se omite el stringify por que de base esta pasado como string
+        console.log(vigencia);
+      }else{
+        console.log(vigencia.message);
+        setOpenSnack(true);
+        setErrorMessage(vigencia.message);
+      }
+     
     } catch (error) {
-      console.error('Error al obtener baldosas:', error);
+      console.error('Error al obtener Vigencia:', error);
     }
   }
 
@@ -487,6 +497,19 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   return (
     <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px', }}>
+      
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={openSnack}
+        autoHideDuration={5000}
+        onClose={() => setOpenSnack(false)}
+      >
+        <Alert style={{ fontSize: "1em" }} severity="error">
+          <AlertTitle style={{ textAlign: "left" }}>Error</AlertTitle>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+      
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={openBackdrop}
@@ -918,8 +941,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
               required
             >
               {vigencia.map((vigencia, index) => (
-                <MenuItem key={index} value={vigencia.value}>
-                  {vigencia.text} Meses
+                <MenuItem key={index} value={vigencia.Codigo}>
+                  {vigencia.Nombre} Meses
                 </MenuItem>
               ))}
               

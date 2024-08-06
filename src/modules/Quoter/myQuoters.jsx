@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
@@ -10,7 +9,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import TableSortLabel from "@mui/material/TableSortLabel";
+import TableSortLabel from "@mui/material/TableSortLabel"
+import { TextField, Select, MenuItem, FormControl, InputLabel, Button, Grid } from '@mui/material';
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
@@ -20,10 +20,13 @@ import CurrencyInput from "../../utils/currencyInput";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Backdrop from "@mui/material/Backdrop";
+import SearchIcon from '@mui/icons-material/Search';
 import CircularProgress from "@mui/material/CircularProgress";
 import { visuallyHidden } from "@mui/utils";
 import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
+import BaldosasService from "../../services/BaldosasService/BaldosasService"
+import ComboService from "../../services/ComboService/ComboService";
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
@@ -207,22 +210,15 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
-  let user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+const EnhancedTableToolbar = React.memo(({ filter, setFilter }) => {
+  const user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
 
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
+
       }}
       style={{
         borderBottom: "2px solid #00a99e ",
@@ -237,29 +233,32 @@ function EnhancedTableToolbar(props) {
         component="div"
         style={{ textAlign: "start", fontSize: "14px", color: "#00a99e" }}
       >
-        Usuario: {user.des_usuario}
+        Usuario: <span style={{ color: 'black' }}>{user.des_usuario} </span>
       </Typography>
+      <Tooltip title="Filter list" style={{ display: 'flex', alignContent: 'center' }}>
+        <TextField
+          type="text"
+          size="small"
+          variant="standard"
+          style={{ height: '15px', visibility: 'hidden' }}
+          value={filter}
+          onChange={(event) => setFilter(event.target.value)}
+          placeholder="Buscar..."
 
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+          sx={{ marginLeft: "16px", marginTop: '5px', borderRadius: "4px", height: '15px' }}
+        />
+        <IconButton>
+          <FilterListIcon />
+        </IconButton>
+      </Tooltip>
     </Toolbar>
   );
-}
-
+});
 EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
+  filter: PropTypes.string.isRequired,
+  setFilter: PropTypes.func.isRequired,
 };
+
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -289,14 +288,88 @@ export default function MyQuoters() {
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
 
+
+
+  const [estado, setEstado] = React.useState([]);
+  const [ramo, setRamo] = React.useState([]);
+  const [producto, setProducto] = React.useState([]);
+  const [filters, setFilters] = React.useState({
+    estado: '',
+    producto: '',
+    ramo: '',
+    cliente: '',
+  });
+
+  //Filtrar tabla
+  const [filter, setFilter] = React.useState("");
+
+
+
+  const cargarRamo = async () => {
+    try {
+      const baldosas = await BaldosasService.fetchBaldosas();
+      console.log(baldosas);
+      if (baldosas && baldosas.data) {
+        setRamo(baldosas.data.BaldosaServisios);
+      }
+    } catch (error) {
+      console.error("Error al obtener baldosas:", error);
+    }
+  };
+
+  const cargarProducto = async (ramo) => {
+    try {
+      const subbaldosas = await BaldosasService.fetchSubBaldosas(ramo, '');
+      if (subbaldosas && subbaldosas.data) {
+        setProducto(subbaldosas.data.BaldosaSubServisios);
+      }
+    } catch (error) {
+      console.error("Error al obtener subbaldosas:", error);
+    }
+  };
+
+  const cargarEstado = async () => {
+    try {
+      const estado = await ComboService.fetchComboEstado();
+      if (estado && estado.data) {
+        setEstado(estado.data);
+      }
+    } catch (error) {
+      console.error("Error al obtener baldosas:", error);
+    }
+  };
+
+  const filteredRows = rows.filter((row) => {
+    return (
+      row.ramo.toLowerCase().includes(filter.toLowerCase()) ||
+      row.producto.toLowerCase().includes(filter.toLowerCase()) ||
+      row.cliente.toLowerCase().includes(filter.toLowerCase()) ||
+      row.state.toLowerCase().includes(filter.toLowerCase()) ||
+      row.createdDate.toLowerCase().includes(filter.toLowerCase())
+    );
+  });
+
+
+
+
+
+
+
+  const handleSetFilter = React.useCallback((value) => {
+    setFilter(value);
+  }, []);
+
   useEffect(() => {
     cargarTabla();
   }, []);
 
+
   async function cargarTabla() {
     handleOpenBackdrop();
+    await cargarEstado();
+    await cargarRamo();
 
-    const objetoSeguro = await cargarCotizacion();
+    const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado);
 
     if (objetoSeguro) {
       let number = 1;
@@ -387,10 +460,13 @@ export default function MyQuoters() {
     await eliminarCotizacion(id);
   };
 
-  const cargarCotizacion = async () => {
+  const cargarCotizacion = async (ramo = '', producto = "", estado = '') => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let dato = {
       usuario: userId.id,
+      ramo: ramo,
+      producto: producto,
+      estado: estado
     };
     try {
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
@@ -468,11 +544,11 @@ export default function MyQuoters() {
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [rows, order, orderBy, page, rowsPerPage]
+    [filteredRows, order, orderBy, page, rowsPerPage]
   );
 
   const handleCloseBackdrop = () => {
@@ -482,162 +558,288 @@ export default function MyQuoters() {
     setOpenBackdrop(true);
   };
 
+  const handleChange = (e) => {
+
+    if (e.target.name === "ramo") {
+      cargarProducto(e.target.value);
+    }
+
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value,
+    });
+
+
+  };
+
+  const handleSearch = () => {
+    cargarTabla();
+  };
+
   return (
-    <div style={{ width: "100%" }}>
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackdrop}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      {/* Modal */}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-      <h2 style={{ color: "#00a99e" }}>Mis Cotizaciones</h2>
 
-      <Box style={{ width: "100%" }} sx={{ width: "100%", marginTop: "12px" }}>
-        <Paper sx={{ width: "100%", mb: 2 }}>
-          <EnhancedTableToolbar numSelected={selected.length} />
-          {visibleRows.length === 0 ? (
-            <Typography variant="body2" style={{ padding: "16px" }}>
-              No hay registros en la tabla.
-            </Typography>
-          ) : (
-            <TableContainer
-              style={{ overflow: "auto", height: 300, padding: "20px" }}
-            >
-              <Table
-                sx={{ minWidth: 750 }}
-                aria-labelledby="tableTitle"
-                size={"small"}
-                style={{ height: 50 }}
+      
+
+      <Typography variant="h4" sx={{ color: "#00a99e", mb: 2 }} xs={{ fontSize: 10 }}>Mis Cotizaciones</Typography>
+
+      <Grid style={{ width: '90%', display: 'flex', justifyContent: 'center' }} spacing={2}>
+
+        <Grid container spacing={4} justifyContent="center" sx={{ width: '90%' }}>
+          <Grid item xs={8} md={2}>
+            <TextField
+              fullWidth
+              id="cliente"
+              name="cliente"
+              label="Cliente"
+              variant="standard"
+
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+            />
+          </Grid>
+
+          <Grid item xs={8} md={2}>
+            <FormControl fullWidth>
+              <InputLabel id="ramo-label">Ramo</InputLabel>
+              <Select
+                labelId="ramo-label"
+                id="ramo"
+                name="ramo"
+                variant="standard"
+                fullWidth
+                value={filters.ramo}
+                onChange={handleChange}
+                label="Ramo"
               >
-                <EnhancedTableHead
-                  numSelected={selected.length}
-                  order={order}
-                  orderBy={orderBy}
-                  onSelectAllClick={handleSelectAllClick}
-                  onRequestSort={handleRequestSort}
-                  rowCount={rows.length}
-                />
-                <TableBody>
-                  {visibleRows.map((row, index) => {
-                    const isItemSelected = isSelected(row.number);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                {ramo.map((rm, index) => (
+                  <MenuItem key={index} value={rm.ramo}>
+                    {rm.titulo}
+                  </MenuItem>
+                ))}
+                {/* Agrega más opciones según tu necesidad */}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8} md={2}>
+            <FormControl fullWidth>
+              <InputLabel id="producto-label">Producto</InputLabel>
+              <Select
+                labelId="producto-label"
+                id="producto"
+                name="producto"
+                variant="standard"
+                fullWidth
+                value={filters.producto}
+                onChange={handleChange}
+                label="Producto"
+              >
+                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                {producto.map((pro, index) => (
+                  <MenuItem key={index} value={pro.producto}>
+                    {pro.titulo}
+                  </MenuItem>
+                ))}
+                {/* Agrega más opciones según tu necesidad */}
+              </Select>
+            </FormControl>
+          </Grid>
 
-                    return (
-                      <StyledTableRow
-                        hover
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.number}
-                        selected={isItemSelected}
-                        sx={{ cursor: "pointer" }}
-                      >
-                        <TableCell padding="checkbox"></TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          padding="none"
+          <Grid item xs={8} md={2}>
+            <FormControl fullWidth>
+              <InputLabel id="estado-label">Estado</InputLabel>
+              <Select
+                labelId="estado-label"
+                id="estado"
+                name="estado"
+                variant="standard"
+                fullWidth
+                value={filters.estado}
+                onChange={handleChange}
+                label="Estado"
+              >
+                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                {estado.map((est, index) => (
+                  <MenuItem key={index} value={est.Codigo}>
+                    {est.Nombre}
+                  </MenuItem>
+                ))}
+                {/* Agrega más opciones según tu necesidad */}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8} md={2}>
+            <Button variant="contained"
+              style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+              onClick={handleSearch}
+              startIcon={<SearchIcon />}
+            >
+              Buscar</Button>
+          </Grid>
+        </Grid>
+
+      </Grid>
+
+      <div style={{ width: "100%" }}>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={openBackdrop}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        {/* Modal */}
+
+
+
+
+        <Box style={{ width: "100%" }} sx={{ width: "100%", marginTop: "12px" }}>
+          <Paper sx={{ width: "100%", mb: 2 }}>
+            <EnhancedTableToolbar filter={filter} setFilter={handleSetFilter} />
+            {visibleRows.length === 0 ? (
+              <Typography variant="body2" style={{ padding: "16px" }}>
+                No hay registros en la tabla.
+              </Typography>
+            ) : (
+
+              <TableContainer
+                style={{ overflow: "auto", height: 300 }}
+              >
+                <Table
+                  sx={{ minWidth: 750 }}
+                  aria-labelledby="tableTitle"
+                  size={"small"}
+                  style={{ height: 50 }}
+                >
+                  <EnhancedTableHead
+                    numSelected={selected.length}
+                    order={order}
+                    orderBy={orderBy}
+                    onSelectAllClick={handleSelectAllClick}
+                    onRequestSort={handleRequestSort}
+                    rowCount={rows.length}
+                  />
+                  <TableBody>
+                    {visibleRows.map((row, index) => {
+                      const isItemSelected = isSelected(row.number);
+                      const labelId = `enhanced-table-checkbox-${index}`;
+
+                      return (
+                        <StyledTableRow
+                          hover
+                          role="checkbox"
+                          aria-checked={isItemSelected}
+                          tabIndex={-1}
+                          key={row.number}
+                          selected={isItemSelected}
+                          sx={{ cursor: "pointer" }}
                         >
-                          {row.number}
-                        </TableCell>
-                        <TableCell align="left">{row.ramo}</TableCell>
-                        <TableCell align="left">{row.producto}</TableCell>
-                        <TableCell align="left">{row.cliente}</TableCell>
+                          <TableCell padding="checkbox"></TableCell>
+                          <TableCell
+                            component="th"
+                            id={labelId}
+                            scope="row"
+                            padding="none"
+                          >
+                            {row.number}
+                          </TableCell>
+                          <TableCell align="left">{row.ramo}</TableCell>
+                          <TableCell align="left">{row.producto}</TableCell>
+                          <TableCell align="left">{row.cliente}</TableCell>
 
-                        <TableCell align="right">
-                          <CurrencyInput
-                            value={row.amount}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <input
-                            value={(parseFloat(row.rate).toFixed(2) || 0) + "%"}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <CurrencyInput
-                            value={row.prima}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <input
-                            value={row.createdDate}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <input
-                            value={row.state}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          {row.state !== "Cancelado" &&
-                            row.state !== "Emitida" && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "end",
-                                }}
-                              >
-                                <IconButton
-                                  onClick={() =>
-                                    handleOpenQuoter(
-                                      row.id,
-                                      row.productoId,
-                                      row.ramoId
-                                    )
-                                  }
+                          <TableCell align="right">
+                            <CurrencyInput
+                              value={row.amount}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              value={(parseFloat(row.rate).toFixed(2) || 0) + "%"}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <CurrencyInput
+                              value={row.prima}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              value={row.createdDate}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              value={row.state}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            {row.state !== "Cancelado" &&
+                              row.state !== "Emitida" && (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "end",
+                                  }}
                                 >
-                                  <EditIcon />
-                                </IconButton>
-                                <IconButton
-                                  onClick={() => handleDeleteQuoter(row.id)}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </div>
-                            )}
-                        </TableCell>
-                      </StyledTableRow>
-                    );
-                  })}
-                  {emptyRows > 0 && (
-                    <TableRow
-                      style={{
-                        height: 33 * emptyRows,
-                      }}
-                    >
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25, 50]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Filas por pagina"
-          />
-        </Paper>
-      </Box>
+                                  <IconButton
+                                    onClick={() =>
+                                      handleOpenQuoter(
+                                        row.id,
+                                        row.productoId,
+                                        row.ramoId
+                                      )
+                                    }
+                                  >
+                                    <EditIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    onClick={() => handleDeleteQuoter(row.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </div>
+                              )}
+                          </TableCell>
+                        </StyledTableRow>
+                      );
+                    })}
+                    {emptyRows > 0 && (
+                      <TableRow
+                        style={{
+                          height: 33 * emptyRows,
+                        }}
+                      >
+                        <TableCell colSpan={6} />
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Filas por pagina"
+            />
+          </Paper>
+        </Box>
+      </div>
     </div>
   );
 }

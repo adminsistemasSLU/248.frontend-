@@ -1,12 +1,15 @@
 import authService from "../authServices";
 
 const LifeService = {
-  fetchVidaProducto: async (ramo, producto) => {
+  fetchVidaProducto: async (ramo, producto,ciudad) => {
     const endpoint = "api/vida/Producto";
     const method = "POST";
     const data = {
       ramo: ramo,
       producto: producto,
+      tipPoliza:1, // nuevo
+      action:"cargaListas",// constasnte
+      UsoZona:"G"// ciudad
     };
 
     try {
