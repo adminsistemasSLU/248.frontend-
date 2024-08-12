@@ -41,8 +41,8 @@ import LifeService from '../../services/LifeService/LifeService';
 import QuestionModalLife from "./questionModalLife";
 
 dayjs.extend(customParseFormat);
-const producto = localStorage.getItem(LS_PRODUCTO);
-const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+let producto = localStorage.getItem(LS_PRODUCTO);
+let ramo = JSON.parse(localStorage.getItem(LS_RAMO));
 
 
 const PersonalFormLife = forwardRef((props, ref) => {
@@ -231,6 +231,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const cargarVigencia = async () => {
     try {
+      producto = localStorage.getItem(LS_PRODUCTO);
+      ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+      
       const vigencia = await LifeService.fetchVidaProducto(ramo, producto);
       if(vigencia && vigencia.data){
         setVigencia(vigencia.data.vigencia);
