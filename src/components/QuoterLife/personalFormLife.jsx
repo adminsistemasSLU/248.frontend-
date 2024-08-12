@@ -12,6 +12,12 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
+
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -20,8 +26,7 @@ import ComboService from "../../services/ComboService/ComboService";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
-import Card from '@mui/material/Card';
-import Typography from '@mui/material/Typography';
+
 import {
   LS_COTIZACION,
   USER_STORAGE_KEY,
@@ -33,6 +38,7 @@ import {
 import QuoterService from "../../services/QuoterService/QuoterService";
 import { Button } from "@mui/base";
 import LifeService from '../../services/LifeService/LifeService';
+import QuestionModalLife from "./questionModalLife";
 
 dayjs.extend(customParseFormat);
 const producto = localStorage.getItem(LS_PRODUCTO);
@@ -111,6 +117,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const [openSnack, setOpenSnack] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [openModal, setOpenModal] = React.useState(false);
 
   const maxDate = dayjs().subtract(18, "years");
   const [error, setError] = useState("");
@@ -232,6 +239,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         setFinVigencia(newFinVigencia);
         
         let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
+        
         let documentosVida = vigencia.data.documentos
         
         localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
@@ -476,12 +484,21 @@ const PersonalFormLife = forwardRef((props, ref) => {
         // "tasa": "1.25",
         // "arrMontos": "", 
         "arrDeclaracionesAsegurado":  [],       
+        
         "arrRequisitosasegurados": []
+        
     }
 
-
-
   }
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    
+  };
 
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
@@ -498,6 +515,35 @@ const PersonalFormLife = forwardRef((props, ref) => {
   return (
     <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px', }}>
       
+      {/* MODAL de  */}
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="xl"
+        className="dialog-height"
+        PaperProps={{
+          style: {
+            backgroundColor: "#ffffff",
+            boxShadow: "none",
+            overflow: "hidden",
+            zIndex: "2000",
+          },
+        }}
+      >
+        <DialogContent
+          style={{ overflow: "scroll", padding: "0px" }}
+          className="dialog-height-content"
+        >
+          {/* Componente del formulario */}
+          <QuestionModalLife
+            closeModalDetail={handleCloseModal}
+            isEditMode=""
+            style={{ width: "100%" }}
+          />
+        </DialogContent>
+      </Dialog>
+
+
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={openSnack}
@@ -1003,7 +1049,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           </Grid>
           <Grid item xs={10.5} md={3} style={{ paddingTop: '25px' }}>
             <Button
-              onClick=""
+              onClick={handleOpenModal}
               sx={{ mr: 1 }}
               className="button-styled-primary"
               style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}

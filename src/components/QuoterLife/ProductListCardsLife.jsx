@@ -58,13 +58,13 @@ const ProductListCardsLife = ({ onNext }) => {
       <div>
         {isLoading ? <Loading /> : (<div></div>)}
       </div>
-      <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
+      {/* <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
           PRODUCTOS
-      </Typography>
+      </Typography> */}
 
-      <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+      {/* <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Seleccione el Producto a cotizar 
-            </Typography>
+            </Typography> */}
 
       <Grid container spacing={2}>
 

@@ -11,10 +11,10 @@ import Backdrop from "@mui/material/Backdrop";
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CircularProgress from "@mui/material/CircularProgress";
-import { TextField, Box, Grid, FormControl, InputLabel,Select,MenuItem, Snackbar, Button } from "@mui/material";
+import { TextField, Box, Grid, FormControl, Select, MenuItem, Snackbar, Button } from "@mui/material";
 import { LS_DOCUMENTOSVIDA, LS_PREGUNTASVIDA } from "../../utils/constantes";
 
-const QuestionsFormLife = forwardRef((props, ref) => {
+const RiskFormLife = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [documentsUpload, setDocumentsUpload] = useState([]);
@@ -27,13 +27,7 @@ const QuestionsFormLife = forwardRef((props, ref) => {
     let docuemtos = JSON.parse(localStorage.getItem(LS_DOCUMENTOSVIDA));
     let array = Object.values(docuemtos);
     setDocuments(array || []);
-    let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
-    setQuestions(preguntas || []);
 
-    let questions = (preguntas || []).map(pregunta => ({
-      codigo: pregunta.codigo,
-      respuesta: ""
-    }));
     console.log(questions);
     setQuestionsUpload(questions);
   }, []);
@@ -88,13 +82,7 @@ const QuestionsFormLife = forwardRef((props, ref) => {
     );
   };
 
-useEffect(()=>{
-  console.log(documents);
-  console.log(typeof  documents);
-  let array = Object.values(documents);
-  console.log(array);
-  console.log(typeof  array);
-},[documents])
+
 
   const documentsArray = (
     <Grid container spacing={2} sx={{
@@ -127,10 +115,10 @@ useEffect(()=>{
               />
               <label htmlFor={`file-upload-${file.codigo}`}>
                 <Button
-                 startIcon={<DriveFolderUploadIcon />}
+                  startIcon={<DriveFolderUploadIcon />}
                   variant="contained"
-                   component="span" 
-                   style={{backgroundColor:"#0099a8"}}>
+                  component="span"
+                  style={{ backgroundColor: "#0099a8" }}>
                   Upload File
                 </Button>
               </label>
@@ -149,11 +137,11 @@ useEffect(()=>{
                         onClick={() => handleRemoveFile(fileObj.codigo)}
                         variant="contained"
                         sx={{
-                          backgroundColor:"#dd3301"
+                          backgroundColor: "#dd3301"
                         }}
                         size="small"
                         startIcon={<DeleteOutlineIcon />}
-                        style={{ marginTop: '10px', width: '143.7px',  height: '36.7px' }}
+                        style={{ marginTop: '10px', width: '143.7px', height: '36.7px' }}
                       >
                         Remove
                       </Button>
@@ -176,18 +164,18 @@ useEffect(()=>{
   //     prevFiles.filter(fileObj => fileObj.cod !== fileCod)
   //   );
   // };
-  
+
 
   const handleSelectChange = (event, questionIndex) => {
     const value = event.target.value;
-    console.log(value,questionIndex);
+    console.log(value, questionIndex);
     setQuestionsUpload(prevQuestions => {
       const newQuestions = [...prevQuestions];
       newQuestions[questionIndex].respuesta = value;
       return newQuestions;
     });
   };
-  
+
   const handleTextChange = (event, questionIndex) => {
     const value = event.target.value;
     setQuestionsUpload(prevQuestions => {
@@ -198,11 +186,11 @@ useEffect(()=>{
   };
 
   const preguntasArray = (
-    <Grid container spacing={2} style={{ paddingRight: '5px',marginLeft:'1px' }}>
+    <Grid container spacing={2} style={{ paddingRight: '5px', marginLeft: '1px' }}>
       {questions.length > 0 && questions.map((pregunta, questionIndex) => (
-        <Grid item xs={12}  sm={5} md={4} textAlign={"start"}
-        style={{display:'flex',flexDirection:'column',justifyContent:'space-between'}}
-        key={pregunta.codigo}>
+        <Grid item xs={12} sm={5} md={4} textAlign={"start"}
+          style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+          key={pregunta.codigo}>
           <Typography variant="body1" fontSize={14}>{pregunta.pregunta}</Typography>
           {pregunta.tipo === 'lista' ? (
             <FormControl fullWidth margin="normal">
@@ -214,10 +202,10 @@ useEffect(()=>{
                 {JSON.parse(pregunta.respuesta)
                   .filter(respuesta => respuesta.nombre !== "")
                   .map((respuesta, answerIndex) => (
-                  <MenuItem key={answerIndex} value={respuesta.nombre}>
-                    {respuesta.nombre}
-                  </MenuItem>
-                ))}
+                    <MenuItem key={answerIndex} value={respuesta.nombre}>
+                      {respuesta.nombre}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
           ) : (
@@ -243,7 +231,7 @@ useEffect(()=>{
         <CircularProgress color="inherit" />
       </Backdrop>
       <form
-        
+
         style={{ paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px' }}
       >
         <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
@@ -261,17 +249,20 @@ useEffect(()=>{
           {documentsArray}
         </Grid>
 
+        {questions.length > 0 && (
+          <>
+            <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
+              DECLARACION DE ASEGURABILIDAD
+            </Typography>
 
-        <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
-          DECLARACION DE ASEGURABILIDAD
-        </Typography>
-
-        <Grid container spacing={2} style={{ paddingRight: '5px' }}>
-          {preguntasArray}
-        </Grid>
+            <Grid container spacing={2} style={{ paddingRight: '5px' }}>
+              {preguntasArray}
+            </Grid>
+          </>
+        )}
       </form>
-    </Card>
+    </Card >
   );
 });
 
-export default QuestionsFormLife;
+export default RiskFormLife;

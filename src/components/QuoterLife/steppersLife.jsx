@@ -27,23 +27,22 @@ import DialogTitle from "@mui/material/DialogTitle";
 import "../../styles/button.scss";
 import "../../styles/form.scss";
 import PersonalFormLife from ".//../QuoterLife/personalFormLife";
-import PaidForm from "./../QuoterPymes/paidForm";
+import InvoiceFormLife from ".//../QuoterLife/invoiceFormLife";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ProductListCardsLife from "./ProductListCardsLife";
-import PaymentMethods from "./../QuoterPymes/paymentMethods";
+import SumaryFormLife from ".//../QuoterLife/sumaryFormLife";
 import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   LS_FORMAPAGO,
-  LS_TOTAL_PRIMA_RIESGO,
   USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
-import QuestionsFormLife from "./questionsFormLife";
+import RiskFormLife from "./riskFormLife";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -234,7 +233,7 @@ export default function SteppersLife() {
 
   const steps = [
     {
-        label: "Productos",
+        label: "Producto",
         formComponent: <ProductListCardsLife onNext={handleNext} />,
     },
     {
@@ -243,15 +242,15 @@ export default function SteppersLife() {
     },
     {
       label: "Riesgo",
-      formComponent: <QuestionsFormLife ref={questionFormRef} />,
+      formComponent: <RiskFormLife ref={questionFormRef} />,
     },
     {
       label: "Facturacion",
-      formComponent: <PaidForm ref={paidFormRef} onNext={handleNext} />,
+      formComponent: <InvoiceFormLife ref={paidFormRef} onNext={handleNext} />,
     },
     {
       label: "Resumen",
-      formComponent: <PaymentMethods onNext={handleNext} />,
+      formComponent: <SumaryFormLife onNext={handleNext} />,
     },
   ];
 
@@ -473,14 +472,14 @@ export default function SteppersLife() {
               Regresar
             </Button>
           )}
-            {steps[activeStep].label === "Pago" && (
+            {steps[activeStep].label === "Resumen" && (
               <Button
                 onClick={handleClickOpen}
                 sx={{ mr: 1 }}
                 className="button-styled-primary"
                 style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
               >
-                Enviar Cotización
+                Enviar Certificado
               </Button>
             )}
 
