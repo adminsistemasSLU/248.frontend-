@@ -25,11 +25,14 @@ const RiskFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
     let docuemtos = JSON.parse(localStorage.getItem(LS_DOCUMENTOSVIDA));
-    let array = Object.values(docuemtos);
-    setDocuments(array || []);
-
-    console.log(questions);
-    setQuestionsUpload(questions);
+    if(docuemtos){
+      let array = Object.values(docuemtos);
+      setDocuments(array || []);
+  
+      console.log(questions);
+      setQuestionsUpload(questions);
+    }
+   
   }, []);
 
 
