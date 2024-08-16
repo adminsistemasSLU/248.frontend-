@@ -265,7 +265,7 @@ const PersonalForm = forwardRef((props, ref) => {
           <CircularProgress color="inherit" />
         </Backdrop>
         <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '30px', fontWeight: 'bold' }}>
-          DATOS PERSONALES
+          DATOS PERSONALES 
         </Typography>
           <FormControl
             component="form"
