@@ -234,8 +234,8 @@ export default function SteppersLife() {
   const steps = [
     {
         label: "Producto",
-        // formComponent: <ProductListCardsLife onNext={handleNext} />,
-         formComponent: <PersonalFormLife ref={personalFormRef} />,
+         formComponent: <ProductListCardsLife onNext={handleNext} />,
+        // formComponent: <PersonalFormLife ref={personalFormRef} />,
     },
     {
       label: "Datos Personales",
