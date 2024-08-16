@@ -24,3 +24,7 @@ export const DATOS_PAGO_STORAGE_KEY = 'datos_pago';
 export const LS_PREGUNTASVIDA = 'preguntas_vida';
 export const LS_DOCUMENTOSVIDA = 'documentos_vida';
 export const LS_COMBOSVIDA = 'combos_vida';
+export const LS_TABLACALC = 'tabla_calc';
+export const LS_VIDAPOLIZA = 'vida_poliza';
+export const LS_PROCESODATOSVIDA = 'proceso_datos';
+export const LS_TABLAACTUALIZDA = 'tabla_actualizada';

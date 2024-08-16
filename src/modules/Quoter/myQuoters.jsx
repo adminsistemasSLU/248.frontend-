@@ -254,10 +254,7 @@ const EnhancedTableToolbar = React.memo(({ filter, setFilter }) => {
     </Toolbar>
   );
 });
-EnhancedTableToolbar.propTypes = {
-  filter: PropTypes.string.isRequired,
-  setFilter: PropTypes.func.isRequired,
-};
+
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -356,6 +353,7 @@ export default function MyQuoters() {
 
 
   const handleSetFilter = React.useCallback((value) => {
+    console.log('handlefilter');
     setFilter(value);
   }, []);
 

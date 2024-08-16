@@ -170,13 +170,13 @@ export default function SteppersLife() {
     let continuar = true;
     //Accion para Datos Personales
     if (steps[activeStep].label === "Datos Personales") {
-      //continuar = personalFormRef.current.handleSubmitExternally();
+      continuar = personalFormRef.current.handleSubmitExternally();
       continuar = true;
     }
 
 
 
-    if (steps[activeStep].label === "Pasarela de Pago") {
+    if (steps[activeStep].label === "Resumen") {
       Swal.fire({
         title: "Exito!",
         text: `El proceso ha terminado`,
@@ -191,7 +191,7 @@ export default function SteppersLife() {
     //Accion para Riesgo
     if (steps[activeStep].label === "Pago") {
       continuar = false;
-      continuar = await paidFormRef.current.handleSubmitExternally();
+      //continuar = await paidFormRef.current.handleSubmitExternally();
       if (localStorage.getItem(LS_FORMAPAGO) === "1") {
         Swal.fire({
           title: "Exito!",
@@ -234,7 +234,8 @@ export default function SteppersLife() {
   const steps = [
     {
         label: "Producto",
-        formComponent: <ProductListCardsLife onNext={handleNext} />,
+        // formComponent: <ProductListCardsLife onNext={handleNext} />,
+         formComponent: <PersonalFormLife ref={personalFormRef} />,
     },
     {
       label: "Datos Personales",

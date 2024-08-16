@@ -2,21 +2,21 @@ import React, {
     useState,
     useEffect,
 } from "react";
-import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import { TextField, Grid, FormControl, Select, MenuItem, Snackbar } from "@mui/material";
-import { LS_PREGUNTASVIDA } from "../../utils/constantes";
+import { LS_PREGUNTASVIDA,LS_PROCESODATOSVIDA,LS_TABLAACTUALIZDA } from "../../utils/constantes";
+import LifeService from "../../services/LifeService/LifeService";
 
 
 export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
     const [questions, setQuestions] = useState([]);
     const [questionsUpload, setQuestionsUpload] = useState([]);
     const [open, setOpen] = useState(false);
-    const editMode = isEditMode;
+    // const editMode = isEditMode;
 
     useEffect(() => {
         let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
@@ -57,8 +57,11 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
     };
 
 
-    const handleSaveChanges = () => {
-
+    const handleSaveChanges = async () => {
+        const  data = JSON.parse(localStorage.getItem(LS_PROCESODATOSVIDA));
+        const response = await LifeService.fetchProcesaDatos(data);
+        localStorage.setItem(LS_TABLAACTUALIZDA,JSON.stringify(response));
+        console.log(data);
         closeModalDetail("true");
     };
 
