@@ -115,7 +115,7 @@ function HomeCarrousel(props) {
                 }}
             >
                 {groupItems(items, 3).map((group, index) => (
-                    <div key={index} className="carousel-container">
+                    < div key={index} className="carousel-container">
                         {group.map((item, i) => (
                             <Item key={i} item={item} style={{ flex: 1, maxWidth: '100vw' }} />
                         ))}
@@ -143,7 +143,7 @@ function Item(props) {
         navigate(props.item.url); 
     };
     return (
-        <Card sx={{ maxWidth: 300 }} >
+        <Card sx={{ maxWidth: 300, minWidht:250 }} >
             <Link to={props.item.url} className={props.item.enable ? 'carousel-content' : ''} onClick={(e) => { e.preventDefault(); handleImageClick(props.item.ramo); }}>
                 <CardMedia
                     className={props.item.enable ? '' : 'inactivo'}

@@ -66,21 +66,25 @@ const ProductListCardsLife = ({ onNext }) => {
               Seleccione el Producto a cotizar 
             </Typography> */}
 
-      <Grid container spacing={2}>
+      <Grid container spacing={2} style={{flexWrap:'wrap'}}>
 
 
 
         {data.map((item, index) => (
           <Grid item xs={12} sm={6} md={4} key={index} style={{paddingTop:"20px"}} className='carousel-container' onClick={() => handleCardClick(index, item.producto)}>
-            <Card style={{ maxWidth: 240, cursor: 'pointer' }} >
+            <Card style={{Width: 220,minWidth:200, cursor: 'pointer' }} >
               <CardMedia
                 component="img"
                 height="200"
                 image={item.imagen}
                 alt={item.titulo}
+                sx={{
+                  width: 220,          // Mantiene la relación de aspecto
+                  objectFit: 'contain' // O puedes usar 'cover' si prefieres que la imagen cubra el espacio
+                }}
               />
               <CardContent>
-                <Typography variant="h6" component="div">
+                <Typography variant="h7" component="div">
                   {item.titulo}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
