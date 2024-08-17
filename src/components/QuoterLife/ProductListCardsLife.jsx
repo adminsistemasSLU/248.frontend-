@@ -80,7 +80,7 @@ const ProductListCardsLife = ({ onNext }) => {
                 alt={item.titulo}
                 sx={{
                   width: 220,          // Mantiene la relación de aspecto
-                  objectFit: 'contain' // O puedes usar 'cover' si prefieres que la imagen cubra el espacio
+                  objectFit: 'cover' // O puedes usar 'cover' si prefieres que la imagen cubra el espacio
                 }}
               />
               <CardContent>
