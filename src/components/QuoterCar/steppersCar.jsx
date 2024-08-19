@@ -40,9 +40,9 @@ import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
 import PersonalFormCar from "./personalFormCar";
 import InvoiceFormCar from "./invoiceFormCar";
-import ProductListCardsCar from "./personalFormCar";
 import ResumenCar from "./resumenCar";
 import DetailsCar from "./DetailsCar";
+import ProductListCardsCar from "./ProductListCardsCar";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -165,42 +165,13 @@ export default function SteppersCar() {
   const questionFormRef = useRef();
 
   const handleNext = async (formData) => {
-    // Actualiza el estado formData con los datos recibidos
     setFormData(formData);
     let continuar = true;
-    //Accion para Datos Personales
     if (steps[activeStep].label === "Datos Personales") {
-      //continuar = personalFormRef.current.handleSubmitExternally();
       continuar = true;
     }
 
-    if (steps[activeStep].label === "Pasarela de Pago") {
-      Swal.fire({
-        title: "Exito!",
-        text: `El proceso ha terminado`,
-        icon: "success",
-        confirmButtonText: "Ok",
-      }).then(() => {
-        navigate("/quoter/Pymes/MyQuotes");
-      });
-      return;
-    }
-
-    //Accion para Riesgo
-    if (steps[activeStep].label === "Pago") {
-      continuar = false;
-      continuar = await paidFormRef.current.handleSubmitExternally();
-      if (localStorage.getItem(LS_FORMAPAGO) === "1") {
-        Swal.fire({
-          title: "Exito!",
-          text: `El proceso ha terminado`,
-          icon: "success",
-          confirmButtonText: "Ok",
-        }).then(() => {
-          navigate("/quoter/Pymes/MyQuotes");
-        });
-      }
-    }
+    console.log(steps[activeStep].label);
 
     let datosPersonales = JSON.parse(
       localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
@@ -210,15 +181,11 @@ export default function SteppersCar() {
       setEmail(datosPersonales.correo);
     }
     
-
-    if (steps[activeStep].label === "Riesgo") {
-      console.log("continuar 1");
-      //continuar = questionFormRef.current.handleSubmitExternally();
+    if (steps[activeStep].label === "Datos Vehículo") {
       continuar = true;
     }
 
     if (continuar) {
-      console.log("continuar 2");
       const newActiveStep =
         isLastStep() && !allStepsCompleted()
           ? steps.findIndex((step, i) => !(i in completed))
@@ -237,7 +204,7 @@ export default function SteppersCar() {
       formComponent: <DetailsCar ref={questionFormRef} />,
     },
     {
-      label: "Productos",
+      label: "Planes",
       formComponent: <ProductListCardsCar ref={paidFormRef} onNext={handleNext} />,
     },
     {

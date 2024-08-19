@@ -9,7 +9,6 @@ const ProductListCards = ({ onNext }) => {
   const [data, setdata] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
-  console.log(subbaldosas);
 
   useEffect(() => {
     if(subbaldosas){

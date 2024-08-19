@@ -14,10 +14,6 @@ import Select from "@mui/material/Select";
 import Snackbar from "@mui/material/Snackbar";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
@@ -43,6 +39,14 @@ const PersonalFormCar = forwardRef((props, ref) => {
         identification: "",
         age: "",
         address: "",
+        gender: "M",
+        status: "S",
+        anios: "1",
+        inicioVigencia: null,
+        finVigencia: null,
+        agente: "001",
+        provincia: "1",
+        ciudad: "1",
     });
     const maxDate = dayjs().subtract(18, "years");
     const [error, setError] = useState("");
@@ -56,6 +60,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const cargarDatos = async () => {
         const dataPersonal = await cargarCotizacion();
         console.log(dataPersonal);
+
         if (isMounted.current) {
             setFormData((formData) => ({
                 ...formData,
@@ -66,7 +71,14 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 documentType: dataPersonal[0].clitipcedula,
                 identification: dataPersonal[0].clicedula,
                 address: dataPersonal[0].clidireccion,
+                gender: dataPersonal[0].cligenero,
+                status: dataPersonal[0].cliestadocivil,
+                anios: dataPersonal[0].vigencia,
+                agente: dataPersonal[0].cliagente,
+                provincia: dataPersonal[0].cliprovincia,
+                ciudad: dataPersonal[0].cliciudad
             }));
+
             const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
             setAge(dateObject);
         }
@@ -216,8 +228,16 @@ const PersonalFormCar = forwardRef((props, ref) => {
             "documentType",
             "identification",
             "address",
+            "gender",
+            "status",
+            "anios",
+            "agente",
+            "provincia",
+            "ciudad"
         ];
         let next = false;
+
+        // Verificar que todos los campos requeridos estén llenos
         for (const field of requiredFields) {
             if (!formData[field] || formData[field].trim() === "") {
                 next = false;
@@ -227,9 +247,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
             }
         }
 
-        //VALIDAR MENOR DE EDAD
         next = age !== "" ? true : false;
-
         const objetoSeguro = {
             nombre: formData.name,
             apellido: formData.lastname,
@@ -239,7 +257,14 @@ const PersonalFormCar = forwardRef((props, ref) => {
             identificacion: formData.identification,
             fechaNacimiento: formattedDate,
             direccion: formData.address,
+            genero: formData.gender,
+            estadoCivil: formData.status,
+            aniosVigencia: formData.anios,
+            agente: formData.agente,
+            provincia: formData.provincia,
+            ciudad: formData.ciudad
         };
+
         localStorage.setItem(
             DATOS_PERSONALES_STORAGE_KEY,
             JSON.stringify(objetoSeguro)
@@ -281,7 +306,9 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     >
                         <Alert severity="warning">{messageError}</Alert>
                     </Snackbar>
-                    <Grid item xs={10.5} md={3}>
+
+                    {/* Documento */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Seleccione Documento <span style={{ color: 'red' }}>*</span>
                         </Typography>
@@ -291,9 +318,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             name="documentType"
                             value={formData.documentType}
                             onChange={handleChange}
-                            style={{ textAlign: "left", }}
+                            style={{ textAlign: "left" }}
                             variant="standard"
-                            placeholder="Seleccione documento"
                             fullWidth
                             required
                         >
@@ -302,12 +328,14 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             <MenuItem value="P">Pasaporte</MenuItem>
                         </Select>
                     </Grid>
-                    <Grid item xs={10.5} md={3} >
+
+                    {/* Documento de identificación */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Documento de identificación <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <TextField
-                            type={formData.documentType === "P" ? "text" : "text"}
+                            type="text"
                             name="identification"
                             value={formData.identification}
                             placeholder="Documento de identificación"
@@ -317,16 +345,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             fullWidth
                             required
                         />
-                        {errorCedula ? (
-                            <Alert
-                                severity="error"
-                                style={{ fontSize: "10px", textAlign: "start" }}
-                            >
-                                El documento de identificación no es valido.
-                            </Alert>
-                        ) : null}
                     </Grid>
-                    <Grid item xs={10.5} md={3} >
+
+                    {/* Nombres */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Nombres <span style={{ color: 'red' }}>*</span>
                         </Typography>
@@ -338,12 +360,13 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
-                            disabled={errorCedula}
                             inputProps={{ maxLength: 30 }}
                             required
                         />
                     </Grid>
-                    <Grid item xs={10.5} md={2.5}>
+
+                    {/* Apellidos */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Apellidos <span style={{ color: 'red' }}>*</span>
                         </Typography>
@@ -353,44 +376,63 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             name="lastname"
                             value={formData.lastname}
                             onChange={handleChange}
-                            disabled={errorCedula}
                             variant="standard"
                             fullWidth
                             inputProps={{ maxLength: 30 }}
                             required
                         />
                     </Grid>
-                    <Grid item xs={10.5} md={3} >
+
+                    {/* Género */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Fecha de nacimiento <span style={{ color: 'red' }}>*</span>
+                            Género <span style={{ color: 'red' }}>*</span>
                         </Typography>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DemoContainer components={["DatePicker"]}>
-                                <DatePicker
-                                    placeholder="Fecha de nacimiento"
-                                    slotProps={{
-                                        textField: { variant: "standard", size: "small" },
-                                    }}
-                                    value={age}
-                                    format="DD/MM/YYYY"
-                                    disabled={errorCedula}
-                                    className="datePicker"
-                                    maxDate={maxDate}
-                                    onChange={(newValue) => {
-                                        setAge(newValue);
-                                    }}
-                                />
-                            </DemoContainer>
-                        </LocalizationProvider>
+                        <Select
+                            labelId="gender-Label"
+                            id="gender"
+                            name="gender"
+                            style={{ textAlign: "left" }}
+                            value={formData.gender}
+                            onChange={handleChange}
+                            variant="standard"
+                            fullWidth
+                            required
+                        >
+                            <MenuItem value="M">Masculino</MenuItem>
+                            <MenuItem value="F">Femenino</MenuItem>
+                        </Select>
                     </Grid>
-                    <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
+
+                    {/* Estado Civil */}
+                    <Grid item xs={10.5} md={2.8}>
+                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                            Estado Civil <span style={{ color: 'red' }}>*</span>
+                        </Typography>
+                        <Select
+                            labelId="status-Label"
+                            id="status"
+                            style={{ textAlign: "left" }}
+                            name="status"
+                            value={formData.status}
+                            onChange={handleChange}
+                            variant="standard"
+                            fullWidth
+                            required
+                        >
+                            <MenuItem value="S">Soltero</MenuItem>
+                            <MenuItem value="C">Casado</MenuItem>
+                        </Select>
+                    </Grid>
+
+                    {/* Teléfono */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Teléfono <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <TextField
                             placeholder="Teléfono"
                             type="number"
-                            disabled={errorCedula}
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
@@ -400,14 +442,15 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             required
                         />
                     </Grid>
-                    <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
+
+                    {/* Dirección */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Dirección <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <TextField
                             placeholder="Dirección"
                             type="text"
-                            disabled={errorCedula}
                             name="address"
                             value={formData.address}
                             onChange={handleChange}
@@ -416,7 +459,9 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             required
                         />
                     </Grid>
-                    <Grid item xs={10.5} md={2.5} style={{ paddingTop: '21px' }} >
+
+                    {/* Email */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Email <span style={{ color: 'red' }}>*</span>
                         </Typography>
@@ -424,7 +469,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             placeholder="Email"
                             type="email"
                             name="email"
-                            disabled={errorCedula}
                             value={formData.email}
                             onChange={handleChange}
                             variant="standard"
@@ -432,132 +476,42 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             required
                         />
                     </Grid>
-                    <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
+
+                    {/* Años de Vigencia */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Género <span style={{ color: 'red' }}>*</span>
+                            Años de Vigencia <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <Select
-                            labelId="documentType-Label"
-                            id="documentType"
-                            name="gender"
-                            value={formData.documentType}
-                            onChange={handleChange}
-                            style={{ textAlign: "left", }}
-                            variant="standard"
-                            placeholder="Género"
-                            fullWidth
-                            required
-                        >
-                            <MenuItem value="C">Masculino</MenuItem>
-                            <MenuItem value="R">Femenino</MenuItem>
-                        </Select>
-                    </Grid>
-                    <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Estado Civil <span style={{ color: 'red' }}>*</span>
-                        </Typography>
-                        <Select
-                            labelId="documentType-Label"
-                            id="documentType"
-                            name="status"
-                            value={formData.documentType}
-                            onChange={handleChange}
-                            style={{ textAlign: "left", }}
-                            variant="standard"
-                            placeholder="Estado Civil"
-                            fullWidth
-                            required
-                        >
-                            <MenuItem value="C">Soltero</MenuItem>
-                            <MenuItem value="R">Casado</MenuItem>
-                            <MenuItem value="P">Viudo</MenuItem>
-                        </Select>
-                    </Grid>
-                    <Grid item xs={10.5} md={3} lg={12} style={{ paddingTop: '20px' }} >
-                        <Typography variant="body2" color="#02545C" lg={12} style={{ textAlign: 'left', fontWeight: 'bold' }}>
-                            DATOS DE LA PÓLIZA
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={10.5} md={3}>
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Seleccione Documento <span style={{ color: 'red' }}>*</span>
-                        </Typography>
-                        <Select
-                            labelId="documentType-Label"
-                            id="documentType"
+                            labelId="anios-Label"
+                            id="anios"
                             name="anios"
-                            // value={formData.documentType}
-                            value="1"
+                            style={{ textAlign: "left" }}
+                            value={formData.anios}
                             onChange={handleChange}
-                            style={{ textAlign: "left", }}
                             variant="standard"
-                            placeholder="Años Vigencias"
                             fullWidth
                             required
                         >
-                            <MenuItem value="1">1 año(s)</MenuItem>
-                            <MenuItem value="2">2 año(s)</MenuItem>
-                            <MenuItem value="3">3 año(s)</MenuItem>
+                            <MenuItem value="1">1 año</MenuItem>
+                            <MenuItem value="2">2 años</MenuItem>
+                            <MenuItem value="3">3 años</MenuItem>
                         </Select>
                     </Grid>
-                    <Grid item xs={10.5} md={3} >
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Inicio de Vigencia <span style={{ color: 'red' }}>*</span>
-                        </Typography>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DemoContainer components={["DatePicker"]}>
-                                <DatePicker
-                                    placeholder="Inicio de Vigencia"
-                                    slotProps={{
-                                        textField: { variant: "standard", size: "small" },
-                                    }}
-                                    value={age}
-                                    format="DD/MM/YYYY"
-                                    className="datePicker"
-                                    maxDate={maxDate}
-                                    onChange={(newValue) => {
-                                        setAge(newValue);
-                                    }}
-                                />
-                            </DemoContainer>
-                        </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={10.5} md={3} >
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Fin de Vigencia <span style={{ color: 'red' }}>*</span>
-                        </Typography>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DemoContainer components={["DatePicker"]}>
-                                <DatePicker
-                                    placeholder="Fin de Vigencia"
-                                    slotProps={{
-                                        textField: { variant: "standard", size: "small" },
-                                    }}
-                                    value={age}
-                                    format="DD/MM/YYYY"
-                                    className="datePicker"
-                                    maxDate={maxDate}
-                                    onChange={(newValue) => {
-                                        setAge(newValue);
-                                    }}
-                                />
-                            </DemoContainer>
-                        </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={10.5} md={2.5}>
+
+                    {/* Agente */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Agente <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <Select
-                            labelId="documentType-Label"
-                            id="documentType"
+                            labelId="agente-Label"
+                            id="agente"
+                            style={{ textAlign: "left" }}
                             name="agente"
-                            // value={formData.documentType}
-                            value="1"
+                            value={formData.agente}
                             onChange={handleChange}
-                            style={{ textAlign: "left", }}
                             variant="standard"
-                            placeholder="Agente"
                             fullWidth
                             required
                         >
@@ -566,20 +520,20 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             <MenuItem value="003">ZHM Cia. Lta 2</MenuItem>
                         </Select>
                     </Grid>
-                    <Grid item xs={10.5} md={3} >
+
+                    {/* Provincia */}
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Provincia <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <Select
-                            labelId="documentType-Label"
-                            id="documentType"
+                            labelId="provincia-Label"
+                            id="provincia"
+                            style={{ textAlign: "left" }}
                             name="provincia"
-                            // value={formData.documentType}
-                            value="1"
+                            value={formData.provincia}
                             onChange={handleChange}
-                            style={{ textAlign: "left", }}
                             variant="standard"
-                            placeholder="Provincia"
                             fullWidth
                             required
                         >
@@ -587,20 +541,19 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             <MenuItem value="2">Manabi</MenuItem>
                         </Select>
                     </Grid>
-                    <Grid item xs={10.5} md={3} >
+
+                    <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                             Ciudad <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <Select
-                            labelId="documentType-Label"
-                            id="documentType"
+                            labelId="ciudad-Label"
+                            id="ciudad"
                             name="ciudad"
-                            // value={formData.documentType}
-                            value="1"
+                            style={{ textAlign: "left" }}
+                            value={formData.ciudad}
                             onChange={handleChange}
-                            style={{ textAlign: "left", }}
                             variant="standard"
-                            placeholder="Agente"
                             fullWidth
                             required
                         >
@@ -609,7 +562,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
                         </Select>
                     </Grid>
                 </Grid>
-                {error && <Alert severity="error">{error}</Alert>}
             </FormControl>
         </Card>
     );
