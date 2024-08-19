@@ -222,7 +222,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const memoizedFormDataTabla = useMemo(() => formDataTabla, [formDataTabla]);
 
-
+  const [cobertura, setCobertura] = useState([]);
   const [openSnack, setOpenSnack] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [openModal, setOpenModal] = React.useState(false);
@@ -252,7 +252,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const CodigoComboUnionLibre = "05";
   const cargarDatos = async () => {
 
-    const dataPersonal = await cargarCotizacion();
+  const dataPersonal = await cargarCotizacion();
 
     console.log(dataPersonal);
     if (isMounted.current) {
@@ -355,6 +355,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
         let documentosVida = vigencia.data.documentos
         let tabla1 = vigencia.data.crearTablaPeriodos.tabla1
+        if(tabla1.EtiquetaTable.codigo){
+          setCobertura(tabla1.EtiquetaTable.codigo);
+        }
         localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
         if (vigencia.data.polizas[0]) {
           localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
@@ -420,7 +423,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       conyugueEdad = conyugueage.format('DD/MM/YYYY');
     }
 
-    const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
+    const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));    
     const periodos = formDataTabla.map((item, index) => ({
       monto: item.monto,
       periodo: index + 1, // o cualquier lógica que determine el periodo basado en el índice
@@ -439,19 +442,20 @@ const PersonalFormLife = forwardRef((props, ref) => {
       sess_tip_usuario: "1",
       objPeriodos: [
         {
-          codigo: 1,
+          codigo: cobertura,
           datos: periodos
         }
       ],
       poliza: poliza,
       porAjuste: "0.00",
+      genero: formData.genero,
       producto: producto,
       ramoAlt: ramo,
       ramoOri: ramo,
       tipoContrato: tipoPrestamo, // Uso de tipoPrestamo aquí
       vidaGrupo: "N",
       vigencia: formData.vigencia,
-      zona: formData.city
+      zona: ''
     };
   }
 
@@ -1193,21 +1197,29 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
                 <Grid item xs={10.5} md={3} >
                   <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                    Sexo <span style={{ color: 'red' }}>*</span>
+                    Genero <span style={{ color: 'red' }}>*</span>
                   </Typography>
-                  <TextField
-                    placeholder="Conyugue Sexo"
-                    type="text"
+                  <Select
+                    labelId="genero-Label"
+                    id="conyugesexo"
                     name="conyugesexo"
                     value={formData.conyugesexo}
                     onChange={handleChange}
+                    onBlur={handleBlur}
+                    style={{ textAlign: "left", }}
                     variant="standard"
+                    placeholder="Seleccione el genero"
                     fullWidth
-                    disabled={errorCedula}
-                    inputProps={{ maxLength: 30 }}
                     required
-                  />
+                  >
 
+                    <MenuItem key='0' value='M'>
+                      Masculino
+                    </MenuItem>
+                    <MenuItem key='1' value='F'>
+                      Femenino
+                    </MenuItem>
+                  </Select>
                 </Grid>
 
               </Grid>
@@ -1256,7 +1268,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
                   slotProps={{
                     textField: { variant: "standard", size: "small" }
                   }}
-                  
+
                   value={finVigencia}
                   format="DD/MM/YYYY"
                   readOnly
