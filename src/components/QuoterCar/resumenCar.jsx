@@ -3,15 +3,19 @@ import { Card, CardContent, CardMedia, Container, Grid, Typography } from '@mui/
 import '../../styles/carrousel.scss';
 import BaldosasService from '../../services/BaldosasService/BaldosasService';
 import Loading from '../../utils/loading';
-import { API_SUBBALDOSAS,LS_PRODUCTO } from '../../utils/constantes';
+import { API_SUBBALDOSAS, LS_PRODUCTO, LS_RAMO } from '../../utils/constantes';
 
-const ProductListCards = ({ onNext }) => {
+
+
+const ResumenCar = ({ onNext }) => {
   const [data, setdata] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
+  const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+  console.log(subbaldosas);
 
   useEffect(() => {
-    if(subbaldosas){
+    if (subbaldosas) {
       setdata(subbaldosas);
       return;
     }
@@ -19,20 +23,21 @@ const ProductListCards = ({ onNext }) => {
     const printBaldosas = async () => {
       setIsLoading(true);
       try {
-        const baldosas = await BaldosasService.fetchSubBaldosas(1, '');
+        const baldosas = await BaldosasService.fetchSubBaldosas(ramo, '');
         setIsLoading(false);
         console.log(baldosas);
         if (baldosas && baldosas.data.BaldosaSubServisios) {
+
           const newItems = baldosas.data.BaldosaSubServisios.map(baldosa => {
             return {
               titulo: baldosa.titulo,
               descripcion: baldosa.descripcion,
               imagen: process.env.REACT_APP_API_URL + '/api/Imagen/' + baldosa.nombre_imagen,
-              producto:baldosa.producto,
+              producto: baldosa.producto,
             };
           });
           setdata(newItems);
-          localStorage.setItem(API_SUBBALDOSAS,JSON.stringify(newItems));
+          localStorage.setItem(API_SUBBALDOSAS, JSON.stringify(newItems));
         }
       } catch (error) {
         console.error('Error al obtener baldosas:', error);
@@ -41,10 +46,9 @@ const ProductListCards = ({ onNext }) => {
     printBaldosas();
   }, []);
 
-  const handleCardClick = (index,producto) => {
-    
-    console.log('Producto elegido: '+producto);
-    localStorage.setItem(LS_PRODUCTO,(producto));
+  const handleCardClick = async (index, producto) => {
+    console.log('Producto elegido: ' + producto);
+    localStorage.setItem(LS_PRODUCTO, (producto));
     onNext(index);
   };
 
@@ -54,9 +58,20 @@ const ProductListCards = ({ onNext }) => {
       <div>
         {isLoading ? <Loading /> : (<div></div>)}
       </div>
+      {/* <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
+          PRODUCTOS
+      </Typography> */}
+
+      {/* <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              Seleccione el Producto a cotizar 
+            </Typography> */}
+
       <Grid container spacing={2}>
+
+
+
         {data.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index} className='carousel-container' onClick={() => handleCardClick(index,item.producto)}>
+          <Grid item xs={12} sm={6} md={4} key={index} style={{paddingTop:"20px"}} className='carousel-container' onClick={() => handleCardClick(index, item.producto)}>
             <Card style={{ maxWidth: 240, cursor: 'pointer' }} >
               <CardMedia
                 component="img"
@@ -69,7 +84,7 @@ const ProductListCards = ({ onNext }) => {
                   {item.titulo}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {item.descripcion}
+                  
                 </Typography>
               </CardContent>
             </Card>
@@ -80,4 +95,4 @@ const ProductListCards = ({ onNext }) => {
   );
 };
 
-export default ProductListCards;
+export default ResumenCar;

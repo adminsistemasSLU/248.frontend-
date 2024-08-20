@@ -442,7 +442,6 @@ export default function MyQuoters() {
       nombre: item.clinombre,
       id: item.id,
     }));
-    console.log(data);
     let datosPersonales = data.length > 0 ? data[0] : null;
     if (datosPersonales) {
       localStorage.setItem(
@@ -576,10 +575,6 @@ export default function MyQuoters() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-
-      
-
       <Typography variant="h4" sx={{ color: "#00a99e", mb: 2 }} xs={{ fontSize: 10 }}>Mis Cotizaciones</Typography>
 
       <Grid style={{ width: '90%', display: 'flex', justifyContent: 'center' }} spacing={2}>
