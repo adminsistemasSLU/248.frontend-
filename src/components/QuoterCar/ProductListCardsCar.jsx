@@ -10,8 +10,10 @@ const ProductListCardsCar = ({ onNext }) => {
     const [isLoading, setIsLoading] = useState(false);
     const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
     const [openModal, setOpenModal] = useState(false);
+    const [modalLink, setModalLink] = useState('');
 
-    const handleOpenModal = () => {
+    const handleOpenModal = (link) => {
+        setModalLink(link);
         setOpenModal(true);
     };
 
@@ -97,10 +99,11 @@ const ProductListCardsCar = ({ onNext }) => {
                                     $1.230.00
                                 </Typography>
                                 <Typography variant="body2">
-                                    <Link href="#" onClick={handleOpenModal} style={{ textDecoration: 'underline', color: 'black' }}>
+                                    <Link href="#" onClick={() => handleOpenModal('https://www.example.com/plan-oro')} style={{ textDecoration: 'underline', color: 'black' }}>
                                         Ver condiciones
                                     </Link>
                                 </Typography>
+
                             </CardContent>
                         </Card>
                     </Grid>
@@ -116,10 +119,11 @@ const ProductListCardsCar = ({ onNext }) => {
                                     $800.00
                                 </Typography>
                                 <Typography variant="body2">
-                                    <Link href="#" onClick={handleOpenModal} style={{ textDecoration: 'underline', color: 'black' }}>
+                                    <Link href="#" onClick={() => handleOpenModal('https://www.example.com/plan-oro')} style={{ textDecoration: 'underline', color: 'black' }}>
                                         Ver condiciones
                                     </Link>
                                 </Typography>
+
                             </CardContent>
                         </Card>
                     </Grid>
@@ -135,20 +139,23 @@ const ProductListCardsCar = ({ onNext }) => {
                                     $599.99
                                 </Typography>
                                 <Typography variant="body2">
-                                    <Link href="#" onClick={handleOpenModal} style={{ textDecoration: 'underline', color: 'black' }}>
+                                    <Link href="#" onClick={() => handleOpenModal('https://www.example.com/plan-oro')} style={{ textDecoration: 'underline', color: 'black' }}>
                                         Ver condiciones
                                     </Link>
                                 </Typography>
+
                             </CardContent>
                         </Card>
                     </Grid>
                 </Grid >
-                <Dialog open={openModal} onClose={handleCloseModal}>
+                <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md" fullWidth>
                     <DialogTitle>Condiciones del Plan</DialogTitle>
-                    <DialogContent>
-                        <Typography variant="body1">
-                            Aquí van las condiciones del plan Bronce.
-                        </Typography>
+                    <DialogContent dividers>
+                        <iframe
+                            src={modalLink}
+                            style={{ width: '100%', height: '500px', border: 'none' }}
+                            title="Condiciones del Plan"
+                        />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseModal} color="primary">

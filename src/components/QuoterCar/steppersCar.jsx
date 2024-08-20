@@ -164,14 +164,19 @@ export default function SteppersCar() {
   const paidFormRef = useRef();
   const questionFormRef = useRef();
 
+  const handleComparativo = () => {
+    const link = document.createElement('a');
+    link.href = `${process.env.PUBLIC_URL}/assets/resource/comparativo.pdf`;
+    link.download = 'comparativo.pdf';
+    link.click();
+  };
+
   const handleNext = async (formData) => {
     setFormData(formData);
     let continuar = true;
     if (steps[activeStep].label === "Datos Personales") {
       continuar = true;
     }
-
-    console.log(steps[activeStep].label);
 
     let datosPersonales = JSON.parse(
       localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
@@ -180,7 +185,7 @@ export default function SteppersCar() {
     if (datosPersonales) {
       setEmail(datosPersonales.correo);
     }
-    
+
     if (steps[activeStep].label === "Datos Vehículo") {
       continuar = true;
     }
@@ -251,7 +256,7 @@ export default function SteppersCar() {
 
   const handleBack = () => {
     console.log(activeStep);
-    if(activeStep < 1){
+    if (activeStep < 1) {
       navigate('/quoter/dashboard');
     }
     else {
@@ -389,9 +394,9 @@ export default function SteppersCar() {
       <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto' }}>
         <CardContent sx={{ bgcolor: 'background.default' }}>
           <Stepper
-          alternativeLabel
-          activeStep={activeStep}
-          connector={<ColorlibConnector />}
+            alternativeLabel
+            activeStep={activeStep}
+            connector={<ColorlibConnector />}
           >
             {steps.map((step, index) => (
               <Step key={index}>
@@ -414,10 +419,10 @@ export default function SteppersCar() {
       >
         <Box style={{ width: "100%" }}>
           {steps[activeStep].label === "Producto" && (
-            <div style={{paddingLeft: '9%', paddingTop: '20px', textAlign: 'left'}}>
+            <div style={{ paddingLeft: '9%', paddingTop: '20px', textAlign: 'left' }}>
               <span style={{ color: "#02545C", }}><b>PRODUCTOS</b></span>
               <br />
-            <div style={{paddingTop: '5px', paddingBottom: '30px'}}><span>Seleccione el producto a cotizar</span></div>
+              <div style={{ paddingTop: '5px', paddingBottom: '30px' }}><span>Seleccione el producto a cotizar</span></div>
             </div>
           )}
           {React.cloneElement(steps[activeStep].formComponent, {
@@ -425,7 +430,6 @@ export default function SteppersCar() {
             onNext: handleNext,
           })}
           <div className="btnDisplay">
-          {steps[activeStep].label !== "Productos" && (
             <Button
               onClick={handleBack}
               sx={{ mr: 1 }}
@@ -434,19 +438,9 @@ export default function SteppersCar() {
             >
               Regresar
             </Button>
-          )}
-            {steps[activeStep].label === "Resumen" && (
-              <Button
-                onClick={handleClickOpen}
-                sx={{ mr: 1 }}
-                className="button-styled-primary"
-                style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
-              >
-                Enviar Certificado
-              </Button>
-            )}
 
-            {steps[activeStep].label !== "Productos" && (
+
+            {(steps[activeStep].label === "Cliente" || steps[activeStep].label === "Datos Vehículo") && (
               <Button
                 onClick={handleNext}
                 sx={{ mr: 1 }}
@@ -454,6 +448,17 @@ export default function SteppersCar() {
                 style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
               >
                 Siguiente
+              </Button>
+            )}
+
+            {steps[activeStep].label === "Planes" && (
+              <Button
+                onClick={handleComparativo}
+                sx={{ mr: 1 }}
+                className="button-styled-primary"
+                style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
+              >
+                Compatarivo
               </Button>
             )}
           </div>

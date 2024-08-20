@@ -47,6 +47,8 @@ function HomeCarrousel(props) {
             try {
                 setIsLoading(true);
                 const baldosas = await BaldosasService.fetchBaldosas();
+                console.log(baldosas);
+                
                 setIsLoading(false);
                 if (baldosas && baldosas.data.BaldosaServisios) {
                     const newItems = baldosas.data.BaldosaServisios.map(baldosa => {
