@@ -170,8 +170,8 @@ export default function SteppersLife() {
     let continuar = true;
     //Accion para Datos Personales
     if (steps[activeStep].label === "Datos Personales") {
-      continuar = personalFormRef.current.handleSubmitExternally();
-      continuar = true;
+      continuar = await personalFormRef.current.handleSubmitExternally();
+      
     }
 
 
