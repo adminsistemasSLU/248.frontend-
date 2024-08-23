@@ -923,11 +923,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return;
     }
 
-    if (formData.prestamo === '') {
-      setErrorMessage("Se deben ingresar un valor en prestamo")
-      setOpenSnack(true);
-      return;
-    }
+   
 
     if (formData.vigencia === '' || formData.vigencia === 0) {
       setErrorMessage("Se deben ingresar datos en vigencia")
@@ -950,6 +946,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }, 0); // El acumulador comienza en 0
 
     setFormData({ ...formData, prestamo: resultado });
+
+
+    // if (formData.prestamo === '') {
+    //   setErrorMessage("Se deben ingresar un valor en prestamo")
+    //   setOpenSnack(true);
+    //   return;
+    // }
 
     const data = crearDatosProcesarDatos();
     setOpenBackdrop(true);
