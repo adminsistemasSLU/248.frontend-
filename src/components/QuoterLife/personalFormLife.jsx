@@ -159,7 +159,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     address: "",
     province: "",
     city: "",
-    status: "0",
+    status: "",
     genero: 'M',
 
     conyugetipo: "C",
@@ -241,7 +241,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const [conyugueage, setConyugueAge] = useState("");
   const [inicioVigencia, setInicioVigencia] = useState(dayjs());
   const [finVigencia, setFinVigencia] = useState(dayjs());
-  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(true);
   const isMounted = useRef(false);
   //Combos
   const [estadoCivil, setEstadoCivil] = useState([]);
@@ -529,8 +529,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
           console.error("Error fetching data:", error);
           handleCloseBackdrop();
         }
-      }else{
-        handleCloseBackdrop();
       }
     };
     fetchData();
@@ -538,7 +536,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   //Cuando cambie la variable vigencia
   useEffect(() => {
-    
+
     const fetchDataDocumento = async () => {
       if (formData.vigencia && formData.prestamo && age) {
         let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
@@ -701,7 +699,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
-    
+
 
     if (formData.vigencia === '' || formData.vigencia === 0) {
       setErrorMessage("Debe ingresar un valor en vigencia, no puede ser 0")
@@ -709,7 +707,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
-    if (formData.prima === '' && formData.impuesto=== '') {
+    if (formData.prima === '' && formData.impuesto === '') {
       setErrorMessage("Primero se deben realizar los calculos")
       setOpenSnack(true);
       return false;
@@ -848,8 +846,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
         {
           codcob: cobertura,
           selcob: true,
-          clscob:"",
-          tipcob:""
+          clscob: "",
+          tipcob: ""
         }
       ],
       arrMontoPeriodo: arrMontoPeriodo,
@@ -882,13 +880,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
     console.log(data);
-  
-    
+
+
     try {
       handleOpenBackdrop();
       const response = await LifeService.fetchGrabaDatosVida(data);
       console.log(response);
-        handleCloseBackdrop();
+      handleCloseBackdrop();
       if (response.codigo === 200) {
         //Codigo por valido
         handleCloseBackdrop();
@@ -900,7 +898,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }
     } catch (error) {
       console.error("Error al verificar enviar a guadradar datos:", error);
-        handleCloseBackdrop();
+      handleCloseBackdrop();
       return false;
     }
 
@@ -912,8 +910,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     // console.log("Formulario enviado:", objetoSeguro, next);
     // return next;
   };
-  
-  const handleOpenModal = () => {
+
+  const handleOpenModal = async () => {
 
     const todosTienenNumero = formDataTabla.every((item) => {
       console.log(item.monto);
@@ -932,18 +930,30 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return;
     }
 
-    if (formData.vigencia === ''|| formData.vigencia===0) {
+    if (formData.vigencia === '' || formData.vigencia === 0) {
       setErrorMessage("Se deben ingresar datos en vigencia")
       setOpenSnack(true);
       return;
     }
 
-    
 
     const data = crearDatosProcesarDatos();
-    localStorage.setItem(LS_PROCESODATOSVIDA, JSON.stringify(data));
-    console.log(data);
-    setOpenModal(true);
+    setOpenBackdrop(true);
+    const response = await LifeService.fetchProcesaDatos(data);
+    if (response.codigo === 200) {
+      setOpenBackdrop(false);
+      localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+      setCalculado(response);
+    } else {
+      console.log(response.message);
+      setErrorMessage(response.message);
+      setOpenSnack(true);
+      // localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify([]));
+      setCalculado([]);
+      setOpenBackdrop(false);
+    }
+
+    // setOpenModal(true);
   };
 
   useEffect(() => {
@@ -1690,7 +1700,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Prima"
               type="text"
-              disabled="true"
+              disabled={true}
               name="prima"
               value={ValidationUtils.Valida_moneda(formData.prima)}
               onChange={handleChange}
@@ -1709,7 +1719,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Impuesto"
               type="text"
-              disabled="true"
+              disabled={true}
               name="impuesto"
               value={ValidationUtils.Valida_moneda(formData.impuesto)}
               onChange={handleChange}
@@ -1727,7 +1737,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Prima total"
               type="text"
-              disabled="true"
+              disabled={true}
               name="primaTotal"
               value={ValidationUtils.Valida_moneda(formData.primaTotal)}
               onChange={handleChange}
@@ -1745,7 +1755,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Prima Mensual"
               type="text"
-              disabled="true"
+              disabled={true}
               name="primaMensual"
               value={ValidationUtils.Valida_moneda(formData.primaMensual)}
               onChange={handleChange}

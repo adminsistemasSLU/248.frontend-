@@ -7,7 +7,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
-import { TextField, Grid, FormControl, Select, MenuItem, Snackbar,Alert,AlertTitle } from "@mui/material";
+import { TextField, Grid, FormControl, Select, MenuItem, Snackbar, Alert, AlertTitle } from "@mui/material";
 import { LS_PREGUNTASVIDA, LS_PROCESODATOSVIDA, LS_TABLAACTUALIZDA } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 
@@ -64,16 +64,24 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         const data = JSON.parse(localStorage.getItem(LS_PROCESODATOSVIDA));
         setOpenBackdrop(true);
         const response = await LifeService.fetchProcesaDatos(data);
-        if(response.codigo===200){
+        if (response.codigo === 200) {
             setOpenBackdrop(false);
             localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
-        }else{
-            setOpenBackdrop(false);
+            closeModalDetail("true");
+        } else {
+            console.log(response.message);
             setErrorMessage(response.message);
             setOpenSnack(true);
+            localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify([]));
+
+            // Espera 2 segundos antes de cerrar el backdrop
+            setTimeout(() => {
+                setOpenBackdrop(false);
+                closeModalDetail("true");
+            }, 2000); // 2000 milisegundos = 2 segundos
         }
         console.log(data);
-        closeModalDetail("true");
+        
     };
 
     const preguntasArray = (
@@ -147,7 +155,7 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
             </div>
             <Backdrop
                 sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={open}
+                open={openBackdrop}
             >
                 <CircularProgress color="inherit" />
             </Backdrop>

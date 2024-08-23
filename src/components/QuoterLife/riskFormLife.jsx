@@ -25,16 +25,27 @@ const RiskFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
     let docuemtos = JSON.parse(localStorage.getItem(LS_DOCUMENTOSVIDA));
-    if(docuemtos){
+    let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+    let questions = (preguntas || []).map(pregunta => ({
+      codigo: pregunta.codigo,
+      respuesta: ""
+    }));
+    setQuestions(preguntas || []);
+    if (docuemtos) {
       let array = Object.values(docuemtos);
       setDocuments(array || []);
-  
+
       console.log(questions);
       setQuestionsUpload(questions);
     }
-   
+
   }, []);
 
+  const handleSaveChanges = async () => {
+    
+   
+    
+};
 
 
   useImperativeHandle(ref, () => ({
@@ -43,7 +54,7 @@ const RiskFormLife = forwardRef((props, ref) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes manejar el envío del formulario o de los documentos
+    
     console.log("Submitting documents:", documentsUpload);
   };
 
@@ -118,10 +129,11 @@ const RiskFormLife = forwardRef((props, ref) => {
               />
               <label htmlFor={`file-upload-${file.codigo}`}>
                 <Button
+                
                   startIcon={<DriveFolderUploadIcon />}
                   variant="contained"
                   component="span"
-                  style={{ backgroundColor: "#0099a8" }}>
+                  style={{ backgroundColor: "#0099a8", display:"none" }}>  {/* Se oculta boton por peticion de cliente */}
                   Upload File
                 </Button>
               </label>
@@ -144,8 +156,8 @@ const RiskFormLife = forwardRef((props, ref) => {
                         }}
                         size="small"
                         startIcon={<DeleteOutlineIcon />}
-                        style={{ marginTop: '10px', width: '143.7px', height: '36.7px' }}
-                      >
+                        style={{ marginTop: '10px', width: '143.7px', height: '36.7px' }} 
+                      >{/* Se oculta boton por peticion de cliente */}
                         Remove
                       </Button>
                     </li>
