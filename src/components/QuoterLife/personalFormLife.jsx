@@ -41,7 +41,6 @@ import {
   LS_DOCUMENTOSVIDA,
   LS_TABLACALC,
   LS_VIDAPOLIZA,
-  LS_PROCESODATOSVIDA,
   LS_TABLAACTUALIZDA,
   PARAMETROS_STORAGE_KEY
 } from "../../utils/constantes";
@@ -912,7 +911,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   };
 
   const handleOpenModal = async () => {
-
+    
     const todosTienenNumero = formDataTabla.every((item) => {
       console.log(item.monto);
       return item.monto !== undefined && item.monto !== null && item.monto !== '' && !Number.isNaN(Number(item.monto));
@@ -936,6 +935,21 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return;
     }
 
+    //SUMATORIA DE PRESTAMO A PARTIR DE LA TABLA DE CALCULOS
+    const resultado = formDataTabla.reduce((acc, item) => {
+      const monto = parseFloat(item.monto); // Convierte a número flotante
+    
+      // Verifica si el valor es un número válido
+      if (!isNaN(monto) && monto !== null && monto !== '') {
+        acc += monto; // Suma el monto válido al acumulador
+      } else {
+        console.error(`Valor inválido encontrado: ${item.monto}`);
+      }
+    
+      return acc;
+    }, 0); // El acumulador comienza en 0
+
+    setFormData({ ...formData, prestamo: resultado });
 
     const data = crearDatosProcesarDatos();
     setOpenBackdrop(true);
@@ -1612,23 +1626,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             />
           </Grid>
 
-          <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
-            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              $ Prestamo <span style={{ color: 'red' }}>*</span>
-            </Typography>
-            <TextField
-              placeholder="Prestamo"
-              type="text"
-              disabled={errorCedula}
-              name="prestamo"
-              value={ValidationUtils.Valida_moneda(formData.prestamo)}
-              onChange={handleChange}
-              variant="standard"
-              fullWidth
-              inputProps={{ maxLength: 10 }}
-              required
-            />
-          </Grid>
+          
 
           <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
@@ -1691,8 +1689,26 @@ const PersonalFormLife = forwardRef((props, ref) => {
           </Table>
         </TableContainer>
 
+
         <Grid container spacing={2} style={{ paddingRight: '45px' }}>
 
+        <Grid item xs={10.5} md={3} >
+            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              $ Prestamo <span style={{ color: 'red' }}>*</span>
+            </Typography>
+            <TextField
+              placeholder="Prestamo"
+              type="text"
+              disabled={true}
+              name="prestamo"
+              value={ValidationUtils.Valida_moneda(formData.prestamo)}
+              onChange={handleChange}
+              variant="standard"
+              fullWidth
+              inputProps={{ maxLength: 10 }}
+              required
+            />
+          </Grid>
           <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               $ Prima <span style={{ color: 'red' }}>*</span>
