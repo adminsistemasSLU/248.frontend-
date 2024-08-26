@@ -83,6 +83,20 @@ const LifeService = {
     }
   },
 
+  fetchGrabaDatosVida: async (datos) => {
+    const endpoint = "api/vida/grabarDatosVida";
+    const method = "POST";
+    const data = datos;
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching Vida Producto:", error);
+      throw error;
+    }
+  },
+
 }
 
 export default LifeService;
