@@ -42,7 +42,8 @@ import {
   LS_TABLACALC,
   LS_VIDAPOLIZA,
   LS_TABLAACTUALIZDA,
-  PARAMETROS_STORAGE_KEY
+  PARAMETROS_STORAGE_KEY,
+  LS_IDVIDA,
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import { Button } from "@mui/base";
@@ -678,11 +679,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return true;
     }
 
-    if (formData.montodesempleo === '') {
-      setErrorMessage("Debe ingresar un valor en desempleo")
-      setOpenSnack(true);
-      return true;
-    }
+    // if (formData.montodesempleo === '') {
+    //   setErrorMessage("Debe ingresar un valor en desempleo")
+    //   setOpenSnack(true);
+    //   return true;
+    // }
 
     return false;
   }
@@ -887,7 +888,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
       console.log(response);
       handleCloseBackdrop();
       if (response.codigo === 200) {
-        //Codigo por valido
+        const idVida =  response.data.aplicacion;
+        localStorage.setItem(LS_IDVIDA, idVida);
         handleCloseBackdrop();
         return true;
       } else {
@@ -1631,7 +1633,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           
 
-          <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
+          {/* <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               $ Desempleo <span style={{ color: 'red' }}>*</span>
             </Typography>
@@ -1647,7 +1649,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               inputProps={{ maxLength: 10 }}
               required
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={10.5} md={3} style={{ paddingTop: '25px' }}>
             <Button
               onClick={handleOpenModal}
