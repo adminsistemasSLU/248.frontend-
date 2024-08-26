@@ -58,7 +58,7 @@ function HomeCarrousel(props) {
                             description: baldosa.descripcion,
                             imageUrl: process.env.REACT_APP_API_URL + '/api/Imagen/' + baldosa.nombre_imagen,
                             url: matchedItem ? matchedItem.url : '/default-url',
-                            enable: baldosa.titulo === 'PYMES' || baldosa.titulo === 'VIDA' ? true : false,
+                            enable: true ,
                             ramo:baldosa.ramo,
                         };
                     });
