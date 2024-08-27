@@ -43,7 +43,8 @@ import {
   LS_VIDAPOLIZA,
   LS_TABLAACTUALIZDA,
   PARAMETROS_STORAGE_KEY,
-  LS_IDVIDA,
+  LS_VIDACOBERTURA,
+  LS_IDCOTIZACIONVIDA,
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import { Button } from "@mui/base";
@@ -223,7 +224,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const memoizedFormDataTabla = useMemo(() => formDataTabla, [formDataTabla]);
 
-  const [cobertura, setCobertura] = useState([]);
   const [openSnack, setOpenSnack] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [openModal, setOpenModal] = React.useState(false);
@@ -251,11 +251,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
   //Constantes
   const CodigoComboCasado = "02";
   const CodigoComboUnionLibre = "05";
+  const [datosCargados, setDatosCargados] = useState(false);
+  const [cargarDataInicial, setcargarDataInicial] = useState(false);
+
   const cargarDatos = async () => {
-
+    if (datosCargados) return; // Prevenir cargas redundantes
+    handleOpenBackdrop(true);
     const dataPersonal = await cargarCotizacion();
-
-    console.log(dataPersonal);
     if (isMounted.current) {
       setFormData((formData) => ({
         ...formData,
@@ -269,12 +271,157 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }));
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
       setAge(dateObject);
+
+      const datoscoyugue = JSON.parse(dataPersonal[0].datosconyugues);
+      //Setear datos conyugue si los hay
+      setFormData((formData) => ({
+        ...formData,
+        conyugeapellido: datoscoyugue?.apellidoConyuge || "",
+        nombreConyuge: datoscoyugue?.nombreConyuge || "",
+        conyugenumero: datoscoyugue?.nombreConyuge || "",
+        conyugesexo: datoscoyugue?.genero || "0",
+      }));
+
+      if (datoscoyugue?.fechaNacimiento) {
+        const dateObjectconyugue = dayjs(datoscoyugue.fechaNacimiento, "DD/MM/YYYY");
+        setConyugueAge(dateObjectconyugue);
+      }
+
+      const datosCertificado = JSON.parse(dataPersonal[0].datoscertificado);
+      console.log(datosCertificado);
+      const inicioVig = datosCertificado.inicioVigencia;
+      
+      if (inicioVig) {
+        const dateInicioVig = dayjs(inicioVig, "DD/MM/YYYY");
+        console.log(dateInicioVig);
+        setInicioVigencia(dateInicioVig);
+      }
+
+
+      const dataPoliza = await cargarDatosPoliza(); // API PARA CONSULTAR EMI POL CABECERA
+      setFormData((formData) => ({
+        ...formData,
+        vigencia: dataPoliza.vigencia,
+        numPrestamo:datosCertificado.numPrestamo
+      }));
+      
+      if( dataPoliza.vigencia && inicioVigencia){
+        const newFinVigencia = inicioVigencia.add( dataPoliza.vigencia, 'month');
+        setFinVigencia(newFinVigencia);
+      }
+      
+
+      setcargarDataInicial(true);
+      let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
+      const transformedData = Object.values(montoPeriodo).flat().map(item => ({
+        monto: parseFloat(item.monto) || '',
+        tasa: item.tasa || '',
+        prima: item.prima || '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
+        estado: item.estado || '' // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
+      }));
+      console.log(transformedData);
+      setFormDataTabla(transformedData);
+      setDatosCargados(true);
+      handleOpenBackdrop(false);
     }
+  };
+
+  
+  //Usado para enviar api en modo editar
+  useEffect(() => {
+    //Funcion para carga inicial si se desea usar el useEfect utilizar debajo o declarar una nueva
+    const fetchDataProcesaDatos = async () => {
+      console.log(formDataTabla);
+      if (cargarDataInicial) {
+        // Calcula el resultado basado en formDataTabla
+        const resultado = formDataTabla.reduce((acc, item) => {
+          const monto = parseFloat(item.monto); // Convierte a número flotante
+
+          // Verifica si el valor es un número válido
+          if (!isNaN(monto) && monto !== null && monto !== '') {
+            acc += monto; // Suma el monto válido al acumulador
+          } else {
+            console.error(`Valor inválido encontrado: ${item.monto}`);
+          }
+
+          return acc;
+        }, 0); // El acumulador comienza en 0
+
+        setFormData({ ...formData, prestamo: resultado });
+
+        // Verifica si se debe mostrar el mensaje de error
+        if (resultado === 0) {
+          setErrorMessage("Se deben ingresar un valor en prestamo");
+          setOpenSnack(true);
+          return;
+        }
+
+        const data = crearDatosProcesarDatos();
+        setOpenBackdrop(true);
+
+        try {
+          // Llama al servicio para procesar datos
+          const response = await LifeService.fetchProcesaDatos(data);
+          if (response.codigo === 200) {
+            localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+            setCalculado(response);
+          } else {
+            console.log(response.message);
+            setErrorMessage(response.message);
+            setOpenSnack(true);
+            setCalculado([]);
+          }
+        } catch (error) {
+          console.error("Error al procesar los datos:", error);
+          setErrorMessage("Error al procesar los datos.");
+          setOpenSnack(true);
+          setCalculado([]);
+        } finally {
+          setOpenBackdrop(false);
+        }
+      }
+      setcargarDataInicial(false);
+    };
+
+
+    
+    fetchDataProcesaDatos();
+  }, [formDataTabla]); // Agrega cargarDataInicial a las dependencias para asegurar que el efecto se ejecute cuando cambie
+
+
+  const cargarDatosPoliza = async () => {
+    let ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+
+    try {
+      const cotizacion = await LifeService.fetchConsultarPolizaVida(ramo, idCotizacion, producto);
+
+      if (cotizacion && cotizacion.data) {
+        return cotizacion.data;
+      }
+    } catch (error) {
+      console.error("Error al obtener antiguedad:", error);
+    }
+  };
+
+  const updateFormDataTabla = (data) => {
+    // Primero transformamos el objeto JSON en un arreglo adecuado
+    const transformedData = Object.values(data).flat().map((item, index) => ({
+      monto: parseFloat(item.monto) || '',
+      periodo: index + 1,
+      vigencia: '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
+      // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
+    }));
+
+    // Luego, actualizamos el estado con los datos transformados
+    setFormDataTabla(transformedData);
   };
 
   const cargarCotizacion = async () => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
     let dato = {
       usuario: userId.id,
       id_CotiGeneral: idCotizacion,
@@ -357,7 +504,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let documentosVida = vigencia.data.documentos
         let tabla1 = vigencia.data.crearTablaPeriodos.tabla1
         if (tabla1.EtiquetaTable.codigo) {
-          setCobertura(tabla1.EtiquetaTable.codigo);
+          // setCobertura(tabla1.EtiquetaTable.codigo);
+          localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
         localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
         if (vigencia.data.polizas[0]) {
@@ -389,14 +537,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const iniciarDatosCombos = async () => {
       handleOpenBackdrop();
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
       await cargarProvincias();
       await cargarEstadoCivil();
       await cargarVigencia();
       handleCloseBackdrop();
-      if (idCotizacion) {
-        await cargarDatos();
-      }
+     
     };
 
 
@@ -408,8 +553,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }
     };
 
-    iniciarDatosCombos();
-    modoEditar();
+    // Ejecutar iniciarDatosCombos primero y luego modoEditar
+    const fetchData = async () => {
+      const idCotizacion = await iniciarDatosCombos();
+      await modoEditar(idCotizacion);
+    };
+
+    fetchData();
 
     return () => {
       isMounted.current = false; // Establecer a false cuando el componente se desmonta
@@ -425,6 +575,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
+    const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
     const periodos = formDataTabla.map((item, index) => ({
       monto: item.monto,
       periodo: index + 1, // o cualquier lógica que determine el periodo basado en el índice
@@ -515,23 +666,25 @@ const PersonalFormLife = forwardRef((props, ref) => {
   //Cuando cambie la variable vigencia
   useEffect(() => {
     handleOpenBackdrop();
-    const fetchData = async () => {
+    const fetchDataCargaInicial = async () => {
       if (formData.vigencia) {
-        let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-        try {
-          const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
-          localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.tabla1));
-          setTablecalc(data.data.tabla1);
-          const detalle = transformData(data.data.tabla1);
-          setFormDataTabla(detalle);
-          handleCloseBackdrop();
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          handleCloseBackdrop();
+        if (datosCargados) {
+          let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+          try {
+            const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
+            localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.tabla1));
+            setTablecalc(data.data.tabla1);
+            const detalle = transformData(data.data.tabla1);
+            setFormDataTabla(detalle);
+            handleCloseBackdrop();
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            handleCloseBackdrop();
+          }
         }
       }
     };
-    fetchData();
+    fetchDataCargaInicial();
   }, [formData.vigencia]);
 
   //Cuando cambie la variable vigencia
@@ -539,20 +692,22 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const fetchDataDocumento = async () => {
       if (formData.vigencia && formData.prestamo && age) {
-        let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-        try {
-          handleOpenBackdrop();
-          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
-          console.log(data);
-          if (data) {
-            localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
-          } else {
-            console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
+        if (datosCargados) {
+          let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+          try {
+            handleOpenBackdrop();
+            const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
+            console.log(data);
+            if (data) {
+              localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
+            } else {
+              console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
+            }
+            handleCloseBackdrop();
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            handleCloseBackdrop();
           }
-          handleCloseBackdrop();
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          handleCloseBackdrop();
         }
       }
     };
@@ -699,8 +854,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
-
-
     if (formData.vigencia === '' || formData.vigencia === 0) {
       setErrorMessage("Debe ingresar un valor en vigencia, no puede ser 0")
       setOpenSnack(true);
@@ -738,7 +891,29 @@ const PersonalFormLife = forwardRef((props, ref) => {
     next = age !== "" ? true : false;
     let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
     //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
+    const datosconyugues = {
+      nombreConyuge: formData.conyugenombre,
+      apellidoConyuge: formData.conyugeapellido,
+      identificacion: formData.conyugenumero,
+      fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
+      genero: formData.conyugesexo
+    };
+    const datosprestamo = {
+      prestamo: formData.prestamo,
+      prima: formData.prima,
+      impuesto: formData.impuesto,
+      primatotal: formData.primaTotal,
+      primaMensual: formData.primaMensual
+    };
+
+    const datoscertificado = {
+      inicioVigencia: inicioVigencia.format("DD/MM/YYYY"),
+      finVigencia: finVigencia.format("DD/MM/YYYY"),
+      vigencia: formData.vigencia,
+      numPrestamo: formData.numPrestamo,
+    };
 
 
     const arrDatosCliente = {
@@ -754,7 +929,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
       ramo: ramo,
       tippoliza: 1,
       usuario: userId.id,
-      zona: formData.province
+      zona: formData.province,
+      datosconyugues: datosconyugues,
+      datosprestamo: datosprestamo,
+      datosfacturas: {},
+      datoscertificado: datoscertificado,
     };
 
     const periodos = formDataTabla.map((item, index) => ({
@@ -774,7 +953,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }));
 
     const arrMontoPeriodo = {
-      cobertura: periodos
+      [cobertura]: periodos
     }
 
     const arrFrmEmision = {
@@ -876,7 +1055,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       aprobAutomatica: "",
       jsonPreguntas: "{\"formulario\":\"4\",\"respuestas\":[{\"idpregunta\":\"1\",\"control\":\"input_conf_pregunta_1\",\"respuesta\":\"N\"},{\"idpregunta\":\"2\",\"control\":\"input_conf_pregunta_2\",\"respuesta\":\"N\"}],\"aprobacion\":\"S\"}",
       arrLogTasa: {},
-      vidaGrupo: "N"
+      vidaGrupo: "N",
     }
 
     console.log(data);
@@ -888,8 +1067,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
       console.log(response);
       handleCloseBackdrop();
       if (response.codigo === 200) {
-        const idVida =  response.data.aplicacion;
-        localStorage.setItem(LS_IDVIDA, idVida);
+        const idVida = response.data.aplicacion;
+        localStorage.setItem(LS_IDCOTIZACIONVIDA, idVida);
+        
+        const idCotizacion = response.data.id_CotiGeneral;
+        localStorage.setItem(LS_COTIZACION, idCotizacion);
         handleCloseBackdrop();
         return true;
       } else {
@@ -913,7 +1095,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   };
 
   const handleOpenModal = async () => {
-    
+    console.log(formDataTabla);
     const todosTienenNumero = formDataTabla.every((item) => {
       console.log(item.monto);
       return item.monto !== undefined && item.monto !== null && item.monto !== '' && !Number.isNaN(Number(item.monto));
@@ -925,8 +1107,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return;
     }
 
-   
-
     if (formData.vigencia === '' || formData.vigencia === 0) {
       setErrorMessage("Se deben ingresar datos en vigencia")
       setOpenSnack(true);
@@ -936,14 +1116,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //SUMATORIA DE PRESTAMO A PARTIR DE LA TABLA DE CALCULOS
     const resultado = formDataTabla.reduce((acc, item) => {
       const monto = parseFloat(item.monto); // Convierte a número flotante
-    
+
       // Verifica si el valor es un número válido
       if (!isNaN(monto) && monto !== null && monto !== '') {
         acc += monto; // Suma el monto válido al acumulador
       } else {
         console.error(`Valor inválido encontrado: ${item.monto}`);
       }
-    
+
       return acc;
     }, 0); // El acumulador comienza en 0
 
@@ -974,6 +1154,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     // setOpenModal(true);
   };
+
 
   useEffect(() => {
     if (calculado && calculado.data) {
@@ -1177,7 +1358,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           </Grid>
           <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              Documento de identificación <span style={{ color: 'red' }}>*</span>
+              Doc. de identificación <span style={{ color: 'red' }}>*</span>
             </Typography>
             <TextField
               type={formData.documentType === "P" ? "text" : "text"}
@@ -1631,7 +1812,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             />
           </Grid>
 
-          
+
 
           {/* <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
@@ -1697,7 +1878,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         <Grid container spacing={2} style={{ paddingRight: '45px' }}>
 
-        <Grid item xs={10.5} md={3} >
+          <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               $ Prestamo <span style={{ color: 'red' }}>*</span>
             </Typography>

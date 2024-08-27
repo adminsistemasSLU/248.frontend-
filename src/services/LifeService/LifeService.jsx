@@ -92,7 +92,25 @@ const LifeService = {
       const response = await authService.fetchWithAuth(endpoint, method, data);
       return response;
     } catch (error) {
-      console.error("Error fetching Vida Producto:", error);
+      console.error("Error fetching Grabare Vida Producto:", error);
+      throw error;
+    }
+  },
+
+  fetchConsultarPolizaVida: async (ramo,coti_general,producto) => {
+    const endpoint = "api/vida/ConPolizaVida";
+    const method = "POST";
+    const data = {
+      ramo: ramo,
+      id_cotiGeneral: coti_general,
+      producto:producto
+ };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching Consulta Vida Producto:", error);
       throw error;
     }
   },

@@ -33,10 +33,12 @@ import {
   LS_PRODUCTO,
   LS_RAMO,
   USER_STORAGE_KEY,
-  DATOS_PAGO_STORAGE_KEY
+  DATOS_PAGO_STORAGE_KEY,
+  LS_POLVIDAEDIT
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
+import LifeService from "../../services/LifeService/LifeService";
 
 function createData(
   id,
@@ -286,6 +288,9 @@ export default function MyQuoters() {
   const [totalPrima, setTotalPrima] = React.useState(0);
 
 
+  const RAMOINCENDIO = "1";
+  // const RAMOVEHICULO = "3";
+  const RAMOVIDA = "9";
 
   const [estado, setEstado] = React.useState([]);
   const [ramo, setRamo] = React.useState([]);
@@ -415,10 +420,11 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const handleOpenQuoter = (id, product, ramo) => {
+  const handleOpenQuoter = async (id, product, ramo) => {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
+
     const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
     console.log(resultadoFiltrado);
 
@@ -430,6 +436,7 @@ export default function MyQuoters() {
       id: item.id,
     }));
 
+    //Datos de pago de existir
     localStorage.setItem(
       DATOS_PAGO_STORAGE_KEY,
       JSON.stringify(dataFormaPago)
@@ -443,6 +450,7 @@ export default function MyQuoters() {
       id: item.id,
     }));
     let datosPersonales = data.length > 0 ? data[0] : null;
+    //Datos de personales obligatorios para coti vida
     if (datosPersonales) {
       localStorage.setItem(
         DATOS_PERSONALES_STORAGE_KEY,
@@ -450,7 +458,16 @@ export default function MyQuoters() {
       );
     }
 
-    window.location.href = `/quoter/pymes/`;
+    if (ramo === RAMOVIDA) {
+      //OPCIONES PARA ABRIR EL MODAL DE VIDA 
+      window.location.href = `/quoter/life`;
+    }
+
+    if (ramo === RAMOINCENDIO) {
+       //OPCIONES PARA ABRIR EL MODAL DE INCENDIO 
+      window.location.href = `/quoter/pymes/`;
+    }
+
   };
 
   const handleDeleteQuoter = async (id) => {
@@ -790,7 +807,7 @@ export default function MyQuoters() {
                                       handleOpenQuoter(
                                         row.id,
                                         row.productoId,
-                                        row.ramoId
+                                        row.ramoId,
                                       )
                                     }
                                   >

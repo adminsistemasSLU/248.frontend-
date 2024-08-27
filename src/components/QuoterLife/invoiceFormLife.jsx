@@ -406,12 +406,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         fullWidth
                                         required
                                     >
-                                        {Array.isArray(tipoCredito) &&
-                                            tipoCredito.map((tCredito, index) => (
-                                                <MenuItem key={index} value={tCredito.Codigo}>
-                                                    {tCredito.Nombre}
-                                                </MenuItem>
-                                            ))}
+                                         <MenuItem value="C">Cliente</MenuItem>
+                                         <MenuItem value="R">Otra Persona</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>

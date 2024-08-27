@@ -28,4 +28,6 @@ export const LS_TABLACALC = 'tabla_calc';
 export const LS_VIDAPOLIZA = 'vida_poliza';
 export const LS_PROCESODATOSVIDA = 'proceso_datos';
 export const LS_TABLAACTUALIZDA = 'tabla_actualizada';
-export const LS_IDVIDA = 'id_vida';
+export const LS_IDCOTIZACIONVIDA = 'id_cotizacion_vida';
+export const LS_POLVIDAEDIT = 'cotizacion_vida_data';
+export const LS_VIDACOBERTURA = 'vida_cobertura';

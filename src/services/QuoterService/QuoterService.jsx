@@ -7,6 +7,7 @@ const QuoterService = {
     const method = 'POST'; 
     const data = {
       usuario:dato.usuario,
+      id_CotiGeneral:dato.id_CotiGeneral,
       ramo:dato.ramo,
       producto:dato.producto,
       cliente:dato.cliente,

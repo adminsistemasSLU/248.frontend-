@@ -142,6 +142,7 @@ function Item(props) {
         console.log('Ramo elegido: '+ramo);
         localStorage.setItem(LS_RAMO,JSON.stringify(ramo));
         localStorage.removeItem(API_SUBBALDOSAS);
+        localStorage.removeItem(LS_COTIZACION);
         navigate(props.item.url); 
     };
     return (
