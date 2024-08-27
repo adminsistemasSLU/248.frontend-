@@ -550,6 +550,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       if (idCotizacion) {
         await cargarDatos();
+      }else{
+        setDatosCargados(true);
       }
     };
 
@@ -681,6 +683,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
             console.error("Error fetching data:", error);
             handleCloseBackdrop();
           }
+        }else{
+          handleCloseBackdrop();
         }
       }
     };
