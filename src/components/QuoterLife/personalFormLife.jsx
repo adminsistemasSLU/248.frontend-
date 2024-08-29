@@ -1060,7 +1060,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       arrDatosCliente: arrDatosCliente,
       ramoAlt: ramo,
       ramo: ramo,
-
+      poliza:poliza,
       strCoberturas: [
         {
           codcob: cobertura,
