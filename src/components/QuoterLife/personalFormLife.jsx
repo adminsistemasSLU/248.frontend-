@@ -964,6 +964,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       direccion: formData.address,
       producto: producto,
       ramo: ramo,
+      poliza:poliza,
       tippoliza: 1,
       usuario: userId.id,
       zona: formData.province,
