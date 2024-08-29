@@ -154,7 +154,7 @@ export default function SteppersLife() {
   const modoEditar = () => {
     let idCotizacion = localStorage.getItem(LS_COTIZACION);
     if (idCotizacion) {
-      setActiveStep(3);
+      setActiveStep(1);
     }
   };
 

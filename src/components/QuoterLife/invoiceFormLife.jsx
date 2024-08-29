@@ -23,11 +23,12 @@ import "../../styles/form.scss";
 import {
     LS_COTIZACION,
     LS_DATOSPAGO,
-    LS_DATAVIDASEND
+    LS_DATAVIDASEND,
+    USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
-
+import QuoterService from "../../services/QuoterService/QuoterService";
 
 const InvoiceFormLife = forwardRef((props, ref) => {
 
@@ -48,10 +49,10 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         admision: "",
         subtotal: "",
         total: "",
-    
+
     });
 
-   
+
 
 
     const [tipoCredito, settipoCredito] = useState([]);
@@ -78,17 +79,49 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         cargarData();
     }, []);
 
-    
+    const cargarCotizacion = async () => {
+        let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+        let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
+        let dato = {
+            usuario: userId.id,
+            id_CotiGeneral: idCotizacion,
+        };
+        try {
+            const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
+                dato
+            );
+
+            if (cotizacion && cotizacion.data) {
+                return cotizacion.data;
+            }
+        } catch (error) {
+            console.error("Error al obtener antiguedad:", error);
+        }
+    };
+
 
     useImperativeHandle(ref, () => ({
         handleSubmitExternally: handleSubmit,
     }));
 
-    const cargarDatosVidaPago = () => {
-        let formaPagoAray = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+    const cargarDatosVidaPago = async () => {
         let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+        let idCotizacion = localStorage.getItem(LS_COTIZACION);
+        // debugger;
+        if (idCotizacion) {
+            let cotiVida = await cargarCotizacion();
+            factura = JSON.parse(cotiVida[0].datosfacturas);
+            localStorage.setItem(LS_DATOSPAGO,JSON.stringify(factura));
+        }
+        let formaPagoAray = localStorage.getItem(LS_DATAVIDASEND);
+
+        if (formaPagoAray && formaPagoAray !== undefined) {
+            formaPagoAray = JSON.parse(formaPagoAray);
+        }
+
         let formaPagos;
-        
+
         if (formaPagoAray &&
             formaPagoAray.arrDatosCliente &&
             formaPagoAray.arrDatosCliente.datosfacturas &&
@@ -96,93 +129,129 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             Object.keys(formaPagoAray.arrDatosCliente.datosfacturas).length > 0) {
 
             formaPagos = formaPagoAray.arrDatosCliente.datosfacturas;
-            setEditForm(false);
-        } else {
 
+        } else {
             formaPagos = factura;
-            setEditForm(true);
         }
         setFormData((prevData) => ({
             ...prevData,
             paidType: formaPagos.paidType, // Asegúrate de que `newValue` es el valor correcto que deseas establecer
         }));
         let formapag = formaPagos.paidType || 'C';
+        setEditForm(true);
         setformaPago(formapag);
     }
 
     useEffect(() => {
-        
-       
-        let formaPagoAray = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
-        let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
-        let formaPagos;
+        const cargarData = async () => {
+            let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+            let idCotizacion = localStorage.getItem(LS_COTIZACION);
+            // debugger;
+            if (idCotizacion) {
 
-        if (formaPagoAray &&
-            formaPagoAray.arrDatosCliente &&
-            formaPagoAray.arrDatosCliente.datosfacturas &&
-            typeof formaPagoAray.arrDatosCliente.datosfacturas === 'object' &&
-            Object.keys(formaPagoAray.arrDatosCliente.datosfacturas).length > 0) {
-            formaPagos = formaPagoAray.arrDatosCliente.datosfacturas;
-        } else {
-            formaPagos = factura;
+                let formaPagoAray = localStorage.getItem(LS_DATOSPAGO);
+
+                if (formaPagoAray && formaPagoAray !== undefined) {
+                    factura = JSON.parse(formaPagoAray);
+                }else {
+                    setEditForm(false);
+                    setOpenBackdrop(true);
+                    let cotiVida = await cargarCotizacion();
+                    setOpenBackdrop(false);
+                    factura = JSON.parse(cotiVida[0].datosfacturas);
+                    localStorage.setItem(LS_DATOSPAGO,JSON.stringify(factura));
+                }
+            }
+            let formaPagoAray = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+            // let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+            let formaPagos;
+
+            if (formaPagoAray &&
+                formaPagoAray.arrDatosCliente &&
+                formaPagoAray.arrDatosCliente.datosfacturas &&
+                typeof formaPagoAray.arrDatosCliente.datosfacturas === 'object' &&
+                Object.keys(formaPagoAray.arrDatosCliente.datosfacturas).length > 0) {
+                formaPagos = formaPagoAray.arrDatosCliente.datosfacturas;
+            } else {
+                formaPagos = factura;
+            }
+
+            let monto, prima, sbs, scc, derechoEmision, subtot, iva, total;
+            
+            if (factura) {
+                monto = parseFloat(factura.sumAdd);
+                prima = parseFloat(factura.prima);
+                sbs = parseFloat(factura.impScvs);
+                scc = parseFloat(factura.impSsc);
+                derechoEmision = parseFloat(factura.admision);
+                subtot = parseFloat(factura.subtotal);
+                iva = parseFloat(factura.iva);
+                total = parseFloat(factura.total);
+            } else {
+                monto = parseFloat(formaPagos.sumAdd);
+                prima = parseFloat(formaPagos.prima);
+                sbs = parseFloat(formaPagos.impScvs);
+                scc = parseFloat(formaPagos.impSsc);
+                derechoEmision = parseFloat(formaPagos.admision);
+                subtot = parseFloat(formaPagos.subtotal);
+                iva = parseFloat(formaPagos.iva);
+                total = parseFloat(formaPagos.total);
+            }
+
+            if (formaPago === 'C') {
+                let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+                setFormData({
+                    ...formData,
+                    name: formaPagos.name,
+                    lastname: formaPagos.lastname,
+                    email: formaPagos.email,
+                    phone: formaPagos.phone,
+                    documentType: formaPagos.documentType,
+                    identification: formaPagos.identification,
+                    sumAdd: parseFloat(monto).toFixed(2),
+                    iva: iva.toFixed(2),
+                    prima: parseFloat(prima).toFixed(2),
+                    impScvs: parseFloat(sbs).toFixed(2),
+                    impSsc: parseFloat(scc).toFixed(2),
+                    admision: parseFloat(derechoEmision).toFixed(2),
+                    subtotal: parseFloat(subtot).toFixed(2),
+                    total: parseFloat(total).toFixed(2),
+                });
+            }
+            
+            if (formaPago === 'R') {
+                let nombre='',lastname='',email='',phone='',documentType='',identification='';
+                if(formaPagoAray){
+                    nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
+                    lastname = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.lastname : '';
+                    email = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.email : '';
+                    phone = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.phone : '';
+                    documentType = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.documentType : '';
+                    identification = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.identification : '';
+    
+                }
+                
+                setFormData({
+                    ...formData,
+                    name: nombre || '',
+                    lastname: lastname || '',
+                    email: email || '',
+                    phone: phone || '',
+                    documentType: documentType || 'C',
+                    identification: identification || '',
+                    sumAdd: parseFloat(monto).toFixed(2),
+                    iva: iva.toFixed(2),
+                    prima: parseFloat(prima).toFixed(2),
+                    impScvs: parseFloat(sbs).toFixed(2),
+                    impSsc: parseFloat(scc).toFixed(2),
+                    admision: parseFloat(derechoEmision).toFixed(2),
+                    subtotal: parseFloat(subtot).toFixed(2),
+                    total: parseFloat(total).toFixed(2),
+                });
+            }
+
         }
-
-        let monto = parseFloat(factura.sumAdd);
-        let prima = parseFloat(factura.prima);
-        let sbs = (parseFloat(factura.impScvs));
-        let scc = (parseFloat(factura.impSsc));
-        let derechoEmision = (parseFloat(factura.admision));
-        let subtot = parseFloat(factura.subtotal);
-        let iva = (parseFloat(factura.iva));
-        let total = parseFloat(factura.total);
-
-        if (formaPago === 'C') {
-            let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
-            setFormData({
-                ...formData,
-                name: formaPagos.name,
-                lastname: formaPagos.lastname,
-                email: formaPagos.email,
-                phone: formaPagos.phone,
-                documentType: formaPagos.documentType,
-                identification: formaPagos.identification,
-                sumAdd: parseFloat(monto).toFixed(2),
-                iva: iva.toFixed(2),
-                prima: parseFloat(prima).toFixed(2),
-                impScvs: parseFloat(sbs).toFixed(2),
-                impSsc: parseFloat(scc).toFixed(2),
-                admision: parseFloat(derechoEmision).toFixed(2),
-                subtotal: parseFloat(subtot).toFixed(2),
-                total: parseFloat(total).toFixed(2),
-            });
-        }
-
-        if (formaPago === 'R') {
-            let nombre =   formaPagoAray.arrDatosCliente.datosfacturas.paidType ==='R'?formaPagoAray.arrDatosCliente.datosfacturas.name : '';
-            let lastname =   formaPagoAray.arrDatosCliente.datosfacturas.paidType ==='R'?formaPagoAray.arrDatosCliente.datosfacturas.lastname : '';
-            let email =   formaPagoAray.arrDatosCliente.datosfacturas.paidType ==='R'?formaPagoAray.arrDatosCliente.datosfacturas.email : '';
-            let phone =   formaPagoAray.arrDatosCliente.datosfacturas.paidType ==='R'?formaPagoAray.arrDatosCliente.datosfacturas.phone : '';
-            let documentType =   formaPagoAray.arrDatosCliente.datosfacturas.paidType ==='R'?formaPagoAray.arrDatosCliente.datosfacturas.documentType : '';
-            let identification =   formaPagoAray.arrDatosCliente.datosfacturas.paidType ==='R'?formaPagoAray.arrDatosCliente.datosfacturas.identification : '';
-
-            setFormData({
-                ...formData,
-                name: nombre || '',
-                lastname: lastname || '',
-                email: email || '',
-                phone: phone || '',
-                documentType: documentType || 'C',
-                identification: identification || '',
-                sumAdd: parseFloat(monto).toFixed(2),
-                iva: iva.toFixed(2),
-                prima: parseFloat(prima).toFixed(2),
-                impScvs: parseFloat(sbs).toFixed(2),
-                impSsc: parseFloat(scc).toFixed(2),
-                admision: parseFloat(derechoEmision).toFixed(2),
-                subtotal: parseFloat(subtot).toFixed(2),
-                total: parseFloat(total).toFixed(2),
-            });
-        }
+        cargarData();
     }, [formaPago]);
 
 
@@ -213,7 +282,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
             setFormData({ ...formData, [e.target.name]: e.target.value });
         }
-        if( e.target.name === "paidType" ){
+        if (e.target.name === "paidType") {
             setformaPago(e.target.value);
         }
     };
@@ -225,7 +294,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             seterrorMessage("Debe llenar el campo Tipo de Crédito");
             setOpenSnackAlert(true);
             handleCloseBackdrop();
-            
+
         }
 
         if (formData.name === "" && formData.paidForm === "2") {
@@ -298,7 +367,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             data.arrDatosCliente = datosCliente;
             console.log(data);
 
-           
+
             try {
                 const response = await LifeService.fetchGrabaDatosVida(data);
                 if (response.codigo === 200) {
@@ -316,7 +385,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 return false;
             }
 
-            
+
         }
 
         return enviarFormulario;
@@ -711,7 +780,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                             </Grid>
                         </Grid>
 
-                       
+
                     </div>
                 </Paper>
             </form>

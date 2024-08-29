@@ -77,8 +77,8 @@ const areEqual = (prevProps, nextProps) => {
 };
 function formatedInput(numero) {
   return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    style: "currency",
+    currency: "USD",
   }).format(numero);
 }
 const MemoizedMontoCell = React.memo(({ value, onChange }) => {
@@ -107,8 +107,8 @@ const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   function formatedInput(numero) {
     return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
+      style: "currency",
+      currency: "USD",
     }).format(numero);
   }
   return (
@@ -177,6 +177,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     city: "",
     status: "",
     genero: 'M',
+    country:'',
 
     conyugetipo: "C",
     conyugenumero: "",
@@ -212,6 +213,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     province: false,
     city: false,
     status: false,
+    country:false,
 
     conyugetipo: false,
     conyugenumero: false,
@@ -263,6 +265,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   //Combos
   const [estadoCivil, setEstadoCivil] = useState([]);
   const [provinces, setProvinces] = useState([]);
+  const [country, setCountry] = useState([]);
   const [ciudades, setCiudades] = useState([]);
   const [vigencia, setVigencia] = useState([]);
   //Constantes
@@ -285,6 +288,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
         documentType: dataPersonal[0].clitipcedula,
         identification: dataPersonal[0].clicedula,
         address: dataPersonal[0].clidireccion,
+        genero:dataPersonal[0].cligenero,
+        status: dataPersonal[0].cliestadocivil || "",
       }));
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
       setAge(dateObject);
@@ -294,9 +299,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setFormData((formData) => ({
         ...formData,
         conyugeapellido: datoscoyugue?.apellidoConyuge || "",
-        nombreConyuge: datoscoyugue?.nombreConyuge || "",
-        conyugenumero: datoscoyugue?.nombreConyuge || "",
+        conyugenombre: datoscoyugue?.nombreConyuge || "",
+        conyugenumero: datoscoyugue?.identificacion || "",
         conyugesexo: datoscoyugue?.genero || "0",
+        conyugetipo: datoscoyugue?.tipo || "C",
       }));
 
       const datosprestamo = JSON.parse(dataPersonal[0].datosprestamo);
@@ -304,12 +310,21 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const datosFactura = dataPersonal[0].datosfacturas ? JSON.parse(dataPersonal[0].datosfacturas) : [];
 
       setDatosFactura(datosFactura);
-      
+
+    
       setFormData((formData) => ({
         ...formData,
-        city: datosprestamo?.ciudad || "",
-        province: datosprestamo?.provincia || "",
+        country: dataPersonal[0].clipais || "",
+        province: dataPersonal[0].cliprovincia || "",
       }));
+
+      await cargarCiudad(datosprestamo?.provincia);
+   
+      setFormData((formData) => ({
+        ...formData,
+        city: dataPersonal[0].cliciudad || "",
+      }));
+
 
       if (datoscoyugue?.fechaNacimiento) {
         const dateObjectconyugue = dayjs(datoscoyugue.fechaNacimiento, "DD/MM/YYYY");
@@ -317,12 +332,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }
 
       const datosCertificado = JSON.parse(dataPersonal[0].datoscertificado);
-      console.log(datosCertificado);
+     
       const inicioVig = datosCertificado.inicioVigencia;
-      
+
       if (inicioVig) {
         const dateInicioVig = dayjs(inicioVig, "DD/MM/YYYY");
-        console.log(dateInicioVig);
+       
         setInicioVigencia(dateInicioVig);
       }
 
@@ -331,14 +346,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setFormData((formData) => ({
         ...formData,
         vigencia: dataPoliza.vigencia,
-        numPrestamo:datosCertificado.numPrestamo
+        numPrestamo: datosCertificado.numPrestamo
       }));
-      
-      if( dataPoliza.vigencia && inicioVigencia){
-        const newFinVigencia = inicioVigencia.add( dataPoliza.vigencia, 'month');
+
+      if (dataPoliza.vigencia && inicioVigencia) {
+        const newFinVigencia = inicioVigencia.add(dataPoliza.vigencia, 'month');
         setFinVigencia(newFinVigencia);
       }
-      
+
 
       setcargarDataInicial(true);
       let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
@@ -348,14 +363,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
         prima: item.prima || '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
         estado: item.estado || '' // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
       }));
-      console.log(transformedData);
+      
       setFormDataTabla(transformedData);
       setDatosCargados(true);
       handleOpenBackdrop(false);
     }
   };
 
-  
+
   //Usado para enviar api en modo editar
   useEffect(() => {
     //Funcion para carga inicial si se desea usar el useEfect utilizar debajo o declarar una nueva
@@ -413,7 +428,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     };
 
 
-    
+
     fetchDataProcesaDatos();
   }, [formDataTabla]); // Agrega cargarDataInicial a las dependencias para asegurar que el efecto se ejecute cuando cambie
 
@@ -474,6 +489,20 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
   };
 
+ 
+  const cargarPais = async () => {
+    try {
+      const paises = await ComboService.fetchComboPais();
+      if (paises && paises.data) {
+        await setCountry(paises.data);
+        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais }));
+       
+      }
+    } catch (error) {
+      console.error("Error al obtener paises:", error);
+    }
+  };
+
   const cargarProvincias = async () => {
 
     try {
@@ -508,10 +537,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   function formatedInput(numero) {
     return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
+      style: "currency",
+      currency: "USD",
     }).format(numero);
-}
+  }
 
   const cargarVigencia = async () => {
     try {
@@ -528,16 +557,16 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let documentosVida = vigencia.data.documentos
         let tabla1 = vigencia.data.crearTablaPeriodos.tabla1
         if (tabla1.EtiquetaTable.codigo) {
-          
+
           localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
 
-        const preguntasprevias =  JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
-        if(!(preguntasprevias && preguntasprevias.length>0)){
+        const preguntasprevias = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+        if (!(preguntasprevias && preguntasprevias.length > 0)) {
 
           localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
         }
-        
+
         if (vigencia.data.polizas[0]) {
           localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
         } else {
@@ -567,11 +596,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const iniciarDatosCombos = async () => {
       handleOpenBackdrop();
+      await cargarPais();
       await cargarProvincias();
       await cargarEstadoCivil();
       await cargarVigencia();
       handleCloseBackdrop();
-     
+
     };
 
 
@@ -580,7 +610,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       if (idCotizacion) {
         await cargarDatos();
-      }else{
+      } else {
         setDatosCargados(true);
       }
     };
@@ -713,7 +743,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             console.error("Error fetching data:", error);
             handleCloseBackdrop();
           }
-        }else{
+        } else {
           handleCloseBackdrop();
         }
       }
@@ -932,15 +962,17 @@ const PersonalFormLife = forwardRef((props, ref) => {
       apellidoConyuge: formData.conyugeapellido,
       identificacion: formData.conyugenumero,
       fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
-      genero: formData.conyugesexo
+      genero: formData.conyugesexo,
+      tipo:formData.conyugetipo
     };
+
     const datosprestamo = {
       prestamo: formData.prestamo,
       prima: formData.prima,
       impuesto: formData.impuesto,
       primatotal: formData.primaTotal,
       primaMensual: formData.primaMensual,
-      provincia:formData.province,
+      provincia: formData.province,
       ciudad: formData.city
     };
 
@@ -951,7 +983,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       numPrestamo: formData.numPrestamo,
     };
 
-  
+
 
     const arrDatosCliente = {
       nombre: formData.name,
@@ -964,7 +996,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
       direccion: formData.address,
       producto: producto,
       ramo: ramo,
-      poliza:poliza,
+      cligenero: formData.genero,
+      cliestadocivil: formData.status,
+      clipais: formData.country,
+      cliciudad:formData.city,
+      cliprovincia: formData.province,
+      poliza: poliza,
       tippoliza: 1,
       usuario: userId.id,
       zona: formData.province,
@@ -1061,7 +1098,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       arrDatosCliente: arrDatosCliente,
       ramoAlt: ramo,
       ramo: ramo,
-      poliza:poliza,
+      poliza: poliza,
       strCoberturas: [
         {
           codcob: cobertura,
@@ -1098,21 +1135,40 @@ const PersonalFormLife = forwardRef((props, ref) => {
       arrLogTasa: {},
       vidaGrupo: "N",
     }
+    const pag = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+
+    const totalPagar = {
+      documentType: formData.documentType,
+      identification: formData.identification,
+      name: formData.name,
+      lastname: formData.lastname,
+      email: formData.email,
+      phone: formData.phone,
+      sumAdd: formData.prestamo,
+      prima:  calc.data.valores.prima,
+      impScvs: pag.impScvs,
+      impSsc: pag.impSsc,
+      admision:  pag.admision,
+      subtotal:  pag.subtotal,
+      iva:  pag.iva,
+      total:  pag.total
+    }
+    localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
     // Si existen entonces estamos en modo editar
     const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
-    const id_cotigeneral= localStorage.getItem(LS_COTIZACION);
-    
+    const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
+
     if (application !== null && application !== undefined && application !== '') {
       data.aplicacion = application;
     }
     if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
       data.id_CotiGeneral = id_cotigeneral;
     }
-    
-    
 
-    localStorage.setItem(LS_DATAVIDASEND,JSON.stringify(data));
+
+
+    localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
     try {
       handleOpenBackdrop();
       const response = await LifeService.fetchGrabaDatosVida(data);
@@ -1121,7 +1177,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       if (response.codigo === 200) {
         const idVida = response.data.aplicacion;
         localStorage.setItem(LS_IDCOTIZACIONVIDA, idVida);
-        
+
         const idCotizacion = response.data.id_CotiGeneral;
         localStorage.setItem(LS_COTIZACION, idCotizacion);
         handleCloseBackdrop();
@@ -1268,35 +1324,35 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const ssc = parseFloat((primaNumber * porSsc / 100).toFixed(2));
       const der_poliza = parseFloat(derPoliza.toFixed(2));
 
-      
+
 
       // Suma los impuestos
       impuesto = parseFloat((iva + sbs + ssc + der_poliza).toFixed(2));
 
       // Calcula el total y redondea a 2 decimales
       let total = parseFloat((primaNumber + impuesto).toFixed(2));
-      
-      let subTotal = parseFloat(((impuesto-iva) + prima).toFixed(2));
+
+      let subTotal = parseFloat(((impuesto - iva) + prima).toFixed(2));
       let totalPag = parseFloat((subTotal + iva).toFixed(2));
-      
+
       const totalPagar = {
-        documentType:formData.documentType,
-        identification:formData.identification,
-        name:formData.name,
-        lastname:formData.lastname,
-        email:formData.email,
-        phone:formData.phone,
-        sumAdd :formData.prestamo,
-        prima : primaNumber,
-        impScvs:sbs,
-        impSsc:ssc,
+        documentType: formData.documentType,
+        identification: formData.identification,
+        name: formData.name,
+        lastname: formData.lastname,
+        email: formData.email,
+        phone: formData.phone,
+        sumAdd: formData.prestamo,
+        prima: primaNumber,
+        impScvs: sbs,
+        impSsc: ssc,
         admision: der_poliza,
-        subtotal : subTotal,
-        iva : iva,
-        total:totalPag,
-        
+        subtotal: subTotal,
+        iva: iva,
+        total: totalPag,
+
       }
-      localStorage.setItem(LS_DATOSPAGO,JSON.stringify(totalPagar));
+      localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
       // Actualiza el formData con los valores calculados y redondeados
       setFormData({
@@ -1324,7 +1380,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const handleBlur = (e) => {
     setFormDataTouched({ ...formDataTouched, [e.target.name]: true });
-
   };
 
 
@@ -1572,6 +1627,30 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           <Grid item xs={10.5} md={3}>
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              Pais <span style={{ color: 'red' }}>*</span>
+            </Typography>
+            <Select
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              style={{ textAlign: "left", }}
+              variant="standard"
+              placeholder="Seleccione País"
+              fullWidth
+              required
+            >
+              {country.map((risk, index) => (
+                <MenuItem key={index} value={risk.codpais}>
+                  {risk.nombre}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
+
+          <Grid item xs={10.5} md={3}>
+            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Provincia <span style={{ color: 'red' }}>*</span>
             </Typography>
             <Select
@@ -1616,7 +1695,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
               ))}
             </Select>
           </Grid>
-          <Grid item xs={10.5} md={3}>
+          <Grid item xs={10.5} md={3} sx={{
+            paddingRight: { xs: '0px', md: '42px' }
+          }}  >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Estado civil <span style={{ color: 'red' }}>*</span>
             </Typography>
@@ -1643,9 +1724,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             </Select>
           </Grid>
 
-          <Grid item xs={10.5} md={3} sx={{
-            paddingRight: { xs: '0px', md: '32px' }
-          }} >
+          <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Genero <span style={{ color: 'red' }}>*</span>
             </Typography>
