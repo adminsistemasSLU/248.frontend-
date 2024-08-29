@@ -44,7 +44,12 @@ import {
   LS_TABLAACTUALIZDA,
   PARAMETROS_STORAGE_KEY,
   LS_VIDACOBERTURA,
+  LS_PROCESODATOSVIDA,
+  DATOS_PERSONALES_STORAGE_KEY,
+  LS_POLVIDAEDIT,
   LS_IDCOTIZACIONVIDA,
+  LS_DATAVIDASEND,
+  LS_DATOSPAGO
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import { Button } from "@mui/base";
@@ -70,7 +75,12 @@ const areEqual = (prevProps, nextProps) => {
     prevProps.index === nextProps.index &&
     prevProps.handleTableChange === nextProps.handleTableChange;
 };
-
+function formatedInput(numero) {
+  return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+  }).format(numero);
+}
 const MemoizedMontoCell = React.memo(({ value, onChange }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -79,7 +89,7 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
     <TableCell>
       <TextField
         fullWidth
-        value={value || ''}
+        value={(value) || ''}
         onChange={onChange}
         size={isSmallScreen ? 'small' : 'medium'}
         sx={{
@@ -95,7 +105,12 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
 const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
+  function formatedInput(numero) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    }).format(numero);
+  }
   return (
     <MemoizedStyledTableRow key={index} sx={{ padding: 0 }}>
       <TableCell>
@@ -133,7 +148,7 @@ const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
       <TableCell>
         <TextField
           fullWidth
-          value={item.prima || ''}
+          value={formatedInput(item.prima) || ''}
           readOnly
           disabled
           size={isSmallScreen ? 'small' : 'medium'}
@@ -232,6 +247,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
   //Tabla para calculos
   const [tablecalc, setTablecalc] = useState([]);
 
+  const [datosFactura, setDatosFactura] = useState([]);
+
   const maxDate = dayjs().subtract(18, "years");
   const [error, setError] = useState("");
   const [messageError, setmessageError] = useState("");
@@ -280,6 +297,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
         nombreConyuge: datoscoyugue?.nombreConyuge || "",
         conyugenumero: datoscoyugue?.nombreConyuge || "",
         conyugesexo: datoscoyugue?.genero || "0",
+      }));
+
+      const datosprestamo = JSON.parse(dataPersonal[0].datosprestamo);
+
+      const datosFactura = dataPersonal[0].datosfacturas ? JSON.parse(dataPersonal[0].datosfacturas) : [];
+
+      setDatosFactura(datosFactura);
+      
+      setFormData((formData) => ({
+        ...formData,
+        city: datosprestamo?.ciudad || "",
+        province: datosprestamo?.provincia || "",
       }));
 
       if (datoscoyugue?.fechaNacimiento) {
@@ -405,18 +434,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
   };
 
-  const updateFormDataTabla = (data) => {
-    // Primero transformamos el objeto JSON en un arreglo adecuado
-    const transformedData = Object.values(data).flat().map((item, index) => ({
-      monto: parseFloat(item.monto) || '',
-      periodo: index + 1,
-      vigencia: '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
-      // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
-    }));
-
-    // Luego, actualizamos el estado con los datos transformados
-    setFormDataTabla(transformedData);
-  };
 
   const cargarCotizacion = async () => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
@@ -489,6 +506,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
   };
 
+  function formatedInput(numero) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    }).format(numero);
+}
+
   const cargarVigencia = async () => {
     try {
       producto = localStorage.getItem(LS_PRODUCTO);
@@ -504,10 +528,16 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let documentosVida = vigencia.data.documentos
         let tabla1 = vigencia.data.crearTablaPeriodos.tabla1
         if (tabla1.EtiquetaTable.codigo) {
-          // setCobertura(tabla1.EtiquetaTable.codigo);
+          
           localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
-        localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+
+        const preguntasprevias =  JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+        if(!(preguntasprevias && preguntasprevias.length>0)){
+
+          localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+        }
+        
         if (vigencia.data.polizas[0]) {
           localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
         } else {
@@ -909,7 +939,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
       prima: formData.prima,
       impuesto: formData.impuesto,
       primatotal: formData.primaTotal,
-      primaMensual: formData.primaMensual
+      primaMensual: formData.primaMensual,
+      provincia:formData.province,
+      ciudad: formData.city
     };
 
     const datoscertificado = {
@@ -919,6 +951,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       numPrestamo: formData.numPrestamo,
     };
 
+  
 
     const arrDatosCliente = {
       nombre: formData.name,
@@ -936,7 +969,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       zona: formData.province,
       datosconyugues: datosconyugues,
       datosprestamo: datosprestamo,
-      datosfacturas: {},
+      datosfacturas: datosFactura,
       datoscertificado: datoscertificado,
     };
 
@@ -1020,11 +1053,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
       txtPgCadTarjetaAnio: "",
     }
 
+    const preguntasVida = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+
 
     const data = {
       arrDatosCliente: arrDatosCliente,
       ramoAlt: ramo,
       ramo: ramo,
+
       strCoberturas: [
         {
           codcob: cobertura,
@@ -1057,14 +1093,25 @@ const PersonalFormLife = forwardRef((props, ref) => {
       txtAclaratorios: "",
       slTipCredito: "",
       aprobAutomatica: "",
-      jsonPreguntas: "{\"formulario\":\"4\",\"respuestas\":[{\"idpregunta\":\"1\",\"control\":\"input_conf_pregunta_1\",\"respuesta\":\"N\"},{\"idpregunta\":\"2\",\"control\":\"input_conf_pregunta_2\",\"respuesta\":\"N\"}],\"aprobacion\":\"S\"}",
+      jsonPreguntas: preguntasVida,
       arrLogTasa: {},
       vidaGrupo: "N",
     }
 
-    console.log(data);
+    // Si existen entonces estamos en modo editar
+    const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
+    const id_cotigeneral= localStorage.getItem(LS_COTIZACION);
+    
+    if (application !== null && application !== undefined && application !== '') {
+      data.aplicacion = application;
+    }
+    if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
+      data.id_CotiGeneral = id_cotigeneral;
+    }
+    
+    
 
-
+    localStorage.setItem(LS_DATAVIDASEND,JSON.stringify(data));
     try {
       handleOpenBackdrop();
       const response = await LifeService.fetchGrabaDatosVida(data);
@@ -1077,6 +1124,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
         const idCotizacion = response.data.id_CotiGeneral;
         localStorage.setItem(LS_COTIZACION, idCotizacion);
         handleCloseBackdrop();
+        localStorage.removeItem(LS_POLVIDAEDIT);
+        localStorage.removeItem(DATOS_PERSONALES_STORAGE_KEY);
+        localStorage.removeItem(LS_PROCESODATOSVIDA);
+        localStorage.removeItem(LS_TABLAACTUALIZDA);
+        localStorage.removeItem(LS_TABLACALC);
+        localStorage.removeItem(LS_VIDACOBERTURA);
+        localStorage.removeItem(LS_VIDAPOLIZA);
         return true;
       } else {
         console.log(response);
@@ -1213,11 +1267,35 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const ssc = parseFloat((primaNumber * porSsc / 100).toFixed(2));
       const der_poliza = parseFloat(derPoliza.toFixed(2));
 
+      
+
       // Suma los impuestos
       impuesto = parseFloat((iva + sbs + ssc + der_poliza).toFixed(2));
 
       // Calcula el total y redondea a 2 decimales
       let total = parseFloat((primaNumber + impuesto).toFixed(2));
+      
+      let subTotal = parseFloat(((impuesto-iva) + prima).toFixed(2));
+      let totalPag = parseFloat((subTotal + iva).toFixed(2));
+      
+      const totalPagar = {
+        documentType:formData.documentType,
+        identification:formData.identification,
+        name:formData.name,
+        lastname:formData.lastname,
+        email:formData.email,
+        phone:formData.phone,
+        sumAdd :formData.prestamo,
+        prima : primaNumber,
+        impScvs:sbs,
+        impSsc:ssc,
+        admision: der_poliza,
+        subtotal : subTotal,
+        iva : iva,
+        total:totalPag,
+        
+      }
+      localStorage.setItem(LS_DATOSPAGO,JSON.stringify(totalPagar));
 
       // Actualiza el formData con los valores calculados y redondeados
       setFormData({
@@ -1891,7 +1969,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               type="text"
               disabled={true}
               name="prestamo"
-              value={ValidationUtils.Valida_moneda(formData.prestamo)}
+              value={formatedInput(formData.prestamo)}
               onChange={handleChange}
               variant="standard"
               fullWidth
@@ -1908,7 +1986,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               type="text"
               disabled={true}
               name="prima"
-              value={ValidationUtils.Valida_moneda(formData.prima)}
+              value={formatedInput(formData.prima)}
               onChange={handleChange}
               variant="standard"
               fullWidth
@@ -1927,7 +2005,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               type="text"
               disabled={true}
               name="impuesto"
-              value={ValidationUtils.Valida_moneda(formData.impuesto)}
+              value={formatedInput(formData.impuesto)}
               onChange={handleChange}
               variant="standard"
               fullWidth
@@ -1945,7 +2023,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               type="text"
               disabled={true}
               name="primaTotal"
-              value={ValidationUtils.Valida_moneda(formData.primaTotal)}
+              value={formatedInput(formData.primaTotal)}
               onChange={handleChange}
               variant="standard"
               fullWidth
@@ -1963,7 +2041,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               type="text"
               disabled={true}
               name="primaMensual"
-              value={ValidationUtils.Valida_moneda(formData.primaMensual)}
+              value={formatedInput(formData.primaMensual)}
               onChange={handleChange}
               variant="standard"
               fullWidth

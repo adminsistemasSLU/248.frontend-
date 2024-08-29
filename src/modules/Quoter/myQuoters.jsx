@@ -34,11 +34,10 @@ import {
   LS_RAMO,
   USER_STORAGE_KEY,
   DATOS_PAGO_STORAGE_KEY,
-  LS_POLVIDAEDIT
+
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
-import LifeService from "../../services/LifeService/LifeService";
 
 function createData(
   id,
@@ -97,6 +96,7 @@ function stableSort(array, comparator) {
   });
   return stabilizedThis.map((el) => el[0]);
 }
+
 
 const headCells = [
   {
@@ -356,7 +356,6 @@ export default function MyQuoters() {
 
 
 
-
   const handleSetFilter = React.useCallback((value) => {
     console.log('handlefilter');
     setFilter(value);
@@ -464,7 +463,7 @@ export default function MyQuoters() {
     }
 
     if (ramo === RAMOINCENDIO) {
-       //OPCIONES PARA ABRIR EL MODAL DE INCENDIO 
+      //OPCIONES PARA ABRIR EL MODAL DE INCENDIO 
       window.location.href = `/quoter/pymes/`;
     }
 

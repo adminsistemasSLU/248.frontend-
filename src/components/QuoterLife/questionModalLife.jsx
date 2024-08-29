@@ -1,6 +1,8 @@
 import React, {
     useState,
     useEffect,
+    forwardRef,
+    useImperativeHandle
 } from "react";
 import Typography from '@mui/material/Typography';
 import Backdrop from "@mui/material/Backdrop";
@@ -8,11 +10,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import { TextField, Grid, FormControl, Select, MenuItem, Snackbar, Alert, AlertTitle } from "@mui/material";
-import { LS_PREGUNTASVIDA, LS_PROCESODATOSVIDA, LS_TABLAACTUALIZDA } from "../../utils/constantes";
+import { LS_PREGUNTASVIDA, LS_DATAVIDASEND } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 
 
-export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
+const QuestionModalLife = forwardRef((props, ref) => {
     const [questions, setQuestions] = useState([]);
     const [questionsUpload, setQuestionsUpload] = useState([]);
     const [openSnack, setOpenSnack] = useState(false);
@@ -22,6 +24,7 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
     // const editMode = isEditMode;
 
     useEffect(() => {
+
         let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
         setQuestions(preguntas || []);
 
@@ -32,6 +35,9 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         console.log(questions);
         setQuestionsUpload(questions);
     }, []);
+
+
+
 
     const handleSelectChange = (event, questionIndex) => {
         const value = event.target.value;
@@ -59,29 +65,42 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         setOpen(false);
     };
 
+    useImperativeHandle(ref, () => ({
+        handleSubmitExternally: handleSubmit,
+    }));
+
+    const handleSubmit = async (e) => {
+        await handleSaveChanges();
+        return true;
+    };
 
     const handleSaveChanges = async () => {
-        const data = JSON.parse(localStorage.getItem(LS_PROCESODATOSVIDA));
-        setOpenBackdrop(true);
-        const response = await LifeService.fetchProcesaDatos(data);
-        if (response.codigo === 200) {
-            setOpenBackdrop(false);
-            localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
-            closeModalDetail("true");
-        } else {
-            console.log(response.message);
-            setErrorMessage(response.message);
-            setOpenSnack(true);
-            localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify([]));
+        let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
 
-            // Espera 2 segundos antes de cerrar el backdrop
-            setTimeout(() => {
-                setOpenBackdrop(false);
-                closeModalDetail("true");
-            }, 2000); // 2000 milisegundos = 2 segundos
-        }
+        let updatedQuestions = preguntas.map(pregunta => {
+            let respuestaEncontrada = questionsUpload.find(q => q.codigo === pregunta.codigo);
+            return {
+                ...pregunta,
+                respuestapregunta: respuestaEncontrada ? respuestaEncontrada.respuesta : ""
+            };
+        });
+
+        const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+        setOpenBackdrop(true);
+
+        data.jsonPreguntas = updatedQuestions
         console.log(data);
-        
+        //const response = await LifeService.fetchGrabaDatosVida(data);
+        // if (response.codigo === 200) {
+
+        //     localStorage.setItem(LS_DATAVIDASEND,data);
+        //     closeModalDetail("true");
+        // } else {
+
+        //     closeModalDetail("true");
+        // }
+        console.log(data);
+
     };
 
     const preguntasArray = (
@@ -122,9 +141,9 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         </Grid>
     );
 
-    const closeModal = () => {
-        closeModalDetail("true");
-    };
+    // const closeModal = () => {
+    //     closeModalDetail("true");
+    // };
 
     return (
         <div
@@ -148,10 +167,7 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
                 }}
             >
                 <div>Descripción de Sección</div>
-                <div onClick={closeModal}>
-                    {" "}
-                    <CloseIcon />
-                </div>
+                
             </div>
             <Backdrop
                 sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -200,4 +216,6 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         </div >
 
     );
-}
+});
+
+export default QuestionModalLife;

@@ -11,19 +11,26 @@ import Backdrop from "@mui/material/Backdrop";
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CircularProgress from "@mui/material/CircularProgress";
-import { TextField, Box, Grid, FormControl, Select, MenuItem, Snackbar, Button } from "@mui/material";
-import { LS_DOCUMENTOSVIDA, LS_PREGUNTASVIDA } from "../../utils/constantes";
+import { TextField, Box, Grid, FormControl, Select, MenuItem, Snackbar, Alert, AlertTitle, Button } from "@mui/material";
+import { LS_DOCUMENTOSVIDA, LS_PREGUNTASVIDA, LS_DATAVIDASEND, LS_COTIZACION } from "../../utils/constantes";
+import LifeService from "../../services/LifeService/LifeService";
 
 const RiskFormLife = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [documentsUpload, setDocumentsUpload] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [openSnack, setOpenSnack] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [questionsUpload, setQuestionsUpload] = useState([]);
   const fileInputRefs = useRef({});
 
 
+
   useEffect(() => {
+
+
+
     let docuemtos = JSON.parse(localStorage.getItem(LS_DOCUMENTOSVIDA));
     let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
     let questions = (preguntas || []).map(pregunta => ({
@@ -36,26 +43,82 @@ const RiskFormLife = forwardRef((props, ref) => {
       setDocuments(array || []);
 
       console.log(questions);
-      setQuestionsUpload(questions);
+      //PREGUNTAR SI ES MODO EDITAR
+      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
+      if (idCotizacion) {
+        const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+        const preguntas = data.jsonPreguntas;
+        console.log(preguntas);
+        console.log(questions);
+        const questionUploadNew = questions.map((item) => {
+          // Buscamos la pregunta correspondiente en el arreglo preguntas
+          const preguntaCorrespondiente = preguntas.find(pregunta => pregunta.codigo === item.codigo);
+
+          // Retornamos un nuevo objeto con la respuesta asignada si existe
+          return {
+            ...item,
+            respuesta: preguntaCorrespondiente ? preguntaCorrespondiente.respuestapregunta : item.respuesta
+          };
+        });
+        console.log(questionUploadNew);
+        // Actualizamos el estado con el nuevo arreglo
+        setQuestionsUpload(questionUploadNew);
+
+      } else {
+        setQuestionsUpload(questions);
+      }
+
+
+
     }
 
   }, []);
 
-  const handleSaveChanges = async () => {
-    
-   
-    
-};
 
 
   useImperativeHandle(ref, () => ({
     handleSubmitExternally: handleSubmit,
   }));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+
+    const respuestasIncompletas = questionsUpload.some(q => !q.respuesta || q.respuesta.trim() === "");
+    console.log(respuestasIncompletas);
+    if (respuestasIncompletas) {
+      setErrorMessage("Por favor, complete todas las respuestas antes de continuar.");
+      setOpenSnack(true); 
+      return false; 
+    }
+
+    let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+
+    let updatedQuestions = preguntas.map(pregunta => {
+      let respuestaEncontrada = questionsUpload.find(q => q.codigo === pregunta.codigo);
+      return {
+        ...pregunta,
+        respuestapregunta: respuestaEncontrada ? respuestaEncontrada.respuesta : ""
+      };
+    });
+    const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+
+
+    data.jsonPreguntas = updatedQuestions
+    setOpen(true);
+    const response = await LifeService.fetchGrabaDatosVida(data);
     
-    console.log("Submitting documents:", documentsUpload);
+    if (response.codigo === 200) {
+      
+      localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(updatedQuestions));
+      localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
+      setOpen(false);
+      return true;
+    } else {
+      setErrorMessage(response.message);
+      setOpenSnack(true);
+      setOpen(false);
+      return false;
+    }
   };
 
   const handleClose = (event, reason) => {
@@ -129,11 +192,11 @@ const RiskFormLife = forwardRef((props, ref) => {
               />
               <label htmlFor={`file-upload-${file.codigo}`}>
                 <Button
-                
+
                   startIcon={<DriveFolderUploadIcon />}
                   variant="contained"
                   component="span"
-                  style={{ backgroundColor: "#0099a8", display:"none" }}>  {/* Se oculta boton por peticion de cliente */}
+                  style={{ backgroundColor: "#0099a8", display: "none" }}>  {/* Se oculta boton por peticion de cliente */}
                   Upload File
                 </Button>
               </label>
@@ -156,7 +219,7 @@ const RiskFormLife = forwardRef((props, ref) => {
                         }}
                         size="small"
                         startIcon={<DeleteOutlineIcon />}
-                        style={{ marginTop: '10px', width: '143.7px', height: '36.7px' }} 
+                        style={{ marginTop: '10px', width: '143.7px', height: '36.7px' }}
                       >{/* Se oculta boton por peticion de cliente */}
                         Remove
                       </Button>
@@ -245,10 +308,21 @@ const RiskFormLife = forwardRef((props, ref) => {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <form
 
-        style={{ paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px' }}
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={openSnack}
+        autoHideDuration={5000}
+        onClose={() => setOpenSnack(false)}
       >
+        <Alert style={{ fontSize: "1em" }} severity="error">
+          <AlertTitle style={{ textAlign: "left" }}>Error</AlertTitle>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+
+      <form style={{ paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px' }}>
         <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
           REQUISITOS DE ASEGURABILIDAD
         </Typography>

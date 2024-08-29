@@ -10,7 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/carrousel.scss';
 import BaldosasService from '../services/BaldosasService/BaldosasService';
 import Loading from './loading';
-import { API_BALDOSAS,LS_COTIZACION,LS_RAMO,API_SUBBALDOSAS} from './constantes';
+import { API_BALDOSAS,LS_COTIZACION,LS_PRODUCTO,DATOS_PAGO_STORAGE_KEY,
+    LS_RAMO,API_SUBBALDOSAS,  LS_DATAVIDASEND,LS_DATOSPAGO,LS_PREGUNTASVIDA
+    ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA} from './constantes';
 
 
 function HomeCarrousel(props) {
@@ -34,6 +36,16 @@ function HomeCarrousel(props) {
     ];
     
     useEffect(() => {
+
+  
+        localStorage.removeItem(LS_PRODUCTO);
+        localStorage.removeItem(LS_DATAVIDASEND);
+        localStorage.removeItem(LS_DATOSPAGO);
+        localStorage.removeItem(LS_PREGUNTASVIDA);
+        localStorage.removeItem(LS_DOCUMENTOSVIDA);
+        localStorage.removeItem(LS_IDCOTIZACIONVIDA);
+        localStorage.removeItem(LS_VIDAPOLIZA);
+        localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
         console.log('Error al obtener baldosas:',)
         localStorage.removeItem(LS_COTIZACION);
         const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));

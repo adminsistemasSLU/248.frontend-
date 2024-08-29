@@ -37,8 +37,10 @@ import IncendioService from "../../services/IncencioService/IncendioService";
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
-  LS_FORMAPAGO,
   USER_STORAGE_KEY,
+  LS_PRODUCTO,DATOS_PAGO_STORAGE_KEY,
+     LS_DATAVIDASEND,LS_DATOSPAGO,LS_PREGUNTASVIDA
+    ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
@@ -152,7 +154,7 @@ export default function SteppersLife() {
   const modoEditar = () => {
     let idCotizacion = localStorage.getItem(LS_COTIZACION);
     if (idCotizacion) {
-      setActiveStep(1);
+      setActiveStep(3);
     }
   };
 
@@ -171,12 +173,20 @@ export default function SteppersLife() {
     //Accion para Datos Personales
     if (steps[activeStep].label === "Datos Personales") {
       continuar = await personalFormRef.current.handleSubmitExternally();
-      
+
     }
 
 
 
     if (steps[activeStep].label === "Resumen") {
+      localStorage.removeItem(LS_PRODUCTO);
+      localStorage.removeItem(LS_DATAVIDASEND);
+      localStorage.removeItem(LS_DATOSPAGO);
+      localStorage.removeItem(LS_PREGUNTASVIDA);
+      localStorage.removeItem(LS_DOCUMENTOSVIDA);
+      localStorage.removeItem(LS_IDCOTIZACIONVIDA);
+      localStorage.removeItem(LS_VIDAPOLIZA);
+      localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
       Swal.fire({
         title: "Exito!",
         text: `El proceso ha terminado`,
@@ -188,23 +198,6 @@ export default function SteppersLife() {
       return;
     }
 
-    //Accion para Riesgo
-    if (steps[activeStep].label === "Pago") {
-      continuar = false;
-      //continuar = await paidFormRef.current.handleSubmitExternally();
-      if (localStorage.getItem(LS_FORMAPAGO) === "1") {
-        Swal.fire({
-          title: "Exito!",
-          text: `El proceso ha terminado`,
-          icon: "success",
-          confirmButtonText: "Ok",
-        }).then(() => {
-          navigate("/quoter/Pymes/MyQuotes");
-        });
-      }
-
-
-    }
 
     let datosPersonales = JSON.parse(
       localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
@@ -213,12 +206,17 @@ export default function SteppersLife() {
     if (datosPersonales) {
       setEmail(datosPersonales.correo);
     }
-    
+
+    if (steps[activeStep].label === "Facturacion") {
+      continuar = await paidFormRef.current.handleSubmitExternally();
+
+    }
+
+
 
     if (steps[activeStep].label === "Riesgo") {
-      console.log("continuar 1");
-      //continuar = questionFormRef.current.handleSubmitExternally();
-      continuar = true;
+      continuar = await questionFormRef.current.handleSubmitExternally();
+
     }
 
     if (continuar) {
@@ -233,9 +231,9 @@ export default function SteppersLife() {
 
   const steps = [
     {
-        label: "Producto",
-         formComponent: <ProductListCardsLife onNext={handleNext} />,
-        // formComponent: <PersonalFormLife ref={personalFormRef} />,
+      label: "Producto",
+      formComponent: <ProductListCardsLife onNext={handleNext} />,
+      // formComponent: <PersonalFormLife ref={personalFormRef} />,
     },
     {
       label: "Datos Personales",
@@ -289,7 +287,7 @@ export default function SteppersLife() {
 
   const handleBack = () => {
     console.log(activeStep);
-    if(activeStep < 1){
+    if (activeStep < 1) {
       navigate('/quoter/dashboard');
     }
     else {
@@ -427,9 +425,9 @@ export default function SteppersLife() {
       <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto' }}>
         <CardContent sx={{ bgcolor: 'background.default' }}>
           <Stepper
-          alternativeLabel
-          activeStep={activeStep}
-          connector={<ColorlibConnector />}
+            alternativeLabel
+            activeStep={activeStep}
+            connector={<ColorlibConnector />}
           >
             {steps.map((step, index) => (
               <Step key={index}>
@@ -452,10 +450,10 @@ export default function SteppersLife() {
       >
         <Box style={{ width: "100%" }}>
           {steps[activeStep].label === "Producto" && (
-            <div style={{paddingLeft: '9%', paddingTop: '20px', textAlign: 'left'}}>
+            <div style={{ paddingLeft: '9%', paddingTop: '20px', textAlign: 'left' }}>
               <span style={{ color: "#02545C", }}><b>PRODUCTOS</b></span>
               <br />
-            <div style={{paddingTop: '5px', paddingBottom: '30px'}}><span>Seleccione el producto a cotizar</span></div>
+              <div style={{ paddingTop: '5px', paddingBottom: '30px' }}><span>Seleccione el producto a cotizar</span></div>
             </div>
           )}
           {React.cloneElement(steps[activeStep].formComponent, {
@@ -463,16 +461,16 @@ export default function SteppersLife() {
             onNext: handleNext,
           })}
           <div className="btnDisplay">
-          {steps[activeStep].label !== "Productos" && (
-            <Button
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-              className="button-styled-back"
-              style={{ top: "10%", backgroundColor: 'white', color: "#02545C" }}
-            >
-              Regresar
-            </Button>
-          )}
+            {steps[activeStep].label !== "Productos" && (
+              <Button
+                onClick={handleBack}
+                sx={{ mr: 1 }}
+                className="button-styled-back"
+                style={{ top: "10%", backgroundColor: 'white', color: "#02545C" }}
+              >
+                Regresar
+              </Button>
+            )}
             {steps[activeStep].label === "Resumen" && (
               <Button
                 onClick={handleClickOpen}

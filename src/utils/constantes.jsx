@@ -31,3 +31,5 @@ export const LS_TABLAACTUALIZDA = 'tabla_actualizada';
 export const LS_IDCOTIZACIONVIDA = 'id_cotizacion_vida';
 export const LS_POLVIDAEDIT = 'cotizacion_vida_data';
 export const LS_VIDACOBERTURA = 'vida_cobertura';
+export const LS_DATAVIDASEND = 'datos_vida_completos';
+export const LS_DATOSPAGO = 'datos_vida_pago';

@@ -11,6 +11,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import { LS_DATAVIDASEND, API_SUBBALDOSAS,LS_PRODUCTO } from "../../utils/constantes";
 
 
 const SumaryFormLife = forwardRef((props, ref) => {
@@ -36,7 +37,50 @@ const SumaryFormLife = forwardRef((props, ref) => {
         muerteAccidental: "",
     });
 
+    function formatedInput(numero) {
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+        }).format(numero);
+    }
 
+    //Funcion principal para cargar datos
+    useEffect(() => {
+        const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+        const productos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
+        const IdProducto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+        const nombreProducto = productos.filter((item)=>{
+            return item.producto === IdProducto;
+        })
+
+        let sbs = (parseFloat(data.arrDatosCliente.datosfacturas.impScvs));
+        let scc = (parseFloat(data.arrDatosCliente.datosfacturas.impSsc));
+        let derechoEmision = (parseFloat(data.arrDatosCliente.datosfacturas.admision));
+        let iva = (parseFloat(data.arrDatosCliente.datosfacturas.iva));
+
+        let impuesto = sbs +scc+derechoEmision+iva;
+
+        setFormData((prevData) => ({
+            ...prevData,
+            name: data.arrDatosCliente.nombre+" "+data.arrDatosCliente.apellido,
+            document: data.arrDatosCliente.identificacion,
+            email: data.arrDatosCliente.correo,
+            phone: data.arrDatosCliente.telefono,
+
+            documentInvoice: data.arrDatosCliente.datosfacturas.identification,
+            nameInvoice: data.arrDatosCliente.datosfacturas.name+" "+data.arrDatosCliente.datosfacturas.lastname,
+            emailInvoice: data.arrDatosCliente.datosfacturas.email,
+            phoneInovice: data.arrDatosCliente.datosfacturas.phone,
+
+            producto: nombreProducto[0].titulo,
+            prima: data.arrDatosCliente.datosfacturas.prima,
+            impuesto: impuesto,
+            total: data.arrDatosCliente.datosfacturas.total,
+            muerteCausa: data.arrDatosCliente.datosfacturas.sumAdd,
+            itp: "",
+            muerteAccidental: "",
+        }));
+    }, [])
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -64,7 +108,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                 <Grid container spacing={2} style={{ paddingRight: '5px' }}>
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Documento 
+                            Documento
                         </Typography>
                         <TextField
                             type="text"
@@ -94,7 +138,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                     </Grid>
                     <Grid item xs={10.5} md={3} >
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Email 
+                            Email
                         </Typography>
                         <TextField
                             placeholder="Email"
@@ -110,7 +154,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                     </Grid>
                     <Grid item xs={10.5} md={2.5}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Télefono 
+                            Télefono
                         </Typography>
                         <TextField
                             placeholder="Télefono"
@@ -132,7 +176,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
 
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Documento 
+                            Documento
                         </Typography>
                         <TextField
                             type="text"
@@ -162,7 +206,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                     </Grid>
                     <Grid item xs={10.5} md={3} >
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Email 
+                            Email
                         </Typography>
                         <TextField
                             placeholder="Email"
@@ -178,7 +222,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                     </Grid>
                     <Grid item xs={10.5} md={2.5}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Télefono 
+                            Télefono
                         </Typography>
                         <TextField
                             placeholder="Télefono"
@@ -201,7 +245,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
 
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Producto 
+                            Producto
                         </Typography>
                         <TextField
                             placeholder="Producto"
@@ -218,13 +262,13 @@ const SumaryFormLife = forwardRef((props, ref) => {
 
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            $ Prima 
+                            $ Prima
                         </Typography>
                         <TextField
                             placeholder="Prima"
                             type="text"
                             name="prima"
-                            value={formData.prima}
+                            value={formatedInput(formData.prima)}
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
@@ -235,13 +279,13 @@ const SumaryFormLife = forwardRef((props, ref) => {
 
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            $ Impuesto 
+                            $ Impuesto
                         </Typography>
                         <TextField
                             placeholder="$ Impuesto"
                             type="text"
                             name="impuesto"
-                            value={formData.impuesto}
+                            value={formatedInput(formData.impuesto)}
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
@@ -253,13 +297,13 @@ const SumaryFormLife = forwardRef((props, ref) => {
 
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            $ Total 
+                            $ Total
                         </Typography>
                         <TextField
                             placeholder="$ Total"
                             type="text"
                             name="total"
-                            value={formData.total}
+                            value={formatedInput(formData.total)}
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
@@ -267,16 +311,16 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             required
                         />
                     </Grid>
-                    
+
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            $ Muerte por cualquier causa 
+                            $ Muerte por cualquier causa
                         </Typography>
                         <TextField
                             placeholder="$ Muerte por cualquier causa"
                             type="text"
                             name="muerteCausa"
-                            value={formData.muerteCausa}
+                            value={formatedInput(formData.muerteCausa)}
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
@@ -284,10 +328,10 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             required
                         />
                     </Grid>
-                    
-                    <Grid item xs={10.5} md={3}>
+
+                    <Grid item xs={10.5} md={3} style={{visibility:'hidden'}}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            $ ITP 
+                            $ ITP
                         </Typography>
                         <TextField
                             placeholder="$ ITP"
@@ -302,9 +346,9 @@ const SumaryFormLife = forwardRef((props, ref) => {
                         />
                     </Grid>
 
-                    <Grid item xs={10.5} md={3}>
+                    <Grid item xs={10.5} md={3} style={{visibility:'hidden'}}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            $ Muerte Accidental 
+                            $ Muerte Accidental
                         </Typography>
                         <TextField
                             placeholder="$ Muerte Accidental"
@@ -316,6 +360,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             fullWidth
                             inputProps={{ maxLength: 30 }}
                             required
+                            
                         />
                     </Grid>
 
