@@ -1142,6 +1142,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       identification: formData.identification,
       name: formData.name,
       lastname: formData.lastname,
+      direction: formData.address,
       email: formData.email,
       phone: formData.phone,
       sumAdd: formData.prestamo,

@@ -89,6 +89,27 @@ const QuoterService = {
     }
   },
 
+  fetchExportExcel: async (dato) => {
+    const endpoint = 'api/reporte/ReporteExcelEmisiones';
+    const method = 'POST'; 
+    const data = {
+      usuario:dato.usuario,
+      id_CotiGeneral:dato.id_CotiGeneral,
+      ramo:dato.ramo,
+      producto:dato.producto,
+      cliente:dato.cliente,
+      estado:dato.estado,
+      fecha:dato.fecha
+    };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Envio Correo Cuenta:', error);
+      throw error;
+    }
+  },
 
 
 };

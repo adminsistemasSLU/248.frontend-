@@ -15,6 +15,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+
 import Tooltip from "@mui/material/Tooltip";
 import CurrencyInput from "../../utils/currencyInput";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,6 +29,7 @@ import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
 import BaldosasService from "../../services/BaldosasService/BaldosasService"
 import ComboService from "../../services/ComboService/ComboService";
+
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
@@ -38,6 +41,7 @@ import {
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
+
 
 function createData(
   id,
@@ -589,6 +593,25 @@ export default function MyQuoters() {
     cargarTabla();
   };
 
+  const handleExport = () => {
+    exportarTabla();
+  };
+
+  async function exportarTabla() {
+    handleOpenBackdrop();
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    let dato = {
+      usuario: userId.id,
+      ramo: ramo,
+      producto: producto,
+      estado: estado
+    };
+    QuoterService.fetchExportExcel(dato);
+    
+    handleCloseBackdrop();
+  }
+
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Typography variant="h4" sx={{ color: "#00a99e", mb: 2 }} xs={{ fontSize: 10 }}>Mis Cotizaciones</Typography>
@@ -686,6 +709,15 @@ export default function MyQuoters() {
               startIcon={<SearchIcon />}
             >
               Buscar</Button>
+          </Grid>
+
+          <Grid item xs={8} md={2}>
+            <Button variant="contained"
+              style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+              onClick={handleExport}
+              startIcon={<SaveAltIcon />}
+            >
+              Exportar</Button>
           </Grid>
         </Grid>
 
