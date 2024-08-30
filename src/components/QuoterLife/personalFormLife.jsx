@@ -365,8 +365,22 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }));
       
       setFormDataTabla(transformedData);
-      setDatosCargados(true);
-      await fetchDataDocumento();
+      await setDatosCargados(true);
+      let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+        try {
+          
+          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
+          console.log(data);
+          if (data) {
+            localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
+          } else {
+            console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
+          }
+          handleCloseBackdrop();
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          handleCloseBackdrop();
+        }
       handleOpenBackdrop(false);
     }
   };
