@@ -366,6 +366,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       
       setFormDataTabla(transformedData);
       setDatosCargados(true);
+      await fetchDataDocumento();
       handleOpenBackdrop(false);
     }
   };
@@ -753,31 +754,31 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   //Cuando cambie la variable vigencia
   useEffect(() => {
-
-    const fetchDataDocumento = async () => {
-      if (formData.vigencia && formData.prestamo && age) {
-        if (datosCargados) {
-          let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-          try {
-            handleOpenBackdrop();
-            const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
-            console.log(data);
-            if (data) {
-              localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
-            } else {
-              console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
-            }
-            handleCloseBackdrop();
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            handleCloseBackdrop();
-          }
-        }
-      }
-    };
     fetchDataDocumento();
   }, [formData.vigencia, formData.prestamo, age]);
 
+
+  const fetchDataDocumento = async () => {
+    if (formData.vigencia && formData.prestamo && age) {
+      if (datosCargados) {
+        let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+        try {
+          handleOpenBackdrop();
+          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
+          console.log(data);
+          if (data) {
+            localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
+          } else {
+            console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
+          }
+          handleCloseBackdrop();
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          handleCloseBackdrop();
+        }
+      }
+    }
+  };
 
   useImperativeHandle(ref, () => ({
     handleSubmitExternally: handleSubmit,
