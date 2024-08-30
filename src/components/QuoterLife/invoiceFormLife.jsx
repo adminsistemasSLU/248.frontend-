@@ -493,7 +493,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     variant="standard"
                                     error={!formaPago && validate}
                                 >
-                                    <InputLabel id="paidType-Label">Facturar a asegurado</InputLabel>
+                                    <InputLabel id="paidType-Label">Facturar a:</InputLabel>
                                     <Select
                                         labelId="paidType-Label"
                                         id="paidType"
@@ -505,8 +505,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         fullWidth
                                         required
                                     >
-                                        <MenuItem value="C">Cliente</MenuItem>
-                                        <MenuItem value="R">Otra Persona</MenuItem>
+                                        <MenuItem value="C">Asegurado</MenuItem>
+                                        <MenuItem value="R">Cliente</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
