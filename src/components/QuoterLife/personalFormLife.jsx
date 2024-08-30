@@ -354,10 +354,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
         setFinVigencia(newFinVigencia);
       }
 
-
+      
       setcargarDataInicial(true);
       let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
-      const transformedData = Object.values(montoPeriodo).flat().map(item => ({
+      const transformedData = Object.values(montoPeriodo).flat().map(item => (
+        {
         monto: parseFloat(item.monto) || '',
         tasa: item.tasa || '',
         prima: item.prima || '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
@@ -369,7 +370,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
         try {
           
-          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
+          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"),datosprestamo.prestamo, dataPoliza.vigencia);
           console.log(data);
           if (data) {
             localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
