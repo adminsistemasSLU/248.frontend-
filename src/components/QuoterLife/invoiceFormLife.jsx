@@ -66,6 +66,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     const [errorCedula, setErrorCedula] = useState(false);
     const [open, setOpen] = useState(false);
 
+    const [asegurado, setAsegurado] = React.useState([]);
+
     const [editForm, setEditForm] = useState(false);
 
 
@@ -107,13 +109,20 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     }));
 
     const cargarDatosVidaPago = async () => {
+        
         let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
         let idCotizacion = localStorage.getItem(LS_COTIZACION);
         // debugger;
         if (idCotizacion) {
+            setOpenBackdrop(true);
             let cotiVida = await cargarCotizacion();
+            setOpenBackdrop(false);
             factura = JSON.parse(cotiVida[0].datosfacturas);
-            localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+            console.log(cotiVida[0]);
+            console.log(factura);
+            if (factura && factura.length !== 0) {
+                localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+            }
         }
         let formaPagoAray = localStorage.getItem(LS_DATAVIDASEND);
 
@@ -147,20 +156,35 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         const cargarData = async () => {
             let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
             let idCotizacion = localStorage.getItem(LS_COTIZACION);
+            let asegurado;
             // debugger;
             if (idCotizacion) {
-
+                setOpenBackdrop(true);
+                let coti = await cargarCotizacion();
+                setOpenBackdrop(false);
+                asegurado = {
+                    name: coti[0].clinombre,
+                    lastname: coti[0].cliapellido,
+                    email: coti[0].clicorreo,
+                    phone: coti[0].clitelefono,
+                    direction: coti[0].clidireccion,
+                    documentType: coti[0].clitipcedula,
+                    identification: coti[0].clicedula
+                }
                 let formaPagoAray = localStorage.getItem(LS_DATOSPAGO);
 
                 if (formaPagoAray && formaPagoAray !== undefined) {
                     factura = JSON.parse(formaPagoAray);
                 } else {
                     setEditForm(false);
-                    setOpenBackdrop(true);
-                    let cotiVida = await cargarCotizacion();
-                    setOpenBackdrop(false);
-                    factura = JSON.parse(cotiVida[0].datosfacturas);
-                    localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+
+                    
+
+                    factura = JSON.parse(coti[0].datosfacturas);
+                    if (factura && factura.length !== 0) {
+                        localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+                    }
+
                 }
             }
             let formaPagoAray = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
@@ -200,16 +224,16 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             }
 
             if (formaPago === 'C') {
-                let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+                //let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
                 setFormData({
                     ...formData,
-                    name: formaPagos.name,
-                    lastname: formaPagos.lastname,
-                    email: formaPagos.email,
-                    phone: formaPagos.phone,
-                    direction: formaPagos.direction,
-                    documentType: formaPagos.documentType,
-                    identification: formaPagos.identification,
+                    name: asegurado.name,
+                    lastname: asegurado.lastname,
+                    email: asegurado.email,
+                    phone: asegurado.phone,
+                    direction: asegurado.direction,
+                    documentType: asegurado.documentType,
+                    identification: asegurado.identification,
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -279,6 +303,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             e.target.name === "lastname" ||
             e.target.name === "email" ||
             e.target.name === "phone" ||
+            e.target.name === "direction" ||
             e.target.name === "documentType" ||
             e.target.name === "identification"
         ) {

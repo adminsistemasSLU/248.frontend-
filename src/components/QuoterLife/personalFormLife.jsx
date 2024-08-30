@@ -443,8 +443,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setcargarDataInicial(false);
     };
 
-
-
     fetchDataProcesaDatos();
   }, [formDataTabla]); // Agrega cargarDataInicial a las dependencias para asegurar que el efecto se ejecute cuando cambie
 
@@ -1083,7 +1081,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     let calc = JSON.parse(localStorage.getItem(LS_TABLAACTUALIZDA));
     const arrValores = {
       tasa: calc.data.valores.tasa,
-      prima: calc.data.valores.prima,
+      prima:  formData.prima,
       derecho: calc.data.valores.derecho,
       porinteres: calc.data.valores.porinteres,
       prima_total: calc.data.valores.prima_total,
@@ -1162,7 +1160,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       email: formData.email,
       phone: formData.phone,
       sumAdd: formData.prestamo,
-      prima:  calc.data.valores.prima,
+      prima:  formData.prima,
       impScvs: pag.impScvs,
       impSsc: pag.impSsc,
       admision:  pag.admision,
