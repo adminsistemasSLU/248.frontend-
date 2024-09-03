@@ -26,6 +26,10 @@ import {
     USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
+import ComboService from "../../services/ComboService/ComboService";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 
 dayjs.extend(customParseFormat);
 
@@ -45,8 +49,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
         inicioVigencia: null,
         finVigencia: null,
         agente: "001",
-        provincia: "1",
-        ciudad: "1",
+        provincia: "",
+        ciudad: "",
+        fechaNacimiento: "",
+        pais: "",
     });
     const maxDate = dayjs().subtract(18, "years");
     const [error, setError] = useState("");
@@ -56,6 +62,12 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [age, setAge] = useState(maxDate);
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
     const isMounted = useRef(false);
+    const [estadoCivil, setEstadoCivil] = useState([]);
+    const [provinces, setProvinces] = useState([]);
+    const [pais, setPais] = useState([]);
+    const [ciudades, setCiudades] = useState([]);
+    const [vigencia, setVigencia] = useState([]);
+    const [fechaNacimiento, setFechaNacimiento] = useState([]);
 
     const cargarDatos = async () => {
         const dataPersonal = await cargarCotizacion();
@@ -105,7 +117,18 @@ const PersonalFormCar = forwardRef((props, ref) => {
     };
 
     useEffect(() => {
-        isMounted.current = true; // Establecer a true cuando el componente está montado
+        const iniciarDatosCombos = async () => {
+            handleOpenBackdrop();
+            let idCotizacion = localStorage.getItem(LS_COTIZACION);
+            await cargarProvincias();
+            await cargarEstadoCivil();
+            await cargarCiudad();
+            handleCloseBackdrop();
+            if (idCotizacion) {
+                await cargarDatos();
+            }
+        };
+        isMounted.current = true;
         const modoEditar = async () => {
             let idCotizacion = localStorage.getItem(LS_COTIZACION);
             if (idCotizacion) {
@@ -114,7 +137,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
         };
 
         modoEditar();
-
+        iniciarDatosCombos();
         return () => {
             isMounted.current = false; // Establecer a false cuando el componente se desmonta
         };
@@ -123,32 +146,39 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        let modifiedValue = value;
-        if (name === "identification") {
-            if (formData.documentType === "C" && value.length > 10) {
+        if (name === "provincia") {
+            cargarCiudad(value);
+            setFormData({ ...formData, provincia: value, ciudad: "" });  // Reseteamos la ciudad cuando cambia la provincia
+        } else if (name === "ciudad") {
+            setFormData({ ...formData, ciudad: value });
+        } else {
+            let modifiedValue = value;
+            if (name === "identification") {
+                if (formData.documentType === "C" && value.length > 10) {
+                    modifiedValue = value.slice(0, 10);
+                }
+                if (formData.documentType === "R" && value.length > 13) {
+                    modifiedValue = value.slice(0, 13);
+                }
+                if (isNaN(value)) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+            if (name === "phone") {
                 modifiedValue = value.slice(0, 10);
             }
-            if (formData.documentType === "R" && value.length > 13) {
-                modifiedValue = value.slice(0, 13);
-            }
-            if (isNaN(value)) {
-                e.preventDefault();
-                return;
-            }
-        }
 
-        if (name === "phone") {
-            modifiedValue = value.slice(0, 10);
-        }
-
-        if (name === "email") {
-            if (!ValidationUtils.validateEmail(modifiedValue)) {
-                setError("Por favor ingresa un correo electrónico válido.");
-            } else {
-                setError("");
+            if (name === "email") {
+                if (!ValidationUtils.validateEmail(modifiedValue)) {
+                    setError("Por favor ingresa un correo electrónico válido.");
+                } else {
+                    setError("");
+                }
             }
+            setFormData({ ...formData, [name]: modifiedValue });
         }
-        setFormData({ ...formData, [name]: modifiedValue });
     };
 
     useImperativeHandle(ref, () => ({
@@ -277,10 +307,55 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const handleCloseBackdrop = () => {
         setOpenBackdrop(false);
     };
+
     const handleOpenBackdrop = () => {
         setOpenBackdrop(true);
     };
 
+    const cargarEstadoCivil = async () => {
+        try {
+            const estadoCivil = await ComboService.fetchComboEstadoCivil();
+
+            if (estadoCivil && estadoCivil.data) {
+                setEstadoCivil(estadoCivil.data);
+                setFormData((formData) => ({ ...formData, status: estadoCivil.data[0].Codigo }));
+            }
+        } catch (error) {
+            console.error("Error al obtener estadoCivil:", error);
+        }
+    };
+
+    const cargarProvincias = async () => {
+        try {
+            const provincias = await ComboService.fetchComboProvincias(1, 113);
+            if (provincias && provincias.data) {
+                setProvinces(provincias.data);
+                setFormData((formData) => ({ ...formData, provincia: provincias.data[0].Codigo }));
+                await cargarCiudad(provincias.data[0].Codigo);
+            }
+        } catch (error) {
+            console.error("Error al obtener provincias:", error);
+        }
+    };
+    
+    const cargarCiudad = async (provinciaCodigo) => {
+        try {
+            const ciudades = await ComboService.fetchComboCiudad(1, 113, provinciaCodigo);
+            if (ciudades && ciudades.data) {
+                setCiudades(ciudades.data);
+                setFormData((formData) => ({ ...formData, ciudad: ciudades.data[0].Codigo }));
+            }
+        } catch (error) {
+            console.error("Error al obtener ciudad:", error);
+        }
+    };
+
+    const cargarVigencia = async () => {
+    }
+
+    const handleBlur = (e) => {
+        setFormData({ ...formData, [e.target.name]: true });
+    };
     return (
         <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '20px', }}>
             <Backdrop
@@ -420,8 +495,11 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             fullWidth
                             required
                         >
-                            <MenuItem value="S">Soltero</MenuItem>
-                            <MenuItem value="C">Casado</MenuItem>
+                            {estadoCivil.map((status, index) => (
+                                <MenuItem key={index} value={status.Codigo}>
+                                    {status.Nombre}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </Grid>
 
@@ -521,6 +599,30 @@ const PersonalFormCar = forwardRef((props, ref) => {
                         </Select>
                     </Grid>
 
+                    <Grid item xs={10.5} md={2.8}>
+                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px'}}>
+                            Fecha de nacimiento <span style={{ color: 'red' }}>*</span>
+                        </Typography>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}  >
+                            <DemoContainer components={["DatePicker"]}>
+                                <DatePicker
+                                    placeholder="Fecha de nacimiento"
+                                    slotProps={{
+                                        textField: { variant: "standard", size: "small" },
+                                    }}
+                                    value={fechaNacimiento}
+                                    format="DD/MM/YYYY"
+                                    disabled={errorCedula}
+                                    className="datePicker"
+                                    maxDate={maxDate}
+                                    onChange={(newValue) => {
+                                        setFechaNacimiento(newValue);
+                                    }}
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                    </Grid>
+
                     {/* Provincia */}
                     <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
@@ -533,12 +635,17 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             name="provincia"
                             value={formData.provincia}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             variant="standard"
                             fullWidth
                             required
+                            placeholder="Seleccione provincia"
                         >
-                            <MenuItem value="1">Guayas</MenuItem>
-                            <MenuItem value="2">Manabi</MenuItem>
+                            {provinces.map((province, index) => (
+                                <MenuItem key={index} value={province.Codigo}>
+                                    {province.Nombre}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </Grid>
 
@@ -557,8 +664,11 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             fullWidth
                             required
                         >
-                            <MenuItem value="1">Guayaquil</MenuItem>
-                            <MenuItem value="2">Quito</MenuItem>
+                            {ciudades.map((risk, index) => (
+                                <MenuItem key={index} value={risk.Codigo}>
+                                    {risk.Nombre}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </Grid>
                 </Grid>
