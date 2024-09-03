@@ -1,24 +1,30 @@
 import React, {
     useState,
     useEffect,
+    forwardRef,
+    useImperativeHandle
 } from "react";
 import Typography from '@mui/material/Typography';
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
-import { TextField, Grid, FormControl, Select, MenuItem, Snackbar } from "@mui/material";
-import { LS_PREGUNTASVIDA,LS_PROCESODATOSVIDA,LS_TABLAACTUALIZDA } from "../../utils/constantes";
+import { TextField, Grid, FormControl, Select, MenuItem, Snackbar, Alert, AlertTitle } from "@mui/material";
+import { LS_PREGUNTASVIDA, LS_DATAVIDASEND } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 
 
-export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
+const QuestionModalLife = forwardRef((props, ref) => {
     const [questions, setQuestions] = useState([]);
     const [questionsUpload, setQuestionsUpload] = useState([]);
+    const [openSnack, setOpenSnack] = useState(false);
+    const [openBackdrop, setOpenBackdrop] = React.useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const [open, setOpen] = useState(false);
     // const editMode = isEditMode;
 
     useEffect(() => {
+
         let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
         setQuestions(preguntas || []);
 
@@ -29,6 +35,9 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         console.log(questions);
         setQuestionsUpload(questions);
     }, []);
+
+
+
 
     const handleSelectChange = (event, questionIndex) => {
         const value = event.target.value;
@@ -56,13 +65,42 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         setOpen(false);
     };
 
+    useImperativeHandle(ref, () => ({
+        handleSubmitExternally: handleSubmit,
+    }));
+
+    const handleSubmit = async (e) => {
+        await handleSaveChanges();
+        return true;
+    };
 
     const handleSaveChanges = async () => {
-        const  data = JSON.parse(localStorage.getItem(LS_PROCESODATOSVIDA));
-        const response = await LifeService.fetchProcesaDatos(data);
-        localStorage.setItem(LS_TABLAACTUALIZDA,JSON.stringify(response));
+        let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+
+        let updatedQuestions = preguntas.map(pregunta => {
+            let respuestaEncontrada = questionsUpload.find(q => q.codigo === pregunta.codigo);
+            return {
+                ...pregunta,
+                respuestapregunta: respuestaEncontrada ? respuestaEncontrada.respuesta : ""
+            };
+        });
+
+        const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+        setOpenBackdrop(true);
+
+        data.jsonPreguntas = updatedQuestions
         console.log(data);
-        closeModalDetail("true");
+        //const response = await LifeService.fetchGrabaDatosVida(data);
+        // if (response.codigo === 200) {
+
+        //     localStorage.setItem(LS_DATAVIDASEND,data);
+        //     closeModalDetail("true");
+        // } else {
+
+        //     closeModalDetail("true");
+        // }
+        console.log(data);
+
     };
 
     const preguntasArray = (
@@ -103,9 +141,9 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         </Grid>
     );
 
-    const closeModal = () => {
-        closeModalDetail("true");
-      };
+    // const closeModal = () => {
+    //     closeModalDetail("true");
+    // };
 
     return (
         <div
@@ -129,17 +167,27 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
                 }}
             >
                 <div>Descripción de Sección</div>
-                <div onClick={closeModal}>
-                    {" "}
-                    <CloseIcon />
-                </div>
+                
             </div>
             <Backdrop
                 sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={open}
+                open={openBackdrop}
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
+
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                open={openSnack}
+                autoHideDuration={5000}
+                onClose={() => setOpenSnack(false)}
+            >
+                <Alert style={{ fontSize: "1em" }} severity="error">
+                    <AlertTitle style={{ textAlign: "left" }}>Error</AlertTitle>
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
+
             <form style={{ paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px' }} >
                 <Snackbar
                     open={open}
@@ -168,4 +216,6 @@ export default function QuestionModalLife({ closeModalDetail, isEditMode }) {
         </div >
 
     );
-}
+});
+
+export default QuestionModalLife;

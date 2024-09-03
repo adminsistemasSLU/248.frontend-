@@ -41,8 +41,15 @@ import {
   LS_DOCUMENTOSVIDA,
   LS_TABLACALC,
   LS_VIDAPOLIZA,
+  LS_TABLAACTUALIZDA,
+  PARAMETROS_STORAGE_KEY,
+  LS_VIDACOBERTURA,
   LS_PROCESODATOSVIDA,
-  LS_TABLAACTUALIZDA
+  DATOS_PERSONALES_STORAGE_KEY,
+  LS_POLVIDAEDIT,
+  LS_IDCOTIZACIONVIDA,
+  LS_DATAVIDASEND,
+  LS_DATOSPAGO
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import { Button } from "@mui/base";
@@ -68,7 +75,12 @@ const areEqual = (prevProps, nextProps) => {
     prevProps.index === nextProps.index &&
     prevProps.handleTableChange === nextProps.handleTableChange;
 };
-
+function formatedInput(numero) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(numero);
+}
 const MemoizedMontoCell = React.memo(({ value, onChange }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -77,7 +89,7 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
     <TableCell>
       <TextField
         fullWidth
-        value={value || ''}
+        value={(value) || ''}
         onChange={onChange}
         size={isSmallScreen ? 'small' : 'medium'}
         sx={{
@@ -93,7 +105,12 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
 const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
+  function formatedInput(numero) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(numero);
+  }
   return (
     <MemoizedStyledTableRow key={index} sx={{ padding: 0 }}>
       <TableCell>
@@ -111,7 +128,7 @@ const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
         />
       </TableCell>
       <MemoizedMontoCell
-        value={item.monto}
+        value={ValidationUtils.Valida_moneda(item.monto)}
         onChange={(e) => handleTableChange(e, index, 'monto')}
       />
       <TableCell>
@@ -131,7 +148,7 @@ const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
       <TableCell>
         <TextField
           fullWidth
-          value={item.prima || ''}
+          value={formatedInput(item.prima) || ''}
           readOnly
           disabled
           size={isSmallScreen ? 'small' : 'medium'}
@@ -158,8 +175,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
     address: "",
     province: "",
     city: "",
-    status: "0",
+    status: "",
     genero: 'M',
+    country:'',
 
     conyugetipo: "C",
     conyugenumero: "",
@@ -195,6 +213,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     province: false,
     city: false,
     status: false,
+    country:false,
 
     conyugetipo: false,
     conyugenumero: false,
@@ -222,7 +241,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const memoizedFormDataTabla = useMemo(() => formDataTabla, [formDataTabla]);
 
-  const [cobertura, setCobertura] = useState([]);
   const [openSnack, setOpenSnack] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [openModal, setOpenModal] = React.useState(false);
@@ -231,30 +249,35 @@ const PersonalFormLife = forwardRef((props, ref) => {
   //Tabla para calculos
   const [tablecalc, setTablecalc] = useState([]);
 
+  const [datosFactura, setDatosFactura] = useState([]);
+
   const maxDate = dayjs().subtract(18, "years");
   const [error, setError] = useState("");
   const [messageError, setmessageError] = useState("");
   const [errorCedula, setErrorCedula] = useState(false);
   const [open, setOpen] = useState(false);
   const [age, setAge] = useState(maxDate);
-  const [conyugueage, setConyugueAge] = useState(maxDate);
+  const [conyugueage, setConyugueAge] = useState("");
   const [inicioVigencia, setInicioVigencia] = useState(dayjs());
   const [finVigencia, setFinVigencia] = useState(dayjs());
-  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(true);
   const isMounted = useRef(false);
   //Combos
   const [estadoCivil, setEstadoCivil] = useState([]);
   const [provinces, setProvinces] = useState([]);
+  const [country, setCountry] = useState([]);
   const [ciudades, setCiudades] = useState([]);
   const [vigencia, setVigencia] = useState([]);
   //Constantes
   const CodigoComboCasado = "02";
   const CodigoComboUnionLibre = "05";
+  const [datosCargados, setDatosCargados] = useState(false);
+  const [cargarDataInicial, setcargarDataInicial] = useState(false);
+
   const cargarDatos = async () => {
-
-  const dataPersonal = await cargarCotizacion();
-
-    console.log(dataPersonal);
+    if (datosCargados) return; // Prevenir cargas redundantes
+    handleOpenBackdrop(true);
+    const dataPersonal = await cargarCotizacion();
     if (isMounted.current) {
       setFormData((formData) => ({
         ...formData,
@@ -265,15 +288,186 @@ const PersonalFormLife = forwardRef((props, ref) => {
         documentType: dataPersonal[0].clitipcedula,
         identification: dataPersonal[0].clicedula,
         address: dataPersonal[0].clidireccion,
+        genero:dataPersonal[0].cligenero,
+        status: dataPersonal[0].cliestadocivil || "",
       }));
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
       setAge(dateObject);
+
+      const datoscoyugue = JSON.parse(dataPersonal[0].datosconyugues);
+      //Setear datos conyugue si los hay
+      setFormData((formData) => ({
+        ...formData,
+        conyugeapellido: datoscoyugue?.apellidoConyuge || "",
+        conyugenombre: datoscoyugue?.nombreConyuge || "",
+        conyugenumero: datoscoyugue?.identificacion || "",
+        conyugesexo: datoscoyugue?.genero || "0",
+        conyugetipo: datoscoyugue?.tipo || "C",
+      }));
+
+      const datosprestamo = JSON.parse(dataPersonal[0].datosprestamo);
+
+      const datosFactura = dataPersonal[0].datosfacturas ? JSON.parse(dataPersonal[0].datosfacturas) : [];
+
+      setDatosFactura(datosFactura);
+
+    
+      setFormData((formData) => ({
+        ...formData,
+        country: dataPersonal[0].clipais || "",
+        province: dataPersonal[0].cliprovincia || "",
+      }));
+
+      await cargarCiudad(datosprestamo?.provincia);
+   
+      setFormData((formData) => ({
+        ...formData,
+        city: dataPersonal[0].cliciudad || "",
+      }));
+
+
+      if (datoscoyugue?.fechaNacimiento) {
+        const dateObjectconyugue = dayjs(datoscoyugue.fechaNacimiento, "DD/MM/YYYY");
+        setConyugueAge(dateObjectconyugue);
+      }
+
+      const datosCertificado = JSON.parse(dataPersonal[0].datoscertificado);
+     
+      const inicioVig = datosCertificado.inicioVigencia;
+
+      if (inicioVig) {
+        const dateInicioVig = dayjs(inicioVig, "DD/MM/YYYY");
+       
+        setInicioVigencia(dateInicioVig);
+      }
+
+
+      const dataPoliza = await cargarDatosPoliza(); // API PARA CONSULTAR EMI POL CABECERA
+      setFormData((formData) => ({
+        ...formData,
+        vigencia: dataPoliza.vigencia,
+        numPrestamo: datosCertificado.numPrestamo
+      }));
+
+      if (dataPoliza.vigencia && inicioVigencia) {
+        const newFinVigencia = inicioVigencia.add(dataPoliza.vigencia, 'month');
+        setFinVigencia(newFinVigencia);
+      }
+
+      
+      setcargarDataInicial(true);
+      let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
+      const transformedData = Object.values(montoPeriodo).flat().map(item => (
+        {
+        monto: parseFloat(item.monto) || '',
+        tasa: item.tasa || '',
+        prima: item.prima || '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
+        estado: item.estado || '' // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
+      }));
+      
+      setFormDataTabla(transformedData);
+      await setDatosCargados(true);
+      let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+        try {
+          
+          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"),datosprestamo.prestamo, dataPoliza.vigencia);
+          console.log(data);
+          if (data) {
+            localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
+          } else {
+            console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
+          }
+          handleCloseBackdrop();
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          handleCloseBackdrop();
+        }
+      handleOpenBackdrop(false);
     }
   };
+
+
+  //Usado para enviar api en modo editar
+  useEffect(() => {
+    //Funcion para carga inicial si se desea usar el useEfect utilizar debajo o declarar una nueva
+    const fetchDataProcesaDatos = async () => {
+      console.log(formDataTabla);
+      if (cargarDataInicial) {
+        // Calcula el resultado basado en formDataTabla
+        const resultado = formDataTabla.reduce((acc, item) => {
+          const monto = parseFloat(item.monto); // Convierte a número flotante
+
+          // Verifica si el valor es un número válido
+          if (!isNaN(monto) && monto !== null && monto !== '') {
+            acc += monto; // Suma el monto válido al acumulador
+          } else {
+            console.error(`Valor inválido encontrado: ${item.monto}`);
+          }
+
+          return acc;
+        }, 0); // El acumulador comienza en 0
+
+        setFormData({ ...formData, prestamo: resultado });
+
+        // Verifica si se debe mostrar el mensaje de error
+        if (resultado === 0) {
+          setErrorMessage("Se deben ingresar un valor en prestamo");
+          setOpenSnack(true);
+          return;
+        }
+
+        const data = crearDatosProcesarDatos();
+        setOpenBackdrop(true);
+
+        try {
+          // Llama al servicio para procesar datos
+          const response = await LifeService.fetchProcesaDatos(data);
+          if (response.codigo === 200) {
+            localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+            setCalculado(response);
+          } else {
+            console.log(response.message);
+            setErrorMessage(response.message);
+            setOpenSnack(true);
+            setCalculado([]);
+          }
+        } catch (error) {
+          console.error("Error al procesar los datos:", error);
+          setErrorMessage("Error al procesar los datos.");
+          setOpenSnack(true);
+          setCalculado([]);
+        } finally {
+          setOpenBackdrop(false);
+        }
+      }
+      setcargarDataInicial(false);
+    };
+
+    fetchDataProcesaDatos();
+  }, [formDataTabla]); // Agrega cargarDataInicial a las dependencias para asegurar que el efecto se ejecute cuando cambie
+
+
+  const cargarDatosPoliza = async () => {
+    let ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+
+    try {
+      const cotizacion = await LifeService.fetchConsultarPolizaVida(ramo, idCotizacion, producto);
+
+      if (cotizacion && cotizacion.data) {
+        return cotizacion.data;
+      }
+    } catch (error) {
+      console.error("Error al obtener antiguedad:", error);
+    }
+  };
+
 
   const cargarCotizacion = async () => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
     let dato = {
       usuario: userId.id,
       id_CotiGeneral: idCotizacion,
@@ -309,6 +503,20 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
   };
 
+ 
+  const cargarPais = async () => {
+    try {
+      const paises = await ComboService.fetchComboPais();
+      if (paises && paises.data) {
+        await setCountry(paises.data);
+        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais }));
+       
+      }
+    } catch (error) {
+      console.error("Error al obtener paises:", error);
+    }
+  };
+
   const cargarProvincias = async () => {
 
     try {
@@ -341,6 +549,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
   };
 
+  function formatedInput(numero) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(numero);
+  }
+
   const cargarVigencia = async () => {
     try {
       producto = localStorage.getItem(LS_PRODUCTO);
@@ -355,10 +570,17 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
         let documentosVida = vigencia.data.documentos
         let tabla1 = vigencia.data.crearTablaPeriodos.tabla1
-        if(tabla1.EtiquetaTable.codigo){
-          setCobertura(tabla1.EtiquetaTable.codigo);
+        if (tabla1.EtiquetaTable.codigo) {
+
+          localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
-        localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+
+        const preguntasprevias = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+        if (!(preguntasprevias && preguntasprevias.length > 0)) {
+
+          localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+        }
+
         if (vigencia.data.polizas[0]) {
           localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
         } else {
@@ -388,14 +610,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const iniciarDatosCombos = async () => {
       handleOpenBackdrop();
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      await cargarPais();
       await cargarProvincias();
       await cargarEstadoCivil();
       await cargarVigencia();
       handleCloseBackdrop();
-      if (idCotizacion) {
-        await cargarDatos();
-      }
+
     };
 
 
@@ -404,11 +624,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       if (idCotizacion) {
         await cargarDatos();
+      } else {
+        setDatosCargados(true);
       }
     };
 
-    iniciarDatosCombos();
-    modoEditar();
+    // Ejecutar iniciarDatosCombos primero y luego modoEditar
+    const fetchData = async () => {
+      const idCotizacion = await iniciarDatosCombos();
+      await modoEditar(idCotizacion);
+    };
+
+    fetchData();
 
     return () => {
       isMounted.current = false; // Establecer a false cuando el componente se desmonta
@@ -423,7 +650,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
       conyugueEdad = conyugueage.format('DD/MM/YYYY');
     }
 
-    const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));    
+    const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
+    const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
     const periodos = formDataTabla.map((item, index) => ({
       monto: item.monto,
       periodo: index + 1, // o cualquier lógica que determine el periodo basado en el índice
@@ -495,9 +723,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     if (name === "email") {
       if (!ValidationUtils.validateEmail(modifiedValue)) {
-        setError("Por favor ingresa un correo electrónico válido.");
-      } else {
-        setError("");
+        setErrorMessage("Por favor ingresa un correo electrónico válido.")
+        setOpenSnack(true);
       }
     }
     setFormData({ ...formData, [name]: modifiedValue });
@@ -514,30 +741,42 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   //Cuando cambie la variable vigencia
   useEffect(() => {
-    const fetchData = async () => {
+    handleOpenBackdrop();
+    const fetchDataCargaInicial = async () => {
       if (formData.vigencia) {
-        let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-        try {
-          const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
-          localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.tabla1));
-          setTablecalc(data.data.tabla1);
-          const detalle = transformData(data.data.tabla1);
-          setFormDataTabla(detalle);
-
-        } catch (error) {
-          console.error("Error fetching data:", error);
+        if (datosCargados) {
+          let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+          try {
+            const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
+            localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.tabla1));
+            setTablecalc(data.data.tabla1);
+            const detalle = transformData(data.data.tabla1);
+            setFormDataTabla(detalle);
+            handleCloseBackdrop();
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            handleCloseBackdrop();
+          }
+        } else {
+          handleCloseBackdrop();
         }
       }
     };
-    fetchData();
+    fetchDataCargaInicial();
   }, [formData.vigencia]);
 
   //Cuando cambie la variable vigencia
   useEffect(() => {
-    const fetchDataDocumento = async () => {
-      if (formData.vigencia && formData.prestamo && age) {
+    fetchDataDocumento();
+  }, [formData.vigencia, formData.prestamo, age]);
+
+
+  const fetchDataDocumento = async () => {
+    if (formData.vigencia && formData.prestamo && age) {
+      if (datosCargados) {
         let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
         try {
+          handleOpenBackdrop();
           const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
           console.log(data);
           if (data) {
@@ -545,15 +784,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
           } else {
             console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
           }
-
+          handleCloseBackdrop();
         } catch (error) {
           console.error("Error fetching data:", error);
+          handleCloseBackdrop();
         }
       }
-    };
-    fetchDataDocumento();
-  }, [formData.vigencia, formData.prestamo, age]);
-
+    }
+  };
 
   useImperativeHandle(ref, () => ({
     handleSubmitExternally: handleSubmit,
@@ -628,48 +866,354 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     setOpen(false);
   };
+  function faltanDatosConyugue() {
+    if (conyugueage === '') {
+      setErrorMessage("Debe ingresar una fecha de nacimiento para el conyugue")
+      setOpenSnack(true);
+      return true;
+    }
+    if (formData.conyugenombre === '') {
+      setErrorMessage("Debe ingresar un valor en nombre para el conyugue")
+      setOpenSnack(true);
+      return true;
+    }
 
-  const handleSubmit = (e) => {
+    if (formData.conyugenumero === '') {
+      setErrorMessage("Debe ingresar un valor en cédula para el conyugue")
+      setOpenSnack(true);
+      return true;
+    }
 
-    console.log(jsonDesgravament());
-    // const requiredFields = [
-    //   "name",
-    //   "lastname",
-    //   "email",
-    //   "phone",
-    //   "documentType",
-    //   "identification",
-    //   "address",
-    // ];
+    if (formData.conyugeapellido === '') {
+      setErrorMessage("Debe ingresar un valor en apellido para el conyugue")
+      setOpenSnack(true);
+      return true;
+    }
 
-    // let next = false;
-    // for (const field of requiredFields) {
-    //   if (!formData[field] || formData[field].trim() === "") {
-    //     next = false;
-    //     return next;
-    //   } else {
-    //     next = true;
-    //   }
+    if (formData.conyugesexo === '') {
+      setErrorMessage("Debe ingresar un valor en género para el conyugue")
+      setOpenSnack(true);
+      return true;
+    }
+    return false;
+  }
+
+
+  function faltanDatosUsuario() {
+    if (formData.numPrestamo === '') {
+      setErrorMessage("Debe ingresar un valor en número de prestamo")
+      setOpenSnack(true);
+      return true;
+    }
+
+    if (formData.prestamo === '') {
+      setErrorMessage("Debe ingresar un valor en prestamo")
+      setOpenSnack(true);
+      return true;
+    }
+
+    // if (formData.montodesempleo === '') {
+    //   setErrorMessage("Debe ingresar un valor en desempleo")
+    //   setOpenSnack(true);
+    //   return true;
     // }
-    // //VALIDAR MENOR DE EDAD
-    // next = age !== "" ? true : false;
-    // let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
-    // let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    // //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
-    // const objetoSeguro = {
-    //   nombre: formData.name,
-    //   apellido: formData.lastname,
-    //   correo: formData.email,
-    //   telefono: formData.phone,
-    //   tipoDocumento: formData.documentType,
-    //   identificacion: formData.identification,
-    //   direccion: formData.address,
-    //   producto: producto,
-    //   ramo: ramo,
-    //   tippoliza: 1,
-    //   usuario: userId,
-    //   zona: formData.province
-    // };
+
+    return false;
+  }
+
+  const handleSubmit = async (e) => {
+    const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+    if (tipoPrestamo === 'M') {
+      if (faltanDatosConyugue()) {
+        return false;
+      }
+    }
+    if (faltanDatosUsuario()) {
+      return false;
+    }
+
+    if (formData.vigencia === '' || formData.vigencia === 0) {
+      setErrorMessage("Debe ingresar un valor en vigencia, no puede ser 0")
+      setOpenSnack(true);
+      return false;
+    }
+
+    if (formData.prima === '' && formData.impuesto === '') {
+      setErrorMessage("Primero se deben realizar los calculos")
+      setOpenSnack(true);
+      return false;
+    }
+
+    const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
+    const requiredFields = [
+      "name",
+      "lastname",
+      "email",
+      "phone",
+      "documentType",
+      "identification",
+      "address",
+    ];
+
+    let next = false;
+    for (const field of requiredFields) {
+      if (!formData[field] || formData[field].trim() === "") {
+        next = false;
+        return next;
+      } else {
+        next = true;
+      }
+    }
+
+    //VALIDAR MENOR DE EDAD
+    next = age !== "" ? true : false;
+    let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
+    //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
+    const datosconyugues = {
+      nombreConyuge: formData.conyugenombre,
+      apellidoConyuge: formData.conyugeapellido,
+      identificacion: formData.conyugenumero,
+      fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
+      genero: formData.conyugesexo,
+      tipo:formData.conyugetipo
+    };
+
+    const datosprestamo = {
+      prestamo: formData.prestamo,
+      prima: formData.prima,
+      impuesto: formData.impuesto,
+      primatotal: formData.primaTotal,
+      primaMensual: formData.primaMensual,
+      provincia: formData.province,
+      ciudad: formData.city
+    };
+
+    const datoscertificado = {
+      inicioVigencia: inicioVigencia.format("DD/MM/YYYY"),
+      finVigencia: finVigencia.format("DD/MM/YYYY"),
+      vigencia: formData.vigencia,
+      numPrestamo: formData.numPrestamo,
+    };
+
+
+
+    const arrDatosCliente = {
+      nombre: formData.name,
+      apellido: formData.lastname,
+      correo: formData.email,
+      telefono: formData.phone,
+      tipoDocumento: formData.documentType,
+      identificacion: formData.identification,
+      fechaNacimiento: age.format("DD/MM/YYYY"),
+      direccion: formData.address,
+      producto: producto,
+      ramo: ramo,
+      cligenero: formData.genero,
+      cliestadocivil: formData.status,
+      clipais: formData.country,
+      cliciudad:formData.city,
+      cliprovincia: formData.province,
+      poliza: poliza,
+      tippoliza: 1,
+      usuario: userId.id,
+      zona: formData.province,
+      datosconyugues: datosconyugues,
+      datosprestamo: datosprestamo,
+      datosfacturas: datosFactura,
+      datoscertificado: datoscertificado,
+    };
+
+    const periodos = formDataTabla.map((item, index) => ({
+      tipo_monto: "",
+      monto: item.monto,
+      periodo: index + 1,
+      vigencia: formData.vigencia,
+      vigencia_desde: item.vigencia_desde,
+      vigencia_hasta: item.vigencia_hasta,
+      fecha_desde: item.fecha_desde,
+      fecha_hasta: item.fecha_hasta,
+      total_dias: item.total_dias,
+      tasa: item.tasa,
+      prima_anio: item.prima_anio,
+      prima_dia: item.prima_dia,
+      prima_total: item.prima_total,
+    }));
+
+    const arrMontoPeriodo = {
+      [cobertura]: periodos
+    }
+
+    const arrFrmEmision = {
+      slProducto: producto,
+      slPoliza: poliza,
+      txtAplicacion: "",
+      txtCodCliente: formData.identification,
+      txtEdadCliente: "",
+      slTipContrato: tipoPrestamo,
+      txtReferencia: '',
+      slBeneficiado: "",
+      slVigencia: formData.vigencia,
+      slDiasAdicional: 0,
+      txtFecDesde: inicioVigencia.format("DD/MM/YYYY"),
+      txtFecHasta: finVigencia.format("DD/MM/YYYY"),
+      txtFecCredDesde: inicioVigencia.format("DD/MM/YYYY"),
+      txtFecCredHasta: finVigencia.format("DD/MM/YYYY"),
+      txtNomZona: '',
+      slTipAmortizacion: "",
+      txtValPrestamo: 0,
+      txtTasaInteres: 0,
+      txtAgente: '',
+      slTipConyuge: '',
+      txtCodConyugue: '',
+      txtAplConyugue: formData.conyugeapellido,
+      txtNomConyugue: formData.conyugenombre,
+      txtNacConyugue: conyugueage,
+      txtEdadConyugue: '',
+      txtCodZona: formData.province,//en blanco
+      txtTipoVigencia: tipoPrestamo,
+      sysAccion: '',
+      hddPorTasa: '',
+      hddVidaGrupo: 'N',
+    }
+
+    let calc = JSON.parse(localStorage.getItem(LS_TABLAACTUALIZDA));
+    const arrValores = {
+      tasa: calc.data.valores.tasa,
+      prima:  formData.prima,
+      derecho: calc.data.valores.derecho,
+      porinteres: calc.data.valores.porinteres,
+      prima_total: calc.data.valores.prima_total,
+      monto_total: calc.data.valores.monto_total,
+      prima_minima: calc.data.valores.prima_minima
+    }
+
+    const arrFrmDebito = {
+      slPgTipDeudor: "",
+      slPgTipCedula: "",
+      txtPgCedula: "",
+      txtPgNombre: "",
+      txtPgTelefono: "",
+      slPgTipRegistro: "1",
+      slPgBanco: "",
+      txtPgNumCuenta: "",
+      slPgTipCuenta: "",
+      slPgTarjeta: "",
+      txtPgNumTarjeta: "",
+      txtPgCadTarjetaMes: "",
+      txtPgCadTarjetaAnio: "",
+    }
+
+    const preguntasVida = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+
+
+    const data = {
+      arrDatosCliente: arrDatosCliente,
+      ramoAlt: ramo,
+      ramo: ramo,
+      poliza: poliza,
+      strCoberturas: [
+        {
+          codcob: cobertura,
+          selcob: true,
+          clscob: "",
+          tipcob: ""
+        }
+      ],
+      arrMontoPeriodo: arrMontoPeriodo,
+      arrValores: arrValores,
+      arrFrmEmision: arrFrmEmision,
+      arrFacturacion: null,
+      sumaAsegurada: formData.prestamo,
+      arrFrmDebito: arrFrmDebito,
+      slTipFacturacion: "",
+      slFormaPago: "",
+      txtValEntrada: "",
+      slNumPagos: "",
+      slConInteres: "",
+      txtFecCobro: "",
+      txtFecEmite: "",
+      hddFecCuoInicial: "",
+      txtPorAjuste: "",
+      txtPorTasa: calc.data.valores.tasa,
+      txtValPrima: calc.data.valores.prima,
+      txtValDerecho: calc.data.valores.derecho,
+      txtPorSibs: "",
+      txtPorSsc: "",
+      txtDeducibles: "",
+      txtAclaratorios: "",
+      slTipCredito: "",
+      aprobAutomatica: "",
+      jsonPreguntas: preguntasVida,
+      arrLogTasa: {},
+      vidaGrupo: "N",
+    }
+    const pag = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+
+    const totalPagar = {
+      documentType: formData.documentType,
+      identification: formData.identification,
+      name: formData.name,
+      lastname: formData.lastname,
+      direction: formData.address,
+      email: formData.email,
+      phone: formData.phone,
+      sumAdd: formData.prestamo,
+      prima:  formData.prima,
+      impScvs: pag.impScvs,
+      impSsc: pag.impSsc,
+      admision:  pag.admision,
+      subtotal:  pag.subtotal,
+      iva:  pag.iva,
+      total:  pag.total
+    }
+    localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
+
+    // Si existen entonces estamos en modo editar
+    const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
+    const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
+
+    if (application !== null && application !== undefined && application !== '') {
+      data.aplicacion = application;
+    }
+    if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
+      data.id_CotiGeneral = id_cotigeneral;
+    }
+
+
+
+    localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
+    try {
+      handleOpenBackdrop();
+      const response = await LifeService.fetchGrabaDatosVida(data);
+      console.log(response);
+      handleCloseBackdrop();
+      if (response.codigo === 200) {
+        const idVida = response.data.aplicacion;
+        localStorage.setItem(LS_IDCOTIZACIONVIDA, idVida);
+
+        const idCotizacion = response.data.id_CotiGeneral;
+        localStorage.setItem(LS_COTIZACION, idCotizacion);
+        handleCloseBackdrop();
+        localStorage.removeItem(LS_POLVIDAEDIT);
+        localStorage.removeItem(DATOS_PERSONALES_STORAGE_KEY);
+        localStorage.removeItem(LS_PROCESODATOSVIDA);
+        localStorage.removeItem(LS_TABLAACTUALIZDA);
+        localStorage.removeItem(LS_TABLACALC);
+        localStorage.removeItem(LS_VIDACOBERTURA);
+        localStorage.removeItem(LS_VIDAPOLIZA);
+        return true;
+      } else {
+        console.log(response);
+        handleCloseBackdrop();
+        return false;
+      }
+    } catch (error) {
+      console.error("Error al verificar enviar a guadradar datos:", error);
+      handleCloseBackdrop();
+      return false;
+    }
 
     // // localStorage.setItem(
     // //   DATOS_PERSONALES_STORAGE_KEY,
@@ -680,47 +1224,67 @@ const PersonalFormLife = forwardRef((props, ref) => {
     // return next;
   };
 
-
-  const jsonDesgravament = () => {
-
-    return {
-      ramo: ramo,
-      //id_CotiGeneral:2,
-      producto: producto,
-      riesgo: 1,
-      cantidad: 1,
-      zona: formData.province,
-      ciudad: formData.city,
-      direccion: formData.address,
-
-      conyugetipo: "1",
-      conyugenumero: formData.conyugenumero,
-      conyugeapellido: formData.conyugeapellido,
-      conyugenombre: formData.conyugenombre,
-      conyugefecha: formData.conyugefecha,
-      conyugesexo: formData.conyugesexo,
-      conyugeestadocivil: "C",
-
-      vigencia: formData.vigencia,
-      numPrestamo: formData.numPrestamo,
-      montodesempleo: formData.montodesempleo,
-      monto: formData.prestamo,
-      prima: formData.prima,
-
-      arrDeclaracionesAsegurado: [],
-
-      arrRequisitosasegurados: []
-
+  const handleOpenModal = async () => {
+    console.log(formDataTabla);
+    const todosTienenNumero = formDataTabla.every((item) => {
+      console.log(item.monto);
+      return item.monto !== undefined && item.monto !== null && item.monto !== '' && !Number.isNaN(Number(item.monto));
+    });
+    console.log(todosTienenNumero);
+    if (!todosTienenNumero) {
+      setErrorMessage("Se deben ingresar valores validos en la tabla de montos")
+      setOpenSnack(true);
+      return;
     }
 
-  }
+    if (formData.vigencia === '' || formData.vigencia === 0) {
+      setErrorMessage("Se deben ingresar datos en vigencia")
+      setOpenSnack(true);
+      return;
+    }
 
-  const handleOpenModal = () => {
+    //SUMATORIA DE PRESTAMO A PARTIR DE LA TABLA DE CALCULOS
+    const resultado = formDataTabla.reduce((acc, item) => {
+      const monto = parseFloat(item.monto); // Convierte a número flotante
+
+      // Verifica si el valor es un número válido
+      if (!isNaN(monto) && monto !== null && monto !== '') {
+        acc += monto; // Suma el monto válido al acumulador
+      } else {
+        console.error(`Valor inválido encontrado: ${item.monto}`);
+      }
+
+      return acc;
+    }, 0); // El acumulador comienza en 0
+
+    setFormData({ ...formData, prestamo: resultado });
+
+
+    // if (formData.prestamo === '') {
+    //   setErrorMessage("Se deben ingresar un valor en prestamo")
+    //   setOpenSnack(true);
+    //   return;
+    // }
+
     const data = crearDatosProcesarDatos();
-    localStorage.setItem(LS_PROCESODATOSVIDA, JSON.stringify(data));
-    console.log(data);
-    setOpenModal(true);
+    setOpenBackdrop(true);
+    const response = await LifeService.fetchProcesaDatos(data);
+    if (response.codigo === 200) {
+      setOpenBackdrop(false);
+      localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+      setCalculado(response);
+    } else {
+      console.log(response.message);
+      setErrorMessage(response.message);
+      setOpenSnack(true);
+      // localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify([]));
+      setCalculado([]);
+      setOpenBackdrop(false);
+    }
+
+    // setOpenModal(true);
   };
+
 
   useEffect(() => {
     if (calculado && calculado.data) {
@@ -730,12 +1294,89 @@ const PersonalFormLife = forwardRef((props, ref) => {
             monto: item.monto || '',
             tasa: item.tasa || '',
             prima: item.prima_anio || '',
+            vigencia_desde: item.vigencia_desde || '',
+            vigencia_hasta: item.vigencia_hasta || '',
+            fecha_desde: item.fecha_desde || '',
+            fecha_hasta: item.fecha_hasta || '',
+            total_dias: item.total_dias || '',
+            prima_anio: item.prima_anio || '',
+            prima_dia: item.prima_dia || '',
             estado: ''
           }))
         )
         : [];
       console.log(result);
+
       setFormDataTabla(result);
+
+      let prima = null;
+      for (let key in calculado.data.montoPeriodo) {
+        let firstElement = true;
+        for (let subKey in calculado.data.montoPeriodo[key]) {
+          let item = calculado.data.montoPeriodo[key][subKey];
+          console.log(item);
+
+          if (firstElement) {
+            prima = item.prima_anio;
+            firstElement = false;
+          }
+        }
+      }
+
+      let impuesto = 0;
+      const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
+
+      // Asegúrate de que prima y los valores de parametros son números
+      const primaNumber = Number(prima);
+      const porIva = Number(parametros[0].por_iva);
+      const porSbs = Number(parametros[0].por_sbs);
+      const porSsc = Number(parametros[0].por_ssc);
+      const derPoliza = Number(parametros[0].der_poliza);
+
+      // Calcula los impuestos y redondea a 2 decimales
+      const iva = parseFloat((primaNumber * porIva / 100).toFixed(2));
+      const sbs = parseFloat((primaNumber * porSbs / 100).toFixed(2));
+      const ssc = parseFloat((primaNumber * porSsc / 100).toFixed(2));
+      const der_poliza = parseFloat(derPoliza.toFixed(2));
+
+
+
+      // Suma los impuestos
+      impuesto = parseFloat((iva + sbs + ssc + der_poliza).toFixed(2));
+
+      // Calcula el total y redondea a 2 decimales
+      let total = parseFloat((primaNumber + impuesto).toFixed(2));
+
+      let subTotal = parseFloat(((impuesto - iva) + prima).toFixed(2));
+      let totalPag = parseFloat((subTotal + iva).toFixed(2));
+
+      const totalPagar = {
+        documentType: formData.documentType,
+        identification: formData.identification,
+        name: formData.name,
+        lastname: formData.lastname,
+        email: formData.email,
+        phone: formData.phone,
+        sumAdd: formData.prestamo,
+        prima: primaNumber,
+        impScvs: sbs,
+        impSsc: ssc,
+        admision: der_poliza,
+        subtotal: subTotal,
+        iva: iva,
+        total: totalPag,
+
+      }
+      localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
+
+      // Actualiza el formData con los valores calculados y redondeados
+      setFormData({
+        ...formData,
+        prima: parseFloat(primaNumber.toFixed(2)),
+        primaMensual: parseFloat((total / 12).toFixed(2)),
+        primaTotal: total,
+        impuesto: impuesto
+      });
     }
   }, [calculado]);
 
@@ -754,7 +1395,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const handleBlur = (e) => {
     setFormDataTouched({ ...formDataTouched, [e.target.name]: true });
-
   };
 
 
@@ -871,7 +1511,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           </Grid>
           <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              Documento de identificación <span style={{ color: 'red' }}>*</span>
+              Doc. de identificación <span style={{ color: 'red' }}>*</span>
             </Typography>
             <TextField
               type={formData.documentType === "P" ? "text" : "text"}
@@ -1002,6 +1642,30 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           <Grid item xs={10.5} md={3}>
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              Pais <span style={{ color: 'red' }}>*</span>
+            </Typography>
+            <Select
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              style={{ textAlign: "left", }}
+              variant="standard"
+              placeholder="Seleccione País"
+              fullWidth
+              required
+            >
+              {country.map((risk, index) => (
+                <MenuItem key={index} value={risk.codpais}>
+                  {risk.nombre}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
+
+          <Grid item xs={10.5} md={3}>
+            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Provincia <span style={{ color: 'red' }}>*</span>
             </Typography>
             <Select
@@ -1046,7 +1710,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
               ))}
             </Select>
           </Grid>
-          <Grid item xs={10.5} md={3}>
+          <Grid item xs={10.5} md={3} sx={{
+            paddingRight: { xs: '0px', md: '42px' }
+          }}  >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Estado civil <span style={{ color: 'red' }}>*</span>
             </Typography>
@@ -1073,9 +1739,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             </Select>
           </Grid>
 
-          <Grid item xs={10.5} md={3} sx={{
-            paddingRight: { xs: '0px', md: '32px' }
-          }} >
+          <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Genero <span style={{ color: 'red' }}>*</span>
             </Typography>
@@ -1094,10 +1758,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
             >
 
               <MenuItem key='0' value='M'>
-                Masculino
+                MASCULINO
               </MenuItem>
               <MenuItem key='1' value='F'>
-                Femenino
+                FEMENINO
               </MenuItem>
 
             </Select>
@@ -1214,10 +1878,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
                   >
 
                     <MenuItem key='0' value='M'>
-                      Masculino
+                      MASCULINO
                     </MenuItem>
                     <MenuItem key='1' value='F'>
-                      Femenino
+                      FEMENINO
                     </MenuItem>
                   </Select>
                 </Grid>
@@ -1325,25 +1989,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
             />
           </Grid>
 
-          <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
-            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              $ Prestamo <span style={{ color: 'red' }}>*</span>
-            </Typography>
-            <TextField
-              placeholder="Prestamo"
-              type="text"
-              disabled={errorCedula}
-              name="prestamo"
-              value={ValidationUtils.Valida_moneda(formData.prestamo)}
-              onChange={handleChange}
-              variant="standard"
-              fullWidth
-              inputProps={{ maxLength: 10 }}
-              required
-            />
-          </Grid>
 
-          <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
+
+          {/* <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               $ Desempleo <span style={{ color: 'red' }}>*</span>
             </Typography>
@@ -1359,7 +2007,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               inputProps={{ maxLength: 10 }}
               required
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={10.5} md={3} style={{ paddingTop: '25px' }}>
             <Button
               onClick={handleOpenModal}
@@ -1404,8 +2052,26 @@ const PersonalFormLife = forwardRef((props, ref) => {
           </Table>
         </TableContainer>
 
+
         <Grid container spacing={2} style={{ paddingRight: '45px' }}>
 
+          <Grid item xs={10.5} md={3} >
+            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              $ Prestamo <span style={{ color: 'red' }}>*</span>
+            </Typography>
+            <TextField
+              placeholder="Prestamo"
+              type="text"
+              disabled={true}
+              name="prestamo"
+              value={formatedInput(formData.prestamo)}
+              onChange={handleChange}
+              variant="standard"
+              fullWidth
+              inputProps={{ maxLength: 10 }}
+              required
+            />
+          </Grid>
           <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               $ Prima <span style={{ color: 'red' }}>*</span>
@@ -1413,13 +2079,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Prima"
               type="text"
-              disabled={errorCedula}
+              disabled={true}
               name="prima"
-              value={ValidationUtils.Valida_moneda(formData.prima)}
+              value={formatedInput(formData.prima)}
               onChange={handleChange}
               variant="standard"
               fullWidth
               inputProps={{ maxLength: 10 }}
+
               required
             />
           </Grid>
@@ -1431,13 +2098,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Impuesto"
               type="text"
-              disabled={errorCedula}
+              disabled={true}
               name="impuesto"
-              value={ValidationUtils.Valida_moneda(formData.impuesto)}
+              value={formatedInput(formData.impuesto)}
               onChange={handleChange}
               variant="standard"
               fullWidth
               inputProps={{ maxLength: 10 }}
+              readOnly
               required
             />
           </Grid>
@@ -1448,12 +2116,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Prima total"
               type="text"
-              disabled={errorCedula}
+              disabled={true}
               name="primaTotal"
-              value={ValidationUtils.Valida_moneda(formData.primaTotal)}
+              value={formatedInput(formData.primaTotal)}
               onChange={handleChange}
               variant="standard"
               fullWidth
+              readOnly
               inputProps={{ maxLength: 10 }}
               required
             />
@@ -1465,13 +2134,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
             <TextField
               placeholder="Prima Mensual"
               type="text"
-              disabled={errorCedula}
+              disabled={true}
               name="primaMensual"
-              value={ValidationUtils.Valida_moneda(formData.primaMensual)}
+              value={formatedInput(formData.primaMensual)}
               onChange={handleChange}
               variant="standard"
               fullWidth
               inputProps={{ maxLength: 10 }}
+              readOnly
               required
             />
           </Grid>

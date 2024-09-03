@@ -15,6 +15,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+
 import Tooltip from "@mui/material/Tooltip";
 import CurrencyInput from "../../utils/currencyInput";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,16 +29,19 @@ import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
 import BaldosasService from "../../services/BaldosasService/BaldosasService"
 import ComboService from "../../services/ComboService/ComboService";
+
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   LS_PRODUCTO,
   LS_RAMO,
   USER_STORAGE_KEY,
-  DATOS_PAGO_STORAGE_KEY
+  DATOS_PAGO_STORAGE_KEY,
+
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
+
 
 function createData(
   id,
@@ -95,6 +100,7 @@ function stableSort(array, comparator) {
   });
   return stabilizedThis.map((el) => el[0]);
 }
+
 
 const headCells = [
   {
@@ -286,6 +292,9 @@ export default function MyQuoters() {
   const [totalPrima, setTotalPrima] = React.useState(0);
 
 
+  const RAMOINCENDIO = "1";
+  // const RAMOVEHICULO = "3";
+  const RAMOVIDA = "9";
 
   const [estado, setEstado] = React.useState([]);
   const [ramo, setRamo] = React.useState([]);
@@ -345,7 +354,6 @@ export default function MyQuoters() {
       row.createdDate.toLowerCase().includes(filter.toLowerCase())
     );
   });
-
 
 
 
@@ -415,10 +423,11 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const handleOpenQuoter = (id, product, ramo) => {
+  const handleOpenQuoter = async (id, product, ramo) => {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
+
     const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
     console.log(resultadoFiltrado);
 
@@ -430,6 +439,7 @@ export default function MyQuoters() {
       id: item.id,
     }));
 
+    //Datos de pago de existir
     localStorage.setItem(
       DATOS_PAGO_STORAGE_KEY,
       JSON.stringify(dataFormaPago)
@@ -443,6 +453,7 @@ export default function MyQuoters() {
       id: item.id,
     }));
     let datosPersonales = data.length > 0 ? data[0] : null;
+    //Datos de personales obligatorios para coti vida
     if (datosPersonales) {
       localStorage.setItem(
         DATOS_PERSONALES_STORAGE_KEY,
@@ -450,7 +461,16 @@ export default function MyQuoters() {
       );
     }
 
-    window.location.href = `/quoter/pymes/`;
+    if (ramo === RAMOVIDA) {
+      //OPCIONES PARA ABRIR EL MODAL DE VIDA 
+      window.location.href = `/quoter/life`;
+    }
+
+    if (ramo === RAMOINCENDIO) {
+      //OPCIONES PARA ABRIR EL MODAL DE INCENDIO 
+      window.location.href = `/quoter/pymes/`;
+    }
+
   };
 
   const handleDeleteQuoter = async (id) => {
@@ -573,6 +593,25 @@ export default function MyQuoters() {
     cargarTabla();
   };
 
+  const handleExport = () => {
+    exportarTabla();
+  };
+
+  async function exportarTabla() {
+    handleOpenBackdrop();
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    let dato = {
+      usuario: userId.id,
+      ramo: ramo,
+      producto: producto,
+      estado: estado
+    };
+    QuoterService.fetchExportExcel(dato);
+    
+    handleCloseBackdrop();
+  }
+
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Typography variant="h4" sx={{ color: "#00a99e", mb: 2 }} xs={{ fontSize: 10 }}>Mis Cotizaciones</Typography>
@@ -670,6 +709,15 @@ export default function MyQuoters() {
               startIcon={<SearchIcon />}
             >
               Buscar</Button>
+          </Grid>
+
+          <Grid item xs={8} md={2}>
+            <Button variant="contained"
+              style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+              onClick={handleExport}
+              startIcon={<SaveAltIcon />}
+            >
+              Exportar</Button>
           </Grid>
         </Grid>
 
@@ -790,7 +838,7 @@ export default function MyQuoters() {
                                       handleOpenQuoter(
                                         row.id,
                                         row.productoId,
-                                        row.ramoId
+                                        row.ramoId,
                                       )
                                     }
                                   >

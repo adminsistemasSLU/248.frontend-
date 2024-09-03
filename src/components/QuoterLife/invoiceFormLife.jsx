@@ -6,7 +6,6 @@ import React, {
 } from "react";
 import {
     TextField,
-    Button,
     Container,
     Grid,
     Paper,
@@ -21,23 +20,26 @@ import Select from "@mui/material/Select";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import "../../styles/form.scss";
-import { PARAMETROS_STORAGE_KEY, LS_FORMAPAGO, LS_COTIZACION, DATOS_PAGO_STORAGE_KEY } from "../../utils/constantes";
-import IncendioService from "../../services/IncencioService/IncendioService";
-import ComboService from "../../services/ComboService/ComboService";
-import QuoterService from "../../services/QuoterService/QuoterService";
-import Swal from "sweetalert2";
+import {
+    LS_COTIZACION,
+    LS_DATOSPAGO,
+    LS_DATAVIDASEND,
+    USER_STORAGE_KEY,
+} from "../../utils/constantes";
+import LifeService from "../../services/LifeService/LifeService";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
-
+import QuoterService from "../../services/QuoterService/QuoterService";
 
 const InvoiceFormLife = forwardRef((props, ref) => {
 
 
     const [formData, setFormData] = useState({
-        paidType:"",
+        paidType: "C",
         name: "",
         lastname: "",
         email: "",
         phone: "",
+        direction: "",
         documentType: "C",
         identification: "",
         sumAdd: "",
@@ -48,88 +50,237 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         admision: "",
         subtotal: "",
         total: "",
+
     });
-    const [formaPago, setformaPago] = useState([]);
+
+
+
+
     const [tipoCredito, settipoCredito] = useState([]);
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
     const [formPago, setFormPago] = React.useState([]);
     const [errorMessage, seterrorMessage] = React.useState([]);
     const [OpenSnackAlert, setOpenSnackAlert] = React.useState(false);
     const [validate, setvalidate] = React.useState(false);
-    const [error, setError] = useState("");
     const [messageError, setmessageError] = useState("");
     const [errorCedula, setErrorCedula] = useState(false);
     const [open, setOpen] = useState(false);
 
+    const [asegurado, setAsegurado] = React.useState([]);
+
+    const [editForm, setEditForm] = useState(false);
+
+
+    const [formaPago, setformaPago] = useState("C");
+
     useEffect(() => {
         const cargarData = async () => {
             handleOpenBackdrop();
-            // await cargarFormaPago();
-            // await cargarTipoCredito();
-            // await cargarDatosCotizacion();
+            cargarDatosVidaPago();
             handleCloseBackdrop();
         };
         cargarData();
     }, []);
 
-    useEffect(() => {
-        console.log(tipoCredito);
-    }, [tipoCredito]);
+    const cargarCotizacion = async () => {
+        let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+        let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
+        let dato = {
+            usuario: userId.id,
+            id_CotiGeneral: idCotizacion,
+        };
+        try {
+            const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
+                dato
+            );
+
+            if (cotizacion && cotizacion.data) {
+                return cotizacion.data;
+            }
+        } catch (error) {
+            console.error("Error al obtener antiguedad:", error);
+        }
+    };
+
 
     useImperativeHandle(ref, () => ({
         handleSubmitExternally: handleSubmit,
     }));
 
-    const cargarDatosCotizacion = async () => {
-        try {
-            const idCotizacion = localStorage.getItem(LS_COTIZACION);
-            const response = await IncendioService.cargarDatosPago(idCotizacion);
-            let formaPago = response.data[0];
-            const parametros = JSON.parse(
-                localStorage.getItem(PARAMETROS_STORAGE_KEY)
-            );
-            setFormPago(formaPago);
-            console.log(formaPago);
-            let monto = parseFloat(formaPago.totalmonto);
-            let prima = parseFloat(formaPago.totalprima);
-            let sbs = (parseFloat(formaPago.por_sbs) * prima) / 100;
-            let scc = (parseFloat(formaPago.por_ssc) * prima) / 100;
-            let derechoEmision = (parseFloat(formaPago.valDerecho) * prima) / 100;
-            let subtot =
-                parseFloat(prima) +
-                parseFloat(sbs) +
-                parseFloat(scc) +
-                parseFloat(derechoEmision);
-            let iva = (parseFloat(formaPago.por_iva) * subtot) / 100;
-            let total = iva + sbs + scc + derechoEmision + parseFloat(prima);
-
-            const datosPago = JSON.parse(localStorage.getItem(DATOS_PAGO_STORAGE_KEY));
-            console.log(datosPago[0]);
-
-            let formapago = datosPago[0].formapago != null ? datosPago[0].formapago : "";
-            let numpagos = datosPago[0].numpagos != null ? datosPago[0].numpagos : "";
-            let tipfacturacion = datosPago[0].tipfacturacion != null ? datosPago[0].tipfacturacion : "";
-            let valentrada = datosPago[0].valentrada !== "0.00" ? datosPago[0].valentrada : "";
-
-            setFormData({
-                ...formData,
-                paidType: tipfacturacion,
-                paidForm: formapago,
-                numberPaid: numpagos,
-                firstPaid: valentrada,
-                sumAdd: parseFloat(monto).toFixed(2),
-                iva: iva.toFixed(2),
-                prima: parseFloat(prima).toFixed(2),
-                impScvs: parseFloat(sbs).toFixed(2),
-                impSsc: parseFloat(scc).toFixed(2),
-                admision: parseFloat(derechoEmision).toFixed(2),
-                subtotal: parseFloat(subtot).toFixed(2),
-                total: parseFloat(total).toFixed(2),
-            });
-        } catch (error) {
-            console.error("Error al obtener Datos de Pago: ", error);
+    const cargarDatosVidaPago = async () => {
+        
+        let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+        let idCotizacion = localStorage.getItem(LS_COTIZACION);
+        // debugger;
+        if (idCotizacion) {
+            setOpenBackdrop(true);
+            let cotiVida = await cargarCotizacion();
+            setOpenBackdrop(false);
+            factura = JSON.parse(cotiVida[0].datosfacturas);
+            console.log(cotiVida[0]);
+            console.log(factura);
+            if (factura && factura.length !== 0) {
+                localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+            }
         }
-    };
+        let formaPagoAray = localStorage.getItem(LS_DATAVIDASEND);
+
+        if (formaPagoAray && formaPagoAray !== undefined) {
+            formaPagoAray = JSON.parse(formaPagoAray);
+        }
+
+        let formaPagos;
+
+        if (formaPagoAray &&
+            formaPagoAray.arrDatosCliente &&
+            formaPagoAray.arrDatosCliente.datosfacturas &&
+            typeof formaPagoAray.arrDatosCliente.datosfacturas === 'object' &&
+            Object.keys(formaPagoAray.arrDatosCliente.datosfacturas).length > 0) {
+
+            formaPagos = formaPagoAray.arrDatosCliente.datosfacturas;
+
+        } else {
+            formaPagos = factura;
+        }
+        setFormData((prevData) => ({
+            ...prevData,
+            paidType: formaPagos.paidType, // Asegúrate de que `newValue` es el valor correcto que deseas establecer
+        }));
+        let formapag = formaPagos.paidType || 'C';
+        setEditForm(true);
+        setformaPago(formapag);
+    }
+
+    useEffect(() => {
+        const cargarData = async () => {
+            let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+            let idCotizacion = localStorage.getItem(LS_COTIZACION);
+            let asegurado;
+            // debugger;
+            if (idCotizacion) {
+                setOpenBackdrop(true);
+                let coti = await cargarCotizacion();
+                setOpenBackdrop(false);
+                asegurado = {
+                    name: coti[0].clinombre,
+                    lastname: coti[0].cliapellido,
+                    email: coti[0].clicorreo,
+                    phone: coti[0].clitelefono,
+                    direction: coti[0].clidireccion,
+                    documentType: coti[0].clitipcedula,
+                    identification: coti[0].clicedula
+                }
+                let formaPagoAray = localStorage.getItem(LS_DATOSPAGO);
+
+                if (formaPagoAray && formaPagoAray !== undefined) {
+                    factura = JSON.parse(formaPagoAray);
+                } else {
+                    setEditForm(false);
+
+                    
+
+                    factura = JSON.parse(coti[0].datosfacturas);
+                    if (factura && factura.length !== 0) {
+                        localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+                    }
+
+                }
+            }
+            let formaPagoAray = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+            // let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+            let formaPagos;
+
+            if (formaPagoAray &&
+                formaPagoAray.arrDatosCliente &&
+                formaPagoAray.arrDatosCliente.datosfacturas &&
+                typeof formaPagoAray.arrDatosCliente.datosfacturas === 'object' &&
+                Object.keys(formaPagoAray.arrDatosCliente.datosfacturas).length > 0) {
+                formaPagos = formaPagoAray.arrDatosCliente.datosfacturas;
+            } else {
+                formaPagos = factura;
+            }
+            console.log(formaPago);
+            let monto, prima, sbs, scc, derechoEmision, subtot, iva, total;
+
+            if (factura) {
+                monto = parseFloat(factura.sumAdd);
+                prima = parseFloat(factura.prima);
+                sbs = parseFloat(factura.impScvs);
+                scc = parseFloat(factura.impSsc);
+                derechoEmision = parseFloat(factura.admision);
+                subtot = parseFloat(factura.subtotal);
+                iva = parseFloat(factura.iva);
+                total = parseFloat(factura.total);
+            } else {
+                monto = parseFloat(formaPagos.sumAdd);
+                prima = parseFloat(formaPagos.prima);
+                sbs = parseFloat(formaPagos.impScvs);
+                scc = parseFloat(formaPagos.impSsc);
+                derechoEmision = parseFloat(formaPagos.admision);
+                subtot = parseFloat(formaPagos.subtotal);
+                iva = parseFloat(formaPagos.iva);
+                total = parseFloat(formaPagos.total);
+            }
+
+            if (formaPago === 'C') {
+                //let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+                setFormData({
+                    ...formData,
+                    name: asegurado.name,
+                    lastname: asegurado.lastname,
+                    email: asegurado.email,
+                    phone: asegurado.phone,
+                    direction: asegurado.direction,
+                    documentType: asegurado.documentType,
+                    identification: asegurado.identification,
+                    sumAdd: parseFloat(monto).toFixed(2),
+                    iva: iva.toFixed(2),
+                    prima: parseFloat(prima).toFixed(2),
+                    impScvs: parseFloat(sbs).toFixed(2),
+                    impSsc: parseFloat(scc).toFixed(2),
+                    admision: parseFloat(derechoEmision).toFixed(2),
+                    subtotal: parseFloat(subtot).toFixed(2),
+                    total: parseFloat(total).toFixed(2),
+                });
+            }
+
+            if (formaPago === 'R') {
+                let nombre = '', lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
+                if (formaPagoAray) {
+                    nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
+                    lastname = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.lastname : '';
+                    email = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.email : '';
+                    phone = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.phone : '';
+                    documentType = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.documentType : '';
+                    identification = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.identification : '';
+                    direction = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.direction : '';
+                }
+
+                setFormData({
+                    ...formData,
+                    name: nombre || '',
+                    lastname: lastname || '',
+                    email: email || '',
+                    phone: phone || '',
+                    documentType: documentType || 'C',
+                    direction: direction || '',
+                    identification: identification || '',
+                    sumAdd: parseFloat(monto).toFixed(2),
+                    iva: iva.toFixed(2),
+                    prima: parseFloat(prima).toFixed(2),
+                    impScvs: parseFloat(sbs).toFixed(2),
+                    impSsc: parseFloat(scc).toFixed(2),
+                    admision: parseFloat(derechoEmision).toFixed(2),
+                    subtotal: parseFloat(subtot).toFixed(2),
+                    total: parseFloat(total).toFixed(2),
+                });
+            }
+
+        }
+        cargarData();
+    }, [formaPago]);
+
 
     function formatedInput(numero) {
         return new Intl.NumberFormat("en-US", {
@@ -138,27 +289,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         }).format(numero);
     }
 
-    // const cargarFormaPago = async () => {
-    //     try {
-    //         const fPago = await ComboService.fetchComboFormaPago();
-    //         if (fPago && fPago.data) {
-    //             setformaPago(fPago.data);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error al obtener Forma Pago: ", error);
-    //     }
-    // };
-
-    // const cargarTipoCredito = async () => {
-    //     try {
-    //         const tCredito = await ComboService.fetchComboTipoCredito();
-    //         if (tCredito && tCredito.data) {
-    //             settipoCredito(tCredito.data);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error al obtener Tipo Credito: ", error);
-    //     }
-    // };
 
     const handleCloseBackdrop = () => {
         setOpenBackdrop(false);
@@ -173,11 +303,15 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             e.target.name === "lastname" ||
             e.target.name === "email" ||
             e.target.name === "phone" ||
-            e.target.name === "paidType"||
-            e.target.name === "documentType"||
+            e.target.name === "direction" ||
+            e.target.name === "documentType" ||
             e.target.name === "identification"
         ) {
+
             setFormData({ ...formData, [e.target.name]: e.target.value });
+        }
+        if (e.target.name === "paidType") {
+            setformaPago(e.target.value);
         }
     };
 
@@ -188,25 +322,47 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             seterrorMessage("Debe llenar el campo Tipo de Crédito");
             setOpenSnackAlert(true);
             handleCloseBackdrop();
+
         }
 
-        if (formData.firstPaid === "" && formData.paidForm === "2") {
+        if (formData.name === "" && formData.paidForm === "2") {
             valido = false;
-            seterrorMessage("Debe llenar el campo Entrada");
+            seterrorMessage("Debe llenar el campo Nombre");
             setOpenSnackAlert(true);
             handleCloseBackdrop();
         }
 
-        if (formData.paidForm === "") {
+        if (formData.lastname === "") {
             valido = false;
-            seterrorMessage("Debe llenar el campo Forma de Pago");
+            seterrorMessage("Debe llenar el campo Apellido");
             setOpenSnackAlert(true);
             handleCloseBackdrop();
         }
 
-        if (formData.numberPaid === "") {
+        if (formData.email === "") {
             valido = false;
-            seterrorMessage("Debe llenar el campo Números de pagos");
+            seterrorMessage("Debe llenar el campo email");
+            setOpenSnackAlert(true);
+            handleCloseBackdrop();
+        }
+
+        if (formData.phone === "") {
+            valido = false;
+            seterrorMessage("Debe llenar el campo telefono");
+            setOpenSnackAlert(true);
+            handleCloseBackdrop();
+        }
+
+        if (formData.direction === "") {
+            valido = false;
+            seterrorMessage("Debe llenar el campo telefono");
+            setOpenSnackAlert(true);
+            handleCloseBackdrop();
+        }
+
+        if (formData.identification === "") {
+            valido = false;
+            seterrorMessage("Debe llenar el campo cédula");
             setOpenSnackAlert(true);
             handleCloseBackdrop();
         }
@@ -215,68 +371,57 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     };
 
     const handleSubmit = async (e) => {
+        handleOpenBackdrop();
         setvalidate(true);
         handleOpenBackdrop();
         let enviarFormulario = false;
-        const idCotizacion = localStorage.getItem(LS_COTIZACION);
         enviarFormulario = validarformulario();
+        const datosfacturas = {
+            paidType: formaPago,
+            name: formData.name,
+            lastname: formData.lastname,
+            email: formData.email,
+            phone: formData.phone,
+            direction: formData.direction,
+            documentType: formData.documentType,
+            identification: formData.identification,
+            sumAdd: formData.sumAdd,
+            iva: formData.iva,
+            prima: formData.prima,
+            impScvs: formData.impScvs,
+            impSsc: formData.impSsc,
+            admision: formData.admision,
+            subtotal: formData.subtotal,
+            total: formData.total
+        }
+
         if (enviarFormulario) {
             enviarFormulario = false;
-            let envioPago = {
-                id_CotiGeneral: idCotizacion,
-                enviado: 1,
-                tipfacturacion: formData.paidType,
-                formapago: formData.paidForm,
-                numpagos: formData.numberPaid,
-                valentrada: formData.firstPaid,
-                valprima: formData.prima,
-                porsibs: formPago.por_sbs,
-                valsibs: formData.impScvs,
-                porssc: formPago.por_ssc,
-                valssc: formData.impSsc,
-                porsscnc: formPago.por_sscnc,
-                valsscnc: 0,
-                poriva: formPago.por_iva,
-                valiva: formData.iva,
-                valDerecho: formData.admision,
-            };
+            const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+            const datosCliente = data.arrDatosCliente;
+            datosCliente.datosfacturas = datosfacturas;
+            data.arrDatosCliente = datosCliente;
+            console.log(data);
 
-            //Se agrega en ls para mostrar los datos guardados 
-            let envioPagoLS = [{
-                id: idCotizacion,
-                tipfacturacion: formData.paidType,
-                formapago: formData.paidForm,
-                numpagos: formData.numberPaid,
-                valentrada: formData.firstPaid,
-            }];
-
-            localStorage.setItem(
-                DATOS_PAGO_STORAGE_KEY,
-                JSON.stringify(envioPagoLS)
-            );
 
             try {
-                const response = await QuoterService.fetchGuardarFormaDePago(envioPago);
+                const response = await LifeService.fetchGrabaDatosVida(data);
                 if (response.codigo === 200) {
                     enviarFormulario = true;
-                    localStorage.setItem(LS_FORMAPAGO, formData.paidForm)
+                    localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
                     handleCloseBackdrop();
+                    return true;
                 } else {
                     handleCloseBackdrop();
                     enviarFormulario = false;
-                    Swal.fire({
-                        title: "Exito!",
-                        text: response.message,
-                        icon: "error",
-                        confirmButtonText: "Ok",
-                    });
+                    return false;
                 }
             } catch (error) {
                 handleCloseBackdrop();
-
+                return false;
             }
 
-            return enviarFormulario;
+
         }
 
         return enviarFormulario;
@@ -315,27 +460,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             console.error("Error al verificar cédula:", error);
         }
     };
-
-    //   const consultUserData = async (documentType, identification) => {
-    //     try {
-    //       const cedulaData = await UsuarioService.fetchConsultarUsuario(
-    //         documentType,
-    //         identification
-    //       );
-    //       if (cedulaData.codigo === 200 && cedulaData.data) {
-    //         setFormData({
-    //           ...formData, // Conserva los valores actuales
-    //           name: cedulaData.data[0].cli_nombres || "",
-    //           lastname: cedulaData.data[0].cli_apellidos || "",
-    //           email: cedulaData.data[0].cli_email || "",
-    //           phone: cedulaData.data[0].cli_celular || "",
-    //           address: cedulaData.data[0].cli_direccion || "",
-    //         });
-    //       }
-    //     } catch (error) {
-    //       console.error("Error al verificar cédula:", error);
-    //     }
-    //   };
 
     return (
         <Container
@@ -392,26 +516,22 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                 <FormControl
                                     sx={{ margin: "0px", minWidth: 290, width: "100%" }}
                                     variant="standard"
-                                    error={!formData.paidType && validate}
+                                    error={!formaPago && validate}
                                 >
-                                    <InputLabel id="paidType-Label">Facturar a asegurado</InputLabel>
+                                    <InputLabel id="paidType-Label">Facturar a:</InputLabel>
                                     <Select
                                         labelId="paidType-Label"
                                         id="paidType"
                                         name="paidType"
-                                        value={formData.paidType}
+                                        value={formaPago}
                                         onChange={handleChange}
                                         style={{ textAlign: "left", width: "100%" }}
                                         variant="standard"
                                         fullWidth
                                         required
                                     >
-                                        {Array.isArray(tipoCredito) &&
-                                            tipoCredito.map((tCredito, index) => (
-                                                <MenuItem key={index} value={tCredito.Codigo}>
-                                                    {tCredito.Nombre}
-                                                </MenuItem>
-                                            ))}
+                                        <MenuItem value="C">Asegurado</MenuItem>
+                                        <MenuItem value="R">Cliente</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -427,7 +547,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         name="documentType"
                                         value={formData.documentType}
                                         onChange={handleChange}
-
+                                        disabled={formaPago === 'C'}
                                         style={{ textAlign: "left", }}
                                         variant="standard"
                                         placeholder="Seleccione documento"
@@ -447,6 +567,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                 <TextField
                                     type={formData.documentType === "P" ? "text" : "text"}
                                     name="identification"
+                                    disabled={formaPago === 'C'}
                                     value={formData.identification}
                                     placeholder="Documento"
                                     onChange={handleChange}
@@ -472,10 +593,10 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                 <TextField
                                     type="text"
                                     name="name"
+                                    disabled={formaPago === 'C'}
                                     value={formData.name}
                                     placeholder="Nombres"
                                     onChange={handleChange}
-                                    onBlur={verifyIdentification}
                                     variant="standard"
                                     fullWidth
                                     required
@@ -483,15 +604,15 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                             </Grid>
                             <Grid item xs={12} md={12}>
                                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                                Apellidos<span style={{ color: 'red' }}>*</span>
+                                    Apellidos<span style={{ color: 'red' }}>*</span>
                                 </Typography>
                                 <TextField
                                     type="text"
                                     name="lastname"
                                     value={formData.lastname}
+                                    disabled={formaPago === 'C'}
                                     placeholder="Apellidos"
                                     onChange={handleChange}
-                                    onBlur={verifyIdentification}
                                     variant="standard"
                                     fullWidth
                                     required
@@ -499,15 +620,15 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                             </Grid>
                             <Grid item xs={12} md={12}>
                                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                                Email<span style={{ color: 'red' }}>*</span>
+                                    Email<span style={{ color: 'red' }}>*</span>
                                 </Typography>
                                 <TextField
                                     type="email"
                                     name="email"
                                     value={formData.email}
+                                    disabled={formaPago === 'C'}
                                     placeholder="Email"
                                     onChange={handleChange}
-                                    onBlur={verifyIdentification}
                                     variant="standard"
                                     fullWidth
                                     required
@@ -516,15 +637,32 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
                             <Grid item xs={12} md={12}>
                                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                                Télefono<span style={{ color: 'red' }}>*</span>
+                                    Télefono<span style={{ color: 'red' }}>*</span>
                                 </Typography>
                                 <TextField
                                     type="text"
                                     name="phone"
                                     value={formData.phone}
+                                    disabled={formaPago === 'C'}
                                     placeholder="Télefono"
                                     onChange={handleChange}
-                                    onBlur={verifyIdentification}
+                                    variant="standard"
+                                    fullWidth
+                                    required
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} md={12}>
+                                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                                    Dirección<span style={{ color: 'red' }}>*</span>
+                                </Typography>
+                                <TextField
+                                    type="text"
+                                    name="direction"
+                                    value={formData.direction}
+                                    disabled={formaPago === 'C'}
+                                    placeholder="Dirección"
+                                    onChange={handleChange}
                                     variant="standard"
                                     fullWidth
                                     required
@@ -695,10 +833,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                             </Grid>
                         </Grid>
 
-                        {/* Botón de envío
-            <Button type="submit" variant="contained" style={{ backgroundColor: '#00a99e', color: '#fff',marginTop:'20px' }} fullWidth>
-              Registrarse
-            </Button> */}
+
                     </div>
                 </Paper>
             </form>
