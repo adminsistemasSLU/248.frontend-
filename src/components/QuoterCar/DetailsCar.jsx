@@ -209,6 +209,7 @@ const DetailsCar = forwardRef((props, ref) => {
       return false;
     }
 
+    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, "");
     localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(cars));
     return true;
   };

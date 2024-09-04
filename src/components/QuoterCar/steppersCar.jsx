@@ -192,16 +192,16 @@ export default function SteppersCar() {
 
     if (steps[activeStep].label === "Datos Vehículo") {
       continuar = await questionFormRef.current.handleSubmitExternally();
+      let datosVehiculo = JSON.parse(
+        localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY)
+      );
+      
+      const totalAseguradoSum = datosVehiculo.reduce((sum, car) => {
+        return sum + parseCurrency(car.totalAsegurado);
+      }, 0);
+  
+      setTotalAsegurado(totalAseguradoSum);
     }
-    let datosVehiculo = JSON.parse(
-      localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY)
-    );
-    
-    const totalAseguradoSum = datosVehiculo.reduce((sum, car) => {
-      return sum + parseCurrency(car.totalAsegurado);
-    }, 0);
-
-    setTotalAsegurado(totalAseguradoSum);
 
     if (continuar) {
       const newActiveStep =
