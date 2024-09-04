@@ -615,9 +615,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       await cargarEstadoCivil();
       await cargarVigencia();
       handleCloseBackdrop();
-
     };
-
 
     const modoEditar = async () => {
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
@@ -654,7 +652,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
     const periodos = formDataTabla.map((item, index) => ({
       monto: item.monto,
-      periodo: index + 1, // o cualquier lógica que determine el periodo basado en el índice
+      periodo: index + 1, 
       vigencia: ""
     }));
     return {
@@ -687,9 +685,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
     };
   }
 
-
-
-
   const handleChange = async (e) => {
     const { name, value } = e.target;
     let modifiedValue = value;
@@ -714,8 +709,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         return;
       }
     }
-
-
 
     if (name === "phone") {
       modifiedValue = value.slice(0, 10);
@@ -1180,8 +1173,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
     if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
       data.id_CotiGeneral = id_cotigeneral;
     }
-
-
 
     localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
     try {

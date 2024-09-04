@@ -19,6 +19,20 @@ const BaldosasService = {
     }
   },
 
+  fetchSubBaldosasMock: async () => {
+    const endpoint = 'api/planesConTasas';
+    const method = 'GET'; 
+    
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method);
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.error('Error fetching subbaldosas:', error);
+      throw error;
+    }
+  },
+
   fetchBaldosas: async () => {
     const endpoint = 'api/baldosas';
     const method = 'PUT'; 

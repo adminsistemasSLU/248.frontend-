@@ -32,6 +32,7 @@ import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import {
   DATOS_PERSONALES_STORAGE_KEY,
+  DATOS_VEHICULO_STORAGE_KEY,
   LS_COTIZACION,
   LS_FORMAPAGO,
   USER_STORAGE_KEY,
@@ -140,6 +141,8 @@ export default function SteppersCar() {
   const [emailError, setEmailError] = React.useState("");
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [openSnack, setOpenSnack] = React.useState(false);
+  const [totalAsegurado, setTotalAsegurado] = React.useState("");
+
   const navigate = useNavigate();
 
   const handleCloseBackdrop = () => {
@@ -173,9 +176,10 @@ export default function SteppersCar() {
 
   const handleNext = async (formData) => {
     setFormData(formData);
+
     let continuar = true;
-    if (steps[activeStep].label === "Datos Personales") {
-      continuar = true;
+    if (steps[activeStep].label === "Cliente") {
+      continuar = await personalFormRef.current.handleSubmitExternally();
     }
 
     let datosPersonales = JSON.parse(
@@ -187,8 +191,17 @@ export default function SteppersCar() {
     }
 
     if (steps[activeStep].label === "Datos Vehículo") {
-      continuar = true;
+      continuar = await questionFormRef.current.handleSubmitExternally();
     }
+    let datosVehiculo = JSON.parse(
+      localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY)
+    );
+    
+    const totalAseguradoSum = datosVehiculo.reduce((sum, car) => {
+      return sum + parseCurrency(car.totalAsegurado);
+    }, 0);
+
+    setTotalAsegurado(totalAseguradoSum);
 
     if (continuar) {
       const newActiveStep =
@@ -210,7 +223,7 @@ export default function SteppersCar() {
     },
     {
       label: "Planes",
-      formComponent: <ProductListCardsCar ref={paidFormRef} onNext={handleNext} />,
+      formComponent: <ProductListCardsCar ref={paidFormRef} onNext={handleNext} totalAsegurado={totalAsegurado} />,
     },
     {
       label: "Facturación",
@@ -221,6 +234,10 @@ export default function SteppersCar() {
       formComponent: <ResumenCar onNext={handleNext} />,
     },
   ];
+
+  const parseCurrency = (value) => {
+    return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+  };
 
   const descargarPdf = async () => {
     try {

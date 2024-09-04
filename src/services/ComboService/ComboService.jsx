@@ -2,22 +2,6 @@ import authService from '../authServices';
 
 const ComboService = {
 
-    fetchComboPais: async (ramo, producto) => {
-        const endpoint = 'api/cb_pais';
-        const method = 'POST';
-        const data = {
-            ramo: ramo,
-            producto: producto,
-        };
-        try {
-            const response = await authService.fetchWithAuth(endpoint, method, data);
-            return response;
-        } catch (error) {
-            console.error('Error fetching validar ComboPais:', error);
-            throw error;
-        }
-    },
-
     fetchComboProvincias: async (ramo, producto) => {
         const endpoint = 'api/cb_provincias';
         const method = 'POST';
@@ -34,15 +18,11 @@ const ComboService = {
         }
     },
 
-    fetchComboPais: async (ramo, producto) => {
-        const endpoint = 'api/cb_pais';
+    fetchComboPais: async () => {
+        const endpoint = 'api/cb_pais/';
         const method = 'POST';
-        const data = {
-            ramo: ramo,
-            producto: producto,
-        };
         try {
-            const response = await authService.fetchWithAuth(endpoint, method, data);
+            const response = await authService.fetchWithAuth(endpoint, method);
             return response;
         } catch (error) {
             console.error('Error fetching validar ComboProvincias:', error);
@@ -63,6 +43,67 @@ const ComboService = {
             return response;
         } catch (error) {
             console.error('Error fetching validar ComboCiudad:', error);
+            throw error;
+        }
+    },
+
+    fetchComboMarca: async () => {
+        const endpoint = 'api/marca';
+        const method = 'GET';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar Marca:', error);
+            throw error;
+        }
+    },
+
+    fetchComboGrupo: async (idMarca) => {
+        const endpoint = 'api/grupo/' + idMarca;
+        const method = 'GET';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            console.log(response);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar Grupo vehicuo:', error);
+            throw error;
+        }
+    },
+
+    fetchComboModelo: async (idGrupo) => {
+        const endpoint = 'api/modelo/' + idGrupo;
+        const method = 'GET';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar modelo:', error);
+            throw error;
+        }
+    },
+
+    fetchComboTipo: async () => {
+        const endpoint = 'api/tipo';
+        const method = 'GET';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar modelo:', error);
+            throw error;
+        }
+    },
+
+    fetchComboUso: async () => {
+        const endpoint = 'api/uso';
+        const method = 'GET';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar modelo:', error);
             throw error;
         }
     },

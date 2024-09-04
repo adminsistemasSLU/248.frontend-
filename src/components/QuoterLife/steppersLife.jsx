@@ -173,9 +173,7 @@ export default function SteppersLife() {
     //Accion para Datos Personales
     if (steps[activeStep].label === "Datos Personales") {
       continuar = await personalFormRef.current.handleSubmitExternally();
-
     }
-
 
 
     if (steps[activeStep].label === "Resumen") {
@@ -211,8 +209,6 @@ export default function SteppersLife() {
       continuar = await paidFormRef.current.handleSubmitExternally();
 
     }
-
-
 
     if (steps[activeStep].label === "Riesgo") {
       continuar = await questionFormRef.current.handleSubmitExternally();

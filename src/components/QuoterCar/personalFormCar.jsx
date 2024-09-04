@@ -7,24 +7,27 @@ import React, {
 } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { TextField, Grid, Alert } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import Snackbar from "@mui/material/Snackbar";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import "../../styles/form.scss";
-import ValidationUtils from "../../utils/ValiationsUtils";
-import UsuarioService from "../../services/UsuarioService/UsuarioService";
-import Card from '@mui/material/Card';
-import Typography from '@mui/material/Typography';
-
+import {
+    TextField,
+    Grid,
+    Alert,
+    Snackbar,
+    Backdrop,
+    CircularProgress,
+    MenuItem,
+    FormControl,
+    Select,
+    Card,
+    Typography,
+} from "@mui/material";
 import {
     DATOS_PERSONALES_STORAGE_KEY,
     LS_COTIZACION,
     USER_STORAGE_KEY,
 } from "../../utils/constantes";
+import "../../styles/form.scss";
+import ValidationUtils from "../../utils/ValiationsUtils";
+import UsuarioService from "../../services/UsuarioService/UsuarioService";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import ComboService from "../../services/ComboService/ComboService";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -41,13 +44,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
         phone: "",
         documentType: "C",
         identification: "",
-        age: "",
         address: "",
         gender: "M",
         status: "S",
         anios: "1",
-        inicioVigencia: null,
-        finVigencia: null,
         agente: "001",
         provincia: "",
         ciudad: "",
@@ -58,8 +58,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [error, setError] = useState("");
     const [messageError, setmessageError] = useState("");
     const [errorCedula, setErrorCedula] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [age, setAge] = useState(maxDate);
+    const [openSnack, setOpenSnack] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
     const isMounted = useRef(false);
     const [estadoCivil, setEstadoCivil] = useState([]);
@@ -67,15 +67,34 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [pais, setPais] = useState([]);
     const [ciudades, setCiudades] = useState([]);
     const [vigencia, setVigencia] = useState([]);
-    const [fechaNacimiento, setFechaNacimiento] = useState([]);
+    const [fechaNacimiento, setFechaNacimiento] = useState(null);
+
+    useEffect(() => {
+        const iniciarDatosCombos = async () => {
+            handleOpenBackdrop();
+            let idCotizacion = localStorage.getItem(LS_COTIZACION);
+            await cargarProvincias();
+            await cargarEstadoCivil();
+            await cargarPais();
+            handleCloseBackdrop();
+            if (idCotizacion) {
+                await cargarDatos();
+            }
+        };
+
+        isMounted.current = true;
+        iniciarDatosCombos();
+
+        return () => {
+            isMounted.current = false; // Establecer a false cuando el componente se desmonta
+        };
+    }, []);
 
     const cargarDatos = async () => {
         const dataPersonal = await cargarCotizacion();
-        console.log(dataPersonal);
 
-        if (isMounted.current) {
-            setFormData((formData) => ({
-                ...formData,
+        if (isMounted.current && dataPersonal?.length) {
+            setFormData({
                 name: dataPersonal[0].clinombre,
                 lastname: dataPersonal[0].cliapellido,
                 email: dataPersonal[0].clicorreo,
@@ -88,11 +107,9 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 anios: dataPersonal[0].vigencia,
                 agente: dataPersonal[0].cliagente,
                 provincia: dataPersonal[0].cliprovincia,
-                ciudad: dataPersonal[0].cliciudad
-            }));
-
-            const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
-            setAge(dateObject);
+                ciudad: dataPersonal[0].cliciudad,
+                fechaNacimiento: dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD"),
+            });
         }
     };
 
@@ -104,44 +121,15 @@ const PersonalFormCar = forwardRef((props, ref) => {
             id_CotiGeneral: idCotizacion,
         };
         try {
-            const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
-                dato
-            );
+            const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
 
             if (cotizacion && cotizacion.data) {
                 return cotizacion.data;
             }
         } catch (error) {
-            console.error("Error al obtener antiguedad:", error);
+            console.error("Error al obtener antigüedad:", error);
         }
     };
-
-    useEffect(() => {
-        const iniciarDatosCombos = async () => {
-            handleOpenBackdrop();
-            let idCotizacion = localStorage.getItem(LS_COTIZACION);
-            await cargarProvincias();
-            await cargarEstadoCivil();
-            await cargarCiudad();
-            handleCloseBackdrop();
-            if (idCotizacion) {
-                await cargarDatos();
-            }
-        };
-        isMounted.current = true;
-        const modoEditar = async () => {
-            let idCotizacion = localStorage.getItem(LS_COTIZACION);
-            if (idCotizacion) {
-                await cargarDatos();
-            }
-        };
-
-        modoEditar();
-        iniciarDatosCombos();
-        return () => {
-            isMounted.current = false; // Establecer a false cuando el componente se desmonta
-        };
-    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -151,6 +139,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
             setFormData({ ...formData, provincia: value, ciudad: "" });  // Reseteamos la ciudad cuando cambia la provincia
         } else if (name === "ciudad") {
             setFormData({ ...formData, ciudad: value });
+        } else if (name === "pais") {
+            setFormData({ ...formData, pais: value });
         } else {
             let modifiedValue = value;
             if (name === "identification") {
@@ -185,28 +175,80 @@ const PersonalFormCar = forwardRef((props, ref) => {
         handleSubmitExternally: handleSubmit,
     }));
 
+    const handleSubmit = (e) => {
+        if (e && e.preventDefault) e.preventDefault(); 
+
+        const requiredFields = [
+            "name",
+            "lastname",
+            "email",
+            "phone",
+            "documentType",
+            "identification",
+            "address",
+            "gender",
+            "status",
+            "anios",
+            "provincia",
+            "ciudad",
+            "fechaNacimiento",
+            "pais",
+        ];
+
+        let next = true;
+        for (const field of requiredFields) {
+            const value = formData[field];
+            if (typeof value === "undefined" || value === null || (typeof value === "string" && value.trim() === "")) {
+                next = false;
+                faltanDatosUsuario();
+                break;
+            }
+        }
+
+        if (!next) return false;
+
+        const objetoSeguro = {
+            name: formData.name,
+            lastname: formData.lastname,
+            email: formData.email,
+            phone: formData.phone,
+            documentType: formData.documentType,
+            identification: formData.identification,
+            address: formData.address,
+            gender: formData.gender,
+            status: formData.status,
+            anios: formData.anios,
+            inicioVigencia: formData.inicioVigencia,
+            agente: formData.agente,
+            provincia: formData.provincia,
+            ciudad: formData.ciudad,
+            fechaNacimiento: formData.fechaNacimiento,
+            pais: formData.pais,
+        };
+
+        localStorage.setItem(DATOS_PERSONALES_STORAGE_KEY, JSON.stringify(objetoSeguro));
+        return true;
+    };
+
     const verifyIdentification = async (e) => {
         const { value } = e.target;
         let documentType = formData.documentType;
         let identification = value;
         if (value === "") {
-            setOpen(true);
+            setOpenSnack(true);
             setmessageError("Valor de cedula invalido");
             return;
         }
         try {
             handleOpenBackdrop();
-            const cedulaData = await UsuarioService.fetchVerificarCedula(
-                documentType,
-                identification
-            );
+            const cedulaData = await UsuarioService.fetchVerificarCedula(documentType, identification);
             if (cedulaData.codigo === 200) {
                 setErrorCedula(false);
                 await consultUserData(documentType, identification);
                 handleCloseBackdrop();
             } else {
                 setErrorCedula(true);
-                setOpen(true);
+                setOpenSnack(true);
                 setmessageError(cedulaData.message);
                 handleCloseBackdrop();
             }
@@ -217,15 +259,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
 
     const consultUserData = async (documentType, identification) => {
         try {
-            const cedulaData = await UsuarioService.fetchConsultarUsuario(
-                documentType,
-                identification
-            );
+            const cedulaData = await UsuarioService.fetchConsultarUsuario(documentType, identification);
             if (cedulaData.codigo === 200 && cedulaData.data) {
-                const dateString = cedulaData.data[0].cli_fecnacio;
-                const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
-
-                setAge(dateObject);
                 setFormData({
                     ...formData, // Conserva los valores actuales
                     name: cedulaData.data[0].cli_nombres || "",
@@ -244,65 +279,13 @@ const PersonalFormCar = forwardRef((props, ref) => {
         if (reason === "clickaway") {
             return;
         }
-
-        setOpen(false);
+        setOpenSnack(false);
     };
 
-    const handleSubmit = (e) => {
-        const formattedDate = dayjs(age).format("DD/MM/YYYY");
-        const requiredFields = [
-            "name",
-            "lastname",
-            "email",
-            "phone",
-            "documentType",
-            "identification",
-            "address",
-            "gender",
-            "status",
-            "anios",
-            "agente",
-            "provincia",
-            "ciudad"
-        ];
-        let next = false;
-
-        // Verificar que todos los campos requeridos estén llenos
-        for (const field of requiredFields) {
-            if (!formData[field] || formData[field].trim() === "") {
-                next = false;
-                return next;
-            } else {
-                next = true;
-            }
-        }
-
-        next = age !== "" ? true : false;
-        const objetoSeguro = {
-            nombre: formData.name,
-            apellido: formData.lastname,
-            correo: formData.email,
-            telefono: formData.phone,
-            tipoDocumento: formData.documentType,
-            identificacion: formData.identification,
-            fechaNacimiento: formattedDate,
-            direccion: formData.address,
-            genero: formData.gender,
-            estadoCivil: formData.status,
-            aniosVigencia: formData.anios,
-            agente: formData.agente,
-            provincia: formData.provincia,
-            ciudad: formData.ciudad
-        };
-
-        localStorage.setItem(
-            DATOS_PERSONALES_STORAGE_KEY,
-            JSON.stringify(objetoSeguro)
-        );
-
-        console.log("Formulario enviado:", objetoSeguro, next);
-        return next;
-    };
+    function faltanDatosUsuario() {
+        setErrorMessage("Debe llenar todos los datos obligatorios");
+        setOpenSnack(true);
+    }
 
     const handleCloseBackdrop = () => {
         setOpenBackdrop(false);
@@ -337,7 +320,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
             console.error("Error al obtener provincias:", error);
         }
     };
-    
+
     const cargarCiudad = async (provinciaCodigo) => {
         try {
             const ciudades = await ComboService.fetchComboCiudad(1, 113, provinciaCodigo);
@@ -350,36 +333,39 @@ const PersonalFormCar = forwardRef((props, ref) => {
         }
     };
 
-    const cargarVigencia = async () => {
-    }
-
-    const handleBlur = (e) => {
-        setFormData({ ...formData, [e.target.name]: true });
+    const cargarPais = async () => {
+        try {
+            const pais = await ComboService.fetchComboPais();
+            if (pais && pais.data) {
+                setPais(pais.data);
+                setFormData((formData) => ({ ...formData, pais: pais.data[0].codiso }));
+            }
+        } catch (error) {
+            console.error("Error al obtener pais:", error);
+        }
     };
+
     return (
-        <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '20px', }}>
-            <Backdrop
-                sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={openBackdrop}
-            >
+        <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '20px' }}>
+            <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={openBackdrop}>
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '30px', fontWeight: 'bold' }}>
-                DATOS PERSONALES
-            </Typography>
-            <FormControl
+            <form
                 component="form"
                 onSubmit={handleSubmit}
                 style={{ width: '100%', paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px' }}
             >
+                <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '30px', fontWeight: 'bold' }}>
+                    DATOS PERSONALES
+                </Typography>
                 <Grid container spacing={2}>
                     <Snackbar
-                        open={open}
+                        open={openSnack}
                         autoHideDuration={5000}
                         onClose={handleClose}
                         anchorOrigin={{ vertical: "top", horizontal: "right" }}
                     >
-                        <Alert severity="warning">{messageError}</Alert>
+                        <Alert severity="warning">{errorMessage}</Alert>
                     </Snackbar>
 
                     {/* Documento */}
@@ -574,33 +560,13 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             <MenuItem value="1">1 año</MenuItem>
                             <MenuItem value="2">2 años</MenuItem>
                             <MenuItem value="3">3 años</MenuItem>
-                        </Select>
-                    </Grid>
-
-                    {/* Agente */}
-                    <Grid item xs={10.5} md={2.8}>
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Agente <span style={{ color: 'red' }}>*</span>
-                        </Typography>
-                        <Select
-                            labelId="agente-Label"
-                            id="agente"
-                            style={{ textAlign: "left" }}
-                            name="agente"
-                            value={formData.agente}
-                            onChange={handleChange}
-                            variant="standard"
-                            fullWidth
-                            required
-                        >
-                            <MenuItem value="001">ZHM Cia. Lta</MenuItem>
-                            <MenuItem value="002">ZHM Cia. Lta 1</MenuItem>
-                            <MenuItem value="003">ZHM Cia. Lta 2</MenuItem>
+                            <MenuItem value="2">4 años</MenuItem>
+                            <MenuItem value="3">5 años</MenuItem>
                         </Select>
                     </Grid>
 
                     <Grid item xs={10.5} md={2.8}>
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px'}}>
+                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px' }}>
                             Fecha de nacimiento <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <LocalizationProvider dateAdapter={AdapterDayjs}  >
@@ -617,10 +583,36 @@ const PersonalFormCar = forwardRef((props, ref) => {
                                     maxDate={maxDate}
                                     onChange={(newValue) => {
                                         setFechaNacimiento(newValue);
+                                        setFormData({ ...formData, fechaNacimiento: newValue });
                                     }}
                                 />
                             </DemoContainer>
                         </LocalizationProvider>
+                    </Grid>
+
+                    {/* Pais */}
+                    <Grid item xs={10.5} md={2.8}>
+                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                            Pais <span style={{ color: 'red' }}>*</span>
+                        </Typography>
+                        <Select
+                            labelId="pais-Label"
+                            id="pais"
+                            style={{ textAlign: "left" }}
+                            name="pais"
+                            value={formData.pais}
+                            onChange={handleChange}
+                            variant="standard"
+                            fullWidth
+                            required
+                            placeholder="Seleccione pais"
+                        >
+                            {pais.map((pais, index) => (
+                                <MenuItem key={index} value={pais.codiso}>
+                                    {pais.nombre}
+                                </MenuItem>
+                            ))}
+                        </Select>
                     </Grid>
 
                     {/* Provincia */}
@@ -635,7 +627,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             name="provincia"
                             value={formData.provincia}
                             onChange={handleChange}
-                            onBlur={handleBlur}
                             variant="standard"
                             fullWidth
                             required
@@ -672,8 +663,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
                         </Select>
                     </Grid>
                 </Grid>
-            </FormControl>
-        </Card>
+            </form>
+        </Card >
     );
 });
 

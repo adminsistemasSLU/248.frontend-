@@ -7,31 +7,36 @@ import React, {
 } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { TextField, Grid, Alert, Button } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import Snackbar from "@mui/material/Snackbar";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import "../../styles/form.scss";
-import Card from '@mui/material/Card';
-import Typography from '@mui/material/Typography';
-import "../../styles/button.scss";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-
 import {
-  DATOS_PERSONALES_STORAGE_KEY,
+  TextField,
+  Grid,
+  Alert,
+  Button,
+  MenuItem,
+  FormControl,
+  Select,
+  Snackbar,
+  Backdrop,
+  CircularProgress,
+  Card,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+import "../../styles/form.scss";
+import "../../styles/button.scss";
+import {
+  DATOS_VEHICULO_STORAGE_KEY,
   LS_COTIZACION,
   USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
+import ComboService from "../../services/ComboService/ComboService";
 
 dayjs.extend(customParseFormat);
 
@@ -39,9 +44,12 @@ const DetailsCar = forwardRef((props, ref) => {
   const [formData, setFormData] = useState({
     placa: "",
     marca: "",
+    grupo: "",
     modelo: "",
     anio: "2001",
     zona: "C",
+    uso: "",
+    tipo: "",
     valor_vehiculo: "",
     valor_accesorios: "",
     suma_asegurada: "",
@@ -49,21 +57,29 @@ const DetailsCar = forwardRef((props, ref) => {
 
   const [cars, setCars] = useState([]);
   const [error, setError] = useState("");
-  const [messageError, setmessageError] = useState("");
-  const [open, setOpen] = useState(false);
-  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [messageError, setMessageError] = useState("");
+  const [openSnack, setOpenSnack] = useState(false);
+  const [openBackdrop, setOpenBackdrop] = useState(false);
   const isMounted = useRef(false);
+
+  const [marca, setMarca] = useState([]);
+  const [grupo, setGrupo] = useState([]);
+  const [modelo, setModelo] = useState([]);
+  const [uso, setUso] = useState([]);
+  const [tipo, setTipo] = useState([]);
 
   const cargarDatos = async () => {
     const dataPersonal = await cargarCotizacion();
-    console.log(dataPersonal);
-    if (isMounted.current) {
+    if (dataPersonal) {
       setFormData((formData) => ({
         ...formData,
         placa: dataPersonal[0].placa,
         marca: dataPersonal[0].marca,
+        grupo: dataPersonal[0].grupo,
         modelo: dataPersonal[0].modelo,
         anio: dataPersonal[0].anio,
+        uso: dataPersonal[0].uso,
+        tipo: dataPersonal[0].tipo,
         zona: dataPersonal[0].zona,
         valor_vehiculo: dataPersonal[0].valor_vehiculo,
         valor_accesorios: dataPersonal[0].valor_accesorios,
@@ -73,17 +89,15 @@ const DetailsCar = forwardRef((props, ref) => {
   };
 
   const cargarCotizacion = async () => {
-    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    let idCotizacion = localStorage.getItem(LS_COTIZACION);
-    let dato = {
+    const userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    const idCotizacion = localStorage.getItem(LS_COTIZACION);
+    const dato = {
       usuario: userId.id,
       id_CotiGeneral: idCotizacion,
     };
     try {
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
-      if (cotizacion && cotizacion.data) {
-        return cotizacion.data;
-      }
+      return cotizacion.data || [];
     } catch (error) {
       console.error("Error al obtener cotización:", error);
     }
@@ -91,11 +105,13 @@ const DetailsCar = forwardRef((props, ref) => {
 
   useEffect(() => {
     isMounted.current = true;
+
     const modoEditar = async () => {
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      const idCotizacion = localStorage.getItem(LS_COTIZACION);
       if (idCotizacion) {
         await cargarDatos();
       }
+      await cargarCombos();
     };
 
     modoEditar();
@@ -105,44 +121,50 @@ const DetailsCar = forwardRef((props, ref) => {
     };
   }, []);
 
+  const cargarCombos = async () => {
+    try {
+      await cargarMarca();
+      await cargarUso();
+      await cargarTipo();
+    } catch (error) {
+      console.error("Error al cargar combos:", error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     let modifiedValue = value;
+
     if (name === "placa") {
       modifiedValue = value.toUpperCase();
     }
 
-    if (["valor_vehiculo", "valor_accesorios", "suma_asegurada"].includes(name)) {
-      modifiedValue = formatCurrency(value);
+    if (name === "marca") {
+      cargarGrupo(modifiedValue);
+      setModelo([]);
     }
 
-    setFormData({ ...formData, [name]: modifiedValue });
+    if (name === "grupo") {
+      cargarModelo(modifiedValue);
+    }
+
+    if (["valor_vehiculo", "valor_accesorios", "suma_asegurada"].includes(name)) {
+      modifiedValue = formatCurrency(modifiedValue);
+    }
+
+    setFormData((prevData) => ({ ...prevData, [name]: modifiedValue }));
   };
 
   const formatCurrency = (value) => {
     let cleanValue = value.replace(/[^\d,]/g, "");
-
-    if (cleanValue.includes(",")) {
-      const [integerPart, decimalPart] = cleanValue.split(",");
-      cleanValue = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + decimalPart.slice(0, 2);
-    } else {
-      cleanValue = cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
+    cleanValue = cleanValue.includes(",")
+      ? cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      : cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return cleanValue;
   };
 
   const handleAddCar = () => {
-    if (
-      !formData.placa ||
-      !formData.marca ||
-      !formData.modelo ||
-      !formData.anio ||
-      !formData.valor_vehiculo ||
-      !formData.valor_accesorios ||
-      !formData.suma_asegurada
-    ) {
+    if (!isFormValid()) {
       setError("Por favor, complete todos los campos.");
       return;
     }
@@ -156,68 +178,90 @@ const DetailsCar = forwardRef((props, ref) => {
       costo: formData.valor_vehiculo,
       tasa: "TBD",
       prima: "TBD",
+      totalAsegurado: formData.suma_asegurada,
     };
 
     setCars([...cars, newCar]);
     setError("");
   };
 
+  const isFormValid = () => {
+    return (
+      formData.placa &&
+      formData.marca &&
+      formData.modelo &&
+      formData.anio &&
+      formData.valor_vehiculo &&
+      formData.valor_accesorios &&
+      formData.suma_asegurada
+    );
+  };
+
   const handleDeleteCar = (index) => {
-    const updatedCars = cars.filter((_, i) => i !== index);
-    setCars(updatedCars);
+    setCars(cars.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e) => {
-    const requiredFields = [
-      "name",
-      "lastname",
-      "email",
-      "phone",
-      "documentType",
-      "identification",
-      "address",
-      "gender",
-      "status",
-      "anios",
-      "agente",
-      "provincia",
-      "ciudad"
-    ];
-    let next = false;
+    if (e) e.preventDefault();
 
-    // Verificar que todos los campos requeridos estén llenos
-    for (const field of requiredFields) {
-      if (!formData[field] || formData[field].trim() === "") {
-        next = false;
-        return next;
-      } else {
-        next = true;
-      }
+    if (!cars.length) {
+      faltanDatosUsuario();
+      return false;
     }
 
-    const objetoSeguro = {
-      // nombre: formData.name,
-      // apellido: formData.lastname,
-      // correo: formData.email,
-      // telefono: formData.phone,
-      // tipoDocumento: formData.documentType,
-      // identificacion: formData.identification,
-      // direccion: formData.address,
-      // genero: formData.gender,
-      // estadoCivil: formData.status,
-      // aniosVigencia: formData.anios,
-      // agente: formData.agente,
-      // provincia: formData.provincia,
-      // ciudad: formData.ciudad
-    };
+    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(cars));
+    return true;
+  };
 
-    localStorage.setItem(
-      DATOS_PERSONALES_STORAGE_KEY,
-      JSON.stringify(objetoSeguro)
-    );
+  useImperativeHandle(ref, () => ({
+    handleSubmitExternally: handleSubmit,
+  }));
 
-    console.log("Formulario enviado:", objetoSeguro, next);
-    return next;
+  const faltanDatosUsuario = () => {
+    setMessageError("Debe llenar todos los datos obligatorios");
+    setOpenSnack(true);
+  };
+
+  const cargarMarca = async () => {
+    const marca = await ComboService.fetchComboMarca();
+    if (marca?.data) {
+      setMarca(marca.data);
+      setFormData((prevData) => ({ ...prevData, marca: marca.data[0].clave }));
+      await cargarGrupo(marca.data[0].clave);
+    }
+  };
+
+  const cargarGrupo = async (idMarca) => {
+    const grupo = await ComboService.fetchComboGrupo(idMarca);
+    if (grupo?.data?.length > 0) {
+      setGrupo(grupo.data);
+      setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].id }));
+      await cargarModelo(grupo.data[0].id);
+    }
+  };
+
+  const cargarModelo = async (idGrupo) => {
+    const modelo = await ComboService.fetchComboModelo(idGrupo);
+    if (modelo?.data?.length > 0) {
+      setModelo(modelo.data);
+      setFormData((prevData) => ({ ...prevData, modelo: modelo.data[0].id }));
+    }
+  };
+
+  const cargarUso = async () => {
+    const uso = await ComboService.fetchComboUso();
+    if (uso?.data) {
+      setUso(uso.data);
+      setFormData((prevData) => ({ ...prevData, uso: uso.data[0].idUso }));
+    }
+  };
+
+  const cargarTipo = async () => {
+    const tipo = await ComboService.fetchComboTipo();
+    if (tipo?.data) {
+      setTipo(tipo.data);
+      setFormData((prevData) => ({ ...prevData, tipo: tipo.data[0].idTipoVehiculo }));
+    }
   };
 
   return (
@@ -238,7 +282,7 @@ const DetailsCar = forwardRef((props, ref) => {
           style={{ width: '100%', paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px' }}
         >
           <Grid container spacing={2} style={{ width: '100%', paddingLeft: '30px', paddingBottom: '20px' }}>
-            <Snackbar open={open} autoHideDuration={5000} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+            <Snackbar open={openSnack} autoHideDuration={5000} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
               <Alert severity="warning">{messageError}</Alert>
             </Snackbar>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
@@ -246,45 +290,157 @@ const DetailsCar = forwardRef((props, ref) => {
                 Placa <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
-                type="text"
-                name="placa"
                 placeholder="Placa"
+                type="text"
+                onChange={handleChange}
+                name="placa"
                 value={formData.placa}
                 variant="standard"
-                onChange={handleChange}
                 fullWidth
-                required />
+                inputProps={{ maxLength: 8 }}
+                required
+              />
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                 Marca <span style={{ color: 'red' }}>*</span>
               </Typography>
-              <TextField
-                placeholder="Marca"
-                type="text"
+              <Select
+                labelId="marca-Label"
+                id="marca"
+                style={{ textAlign: "left" }}
                 name="marca"
                 value={formData.marca}
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
-                inputProps={{ maxLength: 30 }}
-                required />
+                required
+                placeholder="Seleccione marca"
+              >
+                {marca.map((marca, index) => (
+                  <MenuItem key={index} value={marca.clave}>
+                    {marca.nombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
+              <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                Grupo <span style={{ color: 'red' }}>*</span>
+              </Typography>
+              <Select
+                labelId="grupo-Label"
+                id="grupo"
+                style={{ textAlign: "left" }}
+                name="grupo"
+                value={formData.grupo}
+                onChange={handleChange}
+                variant="standard"
+                fullWidth
+                required
+                placeholder="Seleccione grupo"
+              >
+                {Array.isArray(grupo) && grupo.length > 0 ? (
+                  grupo.map((grupo, index) => (
+                    <MenuItem key={index} value={grupo.id}>
+                      {grupo.nombre}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled value="">
+                    No hay grupos disponibles
+                  </MenuItem>
+                )}
+              </Select>
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                 Modelo <span style={{ color: 'red' }}>*</span>
               </Typography>
-              <TextField
-                placeholder="Modelo"
-                type="text"
+              <Select
+                labelId="modelo-Label"
+                id="modelo"
+                style={{ textAlign: "left" }}
                 name="modelo"
                 value={formData.modelo}
                 onChange={handleChange}
                 variant="standard"
                 fullWidth
-                inputProps={{ maxLength: 30 }}
-                required />
+                required
+                placeholder="Seleccione modelo"
+              >
+                {Array.isArray(modelo) && modelo.length > 0 ? (
+                  modelo.map((modelo, index) => (
+                    <MenuItem key={index} value={modelo.id}>
+                      {modelo.nombre}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled value="">
+                    No hay Modelos disponibles
+                  </MenuItem>
+                )}
+              </Select>
             </Grid>
+            <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
+              <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                Uso vehículo <span style={{ color: 'red' }}>*</span>
+              </Typography>
+              <Select
+                labelId="uso-label"
+                id="uso"
+                name="uso"
+                value={formData.uso}
+                style={{ textAlign: "left" }}
+                variant="standard"
+                onChange={handleChange}
+                placeholder="Uso"
+                fullWidth
+                required
+              >
+                {Array.isArray(uso) && uso.length > 0 ? (
+                  uso.map((uso, index) => (
+                    <MenuItem key={index} value={uso.idUso}>
+                      {uso.nombre}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled value="">
+                    No hay uso disponibles
+                  </MenuItem>
+                )}
+              </Select>
+            </Grid>
+            <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
+              <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                Tipo <span style={{ color: 'red' }}>*</span>
+              </Typography>
+              <Select
+                labelId="tipo-label"
+                id="tipo"
+                name="tipo"
+                value={formData.tipo}
+                style={{ textAlign: "left" }}
+                variant="standard"
+                onChange={handleChange}
+                placeholder="tipo"
+                fullWidth
+                required
+              >
+                {Array.isArray(tipo) && tipo.length > 0 ? (
+                  tipo.map((tipo, index) => (
+                    <MenuItem key={index} value={tipo.idTipoVehiculo}>
+                      {tipo.nombre}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled value="">
+                    No hay tipo disponibles
+                  </MenuItem>
+                )}
+              </Select>
+            </Grid>
+
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                 Año <span style={{ color: 'red' }}>*</span>
@@ -301,9 +457,14 @@ const DetailsCar = forwardRef((props, ref) => {
                 fullWidth
                 required
               >
-                <MenuItem value="2001">2001</MenuItem>
-                <MenuItem value="2002">2002</MenuItem>
-                <MenuItem value="2003">2003</MenuItem>
+                {Array.from({ length: 2024 - 2001 + 1 }, (_, index) => {
+                  const year = 2001 + index;
+                  return (
+                    <MenuItem key={year} value={year}>
+                      {year}
+                    </MenuItem>
+                  );
+                })}
               </Select>
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
