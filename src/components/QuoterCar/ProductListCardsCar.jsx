@@ -113,7 +113,7 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
                                             {plan.plan.toUpperCase()}
                                         </Typography>
                                         <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
-                                            ${formatCurrency(plan.tasa * parseFloat(totalAsegurado))}
+                                            ${formatCurrency(plan.tasa * parseFloat(totalAsegurado)/100)}
                                         </Typography>
 
                                         <Typography variant="body2">
