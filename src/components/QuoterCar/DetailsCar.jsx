@@ -236,6 +236,7 @@ const DetailsCar = forwardRef((props, ref) => {
     const grupo = await ComboService.fetchComboGrupo(idMarca);
     if (grupo?.data?.length > 0) {
       setGrupo(grupo.data);
+      console.log(grupo.data);
       setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
       await cargarModelo(grupo.data[0].idGrupo);
     }
@@ -344,7 +345,7 @@ const DetailsCar = forwardRef((props, ref) => {
                 {Array.isArray(grupo) && grupo.length > 0 ? (
                   grupo.map((grupo, index) => (
                     <MenuItem key={index} value={grupo.idGrupo}>
-                      {grupo.idGrupo}
+                      {grupo.nombre}
                     </MenuItem>
                   ))
                 ) : (
