@@ -228,7 +228,7 @@ const DetailsCar = forwardRef((props, ref) => {
     if (marca?.data) {
       setMarca(marca.data);
       setFormData((prevData) => ({ ...prevData, marca: marca.data[0].clave }));
-      await cargarGrupo(marca.data[0].clave);
+      await cargarGrupo(marca.data[0].nombre);
     }
   };
 
@@ -236,8 +236,8 @@ const DetailsCar = forwardRef((props, ref) => {
     const grupo = await ComboService.fetchComboGrupo(idMarca);
     if (grupo?.data?.length > 0) {
       setGrupo(grupo.data);
-      setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].id }));
-      await cargarModelo(grupo.data[0].id);
+      setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
+      await cargarModelo(grupo.data[0].idGrupo);
     }
   };
 
@@ -319,7 +319,7 @@ const DetailsCar = forwardRef((props, ref) => {
                 placeholder="Seleccione marca"
               >
                 {marca.map((marca, index) => (
-                  <MenuItem key={index} value={marca.clave}>
+                  <MenuItem key={index} value={marca.nombre}>
                     {marca.nombre}
                   </MenuItem>
                 ))}
@@ -343,8 +343,8 @@ const DetailsCar = forwardRef((props, ref) => {
               >
                 {Array.isArray(grupo) && grupo.length > 0 ? (
                   grupo.map((grupo, index) => (
-                    <MenuItem key={index} value={grupo.id}>
-                      {grupo.nombre}
+                    <MenuItem key={index} value={grupo.idGrupo}>
+                      {grupo.idGrupo}
                     </MenuItem>
                   ))
                 ) : (
