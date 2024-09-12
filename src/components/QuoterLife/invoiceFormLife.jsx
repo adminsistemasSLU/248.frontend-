@@ -371,11 +371,14 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             handleCloseBackdrop();
         }
         let f_pago =  JSON.parse(localStorage.getItem(LS_FPAGO));
-        if(!(formData.formaPago === f_pago || formData.formaPago === '' )){
-            seterrorMessage("La forma de pago ingresada no es valido")
-            setOpenSnackAlert(true);
-            handleCloseBackdrop();
-            
+
+        if ((formData.tipoProducto !== f_pago  )) {
+            if(f_pago !== ''){
+                seterrorMessage("La forma de pago ingresada no es valido")
+                setOpenSnackAlert(true);
+                handleCloseBackdrop();
+              return false;
+            }
           }
         return valido;
     };
@@ -557,7 +560,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         name="documentType"
                                         value={formData.formaPago}
                                         onChange={handleChange}
-                                        disabled={formaPago === 'C'}
                                         style={{ textAlign: "left", }}
                                         variant="standard"
                                         placeholder="Seleccione documento"

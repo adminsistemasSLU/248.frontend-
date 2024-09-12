@@ -412,7 +412,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
         setFormData((formData) => ({
           ...formData,
           vigencia: dataPoliza.vigencia,
-          numPrestamo: datosCertificado.numPrestamo
+          numPrestamo: datosCertificado.numPrestamo,
+          tipoProducto:datosCertificado.tipoProducto,
         }));
 
         if (dataPoliza.vigencia && inicioVigencia) {
@@ -1088,6 +1089,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       finVigencia: finVigencia.format("DD/MM/YYYY"),
       vigencia: formData.vigencia,
       numPrestamo: formData.numPrestamo,
+      tipoProducto:formData.tipoProducto
     };
 
 
