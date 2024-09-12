@@ -53,7 +53,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         admision: "",
         subtotal: "",
         total: "",
-        pais: ""
+        country: ""
     });
 
 
