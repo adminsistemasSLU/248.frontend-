@@ -36,7 +36,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const [formData, setFormData] = useState({
         paidType: "C",
-        formaPago:'',
+        tipoProducto:'',
         name: "",
         lastname: "",
         email: "",
@@ -558,7 +558,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         labelId="documentType-Label"
                                         id="documentType"
                                         name="documentType"
-                                        value={formData.formaPago}
+                                        value={formData.tipoProducto}
                                         onChange={handleChange}
                                         style={{ textAlign: "left", }}
                                         variant="standard"
