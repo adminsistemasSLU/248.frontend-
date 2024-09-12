@@ -730,7 +730,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
    console.log(formDataTabla);
     const periodos = formDataTabla.map((item, index) => ({
-      monto: item.monto.replace(/[$,.]/g, ''),
+      monto: isNaN(item.monto) ? item.monto.replace(/[$,.]/g, '') : item.monto,
       periodo: index + 1,
       vigencia: ""
     }));
