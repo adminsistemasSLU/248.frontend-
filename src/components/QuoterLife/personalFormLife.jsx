@@ -355,7 +355,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         status: dataPersonal[0].cliestadocivil || "",
       }));
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
-      setAge(dateObject);
+      setAgeCalculate(dateObject);
 
       const datoscoyugue = JSON.parse(dataPersonal[0].datosconyugues);
       //Setear datos conyugue si los hay
@@ -366,7 +366,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         conyugenumero: datoscoyugue?.identificacion || "",
         conyugesexo: datoscoyugue?.genero || "0",
         conyugetipo: datoscoyugue?.tipo || "C",
-        conyugePais: datoscoyugue?.conyugePais || "",
+        countryConyugue: datoscoyugue?.pais || "",
       }));
 
       const datosprestamo = JSON.parse(dataPersonal[0].datosprestamo);
@@ -392,7 +392,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       if (datoscoyugue?.fechaNacimiento) {
         const dateObjectconyugue = dayjs(datoscoyugue.fechaNacimiento, "DD/MM/YYYY");
-        setConyugueAge(dateObjectconyugue);
+        setAgeConyugueCalculate(dateObjectconyugue);
       }
 
       const datosCertificado = JSON.parse(dataPersonal[0].datoscertificado);
@@ -967,7 +967,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setOpenSnack(true);
       return true;
     }
-    if (formData.conyugePais === '') {
+    if (formData.countryConyugue === '') {
       setErrorMessage("Debe ingresar un valor en pais para el conyugue")
       setOpenSnack(true);
       return true;
@@ -1070,7 +1070,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
       genero: formData.conyugesexo,
       tipo: formData.conyugetipo,
-      pais:formData.conyugePais
+      pais:formData.countryConyugue
     };
 
     const datosprestamo = {
