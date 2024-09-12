@@ -728,6 +728,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
+   console.log(formDataTabla);
     const periodos = formDataTabla.map((item, index) => ({
       monto: item.monto.replace(/[$,.]/g, ''),
       periodo: index + 1,
