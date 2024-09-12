@@ -25,6 +25,7 @@ import {
     LS_DATOSPAGO,
     LS_DATAVIDASEND,
     USER_STORAGE_KEY,
+    LS_FPAGO,
 } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
@@ -35,6 +36,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const [formData, setFormData] = useState({
         paidType: "C",
+        formaPago:'',
         name: "",
         lastname: "",
         email: "",
@@ -109,9 +111,10 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     }));
 
     const cargarDatosVidaPago = async () => {
-        
+        let f_pago =  JSON.parse(localStorage.getItem(LS_FPAGO));
         let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
         let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
         // debugger;
         if (idCotizacion) {
             setOpenBackdrop(true);
@@ -145,6 +148,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         }
         setFormData((prevData) => ({
             ...prevData,
+            formaPago:f_pago,
             paidType: formaPagos.paidType, // Asegúrate de que `newValue` es el valor correcto que deseas establecer
         }));
         let formapag = formaPagos.paidType || 'C';
@@ -366,7 +370,13 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             setOpenSnackAlert(true);
             handleCloseBackdrop();
         }
-
+        let f_pago =  JSON.parse(localStorage.getItem(LS_FPAGO));
+        if(!(formData.formaPago === f_pago || formData.formaPago === '' )){
+            seterrorMessage("La forma de pago ingresada no es valido")
+            setOpenSnackAlert(true);
+            handleCloseBackdrop();
+            
+          }
         return valido;
     };
 
@@ -532,6 +542,30 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     >
                                         <MenuItem value="C">Asegurado</MenuItem>
                                         <MenuItem value="R">Cliente</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControl
+                                    sx={{ margin: "0px", minWidth: 290, width: "100%" }}
+                                    variant="standard"
+                                >
+                                    <InputLabel id="paidForm-Label">Forma Pago</InputLabel>
+                                    <Select
+                                        labelId="documentType-Label"
+                                        id="documentType"
+                                        name="documentType"
+                                        value={formData.formaPago}
+                                        onChange={handleChange}
+                                        disabled={formaPago === 'C'}
+                                        style={{ textAlign: "left", }}
+                                        variant="standard"
+                                        placeholder="Seleccione documento"
+                                        fullWidth
+                                        required
+                                    >
+                                        <MenuItem value="1">AL contado</MenuItem>
+                                        <MenuItem value="2">Mensual</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>

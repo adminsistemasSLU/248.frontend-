@@ -108,7 +108,6 @@ const RiskFormLife = forwardRef((props, ref) => {
     const response = await LifeService.fetchGrabaDatosVida(data);
     
     if (response.codigo === 200) {
-      
       localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(updatedQuestions));
       localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
       setOpen(false);
