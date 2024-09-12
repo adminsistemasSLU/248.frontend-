@@ -115,12 +115,13 @@ const LifeService = {
     }
   },
 
-  fetchVerificaPrestamo: async (producto, numPrestamo) => {
+  fetchVerificaPrestamo: async (producto, numPrestamo,idcotizacion) => {
     const endpoint = "api/vida/consultaNumeroPrestamo";
     const method = "POST";
     const data = {
       Nprestamo: numPrestamo,
-      producto: producto
+      producto: producto,
+      idCotizacion:idcotizacion
     };
 
     try {

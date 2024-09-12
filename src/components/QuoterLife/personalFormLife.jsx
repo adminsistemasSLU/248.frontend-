@@ -1474,9 +1474,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
   }, [calculado]);
 
   const verificaPrestamo = async (numPrestamo) => {
+    var  idCotizacion = localStorage.getItem(LS_COTIZACION);
     console.log(numPrestamo);
     setOpenBackdrop(true);
-    const response = await LifeService.fetchVerificaPrestamo(producto, numPrestamo);
+    const response = await LifeService.fetchVerificaPrestamo(producto, numPrestamo,idCotizacion);
     console.log(response);
     if (response.codigo === 200) {
       setOpenBackdrop(false);
