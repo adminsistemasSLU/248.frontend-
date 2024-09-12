@@ -1027,10 +1027,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
-    if (!(formData.tipoProducto === t_prestamo || formData.tipoProducto === 'A')) {
-      setErrorMessage("El tipo de plan ingresado no es valido")
-      setOpenSnack(true);
-      return false;
+    
+    if ((formData.tipoProducto !== t_prestamo  )) {
+      if(t_prestamo !== 'A'){
+        setErrorMessage("El tipo de plan ingresado no es valido")
+        setOpenSnack(true);
+        return false;
+      }
     }
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
@@ -2087,9 +2090,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
               </MenuItem>
               <MenuItem key='M' value='TC'>
                 MANCOMUNADO
-              </MenuItem>
-              <MenuItem key='A' value='A'>
-                AMBOS
               </MenuItem>
 
             </Select>
