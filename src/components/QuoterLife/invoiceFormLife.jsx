@@ -318,7 +318,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             e.target.name === "phone" ||
             e.target.name === "direction" ||
             e.target.name === "documentType" ||
-            e.target.name === "pais" ||
+            e.target.name === "country" ||
             e.target.name === "tipoProducto" ||
             e.target.name === "identification"
         ) {
