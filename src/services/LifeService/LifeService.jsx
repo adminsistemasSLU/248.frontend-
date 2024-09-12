@@ -133,6 +133,72 @@ const LifeService = {
     }
   },
 
+  fetchEmitirCertificado: async (idcotizacion) => {
+    const endpoint = "api/vida/emitirCertificado";
+    const method = "POST";
+    const data = {
+      idCotizacion:idcotizacion
+    };
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching Consulta Numero de Prestamo:", error);
+      throw error;
+    }
+  },
+
+
+  fetchPrevizualizarPDF: async (producto,idcotizacion) => {
+    const endpoint = "api/vida/PrevisualizarPDFVida";
+    const method = "POST";
+    const data = {
+      producto: producto,
+      id_CotiGeneral:idcotizacion
+    };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      console.log(response);
+      if (response.codigo===200 && response.data) {
+        const pdfBlob = base64ToBlob(response.data.archivoBase64, 'application/pdf');
+        const downloadUrl = window.URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", "reporteCotizacionVida.pdf"); // O cualquier otro nombre de archivo
+        document.body.appendChild(link);
+        link.click();
+        link.remove(); // Limpiar el enlace temporal
+
+        const pdfBlobDeclaracionSalud = base64ToBlob(response.data.archivoBase64_2, 'application/pdf');
+        const downloadUrlDeclaracionSalud = window.URL.createObjectURL(pdfBlobDeclaracionSalud);
+        const linkDeclaracionSalud = document.createElement("a");
+        linkDeclaracionSalud.href = downloadUrlDeclaracionSalud;
+        linkDeclaracionSalud.setAttribute("download", "reporteCotizacionVida.pdf"); // O cualquier otro nombre de archivo
+        document.body.appendChild(linkDeclaracionSalud);
+        linkDeclaracionSalud.click();
+        linkDeclaracionSalud.remove();
+
+      } else {
+        console.error("Error en la respuesta del servidor:", response.message);
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching Previsualizar pdf:", error);
+      throw error;
+    }
+  },
+
+}
+
+function base64ToBlob(base64, type = 'application/octet-stream') {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], {type: type});
 }
 
 export default LifeService;
