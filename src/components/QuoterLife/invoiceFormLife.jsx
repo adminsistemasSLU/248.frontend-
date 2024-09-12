@@ -244,7 +244,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     direction: asegurado.direction,
                     documentType: asegurado.documentType,
                     identification: asegurado.identification,
-                    pais:asegurado.pais,
+                    country:asegurado.pais,
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -278,7 +278,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     documentType: documentType || 'C',
                     direction: direction || '',
                     identification: identification || '',
-                    pais:pais|| '',
+                    country:pais|| '',
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -730,6 +730,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     variant="standard"
                                     placeholder="Seleccione País"
                                     fullWidth
+                                    disabled={formaPago === 'C'}
                                     required
                                 >
                                     {country.map((risk, index) => (
