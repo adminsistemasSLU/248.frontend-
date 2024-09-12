@@ -1461,7 +1461,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         subtotal: subTotal,
         iva: iva,
         total: totalPag,
-
+        pais: formData.country
       }
       localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 

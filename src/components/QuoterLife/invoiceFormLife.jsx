@@ -232,7 +232,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 iva = parseFloat(formaPagos.iva);
                 total = parseFloat(formaPagos.total);
             }
-            
+            console.log(asegurado);
             if (formaPago === 'C') {
                 //let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
                 setFormData({
@@ -255,7 +255,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     total: parseFloat(total).toFixed(2),
                 });
             }
-
+            console.log(formaPagoAray);
             if (formaPago === 'R') {
                 let nombre = '', pais='',lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
                 if (formaPagoAray) {
