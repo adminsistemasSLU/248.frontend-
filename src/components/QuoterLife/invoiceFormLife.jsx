@@ -37,7 +37,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const [formData, setFormData] = useState({
         paidType: "C",
-        tipoProducto: '',
+        tipoProducto: '1',
         name: "",
         lastname: "",
         email: "",
