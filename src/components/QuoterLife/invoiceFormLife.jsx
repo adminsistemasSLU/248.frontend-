@@ -210,7 +210,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             } else {
                 formaPagos = factura;
             }
-            console.log(formaPago);
+           
             let monto, prima, sbs, scc, derechoEmision, subtot, iva, total;
 
             if (factura) {
@@ -232,7 +232,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 iva = parseFloat(formaPagos.iva);
                 total = parseFloat(formaPagos.total);
             }
-
+            
             if (formaPago === 'C') {
                 //let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
                 setFormData({
@@ -268,7 +268,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     direction = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.direction : '';
                     pais = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.pais : '';
                 }
-                setCountry(pais)
+                
                 setFormData({
                     ...formData,
                     name: nombre || '',
@@ -289,7 +289,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     total: parseFloat(total).toFixed(2),
                 });
             }
-
+            console.log(formData);
         }
         cargarData();
     }, [formaPago]);
