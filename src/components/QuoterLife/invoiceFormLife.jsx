@@ -383,7 +383,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         }
         let f_pago = JSON.parse(localStorage.getItem(LS_FPAGO));
         f_pago = Number(f_pago);
-        if ((formData.tipoProducto !== f_pago)) {
+        
+        if ((Number(formData.tipoProducto) !== f_pago)) {
             if (f_pago !== '') {
                 seterrorMessage("La forma de pago ingresada no es valido")
                 setOpenSnackAlert(true);
