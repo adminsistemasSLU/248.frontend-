@@ -56,11 +56,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     });
 
 
-
-
-    const [tipoCredito, settipoCredito] = useState([]);
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
-    const [formPago, setFormPago] = React.useState([]);
     const [errorMessage, seterrorMessage] = React.useState([]);
     const [OpenSnackAlert, setOpenSnackAlert] = React.useState(false);
     const [validate, setvalidate] = React.useState(false);
@@ -68,7 +64,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     const [errorCedula, setErrorCedula] = useState(false);
     const [open, setOpen] = useState(false);
 
-    const [asegurado, setAsegurado] = React.useState([]);
 
     const [editForm, setEditForm] = useState(false);
 
@@ -553,11 +548,11 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     sx={{ margin: "0px", minWidth: 290, width: "100%" }}
                                     variant="standard"
                                 >
-                                    <InputLabel id="paidForm-Label">Forma Pago</InputLabel>
+                                    <InputLabel id="tipoProducto-Label">Forma Pago</InputLabel>
                                     <Select
-                                        labelId="documentType-Label"
-                                        id="documentType"
-                                        name="documentType"
+                                        labelId="tipoProducto-Label"
+                                        id="tipoProducto"
+                                        name="tipoProducto"
                                         value={formData.tipoProducto}
                                         onChange={handleChange}
                                         style={{ textAlign: "left", }}
