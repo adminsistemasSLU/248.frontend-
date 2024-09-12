@@ -278,6 +278,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     documentType: documentType || 'C',
                     direction: direction || '',
                     identification: identification || '',
+                    pais:pais|| '',
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -716,7 +717,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                 />
                             </Grid>
 
-                            <Grid item xs={10.5} md={3}>
+                            <Grid item xs={12} md={12}>
                                 <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                                     Pais <span style={{ color: 'red' }}>*</span>
                                 </Typography>
