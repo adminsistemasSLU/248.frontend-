@@ -47,11 +47,10 @@ const DetailsCar = forwardRef((props, ref) => {
     grupo: "",
     modelo: "",
     anio: "2001",
-    zona: "C",
     uso: "",
     tipo: "",
     valor_vehiculo: "",
-    valor_accesorios: "",
+    valor_accesorios: "0,00",
     suma_asegurada: "",
   });
 
@@ -80,7 +79,6 @@ const DetailsCar = forwardRef((props, ref) => {
         anio: dataPersonal[0].anio,
         uso: dataPersonal[0].uso,
         tipo: dataPersonal[0].tipo,
-        zona: dataPersonal[0].zona,
         valor_vehiculo: dataPersonal[0].valor_vehiculo,
         valor_accesorios: dataPersonal[0].valor_accesorios,
         suma_asegurada: dataPersonal[0].suma_asegurada,
@@ -131,6 +129,15 @@ const DetailsCar = forwardRef((props, ref) => {
     }
   };
 
+  const calculaSumaAsegurada = (valor1, valor2) => {
+    const cleanValor1 = parseFloat(valor1.replace(/\./g, "").replace(",", "."));
+    const cleanValor2 = parseFloat(valor2.replace(/\./g, "").replace(",", "."));
+
+    console.log(cleanValor1)
+    console.log(cleanValor2)
+    return cleanValor1 + cleanValor2;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     let modifiedValue = value;
@@ -148,19 +155,51 @@ const DetailsCar = forwardRef((props, ref) => {
       cargarModelo(modifiedValue);
     }
 
+    if (name === "modelo") {
+      formData.suma_asegurada = obtenerMontoPorId(formatCurrency(modifiedValue));
+    }
+
+    if (name === "valor_accesorios") {
+      console.log(modifiedValue);
+
+      if (modifiedValue.includes("0,00")) {
+        modifiedValue = modifiedValue.replace("0,00", "");
+      }
+
+      if (modifiedValue == "")
+        modifiedValue = "0,00";
+
+      formData.suma_asegurada = obtenerMontoPorId(formatCurrency(modifiedValue));
+    }
+
     if (["valor_vehiculo", "valor_accesorios", "suma_asegurada"].includes(name)) {
       modifiedValue = formatCurrency(modifiedValue);
     }
 
-    setFormData((prevData) => ({ ...prevData, [name]: modifiedValue }));
+    setFormData((prevData) => {
+      const newData = { ...prevData, [name]: modifiedValue };
+      if (newData.valor_vehiculo && newData.valor_accesorios) {
+        const sumaAsegurada = calculaSumaAsegurada(newData.valor_vehiculo, newData.valor_accesorios);
+        newData.suma_asegurada = formatAmount(sumaAsegurada.toString());
+      }
+      return newData;
+    });
   };
 
   const formatCurrency = (value) => {
+    if (typeof value !== 'string') return value;
     let cleanValue = value.replace(/[^\d,]/g, "");
     cleanValue = cleanValue.includes(",")
       ? cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
       : cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return cleanValue;
+  };
+
+  const formatAmount = (value) => {
+    return new Intl.NumberFormat('de-DE', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
   };
 
   const handleAddCar = () => {
@@ -246,8 +285,16 @@ const DetailsCar = forwardRef((props, ref) => {
     const modelo = await ComboService.fetchComboModelo(idGrupo);
     if (modelo?.data?.length > 0) {
       setModelo(modelo.data);
-      setFormData((prevData) => ({ ...prevData, modelo: modelo.data[0].id }));
+      setFormData((prevData) => ({ ...prevData,
+        modelo: modelo.data[0].id,
+        valor_vehiculo: formatAmount(modelo.data[0].monto),
+        suma_asegurada: formatAmount(modelo.data[0].monto) }));
     }
+  };
+
+  const obtenerMontoPorId = (id) => {
+    const item = modelo.find(obj => obj.id === id);
+    return item ? item.monto : null;
   };
 
   const cargarUso = async () => {
@@ -289,19 +336,29 @@ const DetailsCar = forwardRef((props, ref) => {
             </Snackbar>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                Placa <span style={{ color: 'red' }}>*</span>
+                Año <span style={{ color: 'red' }}>*</span>
               </Typography>
-              <TextField
-                placeholder="Placa"
-                type="text"
-                onChange={handleChange}
-                name="placa"
-                value={formData.placa}
+              <Select
+                labelId="anio-label"
+                id="anio"
+                name="anio"
+                value={formData.anio}
+                style={{ textAlign: "left" }}
                 variant="standard"
+                onChange={handleChange}
+                placeholder="Año"
                 fullWidth
-                inputProps={{ maxLength: 8 }}
                 required
-              />
+              >
+                {Array.from({ length: 2024 - 2001 + 1 }, (_, index) => {
+                  const year = 2001 + index;
+                  return (
+                    <MenuItem key={year} value={year}>
+                      {year}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
@@ -445,50 +502,19 @@ const DetailsCar = forwardRef((props, ref) => {
 
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                Año <span style={{ color: 'red' }}>*</span>
+                Placa <span style={{ color: 'red' }}>*</span>
               </Typography>
-              <Select
-                labelId="anio-label"
-                id="anio"
-                name="anio"
-                value={formData.anio}
-                style={{ textAlign: "left" }}
-                variant="standard"
+              <TextField
+                placeholder="Placa"
+                type="text"
                 onChange={handleChange}
-                placeholder="Año"
-                fullWidth
-                required
-              >
-                {Array.from({ length: 2024 - 2001 + 1 }, (_, index) => {
-                  const year = 2001 + index;
-                  return (
-                    <MenuItem key={year} value={year}>
-                      {year}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </Grid>
-            <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
-              <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                Zona circulación <span style={{ color: 'red' }}>*</span>
-              </Typography>
-              <Select
-                labelId="zona-label"
-                id="zona"
-                name="zona"
-                value={formData.zona}
-                style={{ textAlign: "left" }}
+                name="placa"
+                value={formData.placa}
                 variant="standard"
-                onChange={handleChange}
-                placeholder="Zona"
                 fullWidth
+                inputProps={{ maxLength: 8 }}
                 required
-              >
-                <MenuItem value="C">Costa</MenuItem>
-                <MenuItem value="S">Sierra</MenuItem>
-                <MenuItem value="O">Oriente</MenuItem>
-              </Select>
+              />
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
@@ -511,7 +537,7 @@ const DetailsCar = forwardRef((props, ref) => {
                 Valor accesorios <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
-                placeholder="Valor accesorios"
+                placeholder="0,00"
                 type="text"
                 onChange={handleChange}
                 name="valor_accesorios"
@@ -534,6 +560,7 @@ const DetailsCar = forwardRef((props, ref) => {
                 value={formData.suma_asegurada}
                 variant="standard"
                 fullWidth
+                disabled
                 inputProps={{ maxLength: 15 }}
                 required
               />

@@ -176,7 +176,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
     }));
 
     const handleSubmit = (e) => {
-        if (e && e.preventDefault) e.preventDefault(); 
+        if (e && e.preventDefault) e.preventDefault();
 
         const requiredFields = [
             "name",
@@ -196,16 +196,16 @@ const PersonalFormCar = forwardRef((props, ref) => {
         ];
 
         let next = true;
-        for (const field of requiredFields) {
-            const value = formData[field];
-            if (typeof value === "undefined" || value === null || (typeof value === "string" && value.trim() === "")) {
-                next = false;
-                faltanDatosUsuario();
-                break;
-            }
-        }
+        // for (const field of requiredFields) {
+        //     const value = formData[field];
+        //     if (typeof value === "undefined" || value === null || (typeof value === "string" && value.trim() === "")) {
+        //         next = false;
+        //         faltanDatosUsuario();
+        //         break;
+        //     }
+        // }
 
-        if (!next) return false;
+        // if (!next) return false;
 
         const objetoSeguro = {
             name: formData.name,
@@ -244,6 +244,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
             const cedulaData = await UsuarioService.fetchVerificarCedula(documentType, identification);
             if (cedulaData.codigo === 200) {
                 setErrorCedula(false);
+
+                console.log(documentType);
+                console.log(identification);
+
                 await consultUserData(documentType, identification);
                 handleCloseBackdrop();
             } else {
@@ -338,7 +342,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
             const pais = await ComboService.fetchComboPais();
             if (pais && pais.data) {
                 setPais(pais.data);
-                setFormData((formData) => ({ ...formData, pais: pais.data[0].codiso }));
+                setFormData((formData) => ({
+                    ...formData,
+                    pais: pais.data.find((item) => item.nombre.toLowerCase() === "ecuador".toLowerCase()).codiso
+                }));
             }
         } catch (error) {
             console.error("Error al obtener pais:", error);
