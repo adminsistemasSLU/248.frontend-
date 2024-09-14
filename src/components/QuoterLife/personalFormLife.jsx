@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useRef, useMemo
 } from "react";
-import dayjs from "dayjs";
+import dayjs, { Ls } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { TextField, Grid, Alert, Snackbar, AlertTitle } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
@@ -49,14 +49,21 @@ import {
   LS_POLVIDAEDIT,
   LS_IDCOTIZACIONVIDA,
   LS_DATAVIDASEND,
-  LS_DATOSPAGO
+  LS_DATOSPAGO,
+  LS_FPAGO,
+  LS_TPRESTAMO,
+  API_SUBBALDOSAS
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import { Button } from "@mui/base";
 import LifeService from '../../services/LifeService/LifeService';
 import QuestionModalLife from "./questionModalLife";
+import CurrencyInput from "../../utils/currencyInput";
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(customParseFormat);
+dayjs.extend(relativeTime);
+
 let producto = localStorage.getItem(LS_PRODUCTO);
 let ramo = JSON.parse(localStorage.getItem(LS_RAMO));
 
@@ -87,7 +94,19 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
 
   return (
     <TableCell>
-      <TextField
+      <CurrencyInput
+        className="input-table"
+        onChange={onChange}
+        value={(value) || ''}
+        style={{
+          border: '1px solid #ccc',
+          width: '96%',
+          height: '29px',
+          borderRadius: '5px',
+          fontSize: '16px',
+        }}
+      />
+      {/* <TextField
         fullWidth
         value={(value) || ''}
         onChange={onChange}
@@ -97,7 +116,7 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
             padding: '4.5px 14px',
           }
         }}
-      />
+      /> */}
     </TableCell>
   );
 });
@@ -177,7 +196,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     city: "",
     status: "",
     genero: 'M',
-    country:'',
+    country: '',
+    ageCalculated: '',
 
     conyugetipo: "C",
     conyugenumero: "",
@@ -186,7 +206,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
     conyugefecha: "",
     conyugesexo: "",
     conyugeestadocivil: "",
+    ageConyugueCalculated: '',
+    countryConyugue: '',
 
+    tipoProducto: "T",
     inicioVigencia: "",
     finVigencia: "",
     vigencia: "",
@@ -213,7 +236,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     province: false,
     city: false,
     status: false,
-    country:false,
+    country: false,
 
     conyugetipo: false,
     conyugenumero: false,
@@ -223,6 +246,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     conyugesexo: false,
     conyugeestadocivil: false,
 
+    tipoProducto: false,
     inicioVigencia: false,
     finVigencia: false,
     vigencia: false,
@@ -261,6 +285,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const [inicioVigencia, setInicioVigencia] = useState(dayjs());
   const [finVigencia, setFinVigencia] = useState(dayjs());
   const [openBackdrop, setOpenBackdrop] = React.useState(true);
+  const [NomnbreProducto, setNomnbreProducto] = useState("");
+
   const isMounted = useRef(false);
   //Combos
   const [estadoCivil, setEstadoCivil] = useState([]);
@@ -268,11 +294,48 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const [country, setCountry] = useState([]);
   const [ciudades, setCiudades] = useState([]);
   const [vigencia, setVigencia] = useState([]);
+  const [t_prestamo, setTipoprestamo] = useState([]);
   //Constantes
   const CodigoComboCasado = "02";
   const CodigoComboUnionLibre = "05";
   const [datosCargados, setDatosCargados] = useState(false);
   const [cargarDataInicial, setcargarDataInicial] = useState(false);
+
+  const calculateAge = (birthDate) => {
+    const parsedDate = dayjs(birthDate);
+
+    // Asegurarse de que parsedDate sea válido
+    if (!parsedDate.isValid()) {
+      console.error('Fecha inválida:', birthDate);
+      return;
+    }
+
+    const birth = dayjs(birthDate);  // Parsear la fecha de nacimiento
+    const now = dayjs();  // Fecha actual
+    return now.diff(birth, 'year');  // Devolver la diferencia en años
+  };
+
+  const setAgeCalculate = (birthDate) => {
+    const anio = calculateAge(birthDate);
+
+    setAge(birthDate);
+
+    console.log(anio);
+    setFormData((formData) => ({
+      ...formData,
+      ageCalculated: anio,
+    }));
+  };
+
+  const setAgeConyugueCalculate = (birthDate) => {
+    const age = calculateAge(birthDate);
+
+    setConyugueAge(birthDate);
+    setFormData((formData) => ({
+      ...formData,
+      ageConyugueCalculated: age,
+    }));
+  }
 
   const cargarDatos = async () => {
     if (datosCargados) return; // Prevenir cargas redundantes
@@ -288,11 +351,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
         documentType: dataPersonal[0].clitipcedula,
         identification: dataPersonal[0].clicedula,
         address: dataPersonal[0].clidireccion,
-        genero:dataPersonal[0].cligenero,
+        genero: dataPersonal[0].cligenero,
         status: dataPersonal[0].cliestadocivil || "",
       }));
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
-      setAge(dateObject);
+      setAgeCalculate(dateObject);
 
       const datoscoyugue = JSON.parse(dataPersonal[0].datosconyugues);
       //Setear datos conyugue si los hay
@@ -303,6 +366,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         conyugenumero: datoscoyugue?.identificacion || "",
         conyugesexo: datoscoyugue?.genero || "0",
         conyugetipo: datoscoyugue?.tipo || "C",
+        countryConyugue: datoscoyugue?.pais || "",
       }));
 
       const datosprestamo = JSON.parse(dataPersonal[0].datosprestamo);
@@ -311,7 +375,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       setDatosFactura(datosFactura);
 
-    
+
       setFormData((formData) => ({
         ...formData,
         country: dataPersonal[0].clipais || "",
@@ -319,7 +383,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }));
 
       await cargarCiudad(datosprestamo?.provincia);
-   
+
       setFormData((formData) => ({
         ...formData,
         city: dataPersonal[0].cliciudad || "",
@@ -328,60 +392,65 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       if (datoscoyugue?.fechaNacimiento) {
         const dateObjectconyugue = dayjs(datoscoyugue.fechaNacimiento, "DD/MM/YYYY");
-        setConyugueAge(dateObjectconyugue);
+        setAgeConyugueCalculate(dateObjectconyugue);
       }
 
       const datosCertificado = JSON.parse(dataPersonal[0].datoscertificado);
-     
+
       const inicioVig = datosCertificado.inicioVigencia;
 
       if (inicioVig) {
         const dateInicioVig = dayjs(inicioVig, "DD/MM/YYYY");
-       
+
         setInicioVigencia(dateInicioVig);
       }
 
 
       const dataPoliza = await cargarDatosPoliza(); // API PARA CONSULTAR EMI POL CABECERA
-      setFormData((formData) => ({
-        ...formData,
-        vigencia: dataPoliza.vigencia,
-        numPrestamo: datosCertificado.numPrestamo
-      }));
+      console.log(dataPoliza);
+      if (dataPoliza) {
+        setFormData((formData) => ({
+          ...formData,
+          vigencia: dataPoliza.vigencia,
+          numPrestamo: datosCertificado.numPrestamo,
+          tipoProducto:datosCertificado.tipoProducto,
+        }));
 
-      if (dataPoliza.vigencia && inicioVigencia) {
-        const newFinVigencia = inicioVigencia.add(dataPoliza.vigencia, 'month');
-        setFinVigencia(newFinVigencia);
+        if (dataPoliza.vigencia && inicioVigencia) {
+          const newFinVigencia = inicioVigencia.add(dataPoliza.vigencia, 'month');
+          setFinVigencia(newFinVigencia);
+        }
+
+
+        setcargarDataInicial(true);
+        let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
+        const transformedData = Object.values(montoPeriodo).flat().map(item => (
+          {
+            monto: parseFloat(item.monto) || '',
+            tasa: item.tasa || '',
+            prima: item.prima || '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
+            estado: item.estado || '' // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
+          }));
+        setFormDataTabla(transformedData);
       }
 
-      
-      setcargarDataInicial(true);
-      let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
-      const transformedData = Object.values(montoPeriodo).flat().map(item => (
-        {
-        monto: parseFloat(item.monto) || '',
-        tasa: item.tasa || '',
-        prima: item.prima || '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
-        estado: item.estado || '' // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
-      }));
-      
-      setFormDataTabla(transformedData);
+
       await setDatosCargados(true);
       let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-        try {
-          
-          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"),datosprestamo.prestamo, dataPoliza.vigencia);
-          console.log(data);
-          if (data) {
-            localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
-          } else {
-            console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
-          }
-          handleCloseBackdrop();
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          handleCloseBackdrop();
+      try {
+
+        const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), datosprestamo.prestamo, dataPoliza.vigencia);
+        console.log(data);
+        if (data) {
+          localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
+        } else {
+          console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
         }
+        handleCloseBackdrop();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        handleCloseBackdrop();
+      }
       handleOpenBackdrop(false);
     }
   };
@@ -503,14 +572,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
   };
 
- 
+
   const cargarPais = async () => {
     try {
       const paises = await ComboService.fetchComboPais();
       if (paises && paises.data) {
         await setCountry(paises.data);
         await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais }));
-       
+
       }
     } catch (error) {
       console.error("Error al obtener paises:", error);
@@ -574,7 +643,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
-
+        localStorage.setItem(LS_FPAGO, vigencia.data.frm_pago);
+        localStorage.setItem(LS_TPRESTAMO, vigencia.data.tipo_prestamo);
+        setTipoprestamo(vigencia.data.tipo_prestamo);
         const preguntasprevias = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
         if (!(preguntasprevias && preguntasprevias.length > 0)) {
 
@@ -607,7 +678,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
     isMounted.current = true; // Establecer a true cuando el componente está montado
-
+    const producto = Number(localStorage.getItem(LS_PRODUCTO));
+    console.log(producto);
+    let listaProductos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
+    console.log(listaProductos);
+    const resultado = listaProductos.filter(item => item.producto === producto).map(item => item.titulo);
+    console.log(resultado);
+    setNomnbreProducto(resultado);
+    setAgeCalculate(maxDate);
+    setAgeConyugueCalculate(maxDate);
     const iniciarDatosCombos = async () => {
       handleOpenBackdrop();
       await cargarPais();
@@ -650,9 +729,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
+   console.log(formDataTabla);
     const periodos = formDataTabla.map((item, index) => ({
-      monto: item.monto,
-      periodo: index + 1, 
+      monto: isNaN(item.monto) ? item.monto.replace(/[$,.]/g, '') : item.monto,
+      periodo: index + 1,
       vigencia: ""
     }));
     return {
@@ -888,6 +968,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setOpenSnack(true);
       return true;
     }
+    if (formData.countryConyugue === '') {
+      setErrorMessage("Debe ingresar un valor en pais para el conyugue")
+      setOpenSnack(true);
+      return true;
+    }
     return false;
   }
 
@@ -937,6 +1022,21 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
+    if (formData.tipoProducto === '') {
+      setErrorMessage("Se debe ingresar datos en tipo plan")
+      setOpenSnack(true);
+      return false;
+    }
+
+    
+    if ((formData.tipoProducto !== t_prestamo  )) {
+      if(t_prestamo !== 'A'){
+        setErrorMessage("El tipo de plan ingresado no es valido")
+        setOpenSnack(true);
+        return false;
+      }
+    }
+
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
     const requiredFields = [
       "name",
@@ -970,7 +1070,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
       identificacion: formData.conyugenumero,
       fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
       genero: formData.conyugesexo,
-      tipo:formData.conyugetipo
+      tipo: formData.conyugetipo,
+      pais:formData.countryConyugue
     };
 
     const datosprestamo = {
@@ -988,6 +1089,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       finVigencia: finVigencia.format("DD/MM/YYYY"),
       vigencia: formData.vigencia,
       numPrestamo: formData.numPrestamo,
+      tipoProducto:formData.tipoProducto
     };
 
 
@@ -1006,7 +1108,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       cligenero: formData.genero,
       cliestadocivil: formData.status,
       clipais: formData.country,
-      cliciudad:formData.city,
+      cliciudad: formData.city,
       cliprovincia: formData.province,
       poliza: poliza,
       tippoliza: 1,
@@ -1074,7 +1176,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     let calc = JSON.parse(localStorage.getItem(LS_TABLAACTUALIZDA));
     const arrValores = {
       tasa: calc.data.valores.tasa,
-      prima:  formData.prima,
+      prima: formData.prima,
       derecho: calc.data.valores.derecho,
       porinteres: calc.data.valores.porinteres,
       prima_total: calc.data.valores.prima_total,
@@ -1153,13 +1255,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
       email: formData.email,
       phone: formData.phone,
       sumAdd: formData.prestamo,
-      prima:  formData.prima,
+      prima: formData.prima,
       impScvs: pag.impScvs,
       impSsc: pag.impSsc,
-      admision:  pag.admision,
-      subtotal:  pag.subtotal,
-      iva:  pag.iva,
-      total:  pag.total
+      admision: pag.admision,
+      subtotal: pag.subtotal,
+      iva: pag.iva,
+      total: pag.total,
+      pais: formData.country
     }
     localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
@@ -1218,8 +1321,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const handleOpenModal = async () => {
     console.log(formDataTabla);
     const todosTienenNumero = formDataTabla.every((item) => {
-      console.log(item.monto);
-      return item.monto !== undefined && item.monto !== null && item.monto !== '' && !Number.isNaN(Number(item.monto));
+      const monto = item.monto.replace(/[$,.]/g, '');
+      return monto !== undefined && monto !== null && monto !== '' && !Number.isNaN(Number(monto));
     });
     console.log(todosTienenNumero);
     if (!todosTienenNumero) {
@@ -1236,7 +1339,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     //SUMATORIA DE PRESTAMO A PARTIR DE LA TABLA DE CALCULOS
     const resultado = formDataTabla.reduce((acc, item) => {
-      const monto = parseFloat(item.monto); // Convierte a número flotante
+      const montoConvertido = item.monto.replace(/[$,.]/g, '');
+      const monto = parseFloat(montoConvertido); // Convierte a número flotante
 
       // Verifica si el valor es un número válido
       if (!isNaN(monto) && monto !== null && monto !== '') {
@@ -1325,7 +1429,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const derPoliza = Number(parametros[0].der_poliza);
 
       // Calcula los impuestos y redondea a 2 decimales
-      const iva = parseFloat((primaNumber * porIva / 100).toFixed(2));
+      //const iva = parseFloat((primaNumber * porIva / 100).toFixed(2));
+      const iva = 0;
       const sbs = parseFloat((primaNumber * porSbs / 100).toFixed(2));
       const ssc = parseFloat((primaNumber * porSsc / 100).toFixed(2));
       const der_poliza = parseFloat(derPoliza.toFixed(2));
@@ -1356,7 +1461,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         subtotal: subTotal,
         iva: iva,
         total: totalPag,
-
+        pais: formData.country
       }
       localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
@@ -1370,6 +1475,22 @@ const PersonalFormLife = forwardRef((props, ref) => {
       });
     }
   }, [calculado]);
+
+  const verificaPrestamo = async (numPrestamo) => {
+    var  idCotizacion = localStorage.getItem(LS_COTIZACION);
+    console.log(numPrestamo);
+    setOpenBackdrop(true);
+    const response = await LifeService.fetchVerificaPrestamo(producto, numPrestamo,idCotizacion);
+    console.log(response);
+    if (response.codigo === 200) {
+      setOpenBackdrop(false);
+
+    } else {
+      setOpenBackdrop(false);
+      setErrorMessage(response.message);
+      setFormData({ ...formData, numPrestamo: '' });
+    }
+  }
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -1466,9 +1587,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
         onSubmit={handleSubmit}
         style={{ width: '100%', paddingLeft: '30px', paddingRight: '10px', paddingBottom: '20px' }}
       >
-        <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
-          DATOS PERSONALES
-        </Typography>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', paddingBottom: '20px' }}>
+          <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold' }}>
+            DATOS PERSONALES
+          </Typography>
+
+          <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold', marginRight: '35px' }}>
+            Producto: {NomnbreProducto}
+          </Typography>
+
+        </div>
+
+
         <Grid container spacing={2} style={{ paddingRight: '5px' }}>
           <Snackbar
             open={open}
@@ -1575,7 +1705,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
                   className="datePicker"
                   maxDate={maxDate}
                   onChange={(newValue) => {
-                    setAge(newValue);
+                    setAgeCalculate(newValue);
                   }}
                 />
               </DemoContainer>
@@ -1630,7 +1760,23 @@ const PersonalFormLife = forwardRef((props, ref) => {
               required
             />
           </Grid>
-
+          <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
+            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              Edad <span style={{ color: 'red' }}>*</span>
+            </Typography>
+            <TextField
+              placeholder="Edad"
+              type="text"
+              disabled={true}
+              name="Edad"
+              value={ValidationUtils.Valida_numeros(formData.ageCalculated)}
+              onChange={handleChange}
+              variant="standard"
+              fullWidth
+              inputProps={{ maxLength: 10 }}
+              required
+            />
+          </Grid>
           <Grid item xs={10.5} md={3}>
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Pais <span style={{ color: 'red' }}>*</span>
@@ -1701,9 +1847,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               ))}
             </Select>
           </Grid>
-          <Grid item xs={10.5} md={3} sx={{
-            paddingRight: { xs: '0px', md: '42px' }
-          }}  >
+          <Grid item xs={10.5} md={3}  >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Estado civil <span style={{ color: 'red' }}>*</span>
             </Typography>
@@ -1827,31 +1971,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
                 <Grid item xs={10.5} md={3} >
                   <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                    Fecha de nacimiento <span style={{ color: 'red' }}>*</span>
-                  </Typography>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}  >
-                    <DemoContainer components={["DatePicker"]}>
-                      <DatePicker
-                        placeholder="Fecha de nacimiento"
-                        slotProps={{
-                          textField: { variant: "standard", size: "small" },
-                        }}
-                        value={conyugueage}
-                        format="DD/MM/YYYY"
-                        disabled={errorCedula}
-                        className="datePicker"
-                        maxDate={maxDate}
-                        onChange={(newValue) => {
-                          setConyugueAge(newValue);
-                        }}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-
-                </Grid>
-
-                <Grid item xs={10.5} md={3} >
-                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                     Genero <span style={{ color: 'red' }}>*</span>
                   </Typography>
                   <Select
@@ -1877,6 +1996,73 @@ const PersonalFormLife = forwardRef((props, ref) => {
                   </Select>
                 </Grid>
 
+                <Grid item xs={10.5} md={3} >
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                    Fecha de nacimiento <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}  >
+                    <DemoContainer components={["DatePicker"]}>
+                      <DatePicker
+                        placeholder="Fecha de nacimiento"
+                        slotProps={{
+                          textField: { variant: "standard", size: "small" },
+                        }}
+                        value={conyugueage}
+                        format="DD/MM/YYYY"
+                        disabled={errorCedula}
+                        className="datePicker"
+                        maxDate={maxDate}
+                        onChange={(newValue) => {
+                          setAgeConyugueCalculate(newValue);
+                        }}
+                      />
+                    </DemoContainer>
+                  </LocalizationProvider>
+
+                </Grid>
+
+                <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                    Edad <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <TextField
+                    placeholder="Edad conyugue"
+                    type="text"
+                    disabled={true}
+                    name="Edad"
+                    value={ValidationUtils.Valida_numeros(formData.ageConyugueCalculated)}
+                    onChange={handleChange}
+                    variant="standard"
+                    fullWidth
+                    inputProps={{ maxLength: 10 }}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={10.5} md={3}>
+                  <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                    Pais <span style={{ color: 'red' }}>*</span>
+                  </Typography>
+                  <Select
+                    id="countryConyugue"
+                    name="countryConyugue"
+                    value={formData.countryConyugue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    style={{ textAlign: "left", }}
+                    variant="standard"
+                    placeholder="Seleccione País"
+                    fullWidth
+                    required
+                  >
+                    {country.map((risk, index) => (
+                      <MenuItem key={index} value={risk.codpais}>
+                        {risk.nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+
+
               </Grid>
 
             </>
@@ -1884,8 +2070,34 @@ const PersonalFormLife = forwardRef((props, ref) => {
         <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingTop: '30px', fontWeight: 'bold' }}>
           DATOS DEL CERTIFICADO
         </Typography>
-
         <Grid container spacing={2} style={{ paddingRight: '45px' }}>
+
+          <Grid item xs={10.5} md={3} >
+            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              Tipo de Plan <span style={{ color: 'red' }}>*</span>
+            </Typography>
+            <Select
+              labelId="tipoProducto-Label"
+              id="tipoProducto"
+              name="tipoProducto"
+              value={formData.tipoProducto}
+              onChange={handleChange}
+              style={{ textAlign: "left", }}
+              variant="standard"
+              placeholder="Seleccione tipo de prestamo"
+              fullWidth
+              required
+            >
+
+              <MenuItem key='I' value='T'>
+                INDIVIDUAL
+              </MenuItem>
+              <MenuItem key='M' value='TC'>
+                MANCOMUNADO
+              </MenuItem>
+
+            </Select>
+          </Grid>
 
           <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
@@ -1910,6 +2122,31 @@ const PersonalFormLife = forwardRef((props, ref) => {
                 />
               </DemoContainer>
             </LocalizationProvider>
+          </Grid>
+
+          <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }}>
+            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+              Vigencia/Plazo <span style={{ color: 'red' }}>*</span>
+            </Typography>
+            <Select
+              labelId="vigencia-Label"
+              id="vigencia"
+              name="vigencia"
+              value={formData.vigencia}
+              onChange={handleChange}
+              style={{ textAlign: "left", }}
+              variant="standard"
+              placeholder="Seleccione documento"
+              fullWidth
+              required
+            >
+              {vigencia.map((vigencia, index) => (
+                <MenuItem key={vigencia.Codigo} value={vigencia.Codigo}>
+                  {vigencia.Nombre} Meses
+                </MenuItem>
+              ))}
+
+            </Select>
           </Grid>
 
           <Grid item xs={10.5} md={3} >
@@ -1938,30 +2175,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             </LocalizationProvider>
           </Grid>
 
-          <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }}>
-            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              Vigencia del prestamo <span style={{ color: 'red' }}>*</span>
-            </Typography>
-            <Select
-              labelId="vigencia-Label"
-              id="vigencia"
-              name="vigencia"
-              value={formData.vigencia}
-              onChange={handleChange}
-              style={{ textAlign: "left", }}
-              variant="standard"
-              placeholder="Seleccione documento"
-              fullWidth
-              required
-            >
-              {vigencia.map((vigencia, index) => (
-                <MenuItem key={vigencia.Codigo} value={vigencia.Codigo}>
-                  {vigencia.Nombre} Meses
-                </MenuItem>
-              ))}
 
-            </Select>
-          </Grid>
           <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Num. Prestamo <span style={{ color: 'red' }}>*</span>
@@ -1973,6 +2187,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               name="numPrestamo"
               value={ValidationUtils.Valida_numeros(formData.numPrestamo)}
               onChange={handleChange}
+              onBlur={() => verificaPrestamo(formData.numPrestamo)}
               variant="standard"
               fullWidth
               inputProps={{ maxLength: 10 }}
@@ -1999,16 +2214,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               required
             />
           </Grid> */}
-          <Grid item xs={10.5} md={3} style={{ paddingTop: '25px' }}>
-            <Button
-              onClick={handleOpenModal}
-              sx={{ mr: 1 }}
-              className="button-styled-primary"
-              style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
-            >
-              Calcular
-            </Button>
-          </Grid>
+
         </Grid>
 
 
@@ -2020,7 +2226,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
         <TableContainer
-          style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', justifyContent: 'center' }}
+          style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         >
           <Table
             sx={{ minWidth: 500, width: 500 }}
@@ -2041,6 +2247,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
               ))}
             </TableBody>
           </Table>
+
+          <Grid item xs={10.5} md={3} style={{ paddingTop: '25px' }}>
+            <Button
+              onClick={handleOpenModal}
+              sx={{ mr: 1 }}
+              className="button-styled-primary"
+              style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+            >
+              Calcular
+            </Button>
+          </Grid>
+
         </TableContainer>
 
 

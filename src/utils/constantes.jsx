@@ -33,6 +33,8 @@ export const LS_POLVIDAEDIT = 'cotizacion_vida_data';
 export const LS_VIDACOBERTURA = 'vida_cobertura';
 export const LS_DATAVIDASEND = 'datos_vida_completos';
 export const LS_DATOSPAGO = 'datos_vida_pago';
+export const LS_TPRESTAMO = 'tipo_prestamo';
+export const LS_FPAGO = 'frm_pago';
 
 // VEHICULO
 export const DATOS_VEHICULO_STORAGE_KEY = 'datos_vehiculos';

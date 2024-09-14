@@ -104,14 +104,40 @@ const QuoterService = {
 
     try {
       const response = await authService.fetchWithAuth(endpoint, method, data);
+
+      const pdfBlob = base64ToBlob(response.data.archivo, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        console.log(pdfBlob)
+        // Crear un enlace temporal para descargar el archivo
+        const downloadUrl = window.URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", "ReporteExcel.xlsx"); // O cualquier otro nombre de archivo
+        document.body.appendChild(link);
+        link.click();
+        link.remove(); // Limpiar el enlace temporal
+
+
+
       return response;
     } catch (error) {
       console.error('Error fetching Envio Correo Cuenta:', error);
       throw error;
     }
   },
+  
 
 
 };
+
+function base64ToBlob(base64, type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], {type: type});
+}
+
 
 export default QuoterService;

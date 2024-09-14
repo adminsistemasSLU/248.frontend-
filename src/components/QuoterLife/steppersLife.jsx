@@ -38,13 +38,14 @@ import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   USER_STORAGE_KEY,
-  LS_PRODUCTO,DATOS_PAGO_STORAGE_KEY,
-     LS_DATAVIDASEND,LS_DATOSPAGO,LS_PREGUNTASVIDA
-    ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA
+  LS_PRODUCTO, DATOS_PAGO_STORAGE_KEY,
+  LS_DATAVIDASEND, LS_DATOSPAGO, LS_PREGUNTASVIDA
+  , LS_DOCUMENTOSVIDA, LS_IDCOTIZACIONVIDA, LS_VIDAPOLIZA
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
 import RiskFormLife from "./riskFormLife";
+import LifeService from "../../services/LifeService/LifeService";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -177,23 +178,35 @@ export default function SteppersLife() {
 
 
     if (steps[activeStep].label === "Resumen") {
-      localStorage.removeItem(LS_PRODUCTO);
-      localStorage.removeItem(LS_DATAVIDASEND);
-      localStorage.removeItem(LS_DATOSPAGO);
-      localStorage.removeItem(LS_PREGUNTASVIDA);
-      localStorage.removeItem(LS_DOCUMENTOSVIDA);
-      localStorage.removeItem(LS_IDCOTIZACIONVIDA);
-      localStorage.removeItem(LS_VIDAPOLIZA);
-      localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
-      Swal.fire({
-        title: "Exito!",
-        text: `El proceso ha terminado`,
-        icon: "success",
-        confirmButtonText: "Ok",
-      }).then(() => {
-        navigate("/quoter/Pymes/MyQuotes");
-      });
-      return;
+      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      const terminarTarea = await LifeService.fetchEmitirCertificado(idCotizacion)
+      if (terminarTarea.codigo === 200) {
+        Swal.fire({
+          title: "Exito!",
+          text: `El proceso ha terminado`,
+          icon: "success",
+          confirmButtonText: "Ok",
+        }).then(() => {
+          localStorage.removeItem(LS_PRODUCTO);
+          localStorage.removeItem(LS_DATAVIDASEND);
+          localStorage.removeItem(LS_DATOSPAGO);
+          localStorage.removeItem(LS_PREGUNTASVIDA);
+          localStorage.removeItem(LS_DOCUMENTOSVIDA);
+          localStorage.removeItem(LS_IDCOTIZACIONVIDA);
+          localStorage.removeItem(LS_VIDAPOLIZA);
+          localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
+
+          navigate("/quoter/Pymes/MyQuotes");
+        });
+        return;
+      }else{
+        Swal.fire({
+          title: "Alerta!",
+          text: `El proceso no ha podido ser completado`,
+          icon: "warning",
+          confirmButtonText: "Ok",
+        });
+      }
     }
 
 
@@ -253,7 +266,8 @@ export default function SteppersLife() {
     try {
       handleOpenBackdrop();
       const idCotizacion = localStorage.getItem(LS_COTIZACION);
-      await IncendioService.descargarPdf(idCotizacion);
+      const producto = localStorage.getItem(LS_PRODUCTO);
+      await LifeService.fetchPrevizualizarPDF(producto, idCotizacion);
       handleCloseBackdrop();
     } catch (error) {
       handleCloseBackdrop();
@@ -311,10 +325,11 @@ export default function SteppersLife() {
   const enviarCorreo = async () => {
     try {
       handleOpenBackdrop();
-      let user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
 
+      let user = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+      let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
-
+      let name = user.name + ' ' + user.lastname;
       let emailValido = validateEmail(email);
       console.log(emailValido);
       if (!emailValido) {
@@ -326,14 +341,14 @@ export default function SteppersLife() {
           confirmButtonText: "Ok",
         });
         setEmailError("El Correo no es valido");
-
         return;
       }
 
-      const response = await EmailService.fetchEnvioCorreoCotizacion(
+      const response = await EmailService.fetchEnvioCorreoVida(
         idCotizacion,
-        user.des_usuario,
-        email
+        name,
+        email,
+        producto
       );
 
       if (response.codigo === 200) {

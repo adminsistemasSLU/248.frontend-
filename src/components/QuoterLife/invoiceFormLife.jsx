@@ -25,16 +25,19 @@ import {
     LS_DATOSPAGO,
     LS_DATAVIDASEND,
     USER_STORAGE_KEY,
+    LS_FPAGO,
 } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
 import QuoterService from "../../services/QuoterService/QuoterService";
+import ComboService from "../../services/ComboService/ComboService";
 
 const InvoiceFormLife = forwardRef((props, ref) => {
 
 
     const [formData, setFormData] = useState({
         paidType: "C",
+        tipoProducto: '1',
         name: "",
         lastname: "",
         email: "",
@@ -50,23 +53,18 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         admision: "",
         subtotal: "",
         total: "",
-
+        country: ""
     });
 
 
-
-
-    const [tipoCredito, settipoCredito] = useState([]);
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
-    const [formPago, setFormPago] = React.useState([]);
     const [errorMessage, seterrorMessage] = React.useState([]);
     const [OpenSnackAlert, setOpenSnackAlert] = React.useState(false);
     const [validate, setvalidate] = React.useState(false);
     const [messageError, setmessageError] = useState("");
     const [errorCedula, setErrorCedula] = useState(false);
     const [open, setOpen] = useState(false);
-
-    const [asegurado, setAsegurado] = React.useState([]);
+    const [country, setCountry] = useState([]);
 
     const [editForm, setEditForm] = useState(false);
 
@@ -75,6 +73,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     useEffect(() => {
         const cargarData = async () => {
+            await cargarPais();
             handleOpenBackdrop();
             cargarDatosVidaPago();
             handleCloseBackdrop();
@@ -103,15 +102,27 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         }
     };
 
+    const cargarPais = async () => {
+        try {
+            const paises = await ComboService.fetchComboPais();
+            if (paises && paises.data) {
+                await setCountry(paises.data);
+                await setFormData((formData) => ({ ...formData, pais: paises.data[69].codpais }));
+            }
+        } catch (error) {
+            console.error("Error al obtener paises:", error);
+        }
+    };
 
     useImperativeHandle(ref, () => ({
         handleSubmitExternally: handleSubmit,
     }));
 
     const cargarDatosVidaPago = async () => {
-        
+        let f_pago = JSON.parse(localStorage.getItem(LS_FPAGO));
         let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
         let idCotizacion = localStorage.getItem(LS_COTIZACION);
+
         // debugger;
         if (idCotizacion) {
             setOpenBackdrop(true);
@@ -145,6 +156,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         }
         setFormData((prevData) => ({
             ...prevData,
+            formaPago: f_pago,
             paidType: formaPagos.paidType, // Asegúrate de que `newValue` es el valor correcto que deseas establecer
         }));
         let formapag = formaPagos.paidType || 'C';
@@ -169,7 +181,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     phone: coti[0].clitelefono,
                     direction: coti[0].clidireccion,
                     documentType: coti[0].clitipcedula,
-                    identification: coti[0].clicedula
+                    identification: coti[0].clicedula,
+                    pais:coti[0].clipais
                 }
                 let formaPagoAray = localStorage.getItem(LS_DATOSPAGO);
 
@@ -177,9 +190,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     factura = JSON.parse(formaPagoAray);
                 } else {
                     setEditForm(false);
-
-                    
-
                     factura = JSON.parse(coti[0].datosfacturas);
                     if (factura && factura.length !== 0) {
                         localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
@@ -200,7 +210,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             } else {
                 formaPagos = factura;
             }
-            console.log(formaPago);
+           
             let monto, prima, sbs, scc, derechoEmision, subtot, iva, total;
 
             if (factura) {
@@ -222,7 +232,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 iva = parseFloat(formaPagos.iva);
                 total = parseFloat(formaPagos.total);
             }
-
+            console.log(asegurado);
             if (formaPago === 'C') {
                 //let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
                 setFormData({
@@ -234,6 +244,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     direction: asegurado.direction,
                     documentType: asegurado.documentType,
                     identification: asegurado.identification,
+                    country:asegurado.pais,
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -244,9 +255,9 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     total: parseFloat(total).toFixed(2),
                 });
             }
-
+            console.log(formaPagoAray);
             if (formaPago === 'R') {
-                let nombre = '', lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
+                let nombre = '', pais='',lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
                 if (formaPagoAray) {
                     nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
                     lastname = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.lastname : '';
@@ -255,8 +266,9 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     documentType = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.documentType : '';
                     identification = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.identification : '';
                     direction = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.direction : '';
+                    pais = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.pais : '';
                 }
-
+                
                 setFormData({
                     ...formData,
                     name: nombre || '',
@@ -266,6 +278,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     documentType: documentType || 'C',
                     direction: direction || '',
                     identification: identification || '',
+                    country:pais|| '',
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -276,7 +289,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     total: parseFloat(total).toFixed(2),
                 });
             }
-
+            console.log(formData);
         }
         cargarData();
     }, [formaPago]);
@@ -305,6 +318,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             e.target.name === "phone" ||
             e.target.name === "direction" ||
             e.target.name === "documentType" ||
+            e.target.name === "country" ||
+            e.target.name === "tipoProducto" ||
             e.target.name === "identification"
         ) {
 
@@ -366,7 +381,17 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             setOpenSnackAlert(true);
             handleCloseBackdrop();
         }
-
+        let f_pago = JSON.parse(localStorage.getItem(LS_FPAGO));
+        f_pago = Number(f_pago);
+        
+        if ((Number(formData.tipoProducto) !== f_pago)) {
+            if (f_pago !== '') {
+                seterrorMessage("La forma de pago ingresada no es valido")
+                setOpenSnackAlert(true);
+                handleCloseBackdrop();
+                return false;
+            }
+        }
         return valido;
     };
 
@@ -392,7 +417,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             impSsc: formData.impSsc,
             admision: formData.admision,
             subtotal: formData.subtotal,
-            total: formData.total
+            total: formData.total,
+            pais:formData.pais
         }
 
         if (enviarFormulario) {
@@ -540,6 +566,29 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     sx={{ margin: "0px", minWidth: 290, width: "100%" }}
                                     variant="standard"
                                 >
+                                    <InputLabel id="tipoProducto-Label">Forma Pago</InputLabel>
+                                    <Select
+                                        labelId="tipoProducto-Label"
+                                        id="tipoProducto"
+                                        name="tipoProducto"
+                                        value={formData.tipoProducto}
+                                        onChange={handleChange}
+                                        style={{ textAlign: "left", }}
+                                        variant="standard"
+                                        placeholder="Seleccione documento"
+                                        fullWidth
+                                        required
+                                    >
+                                        <MenuItem value="1">Al contado</MenuItem>
+                                        <MenuItem value="2">Mensual</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControl
+                                    sx={{ margin: "0px", minWidth: 290, width: "100%" }}
+                                    variant="standard"
+                                >
                                     <InputLabel id="paidForm-Label">Tipo Documento</InputLabel>
                                     <Select
                                         labelId="documentType-Label"
@@ -667,6 +716,30 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     fullWidth
                                     required
                                 />
+                            </Grid>
+
+                            <Grid item xs={12} md={12}>
+                                <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                                    Pais <span style={{ color: 'red' }}>*</span>
+                                </Typography>
+                                <Select
+                                    id="country"
+                                    name="country"
+                                    value={formData.country}
+                                    onChange={handleChange}
+                                    style={{ textAlign: "left", }}
+                                    variant="standard"
+                                    placeholder="Seleccione País"
+                                    fullWidth
+                                    disabled={formaPago === 'C'}
+                                    required
+                                >
+                                    {country.map((risk, index) => (
+                                        <MenuItem key={index} value={risk.codpais}>
+                                            {risk.nombre}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
                             </Grid>
 
                         </Grid>
