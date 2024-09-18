@@ -21,7 +21,7 @@ import {
     Typography,
 } from "@mui/material";
 import {
-    DATOS_PERSONALES_STORAGE_KEY,
+    DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
     LS_COTIZACION,
     USER_STORAGE_KEY,
 } from "../../utils/constantes";
@@ -66,7 +66,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [provinces, setProvinces] = useState([]);
     const [pais, setPais] = useState([]);
     const [ciudades, setCiudades] = useState([]);
-    const [vigencia, setVigencia] = useState([]);
     const [fechaNacimiento, setFechaNacimiento] = useState(null);
 
     useEffect(() => {
@@ -102,7 +101,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 documentType: dataPersonal[0].clitipcedula,
                 identification: dataPersonal[0].clicedula,
                 address: dataPersonal[0].clidireccion,
-                gender: dataPersonal[0].cligenero,
+                gender: dataPersonal[0].cli_genero,
                 status: dataPersonal[0].cliestadocivil,
                 anios: dataPersonal[0].vigencia,
                 agente: dataPersonal[0].cliagente,
@@ -122,6 +121,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
         };
         try {
             const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
+
+            console.log(cotizacion);
 
             if (cotizacion && cotizacion.data) {
                 return cotizacion.data;
@@ -226,7 +227,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
             pais: formData.pais,
         };
 
-        localStorage.setItem(DATOS_PERSONALES_STORAGE_KEY, JSON.stringify(objetoSeguro));
+        localStorage.setItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY, JSON.stringify(objetoSeguro));
         return true;
     };
 
@@ -272,6 +273,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     email: cedulaData.data[0].cli_email || "",
                     phone: cedulaData.data[0].cli_celular || "",
                     address: cedulaData.data[0].cli_direccion || "",
+                    gender: cedulaData.data[0].cli_genero || "",
                 });
             }
         } catch (error) {

@@ -133,8 +133,6 @@ const DetailsCar = forwardRef((props, ref) => {
     const cleanValor1 = parseFloat(valor1.replace(/\./g, "").replace(",", "."));
     const cleanValor2 = parseFloat(valor2.replace(/\./g, "").replace(",", "."));
 
-    console.log(cleanValor1)
-    console.log(cleanValor2)
     return cleanValor1 + cleanValor2;
   };
 
@@ -148,20 +146,21 @@ const DetailsCar = forwardRef((props, ref) => {
 
     if (name === "marca") {
       cargarGrupo(modifiedValue);
+      formData.valor_vehiculo = "0,00";
       setModelo([]);
     }
 
     if (name === "grupo") {
       cargarModelo(modifiedValue);
+      formData.valor_vehiculo = "0,00";
     }
 
     if (name === "modelo") {
-      formData.suma_asegurada = obtenerMontoPorId(formatCurrency(modifiedValue));
+      formData.suma_asegurada = formatAmount(obtenerMontoPorId(modifiedValue));
+      formData.valor_vehiculo = formatAmount(obtenerMontoPorId(modifiedValue));
     }
 
     if (name === "valor_accesorios") {
-      console.log(modifiedValue);
-
       if (modifiedValue.includes("0,00")) {
         modifiedValue = modifiedValue.replace("0,00", "");
       }
@@ -211,12 +210,10 @@ const DetailsCar = forwardRef((props, ref) => {
     const newCar = {
       placa: formData.placa,
       marca: formData.marca,
-      modelo: formData.modelo,
+      modelo: obtenerNombrePorId(formData.modelo),
       anio: formData.anio,
       antiguedad: dayjs().diff(formData.anio, "year"),
       costo: formData.valor_vehiculo,
-      tasa: "TBD",
-      prima: "TBD",
       totalAsegurado: formData.suma_asegurada,
     };
 
@@ -275,7 +272,6 @@ const DetailsCar = forwardRef((props, ref) => {
     const grupo = await ComboService.fetchComboGrupo(idMarca);
     if (grupo?.data?.length > 0) {
       setGrupo(grupo.data);
-      console.log(grupo.data);
       setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
       await cargarModelo(grupo.data[0].idGrupo);
     }
@@ -285,11 +281,12 @@ const DetailsCar = forwardRef((props, ref) => {
     const modelo = await ComboService.fetchComboModelo(idGrupo);
     if (modelo?.data?.length > 0) {
       setModelo(modelo.data);
-      setFormData((prevData) => ({ ...prevData,
-        modelo: modelo.data[0].id,
-        valor_vehiculo: formatAmount(modelo.data[0].monto),
-        suma_asegurada: formatAmount(modelo.data[0].monto) }));
     }
+  };
+
+  const obtenerNombrePorId = (idBuscado) => {
+    const objetoEncontrado = modelo.find(item => item.id === idBuscado);
+    return objetoEncontrado ? objetoEncontrado.nombre : 'ID no encontrado';
   };
 
   const obtenerMontoPorId = (id) => {
@@ -588,8 +585,6 @@ const DetailsCar = forwardRef((props, ref) => {
                     <TableCell>Año</TableCell>
                     <TableCell>Antigüedad</TableCell>
                     <TableCell>Costo</TableCell>
-                    <TableCell>Tasa</TableCell>
-                    <TableCell>Prima</TableCell>
                     <TableCell>Eliminar</TableCell>
                   </TableRow>
                 </TableHead>
@@ -602,8 +597,6 @@ const DetailsCar = forwardRef((props, ref) => {
                       <TableCell>{car.anio}</TableCell>
                       <TableCell>{car.antiguedad} años</TableCell>
                       <TableCell>{car.costo}</TableCell>
-                      <TableCell>{car.tasa}</TableCell>
-                      <TableCell>{car.prima}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"

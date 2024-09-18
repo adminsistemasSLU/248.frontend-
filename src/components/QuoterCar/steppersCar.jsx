@@ -31,10 +31,9 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import {
-  DATOS_PERSONALES_STORAGE_KEY,
+  DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
   DATOS_VEHICULO_STORAGE_KEY,
   LS_COTIZACION,
-  LS_FORMAPAGO,
   USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
@@ -183,7 +182,7 @@ export default function SteppersCar() {
     }
 
     let datosPersonales = JSON.parse(
-      localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
+      localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY)
     );
 
     if (datosPersonales) {

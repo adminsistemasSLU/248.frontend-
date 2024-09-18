@@ -10,16 +10,12 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
     const [isLoading, setIsLoading] = useState(false);
     const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
     const [planesVehiculos, setPlanesVehiculos] = useState();
-    const [openModal, setOpenModal] = useState(false);
-    const [modalLink, setModalLink] = useState('');
 
-    const handleOpenModal = (link) => {
-        setModalLink(link);
-        setOpenModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setOpenModal(false);
+    const handleComparativo = () => {
+        const link = document.createElement('a');
+        link.href = `${process.env.PUBLIC_URL}/assets/resource/comparativo.pdf`;
+        link.download = 'comparativo.pdf';
+        link.click();
     };
 
     useEffect(() => {
@@ -113,11 +109,11 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
                                             {plan.plan.toUpperCase()}
                                         </Typography>
                                         <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
-                                            ${formatCurrency(plan.tasa * parseFloat(totalAsegurado)/100)}
+                                            ${formatCurrency(plan.tasa * parseFloat(totalAsegurado) / 100)}
                                         </Typography>
 
                                         <Typography variant="body2">
-                                            <Link href="#" onClick={() => handleOpenModal('https://www.example.com/plan-oro')} style={{ textDecoration: 'underline', color: 'black' }}>
+                                            <Link href="#" onClick={() => handleComparativo()} style={{ textDecoration: 'underline', color: 'black' }}>
                                                 Ver condiciones
                                             </Link>
                                         </Typography>
@@ -130,21 +126,6 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
                         </Typography>
                     )}
                 </Grid>
-                <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md" fullWidth>
-                    <DialogTitle>Condiciones del Plan</DialogTitle>
-                    <DialogContent dividers>
-                        <iframe
-                            src={modalLink}
-                            style={{ width: '100%', height: '500px', border: 'none' }}
-                            title="Condiciones del Plan"
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleCloseModal} color="primary">
-                            Cerrar
-                        </Button>
-                    </DialogActions>
-                </Dialog>
             </Card>
         </>
     );
