@@ -453,14 +453,15 @@ const DetailsCar = forwardRef((props, ref) => {
     } catch (error) {
       console.error("Error al cargar grupos:", error);
 
-    const grupo = await ComboService.fetchComboGrupo(idMarca);
-    if (grupo?.data?.length > 0) {
-      setGrupo(grupo.data);
-      setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
-      await cargarModelo(grupo.data[0].nombre);
+      const grupo = await ComboService.fetchComboGrupo(idMarca);
+      if (grupo?.data?.length > 0) {
+        setGrupo(grupo.data);
+        setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
+        await cargarModelo(grupo.data[0].nombre);
 
+      }
     }
-  };
+  }
 
   const cargarModelo = async (nombre) => {
     const anio = formData.anio;
@@ -472,10 +473,12 @@ const DetailsCar = forwardRef((props, ref) => {
     } else {
       formData.valor_vehiculo = "0,00";
 
-      setFormData((prevData) => ({ ...prevData,
+      setFormData((prevData) => ({
+        ...prevData,
         modelo: modelo.data[0].id,
         valor_vehiculo: formatAmount(modelo.data[0].monto),
-        suma_asegurada: formatAmount(modelo.data[0].monto) })
+        suma_asegurada: formatAmount(modelo.data[0].monto)
+      })
       );
 
     }
