@@ -135,7 +135,6 @@ export default function ProtectionDetailTable({
 
   React.useEffect(() => {
     setTablaAmparo(JSON.parse(localStorage.getItem(LS_TABLAAMPARO)));
-    console.log(id);
     setEditableValues(
       initialRows.map((row) => ({
         descripcion: row.descripcion,
@@ -154,12 +153,10 @@ export default function ProtectionDetailTable({
           amparoDetails.inventarioDetalleAmparo.InventarioDetalleAmparo.map(
             (item, index) => createData(index + 1, item.descripcion, item.monto)
           );
-        console.log(newInitialRows);
         setRowsPerPage(newInitialRows.length);
         setInitialRows(newInitialRows);
         setJsonData(newInitialRows);
         setEditableValues(newInitialRows);
-        console.log({ jsonData, editableValues, visibleRows });
       }
     }
   }, []);
@@ -193,8 +190,6 @@ export default function ProtectionDetailTable({
 
     // Solo procesar como número si el campo no es 'descripcion'
     if (field !== "descripcion") {
-      console.log(newValue);
-      console.log(field);
       let numericValue = parseFloat(newValue.replace(/[^\d.-]/g, ""));
       numericValue = isNaN(numericValue) ? 0.0 : numericValue;
       valueToSet = isNaN(numericValue) ? newValue : numericValue; // Usa el valor numérico si no es NaN, de lo contrario usa el valor original

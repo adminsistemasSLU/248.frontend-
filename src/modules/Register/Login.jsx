@@ -49,7 +49,7 @@ const Login = () => {
     e.preventDefault();
 
     if(errorPassword!==''){
-      console.log('Error corregido')
+
       return;
     }
     
@@ -59,13 +59,11 @@ const Login = () => {
         txtPassword: formData.password,
       };
       const response = await signin('api/Login', 'POST', data);
-      console.log(response);
       if(response.codigo !==200){
         setOpenSnack(true);
         setErrorMessage(response.message);
       }
     } catch (error) {
-      console.log(error);
       setError("Se presentó un error con el inicio de sesión. Por favor, intente nuevamente.");
     }
   };

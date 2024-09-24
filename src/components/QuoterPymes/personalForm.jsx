@@ -55,7 +55,6 @@ const PersonalForm = forwardRef((props, ref) => {
 
   const cargarDatos = async () => {
     const dataPersonal = await cargarCotizacion();
-    console.log(dataPersonal);
     if (isMounted.current) {
       setFormData((formData) => ({
         ...formData,
@@ -244,8 +243,6 @@ const PersonalForm = forwardRef((props, ref) => {
       DATOS_PERSONALES_STORAGE_KEY,
       JSON.stringify(objetoSeguro)
     );
-
-    console.log("Formulario enviado:", objetoSeguro, next);
     return next;
   };
 

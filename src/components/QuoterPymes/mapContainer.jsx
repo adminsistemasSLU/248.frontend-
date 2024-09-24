@@ -160,10 +160,7 @@ const MapContainer = forwardRef(
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=` +
             API_Key_Google_Maps
         );
-        console.log(response);
         let data = await response.json();
-        console.log(data);
-        console.log(data.error_message);
 
         if (data.results.length > 0) {
           return data.results[0].formatted_address;

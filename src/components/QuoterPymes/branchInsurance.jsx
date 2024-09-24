@@ -228,15 +228,12 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
           ramo,
           producto
         );
-        console.log(detalleAsegurado);
       } else {
         detalleAsegurado.codigo = 200;
         detalleAsegurado.data = newItems;
       }
-      console.log(detalleAsegurado);
       if (detalleAsegurado && detalleAsegurado.data) {
         newItems = detalleAsegurado.data.map((detalleAsegurado) => {
-          console.log(detalleAsegurado);
 
           const checked = isfetch
             ? detalleAsegurado.estado === 1
@@ -256,7 +253,6 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
             Amparo: detalleAsegurado.Amparo || [],
           };
         });
-        console.log(newItems);
 
         newItems = calcularPrima(newItems);
 
@@ -290,11 +286,9 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
   };
 
   const handleOpenModal = (codigo) => {
-    console.log(codigo);
     setSelectedSeccion(codigo);
     localStorage.setItem(LS_CLASIFICACIONAMPARO, codigo);
     const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
-    console.log(tablaSecciones);
     localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(editableRows));
 
     setOpenModal(true);
@@ -308,14 +302,11 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
 
   function tablaSeccionesMap() {
     let tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
-    console.log(tablaSecciones);
     tablaSecciones = tablaSecciones.map((seccion) => {
       let tasaMap = (
         (parseFloat(seccion.prima) / parseFloat(seccion.monto)) *
         100
       ).toFixed(2);
-
-      console.log(tasaMap);
       
       return {
         ...seccion,
@@ -341,7 +332,6 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
     const existeSeleccion = tablaSecciones.some(
       (seccion) => seccion.checked === true
     );
-    console.log(existeSeleccion);
   }
 
   // Nuevo estado para rastrear los valores editables
@@ -351,7 +341,6 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
 
   const handleSaveChanges = () => {
     const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
-    console.log(tablaSecciones);
     tablaSecciones.map((item, index) => {
       if (index < editableValues.length && editableValues[index] != null) {
         return {
@@ -376,7 +365,6 @@ export default function BranchInsurance({ closeModalDetail, isEditMode }) {
     const alMenosUnoTieneAmparo = tablaSecciones.some((item, index) => {
       return item.Amparo && item.Amparo.length > 0;
     });
-    console.log(alMenosUnoTieneAmparo);
     if (!alMenosUnoTieneAmparo) {
       setOpenSnack(true);
       setErrorMessage("Se debe agregar un detalle de Amparo");

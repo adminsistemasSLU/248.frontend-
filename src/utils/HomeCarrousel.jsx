@@ -19,7 +19,6 @@ function HomeCarrousel(props) {
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const baldosas = JSON.parse(localStorage.getItem(API_BALDOSAS));
-    console.log(baldosas);
     var items3 = [
         {
             name: "PYMES",
@@ -46,10 +45,8 @@ function HomeCarrousel(props) {
         localStorage.removeItem(LS_IDCOTIZACIONVIDA);
         localStorage.removeItem(LS_VIDAPOLIZA);
         localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
-        console.log('Error al obtener baldosas:',)
         localStorage.removeItem(LS_COTIZACION);
         const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
-        console.error('Cotizacion: '+cotizacion)
         if(baldosas){
             setItems(baldosas);
             return;
@@ -59,7 +56,6 @@ function HomeCarrousel(props) {
             try {
                 setIsLoading(true);
                 const baldosas = await BaldosasService.fetchBaldosas();
-                console.log(baldosas);
                 
                 setIsLoading(false);
                 if (baldosas && baldosas.data.BaldosaServisios) {
@@ -76,7 +72,6 @@ function HomeCarrousel(props) {
                     });
                     setItems(newItems);
                     localStorage.setItem(API_BALDOSAS,JSON.stringify(newItems));
-                    console.log(newItems);
                 }
             } catch (error) {
                 console.error('Error al obtener baldosas:', error);
@@ -151,7 +146,6 @@ function Item(props) {
         return null;
     }
     const handleImageClick = (ramo) => {
-        console.log('Ramo elegido: '+ramo);
         localStorage.setItem(LS_RAMO,JSON.stringify(ramo));
         localStorage.removeItem(API_SUBBALDOSAS);
         localStorage.removeItem(LS_COTIZACION);

@@ -127,7 +127,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     if (e.target.name === "city") {
       cargarParroquia(e.target.value);
     }
-    console.log(e.target.name);
     if (
       e.target.name === "block" ||
       e.target.name === "house" ||
@@ -187,7 +186,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
     }
 
     let objetoSeguro = obtenerFormulario();
-    console.log(objetoSeguro);
     if (!objetoSeguro) {
       return;
     }
@@ -205,7 +203,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
 
     try {
       const response = await accionCotizacion(objetoSeguro);
-      console.log(response);
 
       if (response.codigo === 200) {
         localStorage.removeItem(LS_TABLASECCIONES);
@@ -235,7 +232,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   const obtenerFormulario = () => {
     const idCotizacion = localStorage.getItem(LS_COTIZACION);
     if (!idCotizacion) {
-      console.log("No existe cotizacion generada");
       return null;
     }
 
@@ -337,24 +333,19 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
         id: idObject,
       };
     }
-    console.log(formDatas);
     return formDatas;
   };
 
   const onMarkerDragEnd = ({ lat, lng, direccion }) => {
-    console.log(direccion);
     if (direccion) {
       if (direccion.code === 500) {
-        console.log("error api");
         direccion = "";
       }
     }
     setFormData({ ...formData, lat, lng, direccion });
-    console.log("Marcador actualizado:", formData);
   };
 
   const updateLocation = (lat, lng, direccion) => {
-    console.log(direccion);
     setFormData((prevFormData) => ({
       ...prevFormData,
       lat: lat,
@@ -371,7 +362,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
 
   useEffect(() => {
     const cargarData = async () => {
-      console.log(editMode);
       if (editMode) {
         handleOpenBackdrop();
         await cargarDatosEditar();
@@ -493,7 +483,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
       );
       if (antiguedad && antiguedad.data) {
         setAntiguedad(antiguedad.data);
-        console.log(antiguedad.data[0].Codigo);
         setFormData((formData) => ({
           ...formData,
           buildingAge: antiguedad.data[0].Codigo,
@@ -570,7 +559,6 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
   };
 
   const cargarConstruccion = async (value) => {
-    console.log(openBackdrop1);
     setConstruccion([]);
     try {
       const construccion = await ComboService.fetchComboTipConstruccion();

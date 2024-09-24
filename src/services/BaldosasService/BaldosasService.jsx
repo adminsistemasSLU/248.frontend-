@@ -25,7 +25,6 @@ const BaldosasService = {
     
     try {
       const response = await authService.fetchWithAuth(endpoint, method);
-      console.log(response);
       return response;
     } catch (error) {
       console.error('Error fetching subbaldosas:', error);

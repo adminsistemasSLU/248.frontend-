@@ -40,15 +40,12 @@ const RiskFormLife = forwardRef((props, ref) => {
       let array = Object.values(docuemtos);
       setDocuments(array || []);
 
-      console.log(questions);
       //PREGUNTAR SI ES MODO EDITAR
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
 
       if (idCotizacion) {
         const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
         const preguntas = data.jsonPreguntas;
-        console.log(preguntas);
-        console.log(questions);
         const questionUploadNew = questions.map((item) => {
           // Buscamos la pregunta correspondiente en el arreglo preguntas
           const preguntaCorrespondiente = preguntas.find(pregunta => pregunta.codigo === item.codigo);
@@ -59,7 +56,6 @@ const RiskFormLife = forwardRef((props, ref) => {
             respuesta: preguntaCorrespondiente ? preguntaCorrespondiente.respuestapregunta : item.respuesta
           };
         });
-        console.log(questionUploadNew);
         // Actualizamos el estado con el nuevo arreglo
         setQuestionsUpload(questionUploadNew);
 
@@ -82,7 +78,6 @@ const RiskFormLife = forwardRef((props, ref) => {
   const handleSubmit = async (e) => {
 
     const respuestasIncompletas = questionsUpload.some(q => !q.respuesta || q.respuesta.trim() === "");
-    console.log(respuestasIncompletas);
     if (respuestasIncompletas) {
       setErrorMessage("Por favor, complete todas las respuestas antes de continuar.");
       setOpenSnack(true); 
@@ -127,7 +122,6 @@ const RiskFormLife = forwardRef((props, ref) => {
 
   const handleFileChange = (event, codId, nombre) => {
 
-    console.log(event);
     let newFiles = Array.from(event.target.files);
     newFiles = newFiles.map(file => ({
       file,
@@ -150,7 +144,6 @@ const RiskFormLife = forwardRef((props, ref) => {
   };
 
   const handleRemoveFile = (fileCod) => {
-    console.log(fileCod);
     setDocumentsUpload(prevFiles =>
       prevFiles.filter(fileObj => fileObj.codigo !== fileCod)
     );
@@ -243,7 +236,6 @@ const RiskFormLife = forwardRef((props, ref) => {
 
   const handleSelectChange = (event, questionIndex) => {
     const value = event.target.value;
-    console.log(value, questionIndex);
     setQuestionsUpload(prevQuestions => {
       const newQuestions = [...prevQuestions];
       newQuestions[questionIndex].respuesta = value;

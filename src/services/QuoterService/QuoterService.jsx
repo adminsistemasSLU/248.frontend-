@@ -106,7 +106,6 @@ const QuoterService = {
       const response = await authService.fetchWithAuth(endpoint, method, data);
 
       const pdfBlob = base64ToBlob(response.data.archivo, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        console.log(pdfBlob)
         // Crear un enlace temporal para descargar el archivo
         const downloadUrl = window.URL.createObjectURL(pdfBlob);
         const link = document.createElement("a");

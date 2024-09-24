@@ -31,10 +31,9 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import {
-  DATOS_PERSONALES_STORAGE_KEY,
+  DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
   DATOS_VEHICULO_STORAGE_KEY,
-  LS_COTIZACION,
-  LS_FORMAPAGO,
+  LS_COTIZACION_VEHICULO,
   USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
@@ -153,7 +152,7 @@ export default function SteppersCar() {
   };
 
   const modoEditar = () => {
-    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
     if (idCotizacion) {
       setActiveStep(2);
     }
@@ -169,7 +168,10 @@ export default function SteppersCar() {
 
   const handleComparativo = () => {
     const link = document.createElement('a');
-    link.href = `${process.env.PUBLIC_URL}/assets/resource/comparativo.pdf`;
+    // link.href = `${process.env.PUBLIC_URL}/assets/resource/comparativo.pdf`+ localStorage.getItem(LS_COTIZACION_VEHICULO);
+    console.log("Link de descarga: ");
+    console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/`+ localStorage.getItem(LS_COTIZACION_VEHICULO));
+    link.href = `${process.env.PUBLIC_URL}/api/cotizacion_pdf/`+ localStorage.getItem(LS_COTIZACION_VEHICULO);
     link.download = 'comparativo.pdf';
     link.click();
   };
@@ -183,7 +185,7 @@ export default function SteppersCar() {
     }
 
     let datosPersonales = JSON.parse(
-      localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
+      localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY)
     );
 
     if (datosPersonales) {
@@ -192,15 +194,7 @@ export default function SteppersCar() {
 
     if (steps[activeStep].label === "Datos Vehículo") {
       continuar = await questionFormRef.current.handleSubmitExternally();
-      let datosVehiculo = JSON.parse(
-        localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY)
-      );
-      
-      const totalAseguradoSum = datosVehiculo.reduce((sum, car) => {
-        return sum + parseCurrency(car.totalAsegurado);
-      }, 0);
-  
-      setTotalAsegurado(totalAseguradoSum);
+
     }
 
     if (continuar) {
@@ -223,7 +217,7 @@ export default function SteppersCar() {
     },
     {
       label: "Planes",
-      formComponent: <ProductListCardsCar ref={paidFormRef} onNext={handleNext} totalAsegurado={totalAsegurado} />,
+      formComponent: <ProductListCardsCar ref={paidFormRef} onNext={handleNext} />,
     },
     {
       label: "Facturación",
@@ -242,7 +236,7 @@ export default function SteppersCar() {
   const descargarPdf = async () => {
     try {
       handleOpenBackdrop();
-      const idCotizacion = localStorage.getItem(LS_COTIZACION);
+      const idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
       await IncendioService.descargarPdf(idCotizacion);
       handleCloseBackdrop();
     } catch (error) {
@@ -272,7 +266,6 @@ export default function SteppersCar() {
   };
 
   const handleBack = () => {
-    console.log(activeStep);
     if (activeStep < 1) {
       navigate('/quoter/dashboard');
     }
@@ -298,62 +291,7 @@ export default function SteppersCar() {
     setOpenSnack(false);
   };
 
-  const enviarCorreo = async () => {
-    try {
-      handleOpenBackdrop();
-      let user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
-
-      let emailValido = validateEmail(email);
-      console.log(emailValido);
-      if (!emailValido) {
-        handleCloseBackdrop();
-        Swal.fire({
-          title: "Error!",
-          text: `Correo no valido`,
-          icon: "error",
-          confirmButtonText: "Ok",
-        });
-        setEmailError("El Correo no es valido");
-
-        return;
-      }
-
-      const response = await EmailService.fetchEnvioCorreoCotizacion(
-        idCotizacion,
-        user.des_usuario,
-        email
-      );
-
-      if (response.codigo === 200) {
-        handleCloseBackdrop();
-        Swal.fire({
-          title: "Exito!",
-          text: response.data,
-          icon: "success",
-          confirmButtonText: "Ok",
-        }).then(() => {
-          setOpen(false);
-        });
-      } else {
-        handleCloseBackdrop();
-        setOpen(false);
-      }
-    } catch (error) {
-      // Manejar errores de la petición
-      console.error("Error al realizar la solicitud:", error);
-      handleCloseBackdrop();
-    }
-  };
-
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
   const handleSendQuoter = () => {
-    enviarCorreo();
   };
 
   return (

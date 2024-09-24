@@ -44,14 +44,13 @@ const PaymentMethods = () => {
     let datosPersonales = JSON.parse(
       localStorage.getItem(DATOS_PERSONALES_STORAGE_KEY)
     );
-    console.log(datosPersonales);
+
     if (datosPersonales) {
       setEmail(datosPersonales.correo);
       setCLiente(datosPersonales.nombre + " " + datosPersonales.apellido);
     }
     setFpago(pagoID);
 
-    console.log(fPago);
   }, []);
   // Función para manejar el envío del correo
 

@@ -15,14 +15,12 @@ import {
     Backdrop,
     CircularProgress,
     MenuItem,
-    FormControl,
     Select,
     Card,
     Typography,
 } from "@mui/material";
 import {
-    DATOS_PERSONALES_STORAGE_KEY,
-    LS_COTIZACION,
+    LS_COTIZACION_VEHICULO,
     USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import "../../styles/form.scss";
@@ -33,9 +31,10 @@ import ComboService from "../../services/ComboService/ComboService";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import CarsService from "../../services/CarsServices/CarsService";
 
 dayjs.extend(customParseFormat);
-
+dayjs.locale('es');
 const PersonalFormCar = forwardRef((props, ref) => {
     const [formData, setFormData] = useState({
         name: "",
@@ -66,16 +65,13 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [provinces, setProvinces] = useState([]);
     const [pais, setPais] = useState([]);
     const [ciudades, setCiudades] = useState([]);
-    const [vigencia, setVigencia] = useState([]);
     const [fechaNacimiento, setFechaNacimiento] = useState(null);
 
     useEffect(() => {
         const iniciarDatosCombos = async () => {
             handleOpenBackdrop();
-            let idCotizacion = localStorage.getItem(LS_COTIZACION);
-            await cargarProvincias();
-            await cargarEstadoCivil();
-            await cargarPais();
+            let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
+            await Promise.all([cargarProvincias(), cargarEstadoCivil(), cargarPais()]);
             handleCloseBackdrop();
             if (idCotizacion) {
                 await cargarDatos();
@@ -102,7 +98,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 documentType: dataPersonal[0].clitipcedula,
                 identification: dataPersonal[0].clicedula,
                 address: dataPersonal[0].clidireccion,
-                gender: dataPersonal[0].cligenero,
+                gender: dataPersonal[0].cli_genero,
                 status: dataPersonal[0].cliestadocivil,
                 anios: dataPersonal[0].vigencia,
                 agente: dataPersonal[0].cliagente,
@@ -115,7 +111,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
 
     const cargarCotizacion = async () => {
         let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-        let idCotizacion = localStorage.getItem(LS_COTIZACION);
+        let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
+
         let dato = {
             usuario: userId.id,
             id_CotiGeneral: idCotizacion,
@@ -175,8 +172,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
         handleSubmitExternally: handleSubmit,
     }));
 
-    const handleSubmit = (e) => {
-        if (e && e.preventDefault) e.preventDefault(); 
+    const handleSubmit = async (e) => {
+        if (e && e.preventDefault) e.preventDefault();
 
         const requiredFields = [
             "name",
@@ -207,28 +204,59 @@ const PersonalFormCar = forwardRef((props, ref) => {
 
         if (!next) return false;
 
-        const objetoSeguro = {
-            name: formData.name,
-            lastname: formData.lastname,
-            email: formData.email,
-            phone: formData.phone,
-            documentType: formData.documentType,
-            identification: formData.identification,
-            address: formData.address,
-            gender: formData.gender,
-            status: formData.status,
-            anios: formData.anios,
-            inicioVigencia: formData.inicioVigencia,
-            agente: formData.agente,
-            provincia: formData.provincia,
-            ciudad: formData.ciudad,
-            fechaNacimiento: formData.fechaNacimiento,
-            pais: formData.pais,
-        };
-
-        localStorage.setItem(DATOS_PERSONALES_STORAGE_KEY, JSON.stringify(objetoSeguro));
-        return true;
+        const data = transformarObjetoSeguro(formData);
+        try {
+            handleOpenBackdrop();
+            const response = await CarsService.fetchGrabaDatosPersona(data);
+            if (response.codigo === 200) {
+                handleCloseBackdrop();
+                localStorage.setItem(LS_COTIZACION_VEHICULO, response.data)
+                return true;
+            } else {
+                handleCloseBackdrop();
+                setErrorMessage("Se presentó un error, por favor vuelva a intentar");
+                setOpenSnack(true);
+                return false;
+            }
+        } catch (error) {
+            handleCloseBackdrop();
+            setErrorMessage("Se presentó un error, por favor vuelva a intentar");
+            setOpenSnack(true);
+            return false;
+        }
     };
+
+    const transformarObjetoSeguro = (objetoSeguro) => {
+        return {
+            // producto: process.env.PRODUCT_PIVOTE,
+            // ramo: process.env.RAMO_VEHICULO,
+            producto: 99999,
+            ramo: 3,
+            datosCliente: {
+                zona: obtenerProvinciaPorId(objetoSeguro.provincia)[0],
+                tipoPoliza: "1",
+                nuePoliza: null,
+                poliza: "",
+                agente: "",
+                agenteCorreo: "",
+                tipoCedula: objetoSeguro.documentType,
+                cedula: objetoSeguro.identification,
+                apellido: objetoSeguro.lastname,
+                nombre: objetoSeguro.name,
+                fecNacimiento: objetoSeguro.fechaNacimiento,
+                correo: objetoSeguro.email,
+                genero: objetoSeguro.gender,
+                estadoCivil: obtenerEstadoCivilPorId(objetoSeguro.status),
+                pais: obtenerPaisPorId(objetoSeguro.pais),
+                telefono: objetoSeguro.phone,
+                direccion: objetoSeguro.address,
+                provincia: obtenerProvinciaPorId(objetoSeguro.provincia),
+                ciudad: obtenerCiudadPorId(objetoSeguro.ciudad),
+                vigencia: objetoSeguro.anios
+            }
+        };
+    };
+
 
     const verifyIdentification = async (e) => {
         const { value } = e.target;
@@ -262,12 +290,13 @@ const PersonalFormCar = forwardRef((props, ref) => {
             const cedulaData = await UsuarioService.fetchConsultarUsuario(documentType, identification);
             if (cedulaData.codigo === 200 && cedulaData.data) {
                 setFormData({
-                    ...formData, // Conserva los valores actuales
+                    ...formData,
                     name: cedulaData.data[0].cli_nombres || "",
                     lastname: cedulaData.data[0].cli_apellidos || "",
                     email: cedulaData.data[0].cli_email || "",
                     phone: cedulaData.data[0].cli_celular || "",
                     address: cedulaData.data[0].cli_direccion || "",
+                    gender: cedulaData.data[0].cli_genero || "",
                 });
             }
         } catch (error) {
@@ -338,11 +367,33 @@ const PersonalFormCar = forwardRef((props, ref) => {
             const pais = await ComboService.fetchComboPais();
             if (pais && pais.data) {
                 setPais(pais.data);
-                setFormData((formData) => ({ ...formData, pais: pais.data[0].codiso }));
+                setFormData((formData) => ({
+                    ...formData,
+                    pais: pais.data.find((item) => item.nombre.toLowerCase() === "ecuador".toLowerCase()).codiso
+                }));
             }
         } catch (error) {
             console.error("Error al obtener pais:", error);
         }
+    };
+
+    const obtenerNombrePorId = (id, arrayDatos, idPropiedad = 'Codigo', nombrePropiedad = 'nombre') => {
+        const objetoEncontrado = arrayDatos.find(item => item[idPropiedad].toLowerCase() === id.toLowerCase());
+        return objetoEncontrado ? objetoEncontrado[nombrePropiedad] : 'ID no encontrado';
+    };
+
+    const obtenerPaisPorId = (id) => obtenerNombrePorId(id, pais, 'codiso', 'nombre');
+    const obtenerCiudadPorId = (id) => obtenerNombrePorId(id, ciudades, 'Codigo', 'Nombre');
+    const obtenerProvinciaPorId = (id) => obtenerNombrePorId(id, provinces, 'Codigo', 'Nombre');
+    const obtenerEstadoCivilPorId = (id) => obtenerNombrePorId(id, estadoCivil, 'Codigo', 'Nombre');
+
+    const handleDateChange = (newValue) => {
+        const formattedDate = newValue ? dayjs(newValue).format('DD/MM/YYYY') : '';
+        setFechaNacimiento(newValue); // Almacena el valor seleccionado
+        setFormData((prevData) => ({
+            ...prevData,
+            fechaNacimiento: formattedDate, // Almacena la fecha formateada en el formData
+        }));
     };
 
     return (
@@ -581,10 +632,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                                     disabled={errorCedula}
                                     className="datePicker"
                                     maxDate={maxDate}
-                                    onChange={(newValue) => {
-                                        setFechaNacimiento(newValue);
-                                        setFormData({ ...formData, fechaNacimiento: newValue });
-                                    }}
+                                    onChange={handleDateChange}
                                 />
                             </DemoContainer>
                         </LocalizationProvider>

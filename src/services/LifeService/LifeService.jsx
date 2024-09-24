@@ -195,7 +195,6 @@ const LifeService = {
 
     try {
       const response = await authService.fetchWithAuth(endpoint, method, data);
-      console.log(response);
       if (response.codigo===200 && response.data) {
         const now = new Date();
         const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;

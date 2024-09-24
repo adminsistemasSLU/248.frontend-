@@ -173,12 +173,8 @@ const IncendioService = {
     };
     try {
       const response = await authService.fetchWithAuth(endpoint, method, data);
-      console.log(response);
       if (response.codigo===200 && response.data) {
-        // Decodificar el PDF en base64 y convertirlo 
-        console.log(response);
         const pdfBlob = base64ToBlob(response.data, 'application/pdf');
-        console.log(pdfBlob)
         // Crear un enlace temporal para descargar el archivo
         const downloadUrl = window.URL.createObjectURL(pdfBlob);
         const link = document.createElement("a");

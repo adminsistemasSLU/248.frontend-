@@ -14,7 +14,6 @@ export const AuthContext = React.createContext({
 export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {
-        console.log('context undefined');
       throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
@@ -46,7 +45,6 @@ export const AuthProvider = ({ children }) => {
                     console.error('Error al validar el token:', error);
                 }
             } else {
-                console.log('No encontro token');
                 setIsLoading(false);
                 navigate('/login');
                 setUser('');
@@ -59,10 +57,8 @@ export const AuthProvider = ({ children }) => {
     const signin = async (endpoint, method, data, additionalHeaders) => {
         setIsLoading(true);
         try {
-            console.log(data);
             const userData = await authService.fetchWithAuth(endpoint, method, data, additionalHeaders);
             if(userData.codigo===200){
-                console.log(userData);
                 localStorage.setItem(TOKEN_STORAGE_KEY, userData.token);
                 localStorage.setItem(USER_STORAGE_KEY,JSON.stringify (userData.data.usuario) );
                 localStorage.setItem(MENU_STORAGE_KEY,JSON.stringify (userData.data.menu) );
