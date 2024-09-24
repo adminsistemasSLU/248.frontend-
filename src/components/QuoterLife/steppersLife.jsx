@@ -510,7 +510,7 @@ export default function SteppersLife() {
                 className="button-styled-primary"
                 style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
               >
-                Enviar Certificado
+                Descargar Documentos
               </Button>
             )}
 
