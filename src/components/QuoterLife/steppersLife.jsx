@@ -199,7 +199,7 @@ export default function SteppersLife() {
           navigate("/quoter/Pymes/MyQuotes");
         });
         return;
-      }else{
+      } else {
         Swal.fire({
           title: "Alerta!",
           text: `El proceso no ha podido ser completado`,
@@ -225,7 +225,6 @@ export default function SteppersLife() {
 
     if (steps[activeStep].label === "Riesgo") {
       continuar = await questionFormRef.current.handleSubmitExternally();
-
     }
 
     if (continuar) {
@@ -242,7 +241,6 @@ export default function SteppersLife() {
     {
       label: "Producto",
       formComponent: <ProductListCardsLife onNext={handleNext} />,
-      // formComponent: <PersonalFormLife ref={personalFormRef} />,
     },
     {
       label: "Datos Personales",
@@ -267,7 +265,7 @@ export default function SteppersLife() {
       handleOpenBackdrop();
       const idCotizacion = localStorage.getItem(LS_COTIZACION);
       const producto = localStorage.getItem(LS_PRODUCTO);
-      await LifeService.fetchPrevizualizarPDF(producto, idCotizacion);
+      await LifeService.fetchPrevizualizarPDFFormulario(producto, idCotizacion);
       handleCloseBackdrop();
     } catch (error) {
       handleCloseBackdrop();
@@ -277,6 +275,27 @@ export default function SteppersLife() {
 
   const handleDownloadPdf = () => {
     descargarPdf();
+  };
+
+  const handleDownloadPdfCertificado = () => {
+    descargarPdfCertificado('Certificado de Vida');
+  };
+
+  const handleDownloadPdfFormulario = () => {
+    descargarPdfCertificado('Solicitud de Vida');
+  };
+
+  const descargarPdfCertificado = async (titulo) => {
+    try {
+      handleOpenBackdrop();
+      const idCotizacion = localStorage.getItem(LS_COTIZACION);
+      const producto = localStorage.getItem(LS_PRODUCTO);
+      await LifeService.fetchPrevizualizarPDFCertificado(producto, idCotizacion, titulo);
+      handleCloseBackdrop();
+    } catch (error) {
+      handleCloseBackdrop();
+      console.error("Error al obtener Tipo Credito: ", error);
+    }
   };
 
   const totalSteps = () => {
@@ -406,28 +425,38 @@ export default function SteppersLife() {
         </Snackbar>
 
         <DialogTitle id="alert-dialog-title">
-          {"Enviar cotización por correo"}
+          {"Descargar Reportes"}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <Grid item xs={12}>
-              <TextField
-                label="Correo electrónico"
-                type="text"
-                name="identification"
-                value={email}
-                onChange={handleChangeEmail}
-                variant="standard"
-                fullWidth
-                required
-              />
-            </Grid>
+          <DialogContentText id="alert-dialog-description" style={{ display: "flex", gap: '30px' }} >
+          <Button
+            onClick={handleDownloadPdf}
+            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+            Descargar Formulario
+          </Button>
+          <Button
+            onClick={handleDownloadPdfCertificado}
+            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+            Descargar Certificado
+          </Button>
+          <Button
+            onClick={handleDownloadPdfFormulario}
+            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+            Descargar Solicitud
+          </Button>
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDownloadPdf}>Visualizar Cotizacion</Button>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={handleSendQuoter} autoFocus>
+        <DialogActions style={{ display: "flex", gap: '30px' }}>
+         
+          <Button
+            onClick={handleClose}
+            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSendQuoter}
+            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+            autoFocus>
             Aceptar
           </Button>
         </DialogActions>

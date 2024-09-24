@@ -149,8 +149,44 @@ const LifeService = {
   },
 
 
-  fetchPrevizualizarPDF: async (producto,idcotizacion) => {
-    const endpoint = "api/vida/PrevisualizarPDFVida";
+  fetchPrevizualizarPDFCertificado: async (producto,idcotizacion,tipo_Solicitud) => {
+    const endpoint = "api/vida/PrevisualizarPDFVidaCertificado";
+    const method = "POST";
+    const data = {
+      producto: producto,
+      id_CotiGeneral:idcotizacion,
+      tipo_Solicitud:tipo_Solicitud
+    };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      console.log(response);
+      if (response.codigo===200 && response.data) {
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const formattedTime = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+        
+        const pdfBlobDeclaracionSalud = base64ToBlob(response.data.archivoBase64_2, 'application/pdf');
+        const downloadUrlDeclaracionSalud = window.URL.createObjectURL(pdfBlobDeclaracionSalud);
+        const linkDeclaracionSalud = document.createElement("a");
+        linkDeclaracionSalud.href = downloadUrlDeclaracionSalud;
+        const fileName = `${tipo_Solicitud} - ${formattedDate}_${formattedTime}.pdf`;
+        linkDeclaracionSalud.setAttribute("download", fileName);document.body.appendChild(linkDeclaracionSalud);
+        linkDeclaracionSalud.click();
+        linkDeclaracionSalud.remove();
+
+      } else {
+        console.error("Error en la respuesta del servidor:", response.message);
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching Previsualizar pdf:", error);
+      throw error;
+    }
+  },
+
+  fetchPrevizualizarPDFFormulario: async (producto,idcotizacion) => {
+    const endpoint = "api/vida/PrevisualizarPDFVidaFormulario";
     const method = "POST";
     const data = {
       producto: producto,
@@ -161,23 +197,18 @@ const LifeService = {
       const response = await authService.fetchWithAuth(endpoint, method, data);
       console.log(response);
       if (response.codigo===200 && response.data) {
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const formattedTime = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+        const fileName = `reporteCotizacionVida_${formattedDate}_${formattedTime}.pdf`; 
         const pdfBlob = base64ToBlob(response.data.archivoBase64, 'application/pdf');
         const downloadUrl = window.URL.createObjectURL(pdfBlob);
         const link = document.createElement("a");
         link.href = downloadUrl;
-        link.setAttribute("download", "reporteCotizacionVida.pdf"); // O cualquier otro nombre de archivo
+        link.setAttribute("download", fileName); // O cualquier otro nombre de archivo
         document.body.appendChild(link);
         link.click();
         link.remove(); // Limpiar el enlace temporal
-
-        const pdfBlobDeclaracionSalud = base64ToBlob(response.data.archivoBase64_2, 'application/pdf');
-        const downloadUrlDeclaracionSalud = window.URL.createObjectURL(pdfBlobDeclaracionSalud);
-        const linkDeclaracionSalud = document.createElement("a");
-        linkDeclaracionSalud.href = downloadUrlDeclaracionSalud;
-        linkDeclaracionSalud.setAttribute("download", "reporteCotizacionVida.pdf"); // O cualquier otro nombre de archivo
-        document.body.appendChild(linkDeclaracionSalud);
-        linkDeclaracionSalud.click();
-        linkDeclaracionSalud.remove();
 
       } else {
         console.error("Error en la respuesta del servidor:", response.message);

@@ -209,7 +209,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     ageConyugueCalculated: '',
     countryConyugue: '',
 
-    tipoProducto: "T",
+    tipoProducto: "Z",
     inicioVigencia: "",
     finVigencia: "",
     vigencia: "",
@@ -772,6 +772,19 @@ const PersonalFormLife = forwardRef((props, ref) => {
       cargarCiudad(value);
     }
 
+    if (name ==="tipoProducto"){
+      console.log(value);
+      console.log(t_prestamo);
+      if ((value !== t_prestamo  )) {
+        if(t_prestamo !== 'A'||value === 'Z'){
+          setErrorMessage("El tipo de plan ingresado no es valido")
+          setOpenSnack(true);
+          return false;
+        }
+      }
+  
+    }
+
     if (name === "vigencia") {
       const newFinVigencia = inicioVigencia.add(value, 'month');
       setFinVigencia(newFinVigencia);
@@ -1022,20 +1035,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
-    if (formData.tipoProducto === '') {
+    if (formData.tipoProducto === 'Z') {
       setErrorMessage("Se debe ingresar datos en tipo plan")
       setOpenSnack(true);
       return false;
     }
 
     
-    if ((formData.tipoProducto !== t_prestamo  )) {
-      if(t_prestamo !== 'A'){
-        setErrorMessage("El tipo de plan ingresado no es valido")
-        setOpenSnack(true);
-        return false;
-      }
-    }
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
     const requiredFields = [
@@ -2088,11 +2094,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
               fullWidth
               required
             >
-
-              <MenuItem key='I' value='T'>
+              <MenuItem key='I' value='Z'>
+                Seleccione el Tipo De Plan
+              </MenuItem>
+              <MenuItem key='I' value='I'>
                 INDIVIDUAL
               </MenuItem>
-              <MenuItem key='M' value='TC'>
+              <MenuItem key='M' value='M'>
                 MANCOMUNADO
               </MenuItem>
 

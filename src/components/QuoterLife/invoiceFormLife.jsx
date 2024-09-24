@@ -328,6 +328,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         if (e.target.name === "paidType") {
             setformaPago(e.target.value);
         }
+
+        
     };
 
     const validarformulario = () => {
@@ -557,7 +559,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         required
                                     >
                                         <MenuItem value="C">Asegurado</MenuItem>
-                                        <MenuItem value="R">Cliente</MenuItem>
+                                        <MenuItem value="R">Contratante</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -579,8 +581,9 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         fullWidth
                                         required
                                     >
-                                        <MenuItem value="1">Al contado</MenuItem>
+                                        <MenuItem value="1">Anticipado</MenuItem>
                                         <MenuItem value="2">Mensual</MenuItem>
+                                        <MenuItem value="3">Anual</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>

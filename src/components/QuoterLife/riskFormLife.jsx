@@ -29,8 +29,6 @@ const RiskFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
 
-
-
     let docuemtos = JSON.parse(localStorage.getItem(LS_DOCUMENTOSVIDA));
     let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
     let questions = (preguntas || []).map(pregunta => ({
@@ -90,7 +88,7 @@ const RiskFormLife = forwardRef((props, ref) => {
       setOpenSnack(true); 
       return false; 
     }
-
+    let idCotiGeneral = JSON.parse(localStorage.getItem(LS_COTIZACION));
     let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
 
     let updatedQuestions = preguntas.map(pregunta => {
@@ -102,8 +100,8 @@ const RiskFormLife = forwardRef((props, ref) => {
     });
     const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
 
-
     data.jsonPreguntas = updatedQuestions
+    data.id_CotiGeneral = idCotiGeneral;
     setOpen(true);
     const response = await LifeService.fetchGrabaDatosVida(data);
     
