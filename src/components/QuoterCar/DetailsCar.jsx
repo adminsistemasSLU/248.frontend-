@@ -47,7 +47,7 @@ const DetailsCar = forwardRef((props, ref) => {
     marca: "",
     grupo: "",
     modelo: "",
-    anio: "2001",
+    anio: "2009",
     uso: "",
     tipo: "",
     valor_vehiculo: "",
@@ -139,6 +139,10 @@ const DetailsCar = forwardRef((props, ref) => {
     const { name, value } = e.target;
     let modifiedValue = value;
 
+    if (name === "anio") {
+      //setModelo([]);
+    }
+
     if (name === "placa") {
       modifiedValue = value.toUpperCase();
     }
@@ -150,6 +154,7 @@ const DetailsCar = forwardRef((props, ref) => {
     }
 
     if (name === "grupo") {
+      setModelo([]);
       cargarModelo(modifiedValue);
       formData.valor_vehiculo = "0,00";
     }
@@ -434,6 +439,7 @@ const DetailsCar = forwardRef((props, ref) => {
   };
 
   const cargarGrupo = async (idMarca) => {
+
     try {
       const grupo = await ComboService.fetchComboGrupo(idMarca);
       if (grupo?.data?.length > 0) {
@@ -446,15 +452,32 @@ const DetailsCar = forwardRef((props, ref) => {
       }
     } catch (error) {
       console.error("Error al cargar grupos:", error);
+
+    const grupo = await ComboService.fetchComboGrupo(idMarca);
+    if (grupo?.data?.length > 0) {
+      setGrupo(grupo.data);
+      setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
+      await cargarModelo(grupo.data[0].nombre);
+
     }
   };
 
-  const cargarModelo = async (idGrupo) => {
-    const modelo = await ComboService.fetchComboModelo(idGrupo);
+  const cargarModelo = async (nombre) => {
+    const anio = formData.anio;
+    const marca = formData.marca;
+    const modelo = await ComboService.fetchComboModelo(nombre, anio, marca);
     if (modelo?.data?.length > 0) {
       setModelo(modelo.data);
+
     } else {
       formData.valor_vehiculo = "0,00";
+
+      setFormData((prevData) => ({ ...prevData,
+        modelo: modelo.data[0].id,
+        valor_vehiculo: formatAmount(modelo.data[0].monto),
+        suma_asegurada: formatAmount(modelo.data[0].monto) })
+      );
+
     }
   };
 
@@ -521,8 +544,8 @@ const DetailsCar = forwardRef((props, ref) => {
                 fullWidth
                 required
               >
-                {Array.from({ length: 2024 - 2001 + 1 }, (_, index) => {
-                  const year = 2001 + index;
+                {Array.from({ length: 2025 - 2009 + 1 }, (_, index) => {
+                  const year = 2009 + index;
                   return (
                     <MenuItem key={year} value={year}>
                       {year}

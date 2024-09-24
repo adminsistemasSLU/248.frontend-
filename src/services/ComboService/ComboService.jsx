@@ -71,8 +71,8 @@ const ComboService = {
         }
     },
 
-    fetchComboModelo: async (idGrupo) => {
-        const endpoint = 'api/modelo?idGrupo=' + idGrupo;
+    fetchComboModelo: async (grupo, anio, marca) => {
+        const endpoint = 'api/modelo?grupo=' + grupo + '&anio=' + anio + '&marca=' + marca;
         const method = 'GET';
         try {
             const response = await authService.fetchWithAuth(endpoint, method);
