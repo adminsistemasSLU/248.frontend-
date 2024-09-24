@@ -118,6 +118,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             required
                         />
                     </Grid>
@@ -133,6 +134,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             required
                         />
                     </Grid>
@@ -148,6 +150,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -164,6 +167,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -187,6 +191,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             variant="standard"
                             fullWidth
                             required
+                            disabled
                         />
                     </Grid>
                     <Grid item xs={10.5} md={3} >
@@ -201,6 +206,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             required
                         />
                     </Grid>
@@ -216,6 +222,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -232,6 +239,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -255,6 +263,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -272,6 +281,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -289,6 +299,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -307,6 +318,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -324,6 +336,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -341,6 +354,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                         />
@@ -358,6 +372,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
                             onChange={handleChange}
                             variant="standard"
                             fullWidth
+                            disabled
                             inputProps={{ maxLength: 30 }}
                             required
                             
