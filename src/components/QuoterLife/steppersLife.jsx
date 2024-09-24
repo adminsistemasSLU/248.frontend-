@@ -448,14 +448,9 @@ export default function SteppersLife() {
           <Button
             onClick={handleClose}
             style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
-            Cancelar
+            Cerrar
           </Button>
-          <Button
-            onClick={handleSendQuoter}
-            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
-            autoFocus>
-            Aceptar
-          </Button>
+         
         </DialogActions>
       </Dialog>
 
