@@ -12,7 +12,7 @@ import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CircularProgress from "@mui/material/CircularProgress";
 import { TextField, Box, Grid, FormControl, Select, MenuItem, Snackbar, Alert, AlertTitle, Button } from "@mui/material";
-import { LS_DOCUMENTOSVIDA, LS_PREGUNTASVIDA, LS_DATAVIDASEND, LS_COTIZACION } from "../../utils/constantes";
+import { LS_DOCUMENTOSVIDA, LS_PREGUNTASVIDA, LS_DATAVIDASEND, LS_COTIZACION, LS_IDCOTIZACIONVIDA } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 
 const RiskFormLife = forwardRef((props, ref) => {
@@ -80,10 +80,13 @@ const RiskFormLife = forwardRef((props, ref) => {
     const respuestasIncompletas = questionsUpload.some(q => !q.respuesta || q.respuesta.trim() === "");
     if (respuestasIncompletas) {
       setErrorMessage("Por favor, complete todas las respuestas antes de continuar.");
-      setOpenSnack(true); 
-      return false; 
+      setOpenSnack(true);
+      return false;
     }
-    let idCotiGeneral = JSON.parse(localStorage.getItem(LS_COTIZACION));
+    const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
+    const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
+
+
     let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
 
     let updatedQuestions = preguntas.map(pregunta => {
@@ -94,12 +97,17 @@ const RiskFormLife = forwardRef((props, ref) => {
       };
     });
     const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
-
+    if (application !== null && application !== undefined && application !== '') {
+      data.aplicacion = application;
+    }
+    if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
+      data.id_CotiGeneral = id_cotigeneral;
+    }
     data.jsonPreguntas = updatedQuestions
-    data.id_CotiGeneral = idCotiGeneral;
+
     setOpen(true);
     const response = await LifeService.fetchGrabaDatosVida(data);
-    
+
     if (response.codigo === 200) {
       localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(updatedQuestions));
       localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));

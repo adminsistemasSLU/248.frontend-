@@ -26,6 +26,7 @@ import {
     LS_DATAVIDASEND,
     USER_STORAGE_KEY,
     LS_FPAGO,
+    LS_IDCOTIZACIONVIDA,
 } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
@@ -417,6 +418,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             total: formData.total,
             pais:formData.pais
         }
+        
 
         if (enviarFormulario) {
             enviarFormulario = false;
@@ -424,7 +426,15 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             const datosCliente = data.arrDatosCliente;
             datosCliente.datosfacturas = datosfacturas;
             data.arrDatosCliente = datosCliente;
-
+            const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
+            const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
+        
+            if (application !== null && application !== undefined && application !== '') {
+            data.aplicacion = application;
+            }
+            if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
+            data.id_CotiGeneral = id_cotigeneral;
+            }
             try {
                 const response = await LifeService.fetchGrabaDatosVida(data);
                 if (response.codigo === 200) {
