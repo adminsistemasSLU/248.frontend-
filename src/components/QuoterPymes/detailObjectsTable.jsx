@@ -678,7 +678,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           const newJsonData = [...currentJsonData];
           newJsonData[index][field] = numericValue;
           newJsonData[index]["tasa"] = newTasa;
-          // Puedes poner aquí tus console.log para verificar los datos actualizados
+          
           setEditableRows((currentEditableRows) => {
             const newEditableRows = [...currentEditableRows];
             newEditableRows[index][field] = numericValue;

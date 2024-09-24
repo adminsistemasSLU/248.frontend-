@@ -314,23 +314,22 @@ const DetailsCar = forwardRef((props, ref) => {
     }
 
     const data = crearObjetoVehiculo(cars);
-    console.log("-----------------------");
-    console.log(data);
-    console.log("-----------------------");
-    
     try {
       handleOpenBackdrop();
       const response = await CarsService.fetchGrabaDatosCars(data);
       if (response.codigo === 200) {
-        localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, response.data[0].jsonTasas);
+        localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(response.data));
         handleCloseBackdrop();
         return true;
       } else {
-        handleCloseBackdrop();
+        setMessageError(response.message);
+        setOpenSnack(true);
         return false;
       }
     } catch (error) {
       handleCloseBackdrop();
+      setMessageError("Se presentó un error no controlado, por favor revise toda la información y vuelva a intentar");
+      setOpenSnack(true);
       return false;
     }
   };

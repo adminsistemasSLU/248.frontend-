@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useImperativeHandle, } from 'react';
-import { Card, CardContent, Link, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Button, Typography } from '@mui/material';
+import React, { useState, useEffect, useImperativeHandle } from 'react';
+import { Card, CardContent, Link, Grid, Typography } from '@mui/material';
 import '../../styles/carrousel.scss';
-import BaldosasService from '../../services/BaldosasService/BaldosasService';
 import Loading from '../../utils/loading';
-import { API_SUBBALDOSAS, LS_PRODUCTO, DATOS_VEHICULO_STORAGE_KEY } from '../../utils/constantes';
+import { LS_PRODUCTO, DATOS_VEHICULO_STORAGE_KEY } from '../../utils/constantes';
 
-const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
-    const [data, setdata] = useState([]);
+const ProductListCardsCar = ({ onNext, ref }) => {
     const [isLoading, setIsLoading] = useState(false);
-    const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
-    const [planesVehiculos, setPlanesVehiculos] = useState();
+    const [planesVehiculos, setPlanesVehiculos] = useState([]);
 
     const handleComparativo = () => {
         const link = document.createElement('a');
@@ -19,34 +16,32 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
     };
 
     useEffect(() => {
-        let datosVehiculo = JSON.parse(
-            localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY)
-          );
-          setPlanesVehiculos(datosVehiculo)
+        const storedPlanes = localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY);
+        
+        console.log("-----------------------");
+        console.log(storedPlanes);
+        console.log("-----------------------");
+
+        if (storedPlanes) {
+            try {
+                const parsedPlanes = JSON.parse(storedPlanes);
+                setPlanesVehiculos(parsedPlanes);
+            } catch (error) {
+                console.error("Error al convertir planesVehiculos de JSON:", error);
+            }
+        }
     }, []);
 
-    useImperativeHandle(ref, () => ({
-        handleSubmitExternally: handleSubmit,
-    }));
+    // useImperativeHandle(ref, () => ({
+    //     handleSubmitExternally: handleSubmit,
+    // }));
 
-    const handleSubmit = async (e) => {
-        return true
-    };
+    // const handleSubmit = async (e) => {
+    //     return false;
+    // };
 
     const formatCurrency = (value) => {
-        return value.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    };
-
-    const cargarPlanes = async () => {
-        try {
-            const planes = await BaldosasService.fetchSubBaldosasMock();
-
-            if (planes && planes.data) {
-                setPlanesVehiculos(planes.data);
-            }
-        } catch (error) {
-            console.error("Error al obtener estadoCivil:", error);
-        }
+        return Number(value).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
     const handleCardClick = (index, producto) => {
@@ -56,15 +51,15 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
 
     return (
         <>
-            <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px', }}>
+            <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '30px' }}>
                 <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '30px', fontWeight: 'bold' }}>
                     PLANES
                 </Typography>
                 <div>
                     {isLoading ? <Loading /> : (<div></div>)}
                 </div>
-
-                <Grid container spacing={1}>
+                
+                <Grid container spacing={1} justifyContent="center" alignItems="center">
                     {planesVehiculos && planesVehiculos.length > 0 ? (
                         planesVehiculos.map((plan, index) => (
                             <Grid item xs={12} sm={6} md={4} key={index} className='carousel-container'>
@@ -79,18 +74,22 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
                                             {plan.plan.toUpperCase()}
                                         </Typography>
                                         <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
-                                            ${formatCurrency(plan.prima_minima)}
+                                            ${formatCurrency(plan.prima)}
                                         </Typography>
 
                                         <Typography variant="body2">
-                                            <Link href="#" onClick={() => handleComparativo()} style={{ textDecoration: 'underline', color: 'black' }}>
+                                            <Link href="#" style={{ textDecoration: 'underline', color: 'black' }}>
                                                 Ver condiciones
                                             </Link>
+                                            {/* <Link href="#" onClick={() => handleComparativo()} style={{ textDecoration: 'underline', color: 'black' }}>
+                                                Ver condiciones
+                                            </Link> */}
                                         </Typography>
                                     </CardContent>
                                 </Card>
                             </Grid>
-                        ))) : (
+                        ))
+                    ) : (
                         <Typography variant="body2" style={{ textAlign: 'center', padding: '20px' }}>
                             No hay planes disponibles.
                         </Typography>
