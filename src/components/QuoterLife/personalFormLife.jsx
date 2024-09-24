@@ -320,7 +320,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     setAge(birthDate);
 
-    console.log(anio);
     setFormData((formData) => ({
       ...formData,
       ageCalculated: anio,
@@ -407,7 +406,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
       const dataPoliza = await cargarDatosPoliza(); // API PARA CONSULTAR EMI POL CABECERA
-      console.log(dataPoliza);
       if (dataPoliza) {
         setFormData((formData) => ({
           ...formData,
@@ -440,15 +438,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
       try {
 
         const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), datosprestamo.prestamo, dataPoliza.vigencia);
-        console.log(data);
         if (data) {
           localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
         } else {
-          console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
         }
         handleCloseBackdrop();
       } catch (error) {
-        console.error("Error fetching data:", error);
         handleCloseBackdrop();
       }
       handleOpenBackdrop(false);
@@ -460,7 +455,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
   useEffect(() => {
     //Funcion para carga inicial si se desea usar el useEfect utilizar debajo o declarar una nueva
     const fetchDataProcesaDatos = async () => {
-      console.log(formDataTabla);
       if (cargarDataInicial) {
         // Calcula el resultado basado en formDataTabla
         const resultado = formDataTabla.reduce((acc, item) => {
@@ -470,7 +464,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
           if (!isNaN(monto) && monto !== null && monto !== '') {
             acc += monto; // Suma el monto válido al acumulador
           } else {
-            console.error(`Valor inválido encontrado: ${item.monto}`);
           }
 
           return acc;
@@ -495,13 +488,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
             localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
             setCalculado(response);
           } else {
-            console.log(response.message);
             setErrorMessage(response.message);
             setOpenSnack(true);
             setCalculado([]);
           }
         } catch (error) {
-          console.error("Error al procesar los datos:", error);
           setErrorMessage("Error al procesar los datos.");
           setOpenSnack(true);
           setCalculado([]);
@@ -655,7 +646,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         if (vigencia.data.polizas[0]) {
           localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
         } else {
-          console.log("No existen polizas configuradas para este producto")
         }
 
         localStorage.setItem(LS_TABLACALC, JSON.stringify(tabla1));
@@ -666,7 +656,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
       } else {
-        console.log(vigencia.message);
         setOpenSnack(true);
         setErrorMessage(vigencia.message);
       }
@@ -679,11 +668,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
   useEffect(() => {
     isMounted.current = true; // Establecer a true cuando el componente está montado
     const producto = Number(localStorage.getItem(LS_PRODUCTO));
-    console.log(producto);
     let listaProductos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
-    console.log(listaProductos);
     const resultado = listaProductos.filter(item => item.producto === producto).map(item => item.titulo);
-    console.log(resultado);
+    
     setNomnbreProducto(resultado);
     setAgeCalculate(maxDate);
     setAgeConyugueCalculate(maxDate);
@@ -729,7 +716,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
-   console.log(formDataTabla);
     const periodos = formDataTabla.map((item, index) => ({
       monto: isNaN(item.monto) ? item.monto.replace(/[$,.]/g, '') : item.monto,
       periodo: index + 1,
@@ -851,7 +837,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         try {
           handleOpenBackdrop();
           const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
-          console.log(data);
           if (data) {
             localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
           } else {
@@ -1281,7 +1266,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
     try {
       handleOpenBackdrop();
       const response = await LifeService.fetchGrabaDatosVida(data);
-      console.log(response);
       handleCloseBackdrop();
       if (response.codigo === 200) {
         const idVida = response.data.aplicacion;
@@ -1299,7 +1283,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         localStorage.removeItem(LS_VIDAPOLIZA);
         return true;
       } else {
-        console.log(response);
         handleCloseBackdrop();
         return false;
       }
@@ -1319,12 +1302,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
   };
 
   const handleOpenModal = async () => {
-    console.log(formDataTabla);
     const todosTienenNumero = formDataTabla.every((item) => {
       const monto = item.monto.replace(/[$,.]/g, '');
       return monto !== undefined && monto !== null && monto !== '' && !Number.isNaN(Number(monto));
     });
-    console.log(todosTienenNumero);
     if (!todosTienenNumero) {
       setErrorMessage("Se deben ingresar valores validos en la tabla de montos")
       setOpenSnack(true);
@@ -1369,7 +1350,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
       setCalculado(response);
     } else {
-      console.log(response.message);
       setErrorMessage(response.message);
       setOpenSnack(true);
       // localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify([]));
@@ -1400,8 +1380,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
           }))
         )
         : [];
-      console.log(result);
-
       setFormDataTabla(result);
 
       let prima = null;
@@ -1409,7 +1387,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let firstElement = true;
         for (let subKey in calculado.data.montoPeriodo[key]) {
           let item = calculado.data.montoPeriodo[key][subKey];
-          console.log(item);
 
           if (firstElement) {
             prima = item.prima_anio;
@@ -1478,10 +1455,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const verificaPrestamo = async (numPrestamo) => {
     var  idCotizacion = localStorage.getItem(LS_COTIZACION);
-    console.log(numPrestamo);
     setOpenBackdrop(true);
     const response = await LifeService.fetchVerificaPrestamo(producto, numPrestamo,idCotizacion);
-    console.log(response);
     if (response.codigo === 200) {
       setOpenBackdrop(false);
 

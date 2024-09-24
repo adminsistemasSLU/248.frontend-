@@ -246,7 +246,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   const [totalPrima, setTotalPrima] = React.useState(0);
 
   React.useEffect(() => {
-    console.log("Id Seccion: " + idSelected);
     printClasificacionAmparo(ramo, producto, clasificacionAmparo);
     setEditableValues(
       rows1.map((row) => ({
@@ -258,7 +257,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   }, []);
 
   React.useEffect(() => {
-    console.log(rows1);
     if (rows1 && rows1.length > 0) {
       setEditableValues(
         rows1.map((row) => ({
@@ -319,7 +317,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       let tablaA = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
 
       tablaA = tablaA.find((row) => row.id === amparo);
-      console.log(tablaA);
 
       if (Array.isArray(tablaA.Amparo)) {
         tablaAmparo = tablaA.Amparo;
@@ -334,7 +331,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       if (tablaAmparo.length !== 0) {
         result = tablaAmparo;
       } else {
-        console.log(clasificacionAmparo);
         if (clasificacionAmparo.codigo === 500) {
           Swal.fire({
             title: "Error!",
@@ -367,7 +363,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
             false
           );
           result.push(tituloObj);
-          console.log(key);
           if (clasificacionAmparo.data[0][key]) {
             const items = clasificacionAmparo.data[0][key].map(
               (item, index) => {
@@ -406,10 +401,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
                   item.inpPrima.primafija === "S" ? true : false;
                 const primaminima = item.inpPrima.primaminima;
 
-                console.log(item.inpPrima.value);
-                console.log(isNaN(item.inpPrima.value));
-                console.log(primaValue);
-
                 return createData(
                   count++,
                   item.inpDetalle.value,
@@ -437,8 +428,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           }
         });
       }
-
-      console.log(result);
+      
       const newResult = [...result]; // Para arrays
       //Mapear result al id de la seccion actual
       setEditableValues(
@@ -469,7 +459,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
 
   function tablaSeccionesMap() {
     const tablaSecciones = JSON.parse(localStorage.getItem(LS_TABLASECCIONES));
-    console.log(tablaSecciones);
     //mapear id seccion con tabla secciones
 
     const newTablaAmparo = tablaSecciones.map((amparo, index) => {
@@ -492,7 +481,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           ...amparo,
         };
     });
-    console.log(newTablaAmparo);
     const amparo = newTablaAmparo.find((row) => row.id === clasificacionAmparo);
     localStorage.setItem(LS_TABLASECCIONES, JSON.stringify(newTablaAmparo));
     if (amparo.Amparo) {
@@ -632,9 +620,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       // Lógica si el amparo es el mismo que el grupo de amparo
 
       const tasa = await obtenerTasa(amparo, ramo, numericValue);
-      console.log(tasa);
       newTasa = tasa.data;
-      console.log("Tasa de fetch:" + newTasa);
 
       permitirCambio = true;
     } else if (montofijo === "N" && valmaximo > 0) {
@@ -646,8 +632,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           ? parseFloat(montoPrincipalRow.monto)
           : 0;
       }
-      console.log(grupoAmparo);
-      console.log(amparo);
       if (grupoAmparo === "") {
         if (numericValue > valmaximo) {
           Swal.fire({
@@ -658,10 +642,8 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
           });
           permitirCambio = true;
           numericValue = valmaximo;
-          console.log(`El monto no puede ser mayor a ${valmaximo.toFixed(2)}`);
         }
       } else if (montoPrincipal === 0) {
-        console.log("El valor principal es 0.00");
 
         Swal.fire({
           title: "Error!",
@@ -674,9 +656,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       } else {
         const valMaximoCalculado = montoPrincipal * (valmaximo / 100);
         if (numericValue > valMaximoCalculado) {
-          console.log(
-            `El monto no puede superar el ${valmaximo}% del cobertura principal`
-          );
 
           Swal.fire({
             title: "Error!",
@@ -726,8 +705,6 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
         0
       );
       setTotalPrima(totalPrima);
-      console.log("*****************");
-      console.log(jsonData);
 
       const campoTasa = document.getElementById("idTasa" + index);
       const eventoSimulado = {
@@ -744,13 +721,10 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
 
   React.useEffect(() => {
     if (!openModal && currentId) {
-      console.log("*************************");
       const campoMonto = document.getElementById("idMonto" + currentId);
       const eventoSimulado = {
         target: campoMonto,
       };
-      console.log(campoMonto);
-      console.log(eventoSimulado);
       handleMontoChange(eventoSimulado, currentId, "monto");
     }
   }, [openModal, currentId]);
@@ -771,8 +745,7 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
     );
     const amparo = event.target.getAttribute("data-amparo");
     const grupoAmparo = event.target.getAttribute("data-grupo-amparo");
-    console.log("New Tasa: " + newTasa);
-    console.log("Tasa minima: " + tasaMinima);
+
     // Verificar si la nueva tasa es menor que la tasa mínima
     if (newTasa < tasaMinima && tasaMinima) {
       Swal.fire({
@@ -919,21 +892,14 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
   };
 
   const validarCamposRequeridos = () => {
-    console.log(rows1);
-    console.log(editableValues);
     let NroAmparo = "";
     let permitir = true;
     rows1.forEach((row,index) => {
-      console.log(row);
       if (row.titulo === false) {
-        console.log('Entro por titulo');
         if (row.objCheck) {
-          console.log('Entro por check');
           if (editableValues[index].monto === 0) {
-            console.log('Entro por monto');
             permitir = false;
             NroAmparo = NroAmparo + " " + row.id;
-            console.log(row.id);
           }
         }
       }
@@ -960,14 +926,12 @@ export default function DetailObjectsTable({ closeModalDetail, idSeccion }) {
       prima: (editableValues[index].monto * editableValues[index].tasa) / 100,
     }));
     setEditableRows(newEditableRows);
-    console.log(newEditableRows);
     const newJsonData = jsonData.map((item, index) => ({
       ...item,
       monto: editableValues[index].monto,
       tasa: editableValues[index].tasa,
       prima: (editableValues[index].monto * editableValues[index].tasa) / 100,
     }));
-    console.log(newJsonData);
 
     if (!validarCamposRequeridos()) {
       return;

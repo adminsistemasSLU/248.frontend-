@@ -34,7 +34,6 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Lógica para enviar el formulario
-    console.log(formData);
     // Puedes agregar la lógica para enviar los datos al servidor aquí
   };
 

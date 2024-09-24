@@ -64,7 +64,6 @@ const ComboService = {
         const method = 'GET';
         try {
             const response = await authService.fetchWithAuth(endpoint, method);
-            console.log(response);
             return response;
         } catch (error) {
             console.error('Error fetching validar Grupo vehicuo:', error);

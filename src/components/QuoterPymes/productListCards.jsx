@@ -21,7 +21,6 @@ const ProductListCards = ({ onNext }) => {
       try {
         const baldosas = await BaldosasService.fetchSubBaldosas(1, '');
         setIsLoading(false);
-        console.log(baldosas);
         if (baldosas && baldosas.data.BaldosaSubServisios) {
           const newItems = baldosas.data.BaldosaSubServisios.map(baldosa => {
             return {
@@ -43,7 +42,6 @@ const ProductListCards = ({ onNext }) => {
 
   const handleCardClick = (index,producto) => {
     
-    console.log('Producto elegido: '+producto);
     localStorage.setItem(LS_PRODUCTO,(producto));
     onNext(index);
   };

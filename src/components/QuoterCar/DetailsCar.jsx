@@ -31,12 +31,13 @@ import {
 import "../../styles/form.scss";
 import "../../styles/button.scss";
 import {
+  LS_COTIZACION_VEHICULO,
   DATOS_VEHICULO_STORAGE_KEY,
-  LS_COTIZACION,
   USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import ComboService from "../../services/ComboService/ComboService";
+import CarsService from "../../services/CarsServices/CarsService";
 
 dayjs.extend(customParseFormat);
 
@@ -52,6 +53,7 @@ const DetailsCar = forwardRef((props, ref) => {
     valor_vehiculo: "",
     valor_accesorios: "0,00",
     suma_asegurada: "",
+    ocupantes: "",
   });
 
   const [cars, setCars] = useState([]);
@@ -67,48 +69,47 @@ const DetailsCar = forwardRef((props, ref) => {
   const [uso, setUso] = useState([]);
   const [tipo, setTipo] = useState([]);
 
-  const cargarDatos = async () => {
-    const dataPersonal = await cargarCotizacion();
-    if (dataPersonal) {
-      setFormData((formData) => ({
-        ...formData,
-        placa: dataPersonal[0].placa,
-        marca: dataPersonal[0].marca,
-        grupo: dataPersonal[0].grupo,
-        modelo: dataPersonal[0].modelo,
-        anio: dataPersonal[0].anio,
-        uso: dataPersonal[0].uso,
-        tipo: dataPersonal[0].tipo,
-        valor_vehiculo: dataPersonal[0].valor_vehiculo,
-        valor_accesorios: dataPersonal[0].valor_accesorios,
-        suma_asegurada: dataPersonal[0].suma_asegurada,
-      }));
-    }
-  };
+  // const cargarDatos = async () => {
+  //   const dataPersonal = await cargarCotizacion();
+  //   if (dataPersonal) {
+  //     setFormData((formData) => ({
+  //       ...formData,
+  //       placa: dataPersonal[0].placa,
+  //       marca: dataPersonal[0].marca,
+  //       grupo: dataPersonal[0].grupo,
+  //       modelo: dataPersonal[0].modelo,
+  //       anio: dataPersonal[0].anio,
+  //       uso: dataPersonal[0].uso,
+  //       tipo: dataPersonal[0].tipo,
+  //       valor_vehiculo: dataPersonal[0].valor_vehiculo,
+  //       valor_accesorios: dataPersonal[0].valor_accesorios,
+  //       suma_asegurada: dataPersonal[0].suma_asegurada,
+  //     }));
+  //   }
+  // };
 
-  const cargarCotizacion = async () => {
-    const userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    const idCotizacion = localStorage.getItem(LS_COTIZACION);
-    const dato = {
-      usuario: userId.id,
-      id_CotiGeneral: idCotizacion,
-    };
-    try {
-      const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
-      return cotizacion.data || [];
-    } catch (error) {
-      console.error("Error al obtener cotización:", error);
-    }
-  };
+  // const cargarCotizacion = async () => {
+  //   const userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+  //   const idCotizacion = localStorage.getItem(LS_COTIZACION);
+  //   const dato = {
+  //     usuario: userId.id,
+  //     id_CotiGeneral: idCotizacion,
+  //   };
+  //   try {
+  //     const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
+  //     return cotizacion.data || [];
+  //   } catch (error) {
+  //     console.error("Error al obtener cotización:", error);
+  //   }
+  // };
 
   useEffect(() => {
     isMounted.current = true;
-
     const modoEditar = async () => {
-      const idCotizacion = localStorage.getItem(LS_COTIZACION);
-      if (idCotizacion) {
-        await cargarDatos();
-      }
+      // const idCotizacion = localStorage.getItem(LS_COTIZACION);
+      // if (idCotizacion) {
+      //   await cargarDatos();
+      // }
       await cargarCombos();
     };
 
@@ -121,9 +122,7 @@ const DetailsCar = forwardRef((props, ref) => {
 
   const cargarCombos = async () => {
     try {
-      await cargarMarca();
-      await cargarUso();
-      await cargarTipo();
+      await Promise.all([cargarMarca(), cargarUso(), cargarTipo()]);
     } catch (error) {
       console.error("Error al cargar combos:", error);
     }
@@ -145,9 +144,9 @@ const DetailsCar = forwardRef((props, ref) => {
     }
 
     if (name === "marca") {
-      cargarGrupo(modifiedValue);
       formData.valor_vehiculo = "0,00";
       setModelo([]);
+      cargarGrupo(modifiedValue);
     }
 
     if (name === "grupo") {
@@ -156,11 +155,16 @@ const DetailsCar = forwardRef((props, ref) => {
     }
 
     if (name === "modelo") {
-      formData.suma_asegurada = formatAmount(obtenerMontoPorId(modifiedValue));
-      formData.valor_vehiculo = formatAmount(obtenerMontoPorId(modifiedValue));
+      const valor_vehiculo = formatAmount(obtenerMontoPorId(modifiedValue));
+
+      setFormData((prevData) => ({
+        ...prevData,
+        valor_vehiculo,
+        suma_asegurada: valor_vehiculo,
+      }));
     }
 
-    if (name === "valor_accesorios") {
+    if (name == "valor_accesorios") {
       if (modifiedValue.includes("0,00")) {
         modifiedValue = modifiedValue.replace("0,00", "");
       }
@@ -183,6 +187,46 @@ const DetailsCar = forwardRef((props, ref) => {
       }
       return newData;
     });
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    if (name === "valor_vehiculo") {
+      const valorOriginal = obtenerMontoPorId(formatCurrency(formData.modelo));
+      if (!valorOriginal || parseFloat(valorOriginal) === 0)
+        return;
+
+      const valorModificado = parseFloat(value.replace(/\./g, '').replace(',', '.'));
+      const nuevoValor = modificarValorConRango(valorOriginal, valorModificado);
+
+      if (nuevoValor !== null) {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: formatAmount(nuevoValor),
+        }));
+      } else {
+        alert("El valor está fuera del rango permitido. ");
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: formatAmount(valorOriginal),
+          suma_asegurada: formatAmount(calculaSumaAsegurada(formatAmount(valorOriginal), formData.valor_accesorios)),
+        }));
+      }
+    }
+  };
+
+  const modificarValorConRango = (valorOriginal, valorModificado) => {
+    const valorNumericoOriginal = parseFloat(valorOriginal);
+    const valorNumericoModificado = parseFloat(valorModificado);
+    const diezPorCiento = valorNumericoOriginal * 0.10;
+
+    const maximoPermitido = valorNumericoOriginal + diezPorCiento;
+    const minimoPermitido = valorNumericoOriginal - diezPorCiento;
+
+    if (valorNumericoModificado <= minimoPermitido || valorNumericoModificado >= maximoPermitido) {
+      return null;
+    }
+    return valorNumericoModificado;
   };
 
   const formatCurrency = (value) => {
@@ -208,28 +252,46 @@ const DetailsCar = forwardRef((props, ref) => {
     }
 
     const newCar = {
-      placa: formData.placa,
       marca: formData.marca,
-      modelo: obtenerNombrePorId(formData.modelo),
       anio: formData.anio,
-      antiguedad: dayjs().diff(formData.anio, "year"),
+      grupo: formData.grupo,
+      modelo: formData.modelo,
+      modeloNombre: obtenerNombrePorId(formData.modelo),
+      uso: formData.uso,
+      tipo: formData.tipo,
+      placa: formData.placa,
+      ocupantes: formData.ocupantes,
       costo: formData.valor_vehiculo,
       totalAsegurado: formData.suma_asegurada,
+      valorAccesorios: formData.valor_accesorios,
     };
 
     setCars([...cars, newCar]);
     setError("");
+    formData.anio = "2001";
+    formData.modelo = "";
+    formData.modelo = "";
+    formData.placa = "";
+    formData.ocupantes = "";
+    formData.valor_vehiculo = "0";
+    formData.suma_asegurada = "0";
+    formData.valor_accesorios = "0";
   };
 
   const isFormValid = () => {
     return (
-      formData.placa &&
       formData.marca &&
-      formData.modelo &&
       formData.anio &&
+      formData.grupo &&
+      formData.modelo &&
+      formData.modelo &&
+      formData.uso &&
+      formData.tipo &&
+      formData.placa &&
+      formData.ocupantes &&
       formData.valor_vehiculo &&
-      formData.valor_accesorios &&
-      formData.suma_asegurada
+      formData.suma_asegurada &&
+      formData.valor_accesorios
     );
   };
 
@@ -237,17 +299,114 @@ const DetailsCar = forwardRef((props, ref) => {
     setCars(cars.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
-    if (e) e.preventDefault();
+  const handleCloseBackdrop = () => {
+    setOpenBackdrop(false);
+  };
 
+  const handleOpenBackdrop = () => {
+    setOpenBackdrop(true);
+  };
+
+  const handleSubmit = async (e) => {
     if (!cars.length) {
       faltanDatosUsuario();
       return false;
     }
 
-    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, "");
-    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(cars));
-    return true;
+    const data = crearObjetoVehiculo(cars);
+    console.log("-----------------------");
+    console.log(data);
+    console.log("-----------------------");
+    
+    try {
+      handleOpenBackdrop();
+      const response = await CarsService.fetchGrabaDatosCars(data);
+      if (response.codigo === 200) {
+        localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, response.data[0].jsonTasas);
+        handleCloseBackdrop();
+        return true;
+      } else {
+        handleCloseBackdrop();
+        return false;
+      }
+    } catch (error) {
+      handleCloseBackdrop();
+      return false;
+    }
+  };
+
+  const crearObjetoVehiculo = (listaVehiculos) => {
+    if (!Array.isArray(listaVehiculos)) {
+      console.error("Se esperaba una lista de vehículos.");
+      return null;
+    }
+
+    const arrVehiculo = listaVehiculos.map((newCar) => {
+      const valorVehiculo = (newCar.costo && typeof newCar.costo === 'string')
+        ? parseFloat(newCar.costo.replace(/\./g, '').replace(',', '.'))
+        : parseFloat(newCar.costo);
+
+      const valorAccesorios = (newCar.valorAccesorios && typeof newCar.valorAccesorios === 'string')
+        ? parseFloat(newCar.valorAccesorios.replace(/\./g, '').replace(',', '.'))
+        : parseFloat(newCar.valorAccesorios);
+
+      return {
+        riesgo: "",
+        tipo: newCar.tipo,
+        anio: newCar.anio,
+        nuevo: "N",
+        marca: newCar.marca,
+        grupoModelo: newCar.grupo,
+        modelo: newCar.modelo,
+        nommodelo: newCar.modeloNombre,
+        desmodelo: newCar.modeloNombre,
+        color: "",
+        uso: newCar.uso,
+        rastreo: null,
+        ocupantes: newCar.ocupantes,
+        motor: "",
+        chasis: "",
+        placa: newCar.placa,
+        paisorigen: null,
+        descriesgo: null,
+        valorVehiculo: valorVehiculo,
+        montosugerido: null,
+        montooriginal: null,
+        montoautid: null,
+        tasaanterior: null,
+        tasacomparativo: 2.60,
+        tasapura: "",
+        tasanueva: "",
+        tasaminima: "",
+        tasainfima: "",
+        tasaoriginal: "",
+        tasa: "",
+        prima: "",
+        primaminima: "",
+        accesorios: valorAccesorios,
+        inspeccion: null,
+        observacion: null,
+        descuentotipo: "",
+        descuentovalor: "",
+        cobbasicas: null,
+        cobadicionales: null,
+        clausulas: null,
+        combinado: null,
+        descuentoautoid: null,
+        poliquidautid: null,
+        polizarenautid: null,
+        novigenteautid: null,
+        clase: "",
+        nomClase: ""
+      };
+    });
+
+    return {
+      producto: 99999,
+      ramo: 3,
+      idCotizacion: localStorage.getItem(LS_COTIZACION_VEHICULO),
+      arrVehiculo: arrVehiculo
+    };
   };
 
   useImperativeHandle(ref, () => ({
@@ -260,20 +419,34 @@ const DetailsCar = forwardRef((props, ref) => {
   };
 
   const cargarMarca = async () => {
-    const marca = await ComboService.fetchComboMarca();
-    if (marca?.data) {
-      setMarca(marca.data);
-      setFormData((prevData) => ({ ...prevData, marca: marca.data[0].clave }));
-      await cargarGrupo(marca.data[0].nombre);
+    try {
+      const marca = await ComboService.fetchComboMarca();
+      if (marca?.data) {
+        setMarca(marca.data);
+        setFormData((prevData) => ({
+          ...prevData,
+          marca: marca.data[0].clave,
+        }));
+        await cargarGrupo(marca.data[0].nombre);
+      }
+    } catch (error) {
+      console.error("Error al cargar marcas:", error);
     }
   };
 
   const cargarGrupo = async (idMarca) => {
-    const grupo = await ComboService.fetchComboGrupo(idMarca);
-    if (grupo?.data?.length > 0) {
-      setGrupo(grupo.data);
-      setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
-      await cargarModelo(grupo.data[0].idGrupo);
+    try {
+      const grupo = await ComboService.fetchComboGrupo(idMarca);
+      if (grupo?.data?.length > 0) {
+        setGrupo(grupo.data);
+        setFormData((prevData) => ({
+          ...prevData,
+          grupo: grupo.data[0].idGrupo,
+        }));
+        await cargarModelo(grupo.data[0].idGrupo);
+      }
+    } catch (error) {
+      console.error("Error al cargar grupos:", error);
     }
   };
 
@@ -281,6 +454,8 @@ const DetailsCar = forwardRef((props, ref) => {
     const modelo = await ComboService.fetchComboModelo(idGrupo);
     if (modelo?.data?.length > 0) {
       setModelo(modelo.data);
+    } else {
+      formData.valor_vehiculo = "0,00";
     }
   };
 
@@ -513,6 +688,24 @@ const DetailsCar = forwardRef((props, ref) => {
                 required
               />
             </Grid>
+
+            <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
+              <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                Número de ocupantes <span style={{ color: 'red' }}>*</span>
+              </Typography>
+              <TextField
+                placeholder="Número de ocupantes"
+                type="text"
+                onChange={handleChange}
+                name="ocupantes"
+                value={formData.ocupantes}
+                variant="standard"
+                fullWidth
+                required
+              />
+
+            </Grid>
+
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
                 Valor del vehículo <span style={{ color: 'red' }}>*</span>
@@ -521,6 +714,7 @@ const DetailsCar = forwardRef((props, ref) => {
                 placeholder="Valor del vehículo"
                 type="text"
                 onChange={handleChange}
+                onBlur={handleBlur}
                 name="valor_vehiculo"
                 value={formData.valor_vehiculo}
                 variant="standard"

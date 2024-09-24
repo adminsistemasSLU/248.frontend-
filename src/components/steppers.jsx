@@ -284,7 +284,6 @@ export default function Steppers() {
   };
 
   const handleBack = () => {
-    console.log(activeStep);
     if(activeStep < 1){
       navigate('/quoter/dashboard');
     }
@@ -318,7 +317,7 @@ export default function Steppers() {
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
 
       let emailValido = validateEmail(email);
-      console.log(emailValido);
+
       if (!emailValido) {
         handleCloseBackdrop();
         Swal.fire({

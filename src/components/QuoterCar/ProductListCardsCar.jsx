@@ -3,7 +3,7 @@ import { Card, CardContent, Link, Dialog, DialogTitle, DialogContent, DialogActi
 import '../../styles/carrousel.scss';
 import BaldosasService from '../../services/BaldosasService/BaldosasService';
 import Loading from '../../utils/loading';
-import { API_SUBBALDOSAS, LS_PRODUCTO } from '../../utils/constantes';
+import { API_SUBBALDOSAS, LS_PRODUCTO, DATOS_VEHICULO_STORAGE_KEY } from '../../utils/constantes';
 
 const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
     const [data, setdata] = useState([]);
@@ -19,38 +19,10 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
     };
 
     useEffect(() => {
-        // if (subbaldosas) {
-        //     setdata(subbaldosas);
-        //     return;
-        // }
-
-        const callPlans = async () => {
-            await cargarPlanes()
-        };
-
-        callPlans();
-        // const printBaldosas = async () => {
-        //     setIsLoading(true);
-        //     try {
-        //         const baldosas = await BaldosasService.fetchSubBaldosas(1, '');
-        //         setIsLoading(false);
-        //         if (baldosas && baldosas.data.BaldosaSubServisios) {
-        //             const newItems = baldosas.data.BaldosaSubServisios.map(baldosa => {
-        //                 return {
-        //                     titulo: baldosa.titulo,
-        //                     descripcion: baldosa.descripcion,
-        //                     imagen: process.env.REACT_APP_API_URL + '/api/Imagen/' + baldosa.nombre_imagen,
-        //                     producto: baldosa.producto,
-        //                 };
-        //             });
-        //             setdata(newItems);
-        //             localStorage.setItem(API_SUBBALDOSAS, JSON.stringify(newItems));
-        //         }
-        //     } catch (error) {
-        //         console.error('Error al obtener baldosas:', error);
-        //     }
-        // };
-        // printBaldosas();
+        let datosVehiculo = JSON.parse(
+            localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY)
+          );
+          setPlanesVehiculos(datosVehiculo)
     }, []);
 
     useImperativeHandle(ref, () => ({
@@ -68,7 +40,6 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
     const cargarPlanes = async () => {
         try {
             const planes = await BaldosasService.fetchSubBaldosasMock();
-            console.log(planes);
 
             if (planes && planes.data) {
                 setPlanesVehiculos(planes.data);
@@ -79,7 +50,6 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
     };
 
     const handleCardClick = (index, producto) => {
-        console.log('Producto elegido: ' + producto);
         localStorage.setItem(LS_PRODUCTO, (producto));
         onNext(index);
     };
@@ -109,7 +79,7 @@ const ProductListCardsCar = ({ onNext, ref, totalAsegurado }) => {
                                             {plan.plan.toUpperCase()}
                                         </Typography>
                                         <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
-                                            ${formatCurrency(plan.tasa * parseFloat(totalAsegurado) / 100)}
+                                            ${formatCurrency(plan.prima_minima)}
                                         </Typography>
 
                                         <Typography variant="body2">

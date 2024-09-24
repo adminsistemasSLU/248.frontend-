@@ -61,7 +61,7 @@ const PaidForm = forwardRef((props, ref) => {
   }, []);
 
   useEffect(() => {
-    console.log(tipoCredito);
+
   }, [tipoCredito]);
 
   useImperativeHandle(ref,  () => ({
@@ -77,7 +77,6 @@ const PaidForm = forwardRef((props, ref) => {
         localStorage.getItem(PARAMETROS_STORAGE_KEY)
       );
       setFormPago(formaPago);
-      console.log(formaPago);
       let monto = parseFloat(formaPago.totalmonto);
       let prima = parseFloat(formaPago.totalprima);
       let sbs = (parseFloat(formaPago.por_sbs) * prima) / 100;
@@ -92,8 +91,7 @@ const PaidForm = forwardRef((props, ref) => {
       let total = iva + sbs + scc + derechoEmision + parseFloat(prima);
       
       const datosPago = JSON.parse(localStorage.getItem(DATOS_PAGO_STORAGE_KEY));
-      console.log(datosPago[0]);
-
+      
       let formapago = datosPago[0].formapago!=null ?  datosPago[0].formapago : "" ;
       let numpagos =  datosPago[0].numpagos !=null ?  datosPago[0].numpagos : "";
       let tipfacturacion =  datosPago[0].tipfacturacion !=null ?  datosPago[0].tipfacturacion : "";

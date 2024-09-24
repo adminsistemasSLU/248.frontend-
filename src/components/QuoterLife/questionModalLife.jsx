@@ -32,7 +32,6 @@ const QuestionModalLife = forwardRef((props, ref) => {
             codigo: pregunta.codigo,
             respuesta: ""
         }));
-        console.log(questions);
         setQuestionsUpload(questions);
     }, []);
 
@@ -41,7 +40,6 @@ const QuestionModalLife = forwardRef((props, ref) => {
 
     const handleSelectChange = (event, questionIndex) => {
         const value = event.target.value;
-        console.log(value, questionIndex);
         setQuestionsUpload(prevQuestions => {
             const newQuestions = [...prevQuestions];
             newQuestions[questionIndex].respuesta = value;
@@ -89,7 +87,6 @@ const QuestionModalLife = forwardRef((props, ref) => {
         setOpenBackdrop(true);
 
         data.jsonPreguntas = updatedQuestions
-        console.log(data);
         //const response = await LifeService.fetchGrabaDatosVida(data);
         // if (response.codigo === 200) {
 
@@ -99,7 +96,6 @@ const QuestionModalLife = forwardRef((props, ref) => {
 
         //     closeModalDetail("true");
         // }
-        console.log(data);
 
     };
 

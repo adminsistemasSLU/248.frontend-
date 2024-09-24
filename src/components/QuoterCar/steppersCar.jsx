@@ -191,15 +191,7 @@ export default function SteppersCar() {
 
     if (steps[activeStep].label === "Datos Vehículo") {
       continuar = await questionFormRef.current.handleSubmitExternally();
-      let datosVehiculo = JSON.parse(
-        localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY)
-      );
-      
-      const totalAseguradoSum = datosVehiculo.reduce((sum, car) => {
-        return sum + parseCurrency(car.totalAsegurado);
-      }, 0);
-  
-      setTotalAsegurado(totalAseguradoSum);
+
     }
 
     if (continuar) {
@@ -271,7 +263,6 @@ export default function SteppersCar() {
   };
 
   const handleBack = () => {
-    console.log(activeStep);
     if (activeStep < 1) {
       navigate('/quoter/dashboard');
     }
@@ -305,7 +296,6 @@ export default function SteppersCar() {
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
 
       let emailValido = validateEmail(email);
-      console.log(emailValido);
       if (!emailValido) {
         handleCloseBackdrop();
         Swal.fire({

@@ -316,7 +316,7 @@ export default function MyQuoters() {
   const cargarRamo = async () => {
     try {
       const baldosas = await BaldosasService.fetchBaldosas();
-      console.log(baldosas);
+
       if (baldosas && baldosas.data) {
         setRamo(baldosas.data.BaldosaServisios);
       }
@@ -363,7 +363,7 @@ export default function MyQuoters() {
 
 
   const handleSetFilter = React.useCallback((value) => {
-    console.log('handlefilter');
+
     setFilter(value);
   }, []);
 
@@ -385,7 +385,7 @@ export default function MyQuoters() {
     if (objetoSeguro) {
       let number = 1;
       const rowsObjetoAmparo = [];
-      console.log(objetoSeguro);
+
       for (let item of objetoSeguro) {
         let tasa = parseFloat(
           (item.total_prima / item.total_monto) * 100
@@ -421,8 +421,6 @@ export default function MyQuoters() {
         0
       );
       setTotalPrima(newTotalPrima);
-      console.log(totalMonto);
-      console.log(totalPrima);
     }
 
     handleCloseBackdrop();
@@ -434,7 +432,6 @@ export default function MyQuoters() {
     localStorage.setItem(LS_RAMO, ramo);
 
     const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
-    console.log(resultadoFiltrado);
 
     const dataFormaPago = resultadoFiltrado.map((item) => ({
       numpagos: item.numpagos,

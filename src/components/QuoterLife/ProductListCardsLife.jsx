@@ -5,14 +5,11 @@ import BaldosasService from '../../services/BaldosasService/BaldosasService';
 import Loading from '../../utils/loading';
 import { API_SUBBALDOSAS, LS_PRODUCTO, LS_RAMO } from '../../utils/constantes';
 
-
-
 const ProductListCardsLife = ({ onNext }) => {
   const [data, setdata] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
   const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
-  console.log(subbaldosas);
 
   useEffect(() => {
     if (subbaldosas) {
@@ -25,7 +22,6 @@ const ProductListCardsLife = ({ onNext }) => {
       try {
         const baldosas = await BaldosasService.fetchSubBaldosas(ramo, '');
         setIsLoading(false);
-        console.log(baldosas);
         if (baldosas && baldosas.data.BaldosaSubServisios) {
 
           const newItems = baldosas.data.BaldosaSubServisios.map(baldosa => {
@@ -47,7 +43,6 @@ const ProductListCardsLife = ({ onNext }) => {
   }, []);
 
   const handleCardClick = async (index, producto) => {
-    console.log('Producto elegido: ' + producto);
     localStorage.setItem(LS_PRODUCTO, (producto));
     onNext(index);
   };

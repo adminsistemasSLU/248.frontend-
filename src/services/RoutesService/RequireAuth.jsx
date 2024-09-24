@@ -13,7 +13,6 @@ const RequireAuth = ({ children }) => {
   }
 
   if (!user) {
-    console.log('no hay usuario');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return children; // Si el usuario está autenticado, renderiza los componentes hijos

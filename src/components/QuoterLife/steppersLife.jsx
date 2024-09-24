@@ -229,7 +229,6 @@ export default function SteppersLife() {
     }
 
     if (continuar) {
-      console.log("continuar 2");
       const newActiveStep =
         isLastStep() && !allStepsCompleted()
           ? steps.findIndex((step, i) => !(i in completed))
@@ -296,7 +295,6 @@ export default function SteppersLife() {
   };
 
   const handleBack = () => {
-    console.log(activeStep);
     if (activeStep < 1) {
       navigate('/quoter/dashboard');
     }
@@ -331,7 +329,6 @@ export default function SteppersLife() {
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
       let name = user.name + ' ' + user.lastname;
       let emailValido = validateEmail(email);
-      console.log(emailValido);
       if (!emailValido) {
         handleCloseBackdrop();
         Swal.fire({
