@@ -469,10 +469,6 @@ const DetailsCar = forwardRef((props, ref) => {
     const modelo = await ComboService.fetchComboModelo(nombre, anio, marca);
     if (modelo?.data?.length > 0) {
       setModelo(modelo.data);
-
-    } else {
-      formData.valor_vehiculo = "0,00";
-
       setFormData((prevData) => ({
         ...prevData,
         modelo: modelo.data[0].id,
@@ -480,7 +476,8 @@ const DetailsCar = forwardRef((props, ref) => {
         suma_asegurada: formatAmount(modelo.data[0].monto)
       })
       );
-
+    } else {
+      formData.valor_vehiculo = "0,00";
     }
   };
 
