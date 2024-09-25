@@ -62,6 +62,7 @@ export const AuthProvider = ({ children }) => {
             if(userData.codigo===200){
                 localStorage.setItem(TOKEN_STORAGE_KEY, userData.token);
                 console.log(userData.ramoRol);
+                console.log(userData.ramoRol.ramo_rol);
                 if (userData && userData.ramoRol && userData.ramoRol.ramo_rol) {
                     localStorage.setItem(PERMISSIONS_STORAGE_KEY, userData.ramoRol.ramo_rol);
                 }
