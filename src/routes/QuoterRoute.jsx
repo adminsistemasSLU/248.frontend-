@@ -19,9 +19,9 @@ const QuoterRoutes = () => {
 
       <Route path="/Life" element={<RequireAuth requiredBaldosaId="3"> <SteppersLife /> </RequireAuth>} />
 
-      <Route path="/Pymes" element={<RequireAuth requiredBaldosaId="2"> <Steppers /> </RequireAuth>} />
+      <Route path="/Pymes" element={<RequireAuth requiredBaldosaId="1"> <Steppers /> </RequireAuth>} />
 
-      <Route path="/car" element={<RequireAuth requiredBaldosaId="1"> <SteppersCar /> </RequireAuth>} />
+      <Route path="/car" element={<RequireAuth requiredBaldosaId="2"> <SteppersCar /> </RequireAuth>} />
 
       <Route path="/Pymes/MyQuotes" element={<RequireAuth> <MyQuoters /> </RequireAuth>} />
       <Route path="/Pymes/product" element={<RequireAuth> <PaymentMethods /> </RequireAuth>} />
