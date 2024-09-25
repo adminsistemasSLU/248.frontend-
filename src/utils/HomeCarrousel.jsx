@@ -12,7 +12,8 @@ import BaldosasService from '../services/BaldosasService/BaldosasService';
 import Loading from './loading';
 import { API_BALDOSAS,LS_COTIZACION,LS_PRODUCTO,DATOS_PAGO_STORAGE_KEY,
     LS_RAMO,API_SUBBALDOSAS,  LS_DATAVIDASEND,LS_DATOSPAGO,LS_PREGUNTASVIDA
-    ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA} from './constantes';
+    ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA,
+    PERMISSIONS_STORAGE_KEY} from './constantes';
 
 
 function HomeCarrousel(props) {
@@ -46,20 +47,24 @@ function HomeCarrousel(props) {
         localStorage.removeItem(LS_VIDAPOLIZA);
         localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
         localStorage.removeItem(LS_COTIZACION);
-        const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
+        //const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
         if(baldosas){
             setItems(baldosas);
             return;
         }        
-        
+        const storedBaldosasPermiso = localStorage.getItem(PERMISSIONS_STORAGE_KEY);
+        const baldosasPermiso = storedBaldosasPermiso ? JSON.parse(storedBaldosasPermiso) : { Baldosas: [] };
+
         const printBaldosas = async () => {
             try {
                 setIsLoading(true);
                 const baldosas = await BaldosasService.fetchBaldosas();
-                
+                const baldosasIdsPermitidos = baldosasPermiso.Baldosas;
                 setIsLoading(false);
                 if (baldosas && baldosas.data.BaldosaServisios) {
-                    const newItems = baldosas.data.BaldosaServisios.map(baldosa => {
+                    const newItems = baldosas.data.BaldosaServisios
+                    .filter(baldosa => baldosasIdsPermitidos.includes(baldosa.id_BaldosaServisios.toString()))
+                    .map(baldosa => {
                         const matchedItem = items3.find(item3 => item3.name === baldosa.titulo);
                         return {
                             name: baldosa.titulo,
@@ -68,6 +73,7 @@ function HomeCarrousel(props) {
                             url: matchedItem ? matchedItem.url : '/default-url',
                             enable: true ,
                             ramo:baldosa.ramo,
+                            id_BaldosaServisios: baldosa.id_BaldosaServisios
                         };
                     });
                     setItems(newItems);

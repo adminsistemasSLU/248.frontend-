@@ -5,6 +5,7 @@ export const LS_RAMO = 'IdRamo';
 export const TOKEN_STORAGE_KEY = 'authToken';
 export const USER_STORAGE_KEY = 'user';
 export const MENU_STORAGE_KEY = 'menu';
+export const PERMISSIONS_STORAGE_KEY = 'permisos';
 
 //INCENDIO
 export const LS_COTIZACION = 'IdCotizacion';
