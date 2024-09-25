@@ -61,6 +61,7 @@ export const AuthProvider = ({ children }) => {
             const userData = await authService.fetchWithAuth(endpoint, method, data, additionalHeaders);
             if(userData.codigo===200){
                 localStorage.setItem(TOKEN_STORAGE_KEY, userData.token);
+                console.log(userData.ramoRol);
                 if (userData && userData.ramoRol && userData.ramoRol.ramo_rol) {
                     localStorage.setItem(PERMISSIONS_STORAGE_KEY, userData.ramoRol.ramo_rol);
                 }
