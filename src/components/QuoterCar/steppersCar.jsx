@@ -31,13 +31,8 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import {
-  DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
-  DATOS_VEHICULO_STORAGE_KEY,
   LS_COTIZACION_VEHICULO,
-  USER_STORAGE_KEY,
 } from "../../utils/constantes";
-import EmailService from "../../services/EmailService/EmailService";
-import Swal from "sweetalert2";
 import PersonalFormCar from "./personalFormCar";
 import InvoiceFormCar from "./invoiceFormCar";
 import ResumenCar from "./resumenCar";
@@ -184,13 +179,6 @@ export default function SteppersCar() {
       continuar = await personalFormRef.current.handleSubmitExternally();
     }
 
-    let datosPersonales = JSON.parse(
-      localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY)
-    );
-
-    if (datosPersonales) {
-      setEmail(datosPersonales.correo);
-    }
 
     if (steps[activeStep].label === "Datos Vehículo") {
       continuar = await questionFormRef.current.handleSubmitExternally();

@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import {
     LS_COTIZACION_VEHICULO,
+    DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
     USER_STORAGE_KEY,
 } from "../../utils/constantes";
 import "../../styles/form.scss";
@@ -65,17 +66,21 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [provinces, setProvinces] = useState([]);
     const [pais, setPais] = useState([]);
     const [ciudades, setCiudades] = useState([]);
-    const [fechaNacimiento, setFechaNacimiento] = useState(null);
+    const [fechaNacimiento, setFechaNacimiento] = useState();
 
     useEffect(() => {
         const iniciarDatosCombos = async () => {
             handleOpenBackdrop();
-            let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
+            
             await Promise.all([cargarProvincias(), cargarEstadoCivil(), cargarPais()]);
             handleCloseBackdrop();
-            if (idCotizacion) {
-                await cargarDatos();
+            
+            let data = JSON.parse(localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY));
+            if (data){
+                setFormData(data);
+                // setFechaNacimiento(data.fechaNacimiento);
             }
+            
         };
 
         isMounted.current = true;
@@ -86,47 +91,47 @@ const PersonalFormCar = forwardRef((props, ref) => {
         };
     }, []);
 
-    const cargarDatos = async () => {
-        const dataPersonal = await cargarCotizacion();
+    // const cargarDatos = async () => {
+    //     const dataPersonal = await cargarCotizacion();
 
-        if (isMounted.current && dataPersonal?.length) {
-            setFormData({
-                name: dataPersonal[0].clinombre,
-                lastname: dataPersonal[0].cliapellido,
-                email: dataPersonal[0].clicorreo,
-                phone: dataPersonal[0].clitelefono,
-                documentType: dataPersonal[0].clitipcedula,
-                identification: dataPersonal[0].clicedula,
-                address: dataPersonal[0].clidireccion,
-                gender: dataPersonal[0].cli_genero,
-                status: dataPersonal[0].cliestadocivil,
-                anios: dataPersonal[0].vigencia,
-                agente: dataPersonal[0].cliagente,
-                provincia: dataPersonal[0].cliprovincia,
-                ciudad: dataPersonal[0].cliciudad,
-                fechaNacimiento: dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD"),
-            });
-        }
-    };
+    //     if (isMounted.current && dataPersonal?.length) {
+    //         setFormData({
+    //             name: dataPersonal[0].clinombre,
+    //             lastname: dataPersonal[0].cliapellido,
+    //             email: dataPersonal[0].clicorreo,
+    //             phone: dataPersonal[0].clitelefono,
+    //             documentType: dataPersonal[0].clitipcedula,
+    //             identification: dataPersonal[0].clicedula,
+    //             address: dataPersonal[0].clidireccion,
+    //             gender: dataPersonal[0].cli_genero,
+    //             status: dataPersonal[0].cliestadocivil,
+    //             anios: dataPersonal[0].vigencia,
+    //             agente: dataPersonal[0].cliagente,
+    //             provincia: dataPersonal[0].cliprovincia,
+    //             ciudad: dataPersonal[0].cliciudad,
+    //             fechaNacimiento: dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD"),
+    //         });
+    //     }
+    // };
 
-    const cargarCotizacion = async () => {
-        let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-        let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
+    // const cargarCotizacion = async () => {
+    //     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    //     let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
 
-        let dato = {
-            usuario: userId.id,
-            id_CotiGeneral: idCotizacion,
-        };
-        try {
-            const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
+    //     let dato = {
+    //         usuario: userId.id,
+    //         id_CotiGeneral: idCotizacion,
+    //     };
+    //     try {
+    //         const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
 
-            if (cotizacion && cotizacion.data) {
-                return cotizacion.data;
-            }
-        } catch (error) {
-            console.error("Error al obtener antigüedad:", error);
-        }
-    };
+    //         if (cotizacion && cotizacion.data) {
+    //             return cotizacion.data;
+    //         }
+    //     } catch (error) {
+    //         console.error("Error al obtener antigüedad:", error);
+    //     }
+    // };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -205,6 +210,8 @@ const PersonalFormCar = forwardRef((props, ref) => {
         if (!next) return false;
 
         const data = transformarObjetoSeguro(formData);
+        localStorage.setItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY, JSON.stringify(formData));
+
         try {
             handleOpenBackdrop();
             const response = await CarsService.fetchGrabaDatosPersona(data);
@@ -388,11 +395,12 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const obtenerEstadoCivilPorId = (id) => obtenerNombrePorId(id, estadoCivil, 'Codigo', 'Nombre');
 
     const handleDateChange = (newValue) => {
+        console.log(newValue);
         const formattedDate = newValue ? dayjs(newValue).format('DD/MM/YYYY') : '';
-        setFechaNacimiento(newValue); // Almacena el valor seleccionado
+        setFechaNacimiento(newValue); 
         setFormData((prevData) => ({
             ...prevData,
-            fechaNacimiento: formattedDate, // Almacena la fecha formateada en el formData
+            fechaNacimiento: formattedDate,
         }));
     };
 
@@ -629,7 +637,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
                                     }}
                                     value={fechaNacimiento}
                                     format="DD/MM/YYYY"
-                                    disabled={errorCedula}
                                     className="datePicker"
                                     maxDate={maxDate}
                                     onChange={handleDateChange}

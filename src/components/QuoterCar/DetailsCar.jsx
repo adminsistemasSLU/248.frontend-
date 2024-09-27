@@ -33,7 +33,7 @@ import "../../styles/button.scss";
 import {
   LS_COTIZACION_VEHICULO,
   DATOS_VEHICULO_STORAGE_KEY,
-  USER_STORAGE_KEY,
+  DATOS_VEHICULO_COTI_STORAGE_KEY,
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import ComboService from "../../services/ComboService/ComboService";
@@ -106,10 +106,10 @@ const DetailsCar = forwardRef((props, ref) => {
   useEffect(() => {
     isMounted.current = true;
     const modoEditar = async () => {
-      // const idCotizacion = localStorage.getItem(LS_COTIZACION);
-      // if (idCotizacion) {
-      //   await cargarDatos();
-      // }
+      let data = JSON.parse(localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY));
+      if (data) {
+        setCars(data);
+      }
       await cargarCombos();
     };
 
@@ -138,10 +138,6 @@ const DetailsCar = forwardRef((props, ref) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let modifiedValue = value;
-
-    if (name === "anio") {
-      //setModelo([]);
-    }
 
     if (name === "placa") {
       modifiedValue = value.toUpperCase();
@@ -319,11 +315,13 @@ const DetailsCar = forwardRef((props, ref) => {
     }
 
     const data = crearObjetoVehiculo(cars);
+    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(data));
     try {
       handleOpenBackdrop();
+
       const response = await CarsService.fetchGrabaDatosCars(data);
       if (response.codigo === 200) {
-        localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(response.data));
+        localStorage.setItem(DATOS_VEHICULO_COTI_STORAGE_KEY, JSON.stringify(response.data));
         handleCloseBackdrop();
         return true;
       } else {

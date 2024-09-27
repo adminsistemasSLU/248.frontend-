@@ -12,7 +12,8 @@ import BaldosasService from '../services/BaldosasService/BaldosasService';
 import Loading from './loading';
 import { API_BALDOSAS,LS_COTIZACION,LS_PRODUCTO,DATOS_PAGO_STORAGE_KEY,
     LS_RAMO,API_SUBBALDOSAS,  LS_DATAVIDASEND,LS_DATOSPAGO,LS_PREGUNTASVIDA
-    ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA} from './constantes';
+    ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA,
+    DATOS_PERSONALES_VEHICULO_STORAGE_KEY, DATOS_VEHICULO_STORAGE_KEY, LS_COTIZACION_VEHICULO, DATOS_VEHICULO_COTI_STORAGE_KEY} from './constantes';
 
 
 function HomeCarrousel(props) {
@@ -35,8 +36,11 @@ function HomeCarrousel(props) {
     ];
     
     useEffect(() => {
+        localStorage.removeItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY);
+        localStorage.removeItem(DATOS_VEHICULO_STORAGE_KEY);
+        localStorage.removeItem(DATOS_VEHICULO_COTI_STORAGE_KEY);
+        localStorage.removeItem(LS_COTIZACION_VEHICULO);
 
-  
         localStorage.removeItem(LS_PRODUCTO);
         localStorage.removeItem(LS_DATAVIDASEND);
         localStorage.removeItem(LS_DATOSPAGO);

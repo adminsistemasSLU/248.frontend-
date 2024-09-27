@@ -2,7 +2,7 @@ import React, { useState, useEffect, useImperativeHandle } from 'react';
 import { Card, CardContent, Link, Grid, Typography } from '@mui/material';
 import '../../styles/carrousel.scss';
 import Loading from '../../utils/loading';
-import { LS_PRODUCTO, DATOS_VEHICULO_STORAGE_KEY } from '../../utils/constantes';
+import { LS_PRODUCTO, DATOS_VEHICULO_COTI_STORAGE_KEY } from '../../utils/constantes';
 
 const ProductListCardsCar = ({ onNext, ref }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +16,7 @@ const ProductListCardsCar = ({ onNext, ref }) => {
     };
 
     useEffect(() => {
-        const storedPlanes = localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY);
+        const storedPlanes = localStorage.getItem(DATOS_VEHICULO_COTI_STORAGE_KEY);
         
         console.log("-----------------------");
         console.log(storedPlanes);

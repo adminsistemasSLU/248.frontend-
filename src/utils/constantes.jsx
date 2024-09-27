@@ -38,5 +38,6 @@ export const LS_FPAGO = 'frm_pago';
 
 // VEHICULO
 export const DATOS_VEHICULO_STORAGE_KEY = 'datos_vehiculos';
+export const DATOS_VEHICULO_COTI_STORAGE_KEY = 'datos_vehiculos_coti';
 export const DATOS_PERSONALES_VEHICULO_STORAGE_KEY = 'datos_personales';
 export const LS_COTIZACION_VEHICULO = 'IdCotizacion';
