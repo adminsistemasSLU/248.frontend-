@@ -15,15 +15,16 @@ const QuoterRoutes = () => {
   return (
     <Routes>
       <Route path="dashboard" element={<RequireAuth> <HomePage /> </RequireAuth>} />
-      <Route path="/Pymes" element={<RequireAuth> <Steppers /> </RequireAuth>} />
       <Route path="*" element={<NotFound />} />
 
-      <Route path="/Life" element={<RequireAuth> <SteppersLife /> </RequireAuth>} />
-      <Route path="/car" element={<RequireAuth> <SteppersCar /> </RequireAuth>} />
+      <Route path="/Life" element={<RequireAuth requiredBaldosaId="3"> <SteppersLife /> </RequireAuth>} />
+
+      <Route path="/Pymes" element={<RequireAuth requiredBaldosaId="1"> <Steppers /> </RequireAuth>} />
+
+      <Route path="/car" element={<RequireAuth requiredBaldosaId="2"> <SteppersCar /> </RequireAuth>} />
 
       <Route path="/Pymes/MyQuotes" element={<RequireAuth> <MyQuoters /> </RequireAuth>} />
       <Route path="/Pymes/product" element={<RequireAuth> <PaymentMethods /> </RequireAuth>} />
-
       <Route path="/quoter/*" element={<RequireAuth> <QuoterRoutes /> </RequireAuth> } />
 
     </Routes>

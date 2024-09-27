@@ -8,10 +8,8 @@ import Typography from '@mui/material/Typography';
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
-import CloseIcon from "@mui/icons-material/Close";
 import { TextField, Grid, FormControl, Select, MenuItem, Snackbar, Alert, AlertTitle } from "@mui/material";
 import { LS_PREGUNTASVIDA, LS_DATAVIDASEND } from "../../utils/constantes";
-import LifeService from "../../services/LifeService/LifeService";
 
 
 const QuestionModalLife = forwardRef((props, ref) => {
