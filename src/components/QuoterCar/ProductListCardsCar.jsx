@@ -76,15 +76,6 @@ const ProductListCardsCar = ({ onNext, ref }) => {
                                         <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
                                             ${formatCurrency(plan.prima)}
                                         </Typography>
-
-                                        <Typography variant="body2">
-                                            <Link href="#" style={{ textDecoration: 'underline', color: 'black' }}>
-                                                Ver condiciones
-                                            </Link>
-                                            {/* <Link href="#" onClick={() => handleComparativo()} style={{ textDecoration: 'underline', color: 'black' }}>
-                                                Ver condiciones
-                                            </Link> */}
-                                        </Typography>
                                     </CardContent>
                                 </Card>
                             </Grid>

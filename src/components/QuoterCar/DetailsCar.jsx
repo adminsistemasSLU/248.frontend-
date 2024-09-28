@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {
   TextField,
   Grid,
@@ -35,7 +37,6 @@ import {
   DATOS_VEHICULO_STORAGE_KEY,
   DATOS_VEHICULO_COTI_STORAGE_KEY,
 } from "../../utils/constantes";
-import QuoterService from "../../services/QuoterService/QuoterService";
 import ComboService from "../../services/ComboService/ComboService";
 import CarsService from "../../services/CarsServices/CarsService";
 
@@ -107,6 +108,7 @@ const DetailsCar = forwardRef((props, ref) => {
     isMounted.current = true;
     const modoEditar = async () => {
       let data = JSON.parse(localStorage.getItem(DATOS_VEHICULO_STORAGE_KEY));
+
       if (data) {
         setCars(data);
       }
@@ -119,6 +121,11 @@ const DetailsCar = forwardRef((props, ref) => {
       isMounted.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(cars));
+  }, [cars]);
+
 
   const cargarCombos = async () => {
     try {
@@ -153,6 +160,7 @@ const DetailsCar = forwardRef((props, ref) => {
       setModelo([]);
       cargarModelo(modifiedValue);
       formData.valor_vehiculo = "0,00";
+      formData.ocupantes = "";
     }
 
     if (name === "modelo") {
@@ -162,6 +170,7 @@ const DetailsCar = forwardRef((props, ref) => {
         ...prevData,
         valor_vehiculo,
         suma_asegurada: valor_vehiculo,
+        ocupantes: obtenerOcupantePorId(modifiedValue)
       }));
     }
 
@@ -256,6 +265,7 @@ const DetailsCar = forwardRef((props, ref) => {
       marca: formData.marca,
       anio: formData.anio,
       grupo: formData.grupo,
+      nombreGrupo: obtenerNombreGrupoPorId(formData.grupo),
       modelo: formData.modelo,
       modeloNombre: obtenerNombrePorId(formData.modelo),
       uso: formData.uso,
@@ -267,9 +277,14 @@ const DetailsCar = forwardRef((props, ref) => {
       valorAccesorios: formData.valor_accesorios,
     };
 
-    setCars([...cars, newCar]);
+    const updatedCars = [...cars, newCar];
+    setCars(updatedCars);
+
+    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(updatedCars));
+
+
     setError("");
-    formData.anio = "2001";
+    formData.anio = "2009";
     formData.modelo = "";
     formData.modelo = "";
     formData.placa = "";
@@ -297,8 +312,36 @@ const DetailsCar = forwardRef((props, ref) => {
   };
 
   const handleDeleteCar = (index) => {
-    setCars(cars.filter((_, i) => i !== index));
+    const updatedCars = cars.filter((_, i) => i !== index);
+    setCars(updatedCars);
+    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(updatedCars));
   };
+
+  const handleEditCar = async (index) => {
+    const carToEdit = cars[index];
+    formData.anio = carToEdit.anio;
+    formData.marca = carToEdit.marca;
+    await loadOnlyGrupo(carToEdit.marca);
+    await loadOnlyModel(carToEdit.nombreGrupo);
+
+    setFormData({
+      ...formData,
+      anio: carToEdit.anio,
+      marca: carToEdit.marca,
+      grupo: carToEdit.grupo,
+      modelo: carToEdit.modelo,
+      uso: carToEdit.uso,
+      tipo: carToEdit.tipo,
+      placa: carToEdit.placa,
+      ocupantes: carToEdit.ocupantes,
+      valor_vehiculo: carToEdit.costo,
+      valor_accesorios: carToEdit.valorAccesorios,
+      suma_asegurada: carToEdit.totalAsegurado,
+    });
+
+    handleDeleteCar(index);
+  };
+
 
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
@@ -315,7 +358,6 @@ const DetailsCar = forwardRef((props, ref) => {
     }
 
     const data = crearObjetoVehiculo(cars);
-    localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(data));
     try {
       handleOpenBackdrop();
 
@@ -446,18 +488,18 @@ const DetailsCar = forwardRef((props, ref) => {
           ...prevData,
           grupo: grupo.data[0].idGrupo,
         }));
-        await cargarModelo(grupo.data[0].idGrupo);
+        await cargarModelo(grupo.data[0].nombre);
       }
     } catch (error) {
       console.error("Error al cargar grupos:", error);
 
-      const grupo = await ComboService.fetchComboGrupo(idMarca);
-      if (grupo?.data?.length > 0) {
-        setGrupo(grupo.data);
-        setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
-        await cargarModelo(grupo.data[0].nombre);
+      // const grupo = await ComboService.fetchComboGrupo(idMarca);
+      // if (grupo?.data?.length > 0) {
+      //   setGrupo(grupo.data);
+      //   setFormData((prevData) => ({ ...prevData, grupo: grupo.data[0].idGrupo }));
+      //   await cargarModelo(grupo.data[0].nombre);
 
-      }
+      // }
     }
   }
 
@@ -471,11 +513,29 @@ const DetailsCar = forwardRef((props, ref) => {
         ...prevData,
         modelo: modelo.data[0].id,
         valor_vehiculo: formatAmount(modelo.data[0].monto),
-        suma_asegurada: formatAmount(modelo.data[0].monto)
+        suma_asegurada: formatAmount(modelo.data[0].monto),
+        ocupantes: modelo.data[0].ocupantes
       })
       );
     } else {
       formData.valor_vehiculo = "0,00";
+    }
+  };
+
+  const loadOnlyModel = async (nombre) => {
+    const anio = formData.anio;
+    const marca = formData.marca;
+    const modelo = await ComboService.fetchComboModelo(nombre, anio, marca);
+
+    if (modelo?.data?.length > 0) {
+      setModelo(modelo.data);
+    }
+  };
+
+  const loadOnlyGrupo = async (idMarca) => {
+    const grupo = await ComboService.fetchComboGrupo(idMarca);
+    if (grupo?.data?.length > 0) {
+      setGrupo(grupo.data);
     }
   };
 
@@ -484,9 +544,25 @@ const DetailsCar = forwardRef((props, ref) => {
     return objetoEncontrado ? objetoEncontrado.nombre : 'ID no encontrado';
   };
 
+  const obtenerNombreGrupoPorId = (idBuscado) => {
+    const objetoEncontrado = grupo.find(item => item.idGrupo === idBuscado);
+    console.log(objetoEncontrado);
+    return objetoEncontrado ? objetoEncontrado.nombre : 'ID no encontrado';
+  };
+
   const obtenerMontoPorId = (id) => {
     const item = modelo.find(obj => obj.id === id);
     return item ? item.monto : null;
+  };
+
+  const obtenerOcupantePorId = (id) => {
+    const item = modelo.find(obj => obj.id === id);
+    return item ? item.ocupantes : null;
+  };
+
+  const obtenerPorId = (id) => {
+    const item = modelo.find(obj => obj.id === id);
+    return item ? item.ocupantes : null;
   };
 
   const cargarUso = async () => {
@@ -577,7 +653,7 @@ const DetailsCar = forwardRef((props, ref) => {
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                Grupo <span style={{ color: 'red' }}>*</span>
+                Modelo <span style={{ color: 'red' }}>*</span>
               </Typography>
               <Select
                 labelId="grupo-Label"
@@ -606,7 +682,7 @@ const DetailsCar = forwardRef((props, ref) => {
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                Modelo <span style={{ color: 'red' }}>*</span>
+                Versión <span style={{ color: 'red' }}>*</span>
               </Typography>
               <Select
                 labelId="modelo-Label"
@@ -788,36 +864,42 @@ const DetailsCar = forwardRef((props, ref) => {
               Aceptar
             </Button>
           </Grid>
-          <Grid item xs={10.5} md={12} style={{ width: '100%', paddingTop: '30px', paddingLeft: '30px', paddingRight: '30px', paddingBottom: '20px' }}>
+          <Grid item xs={10.5} md={12} style={{ width: '95%', paddingTop: '30px', paddingLeft: '30px', paddingRight: '30px', paddingBottom: '20px' }}>
             <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="car table">
+              <Table sx={{ minWidth: 600 }} aria-label="car table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Placa</TableCell>
-                    <TableCell>Marca</TableCell>
-                    <TableCell>Modelo</TableCell>
-                    <TableCell>Año</TableCell>
-                    <TableCell>Antigüedad</TableCell>
-                    <TableCell>Costo</TableCell>
-                    <TableCell>Eliminar</TableCell>
+                    <TableCell align="center">Placa</TableCell>
+                    <TableCell align="center">Marca</TableCell>
+                    <TableCell align="center">Modelo</TableCell>
+                    <TableCell align="center">Año</TableCell>
+                    <TableCell align="center">Costo</TableCell>
+                    <TableCell align="center">Eliminar</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {cars.map((car, index) => (
                     <TableRow key={index}>
-                      <TableCell>{car.placa}</TableCell>
-                      <TableCell>{car.marca}</TableCell>
-                      <TableCell>{car.modelo}</TableCell>
-                      <TableCell>{car.anio}</TableCell>
-                      <TableCell>{car.antiguedad} años</TableCell>
-                      <TableCell>{car.costo}</TableCell>
-                      <TableCell>
+                      <TableCell align="center">{car.placa}</TableCell>
+                      <TableCell align="center">{car.marca}</TableCell>
+                      <TableCell align="center">{car.nombreGrupo}</TableCell>
+                      <TableCell align="center">{car.anio}</TableCell>
+                      <TableCell align="center">{car.costo}</TableCell>
+                      <TableCell align="center">
                         <Button
                           variant="contained"
                           color="secondary"
                           onClick={() => handleDeleteCar(index)}
                         >
-                          Eliminar
+                          <DeleteIcon />
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleEditCar(index)}
+                          style={{ marginLeft: '10px' }}
+                        >
+                          <EditIcon />
                         </Button>
                       </TableCell>
                     </TableRow>

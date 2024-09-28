@@ -18,6 +18,19 @@ const ComboService = {
         }
     },
 
+    fetchComboVigencia: async (producto) => {
+        const endpoint = 'api/vigencia-vehiculo/'+producto;
+        const method = 'GET';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            console.log(response);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar ComboProvincias:', error);
+            throw error;
+        }
+    },
+
     fetchComboPais: async () => {
         const endpoint = 'api/cb_pais/';
         const method = 'POST';

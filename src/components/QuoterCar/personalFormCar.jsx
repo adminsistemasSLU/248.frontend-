@@ -22,12 +22,11 @@ import {
 import {
     LS_COTIZACION_VEHICULO,
     DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
-    USER_STORAGE_KEY,
+    DATOS_AGENTES,
 } from "../../utils/constantes";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
-import QuoterService from "../../services/QuoterService/QuoterService";
 import ComboService from "../../services/ComboService/ComboService";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -47,7 +46,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
         address: "",
         gender: "M",
         status: "S",
-        anios: "1",
+        anios: "",
         agente: "001",
         provincia: "",
         ciudad: "",
@@ -67,20 +66,23 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [pais, setPais] = useState([]);
     const [ciudades, setCiudades] = useState([]);
     const [fechaNacimiento, setFechaNacimiento] = useState();
+    const [vigencia, setVigencia] = useState([]);
+    const [agentes, setAgentes] = useState([]);
 
     useEffect(() => {
         const iniciarDatosCombos = async () => {
             handleOpenBackdrop();
-            
-            await Promise.all([cargarProvincias(), cargarEstadoCivil(), cargarPais()]);
+
+            await Promise.all([cargarProvincias(), cargarEstadoCivil(), cargarPais(), cargarVigencia()]);
             handleCloseBackdrop();
-            
+
+            cargarAgentesDesdeLocalStorage()
             let data = JSON.parse(localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY));
-            if (data){
+            if (data) {
                 setFormData(data);
                 // setFechaNacimiento(data.fechaNacimiento);
             }
-            
+
         };
 
         isMounted.current = true;
@@ -90,6 +92,20 @@ const PersonalFormCar = forwardRef((props, ref) => {
             isMounted.current = false; // Establecer a false cuando el componente se desmonta
         };
     }, []);
+
+    const cargarAgentesDesdeLocalStorage = () => {
+        const datosAgentes = localStorage.getItem(DATOS_AGENTES);
+        if (datosAgentes) {
+            try {
+                const agentesGuardados = JSON.parse(datosAgentes);
+                if (Array.isArray(agentesGuardados)) {
+                    setAgentes(agentesGuardados);
+                }
+            } catch (error) {
+                console.error("Error al parsear DATOS_AGENTES:", error);
+            }
+        }
+    };
 
     // const cargarDatos = async () => {
     //     const dataPersonal = await cargarCotizacion();
@@ -357,6 +373,20 @@ const PersonalFormCar = forwardRef((props, ref) => {
         }
     };
 
+    const cargarVigencia = async () => {
+        try {
+            const vigencia = await ComboService.fetchComboVigencia(99999);
+
+            if (vigencia && vigencia.data) {
+                setVigencia(vigencia.data);
+
+                setFormData((formData) => ({ ...formData, anios: vigencia.data[0].vigencia }));
+            }
+        } catch (error) {
+            console.error("Error al obtener vigencia:", error);
+        }
+    };
+
     const cargarCiudad = async (provinciaCodigo) => {
         try {
             const ciudades = await ComboService.fetchComboCiudad(1, 113, provinciaCodigo);
@@ -397,7 +427,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const handleDateChange = (newValue) => {
         console.log(newValue);
         const formattedDate = newValue ? dayjs(newValue).format('DD/MM/YYYY') : '';
-        setFechaNacimiento(newValue); 
+        setFechaNacimiento(newValue);
         setFormData((prevData) => ({
             ...prevData,
             fechaNacimiento: formattedDate,
@@ -616,11 +646,11 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             fullWidth
                             required
                         >
-                            <MenuItem value="1">1 año</MenuItem>
-                            <MenuItem value="2">2 años</MenuItem>
-                            <MenuItem value="3">3 años</MenuItem>
-                            <MenuItem value="2">4 años</MenuItem>
-                            <MenuItem value="3">5 años</MenuItem>
+                            {vigencia.map((vigencia, index) => (
+                                <MenuItem key={index} value={vigencia.vigencia}>
+                                    {vigencia.descripcion}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </Grid>
 
@@ -695,28 +725,39 @@ const PersonalFormCar = forwardRef((props, ref) => {
                         </Select>
                     </Grid>
 
-                    <Grid item xs={10.5} md={2.8}>
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Ciudad <span style={{ color: 'red' }}>*</span>
-                        </Typography>
-                        <Select
-                            labelId="ciudad-Label"
-                            id="ciudad"
-                            name="ciudad"
-                            style={{ textAlign: "left" }}
-                            value={formData.ciudad}
-                            onChange={handleChange}
-                            variant="standard"
-                            fullWidth
-                            required
-                        >
-                            {ciudades.map((risk, index) => (
-                                <MenuItem key={index} value={risk.Codigo}>
-                                    {risk.Nombre}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </Grid>
+                    {agentes.length > 0 && (
+                        <Grid item xs={10.5} md={2.8}>
+                            <Typography
+                                variant="body2"
+                                style={{
+                                    textAlign: "left",
+                                    fontSize: "16px",
+                                    paddingBottom: "5px",
+                                }}
+                            >
+                                Agentes <span style={{ color: "red" }}>*</span>
+                            </Typography>
+                            <Select
+                                labelId="agente-Label"
+                                id="agente"
+                                style={{ textAlign: "left" }}
+                                name="agente"
+                                value={formData.agente}
+                                onChange={handleChange}
+                                variant="standard"
+                                fullWidth
+                                required
+                                placeholder="Seleccione agente"
+                            >
+                                {agentes.map((agente, index) => (
+                                    <MenuItem key={index} value={agente.clave}>
+                                        {`${agente.nombre} ${agente.apellidos}`}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </Grid>
+                    )}
+
                 </Grid>
             </form>
         </Card >

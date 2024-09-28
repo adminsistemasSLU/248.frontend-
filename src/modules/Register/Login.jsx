@@ -8,6 +8,9 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AuthContext }  from  '../../services/AuthProvider';
 import Snackbar from "@mui/material/Snackbar";
 import AlertTitle from "@mui/material/AlertTitle";
+import {
+  DATOS_AGENTES,
+} from "../../utils/constantes";
 
 const Login = () => {
 
@@ -47,7 +50,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    localStorage.removeItem(DATOS_AGENTES);
     if(errorPassword!==''){
 
       return;
@@ -62,11 +65,22 @@ const Login = () => {
       if(response.codigo !==200){
         setOpenSnack(true);
         setErrorMessage(response.message);
+      } else {
+        getAgentes(response.data)
       }
     } catch (error) {
       setError("Se presentó un error con el inicio de sesión. Por favor, intente nuevamente.");
     }
   };
+
+  const getAgentes = (usuario) => {
+    if (usuario && usuario.tip_usuario === "I") {
+      const list_agentes = usuario.arrAgente;
+      if (Array.isArray(list_agentes) && list_agentes.length > 0) {
+        localStorage.setItem("DATOS_AGENTES", JSON.stringify(list_agentes));
+      }
+    }
+  };  
 
   return (
     <Container maxWidth={false} style={{ height: '100vh', width: '100vw', padding: 0, margin: 0 }}>
