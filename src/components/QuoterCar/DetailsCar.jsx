@@ -873,7 +873,7 @@ const DetailsCar = forwardRef((props, ref) => {
                     <TableCell align="center">Marca</TableCell>
                     <TableCell align="center">Modelo</TableCell>
                     <TableCell align="center">Año</TableCell>
-                    <TableCell align="center">Costo</TableCell>
+                    <TableCell align="center">Monto total</TableCell>
                     <TableCell align="center">Eliminar</TableCell>
                   </TableRow>
                 </TableHead>
