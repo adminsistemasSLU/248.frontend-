@@ -884,7 +884,7 @@ const DetailsCar = forwardRef((props, ref) => {
                       <TableCell align="center">{car.marca}</TableCell>
                       <TableCell align="center">{car.nombreGrupo}</TableCell>
                       <TableCell align="center">{car.anio}</TableCell>
-                      <TableCell align="center">{car.costo}</TableCell>
+                      <TableCell align="center">{car.totalAsegurado}</TableCell>
                       <TableCell align="center">
                         <Button
                           variant="contained"

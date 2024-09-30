@@ -32,9 +32,11 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import CarsService from "../../services/CarsServices/CarsService";
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(customParseFormat);
-dayjs.locale('es');
+dayjs.extend(relativeTime);
+
 const PersonalFormCar = forwardRef((props, ref) => {
     const [formData, setFormData] = useState({
         name: "",
@@ -80,7 +82,9 @@ const PersonalFormCar = forwardRef((props, ref) => {
             let data = JSON.parse(localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY));
             if (data) {
                 setFormData(data);
-                // setFechaNacimiento(data.fechaNacimiento);
+                const dateObject = dayjs(data.fechaNacimiento, "DD/MM/YYYY");
+                console.log(data.fechaNacimiento);
+                setFechaNacimiento(dateObject);
             }
 
         };
