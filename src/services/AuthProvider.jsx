@@ -1,23 +1,26 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from './authServices'; // Asegúrate de importar authService correctamente
-import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY,MENU_STORAGE_KEY,PARAMETROS_STORAGE_KEY,PARAMETROS_RAMO_STORAGE_KEY, PERMISSIONS_STORAGE_KEY} from '../utils/constantes';
+import {
+    TOKEN_STORAGE_KEY, USER_STORAGE_KEY, MENU_STORAGE_KEY, PARAMETROS_STORAGE_KEY, PARAMETROS_RAMO_STORAGE_KEY,
+    PERMISSIONS_STORAGE_KEY, DATOS_AGENTES,
+} from '../utils/constantes';
 
 export const AuthContext = React.createContext({
     user: null, // Proporciona una estructura inicial
     signin: () => { },
     signout: () => { },
-    isLoading:false,
+    isLoading: false,
     menu: null,
 });
 
 export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {
-      throw new Error('useAuth must be used within an AuthProvider');
+        throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
-  }
+}
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -37,7 +40,7 @@ export const AuthProvider = ({ children }) => {
                     const menu = localStorage.getItem('menu');
                     //const userData = await authService.fetchWithAuth('user_info_endpoint');
                     setUser(user);
-                    
+
                     setMenu(menu);
                     AuthContext.user = user;
                     setIsLoading(false);
@@ -59,21 +62,24 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(true);
         try {
             const userData = await authService.fetchWithAuth(endpoint, method, data, additionalHeaders);
-            if(userData.codigo===200){
+            if (userData.codigo === 200) {
                 localStorage.setItem(TOKEN_STORAGE_KEY, userData.token);
-                
+
                 if (userData.data && userData.data.ramoRol && userData.data.ramoRol.ramo_rol) {
                     localStorage.setItem(PERMISSIONS_STORAGE_KEY, userData.data.ramoRol.ramo_rol);
                 }
-                localStorage.setItem(USER_STORAGE_KEY,JSON.stringify (userData.data.usuario) );
-                localStorage.setItem(MENU_STORAGE_KEY,JSON.stringify (userData.data.menu) );
-                localStorage.setItem(PARAMETROS_STORAGE_KEY,JSON.stringify (userData.data.parametros) );
-                localStorage.setItem(PARAMETROS_RAMO_STORAGE_KEY,JSON.stringify (userData.data.parametros_ramo) );
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData.data.usuario));
+                localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(userData.data.menu));
+                localStorage.setItem(PARAMETROS_STORAGE_KEY, JSON.stringify(userData.data.parametros));
+                localStorage.setItem(PARAMETROS_RAMO_STORAGE_KEY, JSON.stringify(userData.data.parametros_ramo));
                 setUser(userData); // Asumiendo que la información del usuario viene en la respuesta
-                setMenu(JSON.stringify (userData.data.menu));
+                setMenu(JSON.stringify(userData.data.menu));
+
+                getAgentes(userData.data.usuario)
+
                 navigate('/quoter/dashboard');
                 setIsLoading(false);
-            }else{
+            } else {
                 navigate('/login');
                 setIsLoading(false);
                 return userData;
@@ -84,11 +90,20 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const getAgentes = (usuario) => {
+        if (usuario && usuario.tip_usuario === "I") {
+            const list_agentes = usuario.arrAgente;
+            if (Array.isArray(list_agentes) && list_agentes.length > 0) {
+                localStorage.setItem(DATOS_AGENTES, JSON.stringify(list_agentes));
+            }
+        }
+    };
+
     // Cerrar sesión y eliminar el estado del usuario
     const signout = async (endpoint, method) => {
         setIsLoading(true);
         const userData = await authService.fetchWithAuth(endpoint, method);
-        if(userData.codigo===200){
+        if (userData.codigo === 200) {
             localStorage.removeItem(TOKEN_STORAGE_KEY);
             localStorage.removeItem(USER_STORAGE_KEY);
             localStorage.removeItem('menu');
@@ -96,12 +111,12 @@ export const AuthProvider = ({ children }) => {
             setUser(null); // Asumiendo que la información del usuario viene en la respuesta
             setMenu(null);
             setIsLoading(false);
-        }else{
+        } else {
             setIsLoading(false);
         }
     };
 
-    const value = { user, signin, signout,isLoading,menu };
+    const value = { user, signin, signout, isLoading, menu };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

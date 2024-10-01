@@ -12,7 +12,8 @@ const QuoterService = {
       producto:dato.producto,
       cliente:dato.cliente,
       estado:dato.estado,
-      fecha:dato.fecha
+      fecha:dato.fecha,
+      idBroker:dato.idBroker
     };
 
     try {

@@ -279,7 +279,17 @@ const ComboService = {
         }
     },
 
-
+    fetchComboBroker: async () => {
+        const endpoint = 'api/obtenerTodosUsaurios';
+        const method = 'GET';
+        try {
+            const response = await authService.fetchWithAuth(endpoint, method);
+            return response;
+        } catch (error) {
+            console.error('Error fetching validar Combo Estado:', error);
+            throw error;
+        }
+    },
 }
 
 export default ComboService;

@@ -291,6 +291,7 @@ export default function MyQuoters() {
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
 
+
   const [openSnack, setOpenSnack] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -301,11 +302,13 @@ export default function MyQuoters() {
   const [estado, setEstado] = React.useState([]);
   const [ramo, setRamo] = React.useState([]);
   const [producto, setProducto] = React.useState([]);
+  const [broker, setBroker] = React.useState([]);
   const [filters, setFilters] = React.useState({
     estado: '',
     producto: '',
     ramo: '',
     cliente: '',
+    broker: null,
   });
 
   //Filtrar tabla
@@ -347,6 +350,17 @@ export default function MyQuoters() {
     }
   };
 
+  const cargarBroker = async () => {
+    try {
+      const broker = await ComboService.fetchComboBroker();
+      if (broker && broker.data) {
+        setBroker(broker.data);
+      }
+    } catch (error) {
+      console.error("Error al obtener broker:", error);
+    }
+  };
+
   const filteredRows = rows.filter((row) => {
     return (
       row.ramo.toLowerCase().includes(filter.toLowerCase()) ||
@@ -369,9 +383,10 @@ export default function MyQuoters() {
 
 
   useEffect(() => {
-    cargarTabla();
     let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     setUsuarioInterno(usuario.tip_usuario);
+    
+    cargarTabla();
   }, []);
 
 
@@ -379,8 +394,8 @@ export default function MyQuoters() {
     handleOpenBackdrop();
     await cargarEstado();
     await cargarRamo();
-
-    const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado);
+    await cargarBroker();
+    const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado, filters.broker);
 
     if (objetoSeguro) {
       let number = 1;
@@ -479,13 +494,14 @@ export default function MyQuoters() {
     await eliminarCotizacion(id);
   };
 
-  const cargarCotizacion = async (ramo = '', producto = "", estado = '') => {
+  const cargarCotizacion = async (ramo = '', producto = "", estado = '', idBroker = null) => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let dato = {
       usuario: userId.id,
       ramo: ramo,
       producto: producto,
-      estado: estado
+      estado: estado,
+      idBroker: idBroker,
     };
     try {
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
@@ -596,16 +612,15 @@ export default function MyQuoters() {
   };
 
   const handleExport = () => {
-    debugger;
     let validar = true;
-    if (!filters.ramo || filters.ramo==="") {
+    if (!filters.ramo || filters.ramo === "") {
       setErrorMessage("Se deben ingresar un filtro de ramo");
       setOpenSnack(true);
       validar = false;
       return;
     }
 
-    if (!filters.producto || filters.producto==="") {
+    if (!filters.producto || filters.producto === "") {
       setErrorMessage("Se deben ingresar un filtro en producto");
       setOpenSnack(true);
       validar = false;
@@ -629,102 +644,131 @@ export default function MyQuoters() {
     await QuoterService.fetchExportExcel(dato);
 
     handleCloseBackdrop();
-  
-
-}
 
 
-return (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-    <Typography variant="h4" sx={{ color: "#00a99e", mb: 2 }} xs={{ fontSize: 10 }}>Mis Cotizaciones</Typography>
+  }
 
-    <Grid style={{ width: '90%', display: 'flex', justifyContent: 'center' }} spacing={2}>
 
-      <Grid container spacing={4} justifyContent="center" sx={{ width: '90%' }}>
-        <Grid item xs={8} md={2}>
-          <TextField
-            fullWidth
-            id="cliente"
-            name="cliente"
-            label="Cliente"
-            variant="standard"
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Typography variant="h4" sx={{ color: "#00a99e", mb: 2 }} xs={{ fontSize: 10 }}>Mis Cotizaciones</Typography>
 
-            value={filter}
-            onChange={(event) => setFilter(event.target.value)}
-          />
-        </Grid>
+      <Grid style={{ width: '90%', display: 'flex', justifyContent: 'center' }} spacing={2}>
 
-        <Grid item xs={8} md={2}>
-          <FormControl fullWidth>
-            <InputLabel id="ramo-label">Ramo</InputLabel>
-            <Select
-              labelId="ramo-label"
-              id="ramo"
-              name="ramo"
-              variant="standard"
+        <Grid container spacing={2} justifyContent="center" sx={{ width: '90%' }}>
+          <Grid item xs={8} md={2}>
+            <TextField
               fullWidth
-              value={filters.ramo}
-              onChange={handleChange}
-              label="Ramo"
-            >
-              <MenuItem value=""><em>Ninguno</em></MenuItem>
-              {ramo.map((rm, index) => (
-                <MenuItem key={index} value={rm.ramo}>
-                  {rm.titulo}
-                </MenuItem>
-              ))}
-              {/* Agrega más opciones según tu necesidad */}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={8} md={2}>
-          <FormControl fullWidth>
-            <InputLabel id="producto-label">Producto</InputLabel>
-            <Select
-              labelId="producto-label"
-              id="producto"
-              name="producto"
+              id="cliente"
+              name="cliente"
+              label="Cliente"
               variant="standard"
-              fullWidth
-              value={filters.producto}
-              onChange={handleChange}
-              label="Producto"
-            >
-              <MenuItem value=""><em>Ninguno</em></MenuItem>
-              {producto.map((pro, index) => (
-                <MenuItem key={index} value={pro.producto}>
-                  {pro.titulo}
-                </MenuItem>
-              ))}
-              {/* Agrega más opciones según tu necesidad */}
-            </Select>
-          </FormControl>
+
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+            />
+          </Grid>
+
+          <Grid item xs={8} md={2}>
+            <FormControl fullWidth>
+              <InputLabel id="ramo-label">Ramo</InputLabel>
+              <Select
+                labelId="ramo-label"
+                id="ramo"
+                name="ramo"
+                variant="standard"
+                fullWidth
+                value={filters.ramo}
+                onChange={handleChange}
+                label="Ramo"
+              >
+                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                {ramo.map((rm, index) => (
+                  <MenuItem key={index} value={rm.ramo}>
+                    {rm.titulo}
+                  </MenuItem>
+                ))}
+                {/* Agrega más opciones según tu necesidad */}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8} md={2}>
+            <FormControl fullWidth>
+              <InputLabel id="producto-label">Producto</InputLabel>
+              <Select
+                labelId="producto-label"
+                id="producto"
+                name="producto"
+                variant="standard"
+                fullWidth
+                value={filters.producto}
+                onChange={handleChange}
+                label="Producto"
+              >
+                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                {producto.map((pro, index) => (
+                  <MenuItem key={index} value={pro.producto}>
+                    {pro.titulo}
+                  </MenuItem>
+                ))}
+                {/* Agrega más opciones según tu necesidad */}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={8} md={2}>
+            <FormControl fullWidth>
+              <InputLabel id="estado-label">Estado</InputLabel>
+              <Select
+                labelId="estado-label"
+                id="estado"
+                name="estado"
+                variant="standard"
+                fullWidth
+                value={filters.estado}
+                onChange={handleChange}
+                label="Estado"
+              >
+                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                {estado.map((est, index) => (
+                  <MenuItem key={index} value={est.Codigo}>
+                    {est.Nombre}
+                  </MenuItem>
+                ))}
+                {/* Agrega más opciones según tu necesidad */}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8} md={2}>
+            {usuarioInterno === "I" && (
+              <FormControl fullWidth>
+                <InputLabel id="broker-label">Broker</InputLabel>
+                <Select
+                  labelId="broker-label"
+                  id="broker"
+                  name="broker"
+                  variant="standard"
+                  fullWidth
+                  value={filters.broker}
+                  onChange={handleChange}
+                  label="broker"
+                >
+                  <MenuItem value=""><em>Ninguno</em></MenuItem>
+                  {broker.map((broker, index) => (
+                    <MenuItem key={index} value={broker.id}>
+                      {broker.usu_descripcion}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </Grid>
         </Grid>
 
-        <Grid item xs={8} md={2}>
-          <FormControl fullWidth>
-            <InputLabel id="estado-label">Estado</InputLabel>
-            <Select
-              labelId="estado-label"
-              id="estado"
-              name="estado"
-              variant="standard"
-              fullWidth
-              value={filters.estado}
-              onChange={handleChange}
-              label="Estado"
-            >
-              <MenuItem value=""><em>Ninguno</em></MenuItem>
-              {estado.map((est, index) => (
-                <MenuItem key={index} value={est.Codigo}>
-                  {est.Nombre}
-                </MenuItem>
-              ))}
-              {/* Agrega más opciones según tu necesidad */}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={8} md={2}>
+      </Grid>
+
+      <Grid style={{ width: '90%', paddingTop: '20px', display: 'flex', justifyContent: 'center' }} spacing={2}>
+        <Grid item xs={8} md={2} style={{ paddingRight: '20px'}}>
           <Button variant="contained"
             style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
             onClick={handleSearch}
@@ -745,177 +789,174 @@ return (
           </Grid>
         )}
       </Grid>
-
-    </Grid>
-
-    <div style={{ width: "100%" }}>
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackdrop}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      {/* Modal */}
+      <div style={{ width: "100%" }}>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={openBackdrop}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        {/* Modal */}
 
 
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={openSnack}
-        autoHideDuration={5000}
-        onClose={() => setOpenSnack(false)}
-      >
-        <Alert style={{ fontSize: "1em" }} severity="error">
-          <AlertTitle style={{ textAlign: "left" }}>Error</AlertTitle>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+        <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          open={openSnack}
+          autoHideDuration={5000}
+          onClose={() => setOpenSnack(false)}
+        >
+          <Alert style={{ fontSize: "1em" }} severity="error">
+            <AlertTitle style={{ textAlign: "left" }}>Error</AlertTitle>
+            {errorMessage}
+          </Alert>
+        </Snackbar>
 
-      <Box style={{ width: "100%" }} sx={{ width: "100%", marginTop: "12px" }}>
-        <Paper sx={{ width: "100%", mb: 2 }}>
-          <EnhancedTableToolbar filter={filter} setFilter={handleSetFilter} />
-          {visibleRows.length === 0 ? (
-            <Typography variant="body2" style={{ padding: "16px" }}>
-              No hay registros en la tabla.
-            </Typography>
-          ) : (
+        <Box style={{ width: "100%" }} sx={{ width: "100%", marginTop: "12px" }}>
+          <Paper sx={{ width: "100%", mb: 2 }}>
+            <EnhancedTableToolbar filter={filter} setFilter={handleSetFilter} />
+            {visibleRows.length === 0 ? (
+              <Typography variant="body2" style={{ padding: "16px" }}>
+                No hay registros en la tabla.
+              </Typography>
+            ) : (
 
-            <TableContainer
-              style={{ overflow: "auto", height: 300 }}
-            >
-              <Table stickyHeader 
-                sx={{ minWidth: 750 }}
-                aria-labelledby="tableTitle"
-                size={"small"}
-                style={{ height: 50 }}
+              <TableContainer
+                style={{ overflow: "auto", height: 300 }}
               >
-                <EnhancedTableHead
-                  numSelected={selected.length}
-                  order={order}
-                  orderBy={orderBy}
-                  onSelectAllClick={handleSelectAllClick}
-                  onRequestSort={handleRequestSort}
-                  rowCount={rows.length}
-                />
-                <TableBody>
-                  {visibleRows.map((row, index) => {
-                    const isItemSelected = isSelected(row.number);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                <Table stickyHeader
+                  sx={{ minWidth: 750 }}
+                  aria-labelledby="tableTitle"
+                  size={"small"}
+                  style={{ height: 50 }}
+                >
+                  <EnhancedTableHead
+                    numSelected={selected.length}
+                    order={order}
+                    orderBy={orderBy}
+                    onSelectAllClick={handleSelectAllClick}
+                    onRequestSort={handleRequestSort}
+                    rowCount={rows.length}
+                  />
+                  <TableBody>
+                    {visibleRows.map((row, index) => {
+                      const isItemSelected = isSelected(row.number);
+                      const labelId = `enhanced-table-checkbox-${index}`;
 
-                    return (
-                      <StyledTableRow
-                        hover
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.number}
-                        selected={isItemSelected}
-                        sx={{ cursor: "pointer" }}
-                      >
-                        <TableCell padding="checkbox"></TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          padding="none"
+                      return (
+                        <StyledTableRow
+                          hover
+                          role="checkbox"
+                          aria-checked={isItemSelected}
+                          tabIndex={-1}
+                          key={row.number}
+                          selected={isItemSelected}
+                          sx={{ cursor: "pointer" }}
                         >
-                          {row.number}
-                        </TableCell>
-                        <TableCell align="left">{row.ramo}</TableCell>
-                        <TableCell align="left">{row.producto}</TableCell>
-                        <TableCell align="left">{row.cliente}</TableCell>
+                          <TableCell padding="checkbox"></TableCell>
+                          <TableCell
+                            component="th"
+                            id={labelId}
+                            scope="row"
+                            padding="none"
+                          >
+                            {row.number}
+                          </TableCell>
+                          <TableCell align="left">{row.ramo}</TableCell>
+                          <TableCell align="left">{row.producto}</TableCell>
+                          <TableCell align="left">{row.cliente}</TableCell>
 
-                        <TableCell align="right">
-                          <CurrencyInput
-                            value={row.amount}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <input
-                            value={(parseFloat(row.rate).toFixed(2) || 0) + "%"}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <CurrencyInput
-                            value={row.prima}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <input
-                            value={row.createdDate}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <input
-                            value={row.state}
-                            className="input-table"
-                            disabled
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          {row.state !== "Cancelado" &&
-                            row.state !== "Emitida" && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "end",
-                                }}
-                              >
-                                <IconButton
-                                  onClick={() =>
-                                    handleOpenQuoter(
-                                      row.id,
-                                      row.productoId,
-                                      row.ramoId,
-                                    )
-                                  }
+                          <TableCell align="right">
+                            <CurrencyInput
+                              value={row.amount}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              value={(parseFloat(row.rate).toFixed(2) || 0) + "%"}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <CurrencyInput
+                              value={row.prima}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              value={row.createdDate}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              value={row.state}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            {row.state !== "Cancelado" &&
+                              row.state !== "Emitida" && (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "end",
+                                  }}
                                 >
-                                  <EditIcon />
-                                </IconButton>
-                                <IconButton
-                                  onClick={() => handleDeleteQuoter(row.id)}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </div>
-                            )}
-                        </TableCell>
-                      </StyledTableRow>
-                    );
-                  })}
-                  {emptyRows > 0 && (
-                    <TableRow
-                      style={{
-                        height: 33 * emptyRows,
-                      }}
-                    >
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25, 50]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Filas por pagina"
-          />
-        </Paper>
-      </Box>
+                                  <IconButton
+                                    onClick={() =>
+                                      handleOpenQuoter(
+                                        row.id,
+                                        row.productoId,
+                                        row.ramoId,
+                                      )
+                                    }
+                                  >
+                                    <EditIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    onClick={() => handleDeleteQuoter(row.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </div>
+                              )}
+                          </TableCell>
+                        </StyledTableRow>
+                      );
+                    })}
+                    {emptyRows > 0 && (
+                      <TableRow
+                        style={{
+                          height: 33 * emptyRows,
+                        }}
+                      >
+                        <TableCell colSpan={6} />
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Filas por pagina"
+            />
+          </Paper>
+        </Box>
+      </div>
     </div>
-  </div>
-);
+  );
 }
