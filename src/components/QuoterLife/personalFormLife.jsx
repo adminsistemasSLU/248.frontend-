@@ -668,10 +668,16 @@ const PersonalFormLife = forwardRef((props, ref) => {
   useEffect(() => {
     isMounted.current = true; // Establecer a true cuando el componente está montado
     const producto = Number(localStorage.getItem(LS_PRODUCTO));
-    let listaProductos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
-    const resultado = listaProductos.filter(item => item.producto === producto).map(item => item.titulo);
-    
-    setNomnbreProducto(resultado);
+    let listaProductos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS)) || [];
+    if (listaProductos.length > 0) {
+        const resultado = listaProductos
+            .filter(item => item.producto === producto)
+            .map(item => item.titulo);
+        
+        setNomnbreProducto(resultado);
+    } else {
+        setNomnbreProducto([]); // O algún valor predeterminado
+    }
     setAgeCalculate(maxDate);
     setAgeConyugueCalculate(maxDate);
     const iniciarDatosCombos = async () => {
