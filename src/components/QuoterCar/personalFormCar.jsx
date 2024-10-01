@@ -23,6 +23,7 @@ import {
     LS_COTIZACION_VEHICULO,
     DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
     DATOS_AGENTES,
+    TIPO_USUARIO,
 } from "../../utils/constantes";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
@@ -86,7 +87,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 console.log(data.fechaNacimiento);
                 setFechaNacimiento(dateObject);
             }
-
         };
 
         isMounted.current = true;
@@ -259,6 +259,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
             // ramo: process.env.RAMO_VEHICULO,
             producto: 99999,
             ramo: 3,
+            idUsuarioSistema: localStorage.getItem(TIPO_USUARIO),
             datosCliente: {
                 zona: obtenerProvinciaPorId(objetoSeguro.provincia)[0],
                 tipoPoliza: "1",
