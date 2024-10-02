@@ -356,6 +356,14 @@ export default function MyQuoters() {
       if (broker && broker.data) {
         setBroker(broker.data);
       }
+
+      let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+      if (usuario.tip_usuario == "B") {
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          broker: usuario.id,
+        }));
+      }
     } catch (error) {
       console.error("Error al obtener broker:", error);
     }
@@ -385,7 +393,6 @@ export default function MyQuoters() {
   useEffect(() => {
     let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     setUsuarioInterno(usuario.tip_usuario);
-    
     cargarTabla();
   }, []);
 
@@ -740,9 +747,13 @@ export default function MyQuoters() {
             </FormControl>
           </Grid>
           <Grid item xs={8} md={2}>
-            {usuarioInterno === "I" && (
+            {(usuarioInterno === "I" || usuarioInterno === "B") && (
               <FormControl fullWidth>
-                <InputLabel id="broker-label">Broker</InputLabel>
+                <InputLabel id="broker-label">
+                  {(usuarioInterno !== "B") && (
+                    "Broker"
+                  )}
+                </InputLabel>
                 <Select
                   labelId="broker-label"
                   id="broker"
@@ -752,6 +763,7 @@ export default function MyQuoters() {
                   value={filters.broker}
                   onChange={handleChange}
                   label="broker"
+                  disabled={usuarioInterno === "B"}
                 >
                   <MenuItem value=""><em>Ninguno</em></MenuItem>
                   {broker.map((broker, index) => (
@@ -762,13 +774,14 @@ export default function MyQuoters() {
                 </Select>
               </FormControl>
             )}
+
           </Grid>
         </Grid>
 
       </Grid>
 
       <Grid style={{ width: '90%', paddingTop: '20px', display: 'flex', justifyContent: 'center' }} spacing={2}>
-        <Grid item xs={8} md={2} style={{ paddingRight: '20px'}}>
+        <Grid item xs={8} md={2} style={{ paddingRight: '20px' }}>
           <Button variant="contained"
             style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
             onClick={handleSearch}

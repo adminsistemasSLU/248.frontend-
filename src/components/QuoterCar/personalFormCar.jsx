@@ -84,7 +84,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
             if (data) {
                 setFormData(data);
                 const dateObject = dayjs(data.fechaNacimiento, "DD/MM/YYYY");
-                console.log(data.fechaNacimiento);
                 setFechaNacimiento(dateObject);
             }
         };
@@ -324,8 +323,12 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     email: cedulaData.data[0].cli_email || "",
                     phone: cedulaData.data[0].cli_celular || "",
                     address: cedulaData.data[0].cli_direccion || "",
+                    status: cedulaData.data[0].cli_estcivil || "",
+                    pais: cedulaData.data[0].cli_residencia || "",
                     gender: cedulaData.data[0].cli_genero || "",
                 });
+                const dateObject = dayjs(cedulaData.data[0].cli_fecnacio, "DD/MM/YYYY");
+                setFechaNacimiento(dateObject);
             }
         } catch (error) {
             console.error("Error al verificar cédula:", error);
