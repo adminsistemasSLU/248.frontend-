@@ -837,10 +837,10 @@ const DetailsCar = forwardRef((props, ref) => {
             </Grid>
             <Grid item xs={10.5} md={2.8} style={{ paddingTop: '21px' }}>
               <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                Total suma asegurada <span style={{ color: 'red' }}>*</span>
+                Suma asegurada <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
-                placeholder="Total Suma Asegurada"
+                placeholder="Suma asegurada"
                 type="text"
                 onChange={handleChange}
                 name="suma_asegurada"
@@ -852,18 +852,19 @@ const DetailsCar = forwardRef((props, ref) => {
                 required
               />
             </Grid>
-          </Grid>
-          {error && <Alert severity="error">{error}</Alert>}
-          <Grid item xs={10.5} md={2.5} style={{ paddingTop: '31px' }}>
+            <Grid item xs={10.5} md={2.5} style={{ paddingTop: '21px' }}>
             <Button
               sx={{ mr: 1 }}
               className="button-styled-primary"
               style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
               onClick={handleAddCar}
             >
-              Aceptar
+              Agregar
             </Button>
           </Grid>
+          </Grid>
+          {error && <Alert severity="error">{error}</Alert>}
+
           <Grid item xs={10.5} md={12} style={{ width: '95%', paddingTop: '30px', paddingLeft: '30px', paddingRight: '30px', paddingBottom: '20px' }}>
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 600 }} aria-label="car table">
@@ -873,7 +874,7 @@ const DetailsCar = forwardRef((props, ref) => {
                     <TableCell align="center">Marca</TableCell>
                     <TableCell align="center">Modelo</TableCell>
                     <TableCell align="center">Año</TableCell>
-                    <TableCell align="center">Monto total</TableCell>
+                    <TableCell align="center">Suma Asegurada</TableCell>
                     <TableCell align="center">Eliminar</TableCell>
                   </TableRow>
                 </TableHead>

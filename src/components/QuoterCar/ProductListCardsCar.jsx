@@ -73,7 +73,7 @@ const ProductListCardsCar = ({ onNext, ref }) => {
                                         <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
                                             {plan.plan.toUpperCase()}
                                         </Typography>
-                                        <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
+                                        <Typography variant="h6" component="div" style={{ paddingBottom: 8, fontWeight: 'bold' }}>
                                             ${formatCurrency(plan.prima)}
                                         </Typography>
                                     </CardContent>
