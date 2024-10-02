@@ -584,9 +584,9 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         fullWidth
                                         required
                                     >
-                                        <MenuItem value="1">Anticipado</MenuItem>
-                                        <MenuItem value="2">Mensual</MenuItem>
-                                        <MenuItem value="3">Anual</MenuItem>
+                                        <MenuItem value="1">Mensual</MenuItem>
+                                        <MenuItem value="5">Anual</MenuItem>
+                                        <MenuItem value="6">Anticipado</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
