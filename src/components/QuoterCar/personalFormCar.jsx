@@ -219,9 +219,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
         ];
 
         let next = true;
-
-        console.log(formData);
-        debugger;
         for (const field of requiredFields) {
             const value = formData[field];
             if (typeof value === "undefined" || value === null || (typeof value === "string" && value.trim() === "")) {
