@@ -321,18 +321,25 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     name: cedulaData.data[0].cli_nombres || "",
                     lastname: cedulaData.data[0].cli_apellidos || "",
                     email: cedulaData.data[0].cli_email || "",
-                    phone: cedulaData.data[0].cli_celular || "",
+                    phone: cedulaData.data[0].cli_codigo || "",
                     address: cedulaData.data[0].cli_direccion || "",
                     status: cedulaData.data[0].cli_estcivil || "",
                     pais: cedulaData.data[0].cli_residencia || "",
-                    gender: cedulaData.data[0].cli_genero || "",
+                    gender: cedulaData.data[0].cli_sexo || "",
                 });
-                const dateObject = dayjs(cedulaData.data[0].cli_fecnacio, "DD/MM/YYYY");
+                const dateObject = dayjs(cambiarFormatoFecha(cedulaData.data[0].cli_fecnacio), "DD/MM/YYYY");
                 setFechaNacimiento(dateObject);
             }
         } catch (error) {
             console.error("Error al verificar cédula:", error);
         }
+    };
+
+    const cambiarFormatoFecha = (fecha) => {
+        if (!fecha) return '';
+
+        const [anio, mes, dia] = fecha.split('-');
+        return `${dia}/${mes}/${anio}`;
     };
 
     const handleClose = (event, reason) => {
