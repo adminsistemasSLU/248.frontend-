@@ -34,6 +34,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import CarsService from "../../services/CarsServices/CarsService";
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { DataObject } from "@mui/icons-material";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime);
@@ -81,6 +82,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
 
             cargarAgentesDesdeLocalStorage()
             let data = JSON.parse(localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY));
+            
             if (data) {
                 setFormData(data);
                 const dateObject = dayjs(data.fechaNacimiento, "DD/MM/YYYY");
@@ -217,6 +219,9 @@ const PersonalFormCar = forwardRef((props, ref) => {
         ];
 
         let next = true;
+
+        console.log(formData);
+        debugger;
         for (const field of requiredFields) {
             const value = formData[field];
             if (typeof value === "undefined" || value === null || (typeof value === "string" && value.trim() === "")) {
@@ -328,7 +333,9 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     gender: cedulaData.data[0].cli_sexo || "",
                 });
                 const dateObject = dayjs(cambiarFormatoFecha(cedulaData.data[0].cli_fecnacio), "DD/MM/YYYY");
+                handleDateChange(dateObject);
                 setFechaNacimiento(dateObject);
+
             }
         } catch (error) {
             console.error("Error al verificar cédula:", error);
