@@ -401,7 +401,7 @@ export default function SteppersCar() {
                 className="button-styled-primary"
                 style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
               >
-                Compatarivo
+                Comparativo
               </Button>
             )}
           </div>
