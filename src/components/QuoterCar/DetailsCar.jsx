@@ -369,6 +369,7 @@ const DetailsCar = forwardRef((props, ref) => {
       } else {
         setMessageError(response.message);
         setOpenSnack(true);
+        handleCloseBackdrop();
         return false;
       }
     } catch (error) {

@@ -59,7 +59,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
     });
     const maxDate = dayjs().subtract(18, "years");
     const [error, setError] = useState("");
-    const [messageError, setmessageError] = useState("");
     const [errorCedula, setErrorCedula] = useState(false);
     const [openSnack, setOpenSnack] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -73,6 +72,19 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [vigencia, setVigencia] = useState([]);
     const [agentes, setAgentes] = useState([]);
 
+    const [showLastName, setShowLastName] = useState(true); // Controla si se muestra o no el campo apellido
+    const [labelName, setLabelName] = useState("Nombres"); // Controla la etiqueta de nombre/empresa
+
+    useEffect(() => {
+        if (formData.documentType === "R") {
+            setShowLastName(false);
+            setLabelName("Empresa");
+        } else {
+            setShowLastName(true);
+            setLabelName("Nombres");
+        }
+    }, [formData.documentType]);
+
     useEffect(() => {
         const iniciarDatosCombos = async () => {
             handleOpenBackdrop();
@@ -82,7 +94,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
 
             cargarAgentesDesdeLocalStorage()
             let data = JSON.parse(localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY));
-            
+
             if (data) {
                 setFormData(data);
                 const dateObject = dayjs(data.fechaNacimiento, "DD/MM/YYYY");
@@ -203,7 +215,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
 
         const requiredFields = [
             "name",
-            "lastname",
             "email",
             "phone",
             "documentType",
@@ -217,6 +228,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
             "fechaNacimiento",
             "pais",
         ];
+
+        if (formData.documentType !== "R") {
+            requiredFields.push("lastname");
+        }
 
         let next = true;
         for (const field of requiredFields) {
@@ -293,7 +308,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
         let identification = value;
         if (value === "") {
             setOpenSnack(true);
-            setmessageError("Valor de cedula invalido");
+            setErrorMessage("Valor de cedula invalido");
             return;
         }
         try {
@@ -304,9 +319,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 await consultUserData(documentType, identification);
                 handleCloseBackdrop();
             } else {
+                debugger;
                 setErrorCedula(true);
                 setOpenSnack(true);
-                setmessageError(cedulaData.message);
+                setErrorMessage(cedulaData.message);
                 handleCloseBackdrop();
             }
         } catch (error) {
@@ -516,13 +532,12 @@ const PersonalFormCar = forwardRef((props, ref) => {
                         />
                     </Grid>
 
-                    {/* Nombres */}
                     <Grid item xs={10.5} md={2.8}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Nombres <span style={{ color: 'red' }}>*</span>
+                            {labelName} <span style={{ color: 'red' }}>*</span>
                         </Typography>
                         <TextField
-                            placeholder="Nombres"
+                            placeholder={labelName}
                             type="text"
                             name="name"
                             value={formData.name}
@@ -535,22 +550,24 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     </Grid>
 
                     {/* Apellidos */}
-                    <Grid item xs={10.5} md={2.8}>
-                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            Apellidos <span style={{ color: 'red' }}>*</span>
-                        </Typography>
-                        <TextField
-                            placeholder="Apellidos"
-                            type="text"
-                            name="lastname"
-                            value={formData.lastname}
-                            onChange={handleChange}
-                            variant="standard"
-                            fullWidth
-                            inputProps={{ maxLength: 30 }}
-                            required
-                        />
-                    </Grid>
+                    {showLastName && (
+                        <Grid item xs={10.5} md={2.8}>
+                            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                                Apellidos <span style={{ color: 'red' }}>*</span>
+                            </Typography>
+                            <TextField
+                                placeholder="Apellidos"
+                                type="text"
+                                name="lastname"
+                                value={formData.lastname}
+                                onChange={handleChange}
+                                variant="standard"
+                                fullWidth
+                                inputProps={{ maxLength: 30 }}
+                                required
+                            />
+                        </Grid>
+                    )}
 
                     {/* Género */}
                     <Grid item xs={10.5} md={2.8}>
