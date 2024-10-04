@@ -319,7 +319,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 await consultUserData(documentType, identification);
                 handleCloseBackdrop();
             } else {
-                debugger;
                 setErrorCedula(true);
                 setOpenSnack(true);
                 setErrorMessage(cedulaData.message);
@@ -400,8 +399,12 @@ const PersonalFormCar = forwardRef((props, ref) => {
             const provincias = await ComboService.fetchComboProvincias(1, 113);
             if (provincias && provincias.data) {
                 setProvinces(provincias.data);
-                setFormData((formData) => ({ ...formData, provincia: provincias.data[0].Codigo }));
-                await cargarCiudad(provincias.data[0].Codigo);
+                const codigoProvincia = provincias.data.find((item) => item.Nombre.toLowerCase() === "guayas".toLowerCase()).Codigo;
+                setFormData((formData) => ({
+                    ...formData,
+                    provincia: codigoProvincia
+                }));
+                await cargarCiudad(codigoProvincia);
             }
         } catch (error) {
             console.error("Error al obtener provincias:", error);

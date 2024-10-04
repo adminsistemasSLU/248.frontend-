@@ -1,18 +1,20 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography } from '@mui/material';
-import '../styles/footer.scss'; 
+import '../styles/footer.scss';
 
 
 const Footer = () => {
   return (
-    <AppBar  component="footer" className='appBar'>
-      <Toolbar sx={{backgroundColor: '#00a99e', Height: '75px'}}>
+    <AppBar component="footer" className='appBar'>
+      <Toolbar sx={{ backgroundColor: '#00a99e', height: '75px', display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="body1" color="inherit">
           © 2023 Seguros La Unión.
         </Typography>
+        <Typography variant="body1" color="inherit" sx={{ textAlign: 'right' }}>
+          Powered by AiSoftTech
+        </Typography>
       </Toolbar>
     </AppBar>
-    
   );
 };
 

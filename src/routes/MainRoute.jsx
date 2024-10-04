@@ -37,7 +37,7 @@ const MainRoute = () => {
           <Route path="/quoter/*" element={<QuoterRoutes />} />
         </Routes>
       </Suspense>
-      {shouldShowHeader() && <Header />}
+      {shouldShowHeader() && <Footer />}
     </div>
   );
 };
