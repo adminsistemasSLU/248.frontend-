@@ -329,6 +329,14 @@ export default function SteppersCar() {
         });
       } else {
         handleCloseBackdrop();
+        Swal.fire({
+          title: "Error!",
+          text: "Se presentó un error, por favor vuelva a intentar",
+          icon: "error",
+          confirmButtonText: "Ok",
+        }).then(() => {
+          setOpen(false);
+        });
         setOpen(false);
       }
     } catch (error) {
