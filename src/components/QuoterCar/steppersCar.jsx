@@ -30,14 +30,19 @@ import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../../services/IncencioService/IncendioService";
+import Swal from "sweetalert2";
 import {
   LS_COTIZACION_VEHICULO,
+  LS_COTIZACION,
+  USER_STORAGE_KEY
+
 } from "../../utils/constantes";
 import PersonalFormCar from "./personalFormCar";
 import InvoiceFormCar from "./invoiceFormCar";
 import ResumenCar from "./resumenCar";
 import DetailsCar from "./DetailsCar";
 import ProductListCardsCar from "./ProductListCardsCar";
+import EmailService from "../../services/EmailService/EmailService";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -165,8 +170,8 @@ export default function SteppersCar() {
     const link = document.createElement('a');
     // link.href = `${process.env.PUBLIC_URL}/assets/resource/comparativo.pdf`+ localStorage.getItem(LS_COTIZACION_VEHICULO);
     console.log("Link de descarga: ");
-    console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/`+ localStorage.getItem(LS_COTIZACION_VEHICULO));
-    link.href = `${process.env.PUBLIC_URL}/api/cotizacion_pdf/`+ localStorage.getItem(LS_COTIZACION_VEHICULO);
+    console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + localStorage.getItem(LS_COTIZACION_VEHICULO));
+    link.href = `${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + localStorage.getItem(LS_COTIZACION_VEHICULO);
     link.download = 'comparativo.pdf';
     link.click();
   };
@@ -280,6 +285,63 @@ export default function SteppersCar() {
   };
 
   const handleSendQuoter = () => {
+    enviarCorreo();
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const enviarCorreo = async () => {
+    try {
+      handleOpenBackdrop();
+      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      let emailValido = validateEmail(email);
+
+      if (!emailValido) {
+        handleCloseBackdrop();
+        Swal.fire({
+          title: "Error!",
+          text: `Correo no valido`,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        setEmailError("El Correo no es valido");
+
+        return;
+      }
+
+      const response = await EmailService.fetchEnvioCorreoCotizacionCar(
+        idCotizacion,
+        email
+      );
+
+      if (response.codigo === 200) {
+        handleCloseBackdrop();
+        Swal.fire({
+          title: "Exito!",
+          text: response.data,
+          icon: "success",
+          confirmButtonText: "Ok",
+        }).then(() => {
+          setOpen(false);
+        });
+      } else {
+        handleCloseBackdrop();
+        setOpen(false);
+      }
+    } catch (error) {
+      handleCloseBackdrop();
+      Swal.fire({
+        title: "Error!",
+        text: "Se presentó un error, por favor vuelva a intentar",
+        icon: "error",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        setOpen(false);
+      });
+    }
   };
 
   return (
@@ -307,7 +369,7 @@ export default function SteppersCar() {
         </Snackbar>
 
         <DialogTitle id="alert-dialog-title">
-          {"Enviar cotización por correo"}
+          {"Enviar comparativo por correo"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -326,10 +388,8 @@ export default function SteppersCar() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDownloadPdf}>Visualizar Cotizacion</Button>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={handleSendQuoter} autoFocus>
-            Aceptar
+          <Button onClick={handleSendQuoter}>
+            Enviar
           </Button>
         </DialogActions>
       </Dialog>
@@ -404,9 +464,21 @@ export default function SteppersCar() {
                 Comparativo
               </Button>
             )}
+
+            {steps[activeStep].label === "Planes" && (
+              <Button
+                onClick={handleClickOpen}
+                sx={{ mr: 1 }}
+                className="button-styled-primary"
+                style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
+              >
+                Enviar Cotización
+              </Button>
+            )}
           </div>
         </Box>
       </div>
     </Stack>
+
   );
 }

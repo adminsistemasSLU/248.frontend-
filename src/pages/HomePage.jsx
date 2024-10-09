@@ -2,6 +2,7 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import HomeCarrousel from '../utils/HomeCarrousel';
+import Footer from '../components/footer';
 
 const HomePage = () => {
   return (
@@ -14,7 +15,7 @@ const HomePage = () => {
         ¿Qué tipo de seguro esta interesado(a)?
       </Typography>
       <HomeCarrousel /> { }
-
+      <Footer />
     </div>
   );
 };

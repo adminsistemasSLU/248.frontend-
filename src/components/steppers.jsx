@@ -44,6 +44,7 @@ import {
 } from "../utils/constantes";
 import EmailService from "../services/EmailService/EmailService";
 import Swal from "sweetalert2";
+import Footer from "./footer";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {

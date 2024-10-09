@@ -39,6 +39,22 @@ const EmailService = {
     }
   },
 
+  fetchEnvioCorreoCotizacionCar: async (id_CotiGeneral,correo) => {
+    const endpoint = 'api/enviarMailVehiculo';
+    const method = 'POST'; 
+    const data = {
+        "idCotizacion":id_CotiGeneral,
+        "email": correo
+      };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Consultar Cotizacion General:', error);
+      throw error;
+    }
+  },
 };
 
 
