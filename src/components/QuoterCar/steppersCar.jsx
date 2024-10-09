@@ -34,7 +34,7 @@ import Swal from "sweetalert2";
 import {
   LS_COTIZACION_VEHICULO,
   LS_COTIZACION,
-  USER_STORAGE_KEY
+  MAIL_COTIZACION,
 
 } from "../../utils/constantes";
 import PersonalFormCar from "./personalFormCar";
@@ -187,7 +187,6 @@ export default function SteppersCar() {
 
     if (steps[activeStep].label === "Datos Vehículo") {
       continuar = await questionFormRef.current.handleSubmitExternally();
-
     }
 
     if (continuar) {
@@ -274,6 +273,7 @@ export default function SteppersCar() {
   };
 
   const handleClickOpen = () => {
+    setEmail(localStorage.getItem(MAIL_COTIZACION));
     setOpen(true);
   };
 
@@ -376,9 +376,13 @@ export default function SteppersCar() {
           <Alert severity="warning">{emailError}</Alert>
         </Snackbar>
 
-        <DialogTitle id="alert-dialog-title">
+        <DialogTitle
+          id="alert-dialog-title"
+          style={{ color: '#0099A8' }}
+        >
           {"Enviar comparativo por correo"}
         </DialogTitle>
+
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <Grid item xs={12}>
@@ -396,7 +400,12 @@ export default function SteppersCar() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSendQuoter}>
+          <Button
+            onClick={handleSendQuoter}
+            sx={{ mr: 1 }}
+            className="button-styled-primary"
+            style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
+          >
             Enviar
           </Button>
         </DialogActions>

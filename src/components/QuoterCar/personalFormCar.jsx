@@ -23,7 +23,8 @@ import {
     LS_COTIZACION_VEHICULO,
     DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
     DATOS_AGENTES,
-    USER_STORAGE_KEY
+    USER_STORAGE_KEY,
+    MAIL_COTIZACION,
 } from "../../utils/constantes";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
@@ -244,7 +245,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
         }
 
         if (!next) return false;
-
+        localStorage.setItem(MAIL_COTIZACION, formData.email);
         const data = transformarObjetoSeguro(formData);
         localStorage.setItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY, JSON.stringify(formData));
 
@@ -339,7 +340,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     name: cedulaData.data[0].cli_nombres || "",
                     lastname: cedulaData.data[0].cli_apellidos || "",
                     email: cedulaData.data[0].cli_email || "",
-                    phone: cedulaData.data[0].cli_codigo || "",
+                    phone: cedulaData.data[0].cli_celular || "",
                     address: cedulaData.data[0].cli_direccion || "",
                     status: cedulaData.data[0].cli_estcivil || "",
                     pais: cedulaData.data[0].cli_residencia || "",
@@ -791,7 +792,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             >
                                 {agentes.map((agente, index) => (
                                     <MenuItem key={index} value={agente.clave}>
-                                        {`${agente.nombre} ${agente.apellidos}`}
+                                        {`${agente.nombre}`}
                                     </MenuItem>
                                 ))}
                             </Select>
