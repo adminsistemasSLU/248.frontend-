@@ -82,12 +82,7 @@ const areEqual = (prevProps, nextProps) => {
     prevProps.index === nextProps.index &&
     prevProps.handleTableChange === nextProps.handleTableChange;
 };
-function formatedInput(numero) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(numero);
-}
+
 const MemoizedMontoCell = React.memo(({ value, onChange }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -121,7 +116,38 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
   );
 });
 
-const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
+const MemoizedDesempleoCell = React.memo(({ value, onChange, disabled }) => {
+
+  return (
+    <TableCell>
+      <CurrencyInput
+        className="input-table"
+        onChange={onChange}
+        value={(value) || ''}
+        style={{
+          border: '1px solid #ccc',
+          width: '96%',
+          height: '29px',
+          borderRadius: '5px',
+          fontSize: '16px',
+        }}
+      />
+      {/* <TextField
+        fullWidth
+        value={(value) || ''}
+        onChange={onChange}
+        size={isSmallScreen ? 'small' : 'medium'}
+        sx={{
+          input: {
+            padding: '4.5px 14px',
+          }
+        }}
+      /> */}
+    </TableCell>
+  );
+});
+
+const MemoizedRow = React.memo(({ item, index, handleTableChange, visibleDesempleo }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   function formatedInput(numero) {
@@ -150,6 +176,14 @@ const MemoizedRow = React.memo(({ item, index, handleTableChange }) => {
         value={ValidationUtils.Valida_moneda(item.monto)}
         onChange={(e) => handleTableChange(e, index, 'monto')}
       />
+
+      {visibleDesempleo && <MemoizedDesempleoCell
+        value={ValidationUtils.Valida_moneda(item.desempleo)}
+        onChange={(e) => handleTableChange(e, index, 'desempleo')}
+
+      />}
+
+
       <TableCell>
         <TextField
           fullWidth
@@ -260,8 +294,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
     impuesto: false,
   });
   const [formDataTabla, setFormDataTabla] = useState([
-    { monto: '', tasa: '', prima: '', estado: '' }
+    { monto: '', tasa: '', prima: '', estado: '', desempleo: 0 }
   ]);
+
+  const [visibleDesempleo, setvisibleDesempleo] = React.useState(true);
 
   const memoizedFormDataTabla = useMemo(() => formDataTabla, [formDataTabla]);
 
@@ -411,14 +447,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
           ...formData,
           vigencia: dataPoliza.vigencia,
           numPrestamo: datosCertificado.numPrestamo,
-          tipoProducto:datosCertificado.tipoProducto,
+          tipoProducto: datosCertificado.tipoProducto,
         }));
 
         if (dataPoliza.vigencia && inicioVigencia) {
           const newFinVigencia = inicioVigencia.add(dataPoliza.vigencia, 'month');
           setFinVigencia(newFinVigencia);
         }
-
+        localStorage.setItem(LS_VIDAPOLIZA,dataPoliza.poliza);
+        
 
         setcargarDataInicial(true);
         let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
@@ -426,8 +463,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
           {
             monto: parseFloat(item.monto) || '',
             tasa: item.tasa || '',
-            prima: item.prima || '', // Asumiendo que quieres agregar el campo 'prima', si no es necesario, puedes omitirlo
-            estado: item.estado || '' // Si no tienes 'estado' en el objeto original, puedes eliminar esta línea o ajustar según lo que necesites
+            prima: item.prima || '', 
+            estado: item.estado || '',
+            desempleo: item.desempleo||0,
           }));
         setFormDataTabla(transformedData);
       }
@@ -469,15 +507,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
           return acc;
         }, 0); // El acumulador comienza en 0
 
-        setFormData({ ...formData, prestamo: resultado });
-
+        
+        
         // Verifica si se debe mostrar el mensaje de error
         if (resultado === 0) {
           setErrorMessage("Se deben ingresar un valor en prestamo");
           setOpenSnack(true);
           return;
         }
-
+        setFormData({ ...formData, prestamo: resultado });
         const data = crearDatosProcesarDatos();
         setOpenBackdrop(true);
 
@@ -634,6 +672,17 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
+
+        const coberturas = vigencia.data.conf_amparos.cob_basicas;
+        let verDesempleo = false;
+        for (let key in coberturas) {
+          if (coberturas[key].nomcob.toLowerCase().includes("desempleo")) {
+            verDesempleo = true;
+          }
+        }
+      
+        setvisibleDesempleo(verDesempleo);
+
         localStorage.setItem(LS_FPAGO, vigencia.data.frm_pago);
         localStorage.setItem(LS_TPRESTAMO, vigencia.data.tipo_prestamo);
         setTipoprestamo(vigencia.data.tipo_prestamo);
@@ -642,7 +691,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
         }
-
+       
         if (vigencia.data.polizas[0]) {
           localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
         } else {
@@ -670,13 +719,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const producto = Number(localStorage.getItem(LS_PRODUCTO));
     let listaProductos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS)) || [];
     if (listaProductos.length > 0) {
-        const resultado = listaProductos
-            .filter(item => item.producto === producto)
-            .map(item => item.titulo);
-        
-        setNomnbreProducto(resultado);
+      const resultado = listaProductos
+        .filter(item => item.producto === producto)
+        .map(item => item.titulo);
+
+      setNomnbreProducto(resultado);
     } else {
-        setNomnbreProducto([]); // O algún valor predeterminado
+      setNomnbreProducto([]); // O algún valor predeterminado
     }
     setAgeCalculate(maxDate);
     setAgeConyugueCalculate(maxDate);
@@ -725,7 +774,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const periodos = formDataTabla.map((item, index) => ({
       monto: isNaN(item.monto) ? item.monto.replace(/[$,.]/g, '') : item.monto,
       periodo: index + 1,
-      vigencia: ""
+      vigencia: "",
+      desempleo:item.desempleo||0
     }));
     return {
       action: "procesarDatos",
@@ -764,17 +814,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
       cargarCiudad(value);
     }
 
-    if (name ==="tipoProducto"){
+    if (name === "tipoProducto") {
+      const tipo_prestamo = localStorage.getItem(LS_TPRESTAMO)
       console.log(value);
-      console.log(t_prestamo);
-      if ((value !== t_prestamo  )) {
-        if(t_prestamo !== 'A'||value === 'Z'){
+      console.log(tipo_prestamo);
+      if ((value !== tipo_prestamo)) {
+        if (tipo_prestamo !== 'A' || value === 'Z') {
           setErrorMessage("El tipo de plan ingresado no es valido")
           setOpenSnack(true);
           return false;
         }
       }
-  
+
     }
 
     if (name === "vigencia") {
@@ -1032,7 +1083,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
-    
+
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
     const requiredFields = [
@@ -1068,7 +1119,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
       genero: formData.conyugesexo,
       tipo: formData.conyugetipo,
-      pais:formData.countryConyugue
+      pais: formData.countryConyugue
     };
 
     const datosprestamo = {
@@ -1086,7 +1137,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       finVigencia: finVigencia.format("DD/MM/YYYY"),
       vigencia: formData.vigencia,
       numPrestamo: formData.numPrestamo,
-      tipoProducto:formData.tipoProducto
+      tipoProducto: formData.tipoProducto
     };
 
 
@@ -1120,6 +1171,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const periodos = formDataTabla.map((item, index) => ({
       tipo_monto: "",
       monto: item.monto,
+      desempleo: item.desempleo||0,
       periodo: index + 1,
       vigencia: formData.vigencia,
       vigencia_desde: item.vigencia_desde,
@@ -1378,8 +1430,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const result = calculado.data.montoPeriodo
         ? Object.values(calculado.data.montoPeriodo).flatMap(obj =>
           Object.values(obj).map(item => ({
-            monto: item.monto || '',
+            monto: item.monto|| '',
             tasa: item.tasa || '',
+            desempleo: item.desempleo || '',
             prima: item.prima_anio || '',
             vigencia_desde: item.vigencia_desde || '',
             vigencia_hasta: item.vigencia_hasta || '',
@@ -1460,15 +1513,16 @@ const PersonalFormLife = forwardRef((props, ref) => {
         prima: parseFloat(primaNumber.toFixed(2)),
         primaMensual: parseFloat((total / 12).toFixed(2)),
         primaTotal: total,
-        impuesto: impuesto
+        impuesto: impuesto,
+
       });
     }
   }, [calculado]);
 
   const verificaPrestamo = async (numPrestamo) => {
-    var  idCotizacion = localStorage.getItem(LS_COTIZACION);
+    var idCotizacion = localStorage.getItem(LS_COTIZACION);
     setOpenBackdrop(true);
-    const response = await LifeService.fetchVerificaPrestamo(producto, numPrestamo,idCotizacion);
+    const response = await LifeService.fetchVerificaPrestamo(producto, numPrestamo, idCotizacion);
     if (response.codigo === 200) {
       setOpenBackdrop(false);
 
@@ -2226,13 +2280,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
               <TableRow>
                 <StyledTableCell>Periodo</StyledTableCell>
                 <StyledTableCell>Monto</StyledTableCell>
+                {visibleDesempleo && <StyledTableCell>Desempleo</StyledTableCell>}
                 <StyledTableCell>Tasa</StyledTableCell>
                 <StyledTableCell>Prima</StyledTableCell>
               </TableRow>
             </TableHead>
+            {/* item.desempleoVisble */}
             <TableBody>
               {Array.isArray(memoizedFormDataTabla) && memoizedFormDataTabla.map((item, index) => (
-                <MemoizedRow key={index} item={item} index={index} handleTableChange={handleTableChange} />
+                <MemoizedRow key={index} item={item} index={index} handleTableChange={handleTableChange} visibleDesempleo={visibleDesempleo} />
               ))}
             </TableBody>
           </Table>

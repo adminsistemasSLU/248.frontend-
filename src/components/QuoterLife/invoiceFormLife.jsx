@@ -403,6 +403,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             paidType: formaPago,
             name: formData.name,
             lastname: formData.lastname,
+            tipoProducto:formData.tipoProducto,
             email: formData.email,
             phone: formData.phone,
             direction: formData.direction,
@@ -419,7 +420,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             pais:formData.pais
         }
         
-
+        console.log(datosfacturas);
         if (enviarFormulario) {
             enviarFormulario = false;
             const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
