@@ -676,7 +676,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         const coberturas = vigencia.data.conf_amparos.cob_basicas;
         let verDesempleo = false;
         for (let key in coberturas) {
-          if (coberturas[key].nomcob.toLowerCase().includes("desempleo")) {
+          if (coberturas[key].pidecapital.toLowerCase().includes("s")) {
             verDesempleo = true;
           }
         }
