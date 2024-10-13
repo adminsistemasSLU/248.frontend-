@@ -91,6 +91,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const getAgentes = (usuario) => {
+        localStorage.removeItem(DATOS_AGENTES);
         if (usuario && usuario.tip_usuario === "I") {
             const list_agentes = usuario.arrAgente;
             if (Array.isArray(list_agentes) && list_agentes.length > 0) {

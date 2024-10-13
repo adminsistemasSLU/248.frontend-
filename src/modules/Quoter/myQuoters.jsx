@@ -27,6 +27,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { visuallyHidden } from "@mui/utils";
 import "../../styles/dialogForm.scss";
 import EditIcon from "@mui/icons-material/Edit";
+import DownloadIcon from '@mui/icons-material/Download';
 import BaldosasService from "../../services/BaldosasService/BaldosasService"
 import ComboService from "../../services/ComboService/ComboService";
 
@@ -651,10 +652,16 @@ export default function MyQuoters() {
     await QuoterService.fetchExportExcel(dato);
 
     handleCloseBackdrop();
-
-
   }
 
+  const handleComparativo = async (id) => {
+    const link = document.createElement('a');
+    console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + id);
+    
+    link.href = `${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + id;
+    link.download = 'comparativo.pdf';
+    link.click();
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -914,32 +921,31 @@ export default function MyQuoters() {
                             />
                           </TableCell>
                           <TableCell align="right">
-                            {row.state !== "Cancelado" &&
-                              row.state !== "Emitida" && (
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "end",
-                                  }}
+                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "end",
+                                }}
+                              >
+                                <IconButton
+                                  onClick={() =>
+                                    handleOpenQuoter(row.id, row.productoId, row.ramoId)
+                                  }
                                 >
-                                  <IconButton
-                                    onClick={() =>
-                                      handleOpenQuoter(
-                                        row.id,
-                                        row.productoId,
-                                        row.ramoId,
-                                      )
-                                    }
-                                  >
-                                    <EditIcon />
-                                  </IconButton>
-                                  <IconButton
-                                    onClick={() => handleDeleteQuoter(row.id)}
-                                  >
-                                    <DeleteIcon />
-                                  </IconButton>
-                                </div>
-                              )}
+                                  <EditIcon />
+                                </IconButton>
+                                <IconButton onClick={() => handleDeleteQuoter(row.id)}>
+                                  <DeleteIcon />
+                                </IconButton>
+                              </div>
+                            )}
+
+                            {row.ramoId == 3 && (
+                              <IconButton onClick={() => handleComparativo(row.id)}>
+                                <DownloadIcon />
+                              </IconButton>
+                            )}
                           </TableCell>
                         </StyledTableRow>
                       );

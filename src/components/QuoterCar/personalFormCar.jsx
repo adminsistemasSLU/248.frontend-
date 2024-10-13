@@ -23,7 +23,8 @@ import {
     LS_COTIZACION_VEHICULO,
     DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
     DATOS_AGENTES,
-    TIPO_USUARIO,
+    USER_STORAGE_KEY,
+    MAIL_COTIZACION,
 } from "../../utils/constantes";
 import "../../styles/form.scss";
 import ValidationUtils from "../../utils/ValiationsUtils";
@@ -51,7 +52,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
         gender: "M",
         status: "S",
         anios: "",
-        agente: "001",
+        agente: "",
         provincia: "",
         ciudad: "",
         fechaNacimiento: "",
@@ -244,7 +245,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
         }
 
         if (!next) return false;
-
+        localStorage.setItem(MAIL_COTIZACION, formData.email);
         const data = transformarObjetoSeguro(formData);
         localStorage.setItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY, JSON.stringify(formData));
 
@@ -270,18 +271,19 @@ const PersonalFormCar = forwardRef((props, ref) => {
     };
 
     const transformarObjetoSeguro = (objetoSeguro) => {
+        let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
         return {
             // producto: process.env.PRODUCT_PIVOTE,
             // ramo: process.env.RAMO_VEHICULO,
             producto: 99999,
             ramo: 3,
-            idUsuarioSistema: localStorage.getItem(TIPO_USUARIO),
+            idUsuarioSistema: userId.id,
             datosCliente: {
                 zona: obtenerProvinciaPorId(objetoSeguro.provincia)[0],
                 tipoPoliza: "1",
                 nuePoliza: null,
                 poliza: "",
-                agente: "",
+                agente: objetoSeguro.agente,
                 agenteCorreo: "",
                 tipoCedula: objetoSeguro.documentType,
                 cedula: objetoSeguro.identification,
@@ -338,7 +340,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                     name: cedulaData.data[0].cli_nombres || "",
                     lastname: cedulaData.data[0].cli_apellidos || "",
                     email: cedulaData.data[0].cli_email || "",
-                    phone: cedulaData.data[0].cli_codigo || "",
+                    phone: cedulaData.data[0].cli_celular || "",
                     address: cedulaData.data[0].cli_direccion || "",
                     status: cedulaData.data[0].cli_estcivil || "",
                     pais: cedulaData.data[0].cli_residencia || "",
@@ -790,7 +792,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
                             >
                                 {agentes.map((agente, index) => (
                                     <MenuItem key={index} value={agente.clave}>
-                                        {`${agente.nombre} ${agente.apellidos}`}
+                                        {`${agente.nombre}`}
                                     </MenuItem>
                                 ))}
                             </Select>

@@ -63,17 +63,17 @@ const ProductListCardsCar = ({ onNext, ref }) => {
                     {planesVehiculos && planesVehiculos.length > 0 ? (
                         planesVehiculos.map((plan, index) => (
                             <Grid item xs={12} sm={6} md={4} key={index} className='carousel-container'>
-                                <Card style={{ maxWidth: 240, cursor: 'pointer' }}>
+                                <Card style={{ maxWidth: 240, cursor: 'pointer'}}>
                                     <img
                                         src={process.env.PUBLIC_URL + `/assets/images/${plan.imagen.toLowerCase()}`}
-                                        style={{ width: '250px' }}
+                                        style={{ height: '220px', padding: '10px'}}
                                         alt={`Plan ${plan.plan}`}
                                     />
                                     <CardContent>
                                         <Typography variant="h6" component="div" style={{ paddingBottom: 8 }}>
                                             {plan.plan.toUpperCase()}
                                         </Typography>
-                                        <Typography variant="h6" component="div" style={{ paddingBottom: 8, fontWeight: 'bold' }}>
+                                        <Typography variant="h6" component="div" style={{fontWeight: 'bold' }}>
                                             ${formatCurrency(plan.prima)}
                                         </Typography>
                                     </CardContent>

@@ -46,6 +46,7 @@ import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
 import RiskFormLife from "./riskFormLife";
 import LifeService from "../../services/LifeService/LifeService";
+import Footer from "../footer";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
