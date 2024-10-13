@@ -461,7 +461,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
         const transformedData = Object.values(montoPeriodo).flat().map(item => (
           {
-            monto: parseFloat(item.monto) || '',
+            monto: item.monto ? `$${parseFloat(item.monto).toLocaleString()}` : '',
             tasa: item.tasa || '',
             prima: item.prima || '', 
             estado: item.estado || '',
@@ -496,7 +496,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
       if (cargarDataInicial) {
         // Calcula el resultado basado en formDataTabla
         const resultado = formDataTabla.reduce((acc, item) => {
-          const monto = parseFloat(item.monto); // Convierte a número flotante
+          const monto = item.monto.replace(/[$,.]/g, '');
+          //const monto = parseFloat(item.monto); // Convierte a número flotante
 
           // Verifica si el valor es un número válido
           if (!isNaN(monto) && monto !== null && monto !== '') {
