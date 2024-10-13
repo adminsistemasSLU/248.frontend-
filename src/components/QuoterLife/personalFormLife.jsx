@@ -461,7 +461,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
         const transformedData = Object.values(montoPeriodo).flat().map(item => (
           {
-            monto: parseFloat(item.monto) || '',
+            monto: parseFloat(item.monto.replace(/[$,]/g, '').trim()) || '',
             tasa: item.tasa || '',
             prima: item.prima || '', 
             estado: item.estado || '',
@@ -1367,6 +1367,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const handleOpenModal = async () => {
     const todosTienenNumero = formDataTabla.every((item) => {
+      
       const monto = item.monto.replace(/[$,.]/g, '');
       return monto !== undefined && monto !== null && monto !== '' && !Number.isNaN(Number(monto));
     });
