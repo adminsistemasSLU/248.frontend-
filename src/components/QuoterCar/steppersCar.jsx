@@ -168,9 +168,6 @@ export default function SteppersCar() {
 
   const handleComparativo = () => {
     const link = document.createElement('a');
-    // link.href = `${process.env.PUBLIC_URL}/assets/resource/comparativo.pdf`+ localStorage.getItem(LS_COTIZACION_VEHICULO);
-    console.log("Link de descarga: ");
-    console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + localStorage.getItem(LS_COTIZACION_VEHICULO));
     link.href = `${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + localStorage.getItem(LS_COTIZACION_VEHICULO);
     link.download = 'comparativo.pdf';
     link.click();
