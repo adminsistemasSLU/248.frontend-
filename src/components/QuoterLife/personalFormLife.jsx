@@ -461,7 +461,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
         const transformedData = Object.values(montoPeriodo).flat().map(item => (
           {
-            monto: item.monto ? `$${parseFloat(item.monto).toLocaleString()}` : '',
+            monto: parseFloat(item.monto) || '',
             tasa: item.tasa || '',
             prima: item.prima || '', 
             estado: item.estado || '',
