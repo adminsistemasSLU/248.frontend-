@@ -38,6 +38,7 @@ import {
   LS_RAMO,
   USER_STORAGE_KEY,
   DATOS_PAGO_STORAGE_KEY,
+  LS_IDCOTIZACIONVIDA,
 
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
@@ -408,12 +409,20 @@ export default function MyQuoters() {
     if (objetoSeguro) {
       let number = 1;
       const rowsObjetoAmparo = [];
-
+     
       for (let item of objetoSeguro) {
-        let tasa = parseFloat(
-          (item.total_prima / item.total_monto) * 100
-        ).toFixed(2);
-        tasa = isNaN(tasa) ? 0.0 : tasa;
+        let tasa = 0;
+        if(item.ramo==="9"){
+          tasa = '-';
+        }else{
+          tasa = parseFloat(
+            (item.total_prima / item.total_monto) * 100
+          ).toFixed(2);
+
+          tasa = isNaN(tasa) ? 0.0 : tasa;
+          tasa = '%'+tasa;
+        }
+        
         const row = createData(
           item.id,
           number++,
@@ -449,11 +458,13 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const handleOpenQuoter = async (id, product, ramo) => {
+  const handleOpenQuoter = async (id, product, ramo,aplicacion='') => {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
-
+    if(aplicacion!==''){
+      localStorage.setItem(LS_IDCOTIZACIONVIDA, aplicacion);
+    }
     const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
 
     const dataFormaPago = resultadoFiltrado.map((item) => ({
@@ -894,7 +905,7 @@ export default function MyQuoters() {
                           </TableCell>
                           <TableCell align="right">
                             <input
-                              value={(parseFloat(row.rate).toFixed(2) || 0) + "%"}
+                              value={(row.rate || 0)}
                               className="input-table"
                               disabled
                             />
@@ -930,7 +941,7 @@ export default function MyQuoters() {
                               >
                                 <IconButton
                                   onClick={() =>
-                                    handleOpenQuoter(row.id, row.productoId, row.ramoId)
+                                    handleOpenQuoter(row.id, row.productoId, row.ramoId,row.aplicacion)
                                   }
                                 >
                                   <EditIcon />

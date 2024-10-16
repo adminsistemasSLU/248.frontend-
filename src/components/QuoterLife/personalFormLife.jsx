@@ -74,13 +74,20 @@ const StyledTableRow = styled(({ ...props }) => <TableRow {...props} />)(({ them
   },
 }));
 
+
+
+
 const MemoizedStyledTableRow = React.memo(StyledTableRow);
 
 
 const areEqual = (prevProps, nextProps) => {
-  return prevProps.item === nextProps.item &&
+  return (
+    prevProps.item.monto === nextProps.item.monto &&
+    prevProps.item.tasa === nextProps.item.tasa &&
+    prevProps.item.prima === nextProps.item.prima &&
     prevProps.index === nextProps.index &&
-    prevProps.handleTableChange === nextProps.handleTableChange;
+    prevProps.handleTableChange === nextProps.handleTableChange
+  );
 };
 
 const MemoizedMontoCell = React.memo(({ value, onChange }) => {
@@ -91,8 +98,11 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
     <TableCell>
       <CurrencyInput
         className="input-table"
-        onChange={onChange}
-        value={(value) || ''}
+        value={value || ''}
+        onChange={(e) => {
+          const cleanValue = e.target.value.replace(/[^\d.-]/g, ''); // Elimina formato para obtener el número limpio
+          onChange({ target: { value: cleanValue } }); // Pasa el valor limpio
+        }}
         style={{
           border: '1px solid #ccc',
           width: '96%',
@@ -101,67 +111,30 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
           fontSize: '16px',
         }}
       />
-      {/* <TextField
-        fullWidth
-        value={(value) || ''}
-        onChange={onChange}
-        size={isSmallScreen ? 'small' : 'medium'}
-        sx={{
-          input: {
-            padding: '4.5px 14px',
-          }
-        }}
-      /> */}
     </TableCell>
   );
 });
 
-const MemoizedDesempleoCell = React.memo(({ value, onChange, disabled }) => {
 
-  return (
-    <TableCell>
-      <CurrencyInput
-        className="input-table"
-        onChange={onChange}
-        value={(value) || ''}
-        style={{
-          border: '1px solid #ccc',
-          width: '96%',
-          height: '29px',
-          borderRadius: '5px',
-          fontSize: '16px',
-        }}
-      />
-      {/* <TextField
-        fullWidth
-        value={(value) || ''}
-        onChange={onChange}
-        size={isSmallScreen ? 'small' : 'medium'}
-        sx={{
-          input: {
-            padding: '4.5px 14px',
-          }
-        }}
-      /> */}
-    </TableCell>
-  );
-});
 
-const MemoizedRow = React.memo(({ item, index, handleTableChange, visibleDesempleo }) => {
+
+const MemoizedRow = React.memo(({ item, codcobIndex, periodoIndex, handleTableChange }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   function formatedInput(numero) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(numero);
   }
+
   return (
-    <MemoizedStyledTableRow key={index} sx={{ padding: 0 }}>
+    <MemoizedStyledTableRow key={periodoIndex} sx={{ padding: 0 }}>
       <TableCell>
         <TextField
           fullWidth
-          value={index + 1 || ''}
+          value={periodoIndex + 1 || ''}
           readOnly
           disabled
           size={isSmallScreen ? 'small' : 'medium'}
@@ -173,17 +146,9 @@ const MemoizedRow = React.memo(({ item, index, handleTableChange, visibleDesempl
         />
       </TableCell>
       <MemoizedMontoCell
-        value={ValidationUtils.Valida_moneda(item.monto)}
-        onChange={(e) => handleTableChange(e, index, 'monto')}
+        value={(item.monto)}
+        onChange={(e) => handleTableChange(e, codcobIndex, periodoIndex, 'monto')}
       />
-
-      {visibleDesempleo && <MemoizedDesempleoCell
-        value={ValidationUtils.Valida_moneda(item.desempleo)}
-        onChange={(e) => handleTableChange(e, index, 'desempleo')}
-
-      />}
-
-
       <TableCell>
         <TextField
           fullWidth
@@ -294,8 +259,20 @@ const PersonalFormLife = forwardRef((props, ref) => {
     impuesto: false,
   });
   const [formDataTabla, setFormDataTabla] = useState([
-    { monto: '', tasa: '', prima: '', estado: '', desempleo: 0 }
+    { monto: '', tasa: '', prima: '', estado: '', desempleo: 0, periodos: [] }
   ]);
+
+  const generarPeriodos = (n) => Array.from({ length: n }, (_, i) => ({
+    periodo: i + 1,
+    monto: '',
+    tasa: '',
+    prima: '',
+  }));
+
+
+
+
+  const [tablasData, setTablasData] = useState([]);
 
   const [visibleDesempleo, setvisibleDesempleo] = React.useState(true);
 
@@ -330,7 +307,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const [country, setCountry] = useState([]);
   const [ciudades, setCiudades] = useState([]);
   const [vigencia, setVigencia] = useState([]);
-  const [t_prestamo, setTipoprestamo] = useState([]);
   //Constantes
   const CodigoComboCasado = "02";
   const CodigoComboUnionLibre = "05";
@@ -389,6 +365,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
         genero: dataPersonal[0].cligenero,
         status: dataPersonal[0].cliestadocivil || "",
       }));
+
+      localStorage.setItem(LS_IDCOTIZACIONVIDA, dataPersonal[0].aplicacion);
+
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
       setAgeCalculate(dateObject);
 
@@ -454,8 +433,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
           const newFinVigencia = inicioVigencia.add(dataPoliza.vigencia, 'month');
           setFinVigencia(newFinVigencia);
         }
-        localStorage.setItem(LS_VIDAPOLIZA,dataPoliza.poliza);
-        
+        localStorage.setItem(LS_VIDAPOLIZA, dataPoliza.poliza);
+
 
         setcargarDataInicial(true);
         let montoPeriodo = JSON.parse(dataPoliza.arrmontoperiodo);
@@ -463,19 +442,25 @@ const PersonalFormLife = forwardRef((props, ref) => {
           {
             monto: item.monto ? `$${parseFloat(item.monto).toLocaleString()}` : '',
             tasa: item.tasa || '',
-            prima: item.prima || '', 
+            prima: item.prima || '',
             estado: item.estado || '',
-            desempleo: item.desempleo||0,
+            desempleo: item.desempleo || 0,
           }));
         setFormDataTabla(transformedData);
       }
 
+      localStorage.setItem(LS_TABLACALC, JSON.stringify(datosprestamo.conf_amparos));
+      
+      const datos = [];
+      datos.data = datosprestamo;
+      console.log(datos);
+      setCalculado(datos);
 
       await setDatosCargados(true);
       let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
       try {
 
-        const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), datosprestamo.prestamo, dataPoliza.vigencia);
+        const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("DD/MM/YYYY"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), datosprestamo.prestamo, dataPoliza.vigencia);
         if (data) {
           localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
         } else {
@@ -494,22 +479,24 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //Funcion para carga inicial si se desea usar el useEfect utilizar debajo o declarar una nueva
     const fetchDataProcesaDatos = async () => {
       if (cargarDataInicial) {
-        // Calcula el resultado basado en formDataTabla
-        const resultado = formDataTabla.reduce((acc, item) => {
-          const monto = item.monto.replace(/[$,.]/g, '');
-          //const monto = parseFloat(item.monto); // Convierte a número flotante
+        // Calcula el resultado basado en tablasData
+        const resultado = tablasData.reduce((acc, item) => {
+          // Itera sobre cada periodo en el objeto actual
+          item.periodos.forEach((periodo) => {
+            const montoConvertido = periodo.monto.replace(/[$,.]/g, ''); // Limpiar el monto
+            const monto = parseFloat(montoConvertido); // Convierte a número flotante
 
-          // Verifica si el valor es un número válido
-          if (!isNaN(monto) && monto !== null && monto !== '') {
-            acc += monto; // Suma el monto válido al acumulador
-          } else {
-          }
+            // Verifica si el valor es un número válido
+            if (!isNaN(monto) && monto !== null && monto !== '') {
+              acc += monto; // Suma el monto válido al acumulador
+            } else {
+              console.error(`Valor inválido encontrado: ${periodo.monto}`);
+            }
+          });
 
-          return acc;
-        }, 0); // El acumulador comienza en 0
+          return acc; // Devuelve el acumulador
+        }, 0);  // El acumulador comienza en 0
 
-        
-        
         // Verifica si se debe mostrar el mensaje de error
         if (resultado === 0) {
           setErrorMessage("Se deben ingresar un valor en prestamo");
@@ -543,7 +530,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     };
 
     fetchDataProcesaDatos();
-  }, [formDataTabla]); // Agrega cargarDataInicial a las dependencias para asegurar que el efecto se ejecute cuando cambie
+  }, [tablasData]);
 
 
   const cargarDatosPoliza = async () => {
@@ -674,25 +661,34 @@ const PersonalFormLife = forwardRef((props, ref) => {
           localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
 
-        const coberturas = vigencia.data.conf_amparos.cob_basicas;
-        let verDesempleo = false;
-        for (let key in coberturas) {
-          if (coberturas[key].pidecapital.toLowerCase().includes("s")) {
-            verDesempleo = true;
-          }
-        }
-      
-        setvisibleDesempleo(verDesempleo);
+       
+        setTablasData([]);
+        const tablaDinamicaCoberturas = vigencia.data.configuracionTabla.conf_amparos;
+        const tablasConfAmparos = Object.entries(tablaDinamicaCoberturas).map(([key, value]) => ({
+          codcob: key,
+          carcob: value.tipo.toString(),  // Asigna un valor para carcob según tu lógica
+          tipcob: value.tipo === 1 ? "BASICA" : "ADICIONAL", // Lógica para determinar tipcob
+          nomcob: value.nomcob,
+          numcob: "", // Si tienes lógica para numcob, puedes agregarla aquí
+          selcob: "1", // Si necesitas asignar un valor específico
+          pidecapital: value.tipo === 1 ? "N" : "S", // Lógica para pidecapital
+          periodos: generarPeriodos(Object.keys(value.periodos).length) // Asumiendo que generas periodos según la longitud de la entrada
+        }));
+        setTablasData(tablasConfAmparos);
 
         localStorage.setItem(LS_FPAGO, vigencia.data.frm_pago);
         localStorage.setItem(LS_TPRESTAMO, vigencia.data.tipo_prestamo);
-        setTipoprestamo(vigencia.data.tipo_prestamo);
+     
+   
+
+        setFormData((formData) => ({ ...formData, tipoProducto: vigencia.data.tipo_prestamo }));
+
         const preguntasprevias = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
         if (!(preguntasprevias && preguntasprevias.length > 0)) {
 
           localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
         }
-       
+
         if (vigencia.data.polizas[0]) {
           localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
         } else {
@@ -772,12 +768,17 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
-    const periodos = formDataTabla.map((item, index) => ({
-      monto: isNaN(item.monto) ? item.monto.replace(/[$,.]/g, '') : item.monto,
-      periodo: index + 1,
-      vigencia: "",
-      desempleo:item.desempleo||0
-    }));
+    const periodos = tablasData.map((item) => {
+      return {
+        codigo: item.codcob, 
+        datos: item.periodos.map((periodo, index) => ({
+          monto: periodo.monto.replace(/[$,.]/g, ''), 
+          periodo: index + 1, 
+          vigencia: "", 
+          nomcob: item.nomcob || 0 
+        }))
+      };
+    });
     return {
       action: "procesarDatos",
       aplicacion: "",
@@ -789,12 +790,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       identificacion: formData.identification,
       mode: "Nuevo",
       sess_tip_usuario: "1",
-      objPeriodos: [
-        {
-          codigo: cobertura,
-          datos: periodos
-        }
-      ],
+      objPeriodos: periodos,
       poliza: poliza,
       porAjuste: "0.00",
       genero: formData.genero,
@@ -875,13 +871,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const fetchDataCargaInicial = async () => {
       if (formData.vigencia) {
         if (datosCargados) {
+         
           let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
           try {
             const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
-            localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.tabla1));
-            setTablecalc(data.data.tabla1);
-            const detalle = transformData(data.data.tabla1);
-            setFormDataTabla(detalle);
+            localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.conf_amparos));
+            console.log(data.data.montoPeriodo);
+           
+            setCalculado(data);
+
             handleCloseBackdrop();
           } catch (error) {
             console.error("Error fetching data:", error);
@@ -907,7 +905,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
         try {
           handleOpenBackdrop();
-          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("YYYY/MM/DD"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
+          const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("DD/MM/YYYY"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
           if (data) {
             localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
           } else {
@@ -1123,7 +1121,40 @@ const PersonalFormLife = forwardRef((props, ref) => {
       pais: formData.countryConyugue
     };
 
+    const periodos = tablasData.map((item) => {
+      return {
+        codigo: item.codcob, // Usar codcob de tablasData
+        datos: item.periodos.map((periodo, index) => ({
+          monto: periodo.monto.replace(/[$,.]/g, ''), // Limpiar el monto
+          tipo_monto: "",
+          nomcob: item.nomcob,
+          desempleo: periodo.desempleo || 0,
+          periodo: index + 1,
+          vigencia: formData.vigencia,
+          vigencia_desde: periodo.vigencia_desde,
+          vigencia_hasta: periodo.vigencia_hasta,
+          fecha_desde: periodo.fecha_desde,
+          fecha_hasta: periodo.fecha_hasta,
+          total_dias: periodo.total_dias,
+          tasa: periodo.tasa,
+          prima_anio: periodo.prima_anio,
+          prima_dia: periodo.prima_dia,
+          prima_total: periodo.prima_total,
+        }))
+      };
+    });
+
+    const arrMontoPeriodo = periodos.reduce((acc, item) => {
+      acc[item.codigo] = item.datos; // Aquí item.codigo se usa como clave del objeto acumulado.
+      return acc;
+    }, {});
+
+    console.log(arrMontoPeriodo);
+
+    console.log(tablasData);
+
     const datosprestamo = {
+      conf_amparos:arrMontoPeriodo,
       prestamo: formData.prestamo,
       prima: formData.prima,
       impuesto: formData.impuesto,
@@ -1169,26 +1200,24 @@ const PersonalFormLife = forwardRef((props, ref) => {
       datoscertificado: datoscertificado,
     };
 
-    const periodos = formDataTabla.map((item, index) => ({
-      tipo_monto: "",
-      monto: item.monto,
-      desempleo: item.desempleo||0,
-      periodo: index + 1,
-      vigencia: formData.vigencia,
-      vigencia_desde: item.vigencia_desde,
-      vigencia_hasta: item.vigencia_hasta,
-      fecha_desde: item.fecha_desde,
-      fecha_hasta: item.fecha_hasta,
-      total_dias: item.total_dias,
-      tasa: item.tasa,
-      prima_anio: item.prima_anio,
-      prima_dia: item.prima_dia,
-      prima_total: item.prima_total,
-    }));
+    // const periodos = formDataTabla.map((item, index) => ({
+    //   tipo_monto: "",
+    //   monto: item.monto,
+    //   desempleo: item.desempleo || 0,
+    //   periodo: index + 1,
+    //   vigencia: formData.vigencia,
+    //   vigencia_desde: item.vigencia_desde,
+    //   vigencia_hasta: item.vigencia_hasta,
+    //   fecha_desde: item.fecha_desde,
+    //   fecha_hasta: item.fecha_hasta,
+    //   total_dias: item.total_dias,
+    //   tasa: item.tasa,
+    //   prima_anio: item.prima_anio,
+    //   prima_dia: item.prima_dia,
+    //   prima_total: item.prima_total,
+    // }));
 
-    const arrMontoPeriodo = {
-      [cobertura]: periodos
-    }
+   
 
     const arrFrmEmision = {
       slProducto: producto,
@@ -1327,10 +1356,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
       data.id_CotiGeneral = id_cotigeneral;
     }
 
+
+
     localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
     try {
       handleOpenBackdrop();
       const response = await LifeService.fetchGrabaDatosVida(data);
+      
       handleCloseBackdrop();
       if (response.codigo === 200) {
         const idVida = response.data.aplicacion;
@@ -1367,11 +1399,16 @@ const PersonalFormLife = forwardRef((props, ref) => {
   };
 
   const handleOpenModal = async () => {
-    const todosTienenNumero = formDataTabla.every((item) => {
-      
-      const monto = item.monto.replace(/[$,.]/g, '');
-      return monto !== undefined && monto !== null && monto !== '' && !Number.isNaN(Number(monto));
+
+    const todosTienenNumero = tablasData.every((item) => {
+      // Verificar que cada item tiene periodos y que cada periodo tiene un monto válido
+      return item.periodos.every((periodo) => {
+        const monto = periodo.monto.replace(/[$,.]/g, ''); // Limpiar el monto
+        return monto !== undefined && monto !== null && monto !== '' && !Number.isNaN(Number(monto));
+      });
     });
+
+
     if (!todosTienenNumero) {
       setErrorMessage("Se deben ingresar valores validos en la tabla de montos")
       setOpenSnack(true);
@@ -1385,18 +1422,21 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
     //SUMATORIA DE PRESTAMO A PARTIR DE LA TABLA DE CALCULOS
-    const resultado = formDataTabla.reduce((acc, item) => {
-      const montoConvertido = item.monto.replace(/[$,.]/g, '');
-      const monto = parseFloat(montoConvertido); // Convierte a número flotante
+    const resultado = tablasData.reduce((acc, item) => {
+      // Itera sobre cada periodo en el objeto actual
+      item.periodos.forEach((periodo) => {
+        const montoConvertido = periodo.monto.replace(/[$,.]/g, ''); // Limpiar el monto
+        const monto = parseFloat(montoConvertido); // Convierte a número flotante
 
-      // Verifica si el valor es un número válido
-      if (!isNaN(monto) && monto !== null && monto !== '') {
-        acc += monto; // Suma el monto válido al acumulador
-      } else {
-        console.error(`Valor inválido encontrado: ${item.monto}`);
-      }
+        // Verifica si el valor es un número válido
+        if (!isNaN(monto) && monto !== null && monto !== '') {
+          acc += monto; // Suma el monto válido al acumulador
+        } else {
+          console.error(`Valor inválido encontrado: ${periodo.monto}`);
+        }
+      });
 
-      return acc;
+      return acc; // Devuelve el acumulador
     }, 0); // El acumulador comienza en 0
 
     setFormData({ ...formData, prestamo: resultado });
@@ -1428,43 +1468,49 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   useEffect(() => {
-    if (calculado && calculado.data) {
-      const result = calculado.data.montoPeriodo
-        ? Object.values(calculado.data.montoPeriodo).flatMap(obj =>
-          Object.values(obj).map(item => ({
-            monto: item.monto|| '',
+    if (calculado && calculado.data&& calculado.data.conf_amparos) {
+      const result = calculado.data.conf_amparos
+        ? Object.entries(calculado.data.conf_amparos).map(([codCob, periodos]) => ({
+          codcob: codCob,
+          carcob: "1",
+          tipcob: "BASICA",
+          nomcob: periodos[1]?.nomcob || periodos[0]?.nomcob,
+          numcob: "",
+          selcob: "1",
+          pidecapital: "N",
+          periodos: Object.entries(periodos).map(([periodo, item]) => ({
+            periodo: parseInt(periodo, 10),
+            monto: item.monto || '',
             tasa: item.tasa || '',
-            desempleo: item.desempleo || '',
             prima: item.prima_anio || '',
-            vigencia_desde: item.vigencia_desde || '',
-            vigencia_hasta: item.vigencia_hasta || '',
-            fecha_desde: item.fecha_desde || '',
-            fecha_hasta: item.fecha_hasta || '',
-            total_dias: item.total_dias || '',
-            prima_anio: item.prima_anio || '',
-            prima_dia: item.prima_dia || '',
-            estado: ''
+            vigencia: null,
+            tipo_monto: "",
+            vigencia_desde: item.vigencia_desde,
+            vigencia_hasta: item.vigencia_hasta,
+            fecha_desde: item.fecha_desde,
+            fecha_hasta: item.fecha_hasta,
+            total_dias: item.total_dias,
+            prima_anio: item.prima_anio,
+            prima_dia: item.prima_dia,
+            prima_total: item.prima_total,
           }))
-        )
+        }))
         : [];
-      setFormDataTabla(result);
+      
+      setTablasData(result);
 
-      let prima = null;
-      for (let key in calculado.data.montoPeriodo) {
-        let firstElement = true;
-        for (let subKey in calculado.data.montoPeriodo[key]) {
-          let item = calculado.data.montoPeriodo[key][subKey];
+      let prima = 0;
+      for (let key in calculado.data.conf_amparos) {
 
-          if (firstElement) {
-            prima = item.prima_anio;
-            firstElement = false;
-          }
+        for (let subKey in calculado.data.conf_amparos[key]) {
+          let item = calculado.data.conf_amparos[key][subKey];
+          prima = item.prima_anio + prima;
         }
       }
 
       let impuesto = 0;
       const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
-
+      console.log(prima);
       // Asegúrate de que prima y los valores de parametros son números
       const primaNumber = Number(prima);
       const porIva = Number(parametros[0].por_iva);
@@ -1518,7 +1564,22 @@ const PersonalFormLife = forwardRef((props, ref) => {
         impuesto: impuesto,
 
       });
-    }
+    }else if (calculado && calculado.data&& calculado.data.montoPeriodo){
+      const tablaDinamicaCoberturas = calculado.data.montoPeriodo;
+        const tablasConfAmparos = Object.entries(tablaDinamicaCoberturas).map(([key, value]) => ({
+          codcob: key,
+          carcob: value.tipo.toString(),  // Asigna un valor para carcob según tu lógica
+          tipcob: value.tipo === 1 ? "BASICA" : "ADICIONAL", // Lógica para determinar tipcob
+          nomcob: value.nomcob,
+          numcob: "", // Si tienes lógica para numcob, puedes agregarla aquí
+          selcob: "1", // Si necesitas asignar un valor específico
+          pidecapital: value.tipo === 1 ? "N" : "S", // Lógica para pidecapital
+          periodos: generarPeriodos(Object.keys(value.periodos).length) // Asumiendo que generas periodos según la longitud de la entrada
+        }));
+        setTablasData(tablasConfAmparos);
+      console.log(tablasConfAmparos);
+      setTablasData(tablasConfAmparos);
+      }
   }, [calculado]);
 
   const verificaPrestamo = async (numPrestamo) => {
@@ -1553,13 +1614,17 @@ const PersonalFormLife = forwardRef((props, ref) => {
   };
 
 
-
-
-  const handleTableChange = React.useCallback((e, index, field) => {
+  const handleTableChange = React.useCallback((e, codcobIndex, periodoIndex, field) => {
     const newValue = e.target.value;
 
-    setFormDataTabla(prevData => prevData.map((item, i) => (
-      i === index ? { ...item, [field]: newValue } : item
+
+    setTablasData(prevData => prevData.map((item, i) => (
+      i === codcobIndex ? {
+        ...item,
+        periodos: item.periodos.map((periodo, j) => (
+          j === periodoIndex ? { ...periodo, [field]: newValue } : periodo
+        ))
+      } : item
     )));
   }, []);
 
@@ -2270,7 +2335,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         </Typography>
 
 
-        <TableContainer
+        {/* <TableContainer
           style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         >
           <Table
@@ -2287,7 +2352,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
                 <StyledTableCell>Prima</StyledTableCell>
               </TableRow>
             </TableHead>
-            {/* item.desempleoVisble */}
+           
             <TableBody>
               {Array.isArray(memoizedFormDataTabla) && memoizedFormDataTabla.map((item, index) => (
                 <MemoizedRow key={index} item={item} index={index} handleTableChange={handleTableChange} visibleDesempleo={visibleDesempleo} />
@@ -2305,8 +2370,51 @@ const PersonalFormLife = forwardRef((props, ref) => {
               Calcular
             </Button>
           </Grid>
+        </TableContainer> */}
 
-        </TableContainer>
+        {tablasData.length > 0 ? (tablasData.map((item, index) => (
+          <TableContainer key={item.codcob} style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          >
+            <h3>{item.nomcob}</h3>
+            <Table
+              sx={{ minWidth: 500, width: 500 }}
+              aria-labelledby="tableTitle"
+              size="small"
+            >
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Periodo</StyledTableCell>
+                  <StyledTableCell>Monto</StyledTableCell>
+                  <StyledTableCell>Tasa</StyledTableCell>
+                  <StyledTableCell>Prima</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {item.periodos.map((periodo, periodoIndex) => (
+                  <MemoizedRow
+                    key={periodoIndex}
+                    item={periodo}
+                    codcobIndex={index}
+                    periodoIndex={periodoIndex}
+                    handleTableChange={handleTableChange}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ))) : (
+          <p>No hay coberturas disponibles configuradas para este producto.</p>
+        )}
+        <Grid item xs={10.5} md={3} style={{ paddingTop: '0px', paddingBottom: '25px' }}>
+          <Button
+            onClick={handleOpenModal}
+            sx={{ mr: 1 }}
+            className="button-styled-primary"
+            style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+          >
+            Calcular
+          </Button>
+        </Grid>
 
 
         <Grid container spacing={2} style={{ paddingRight: '45px' }}>
