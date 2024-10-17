@@ -480,7 +480,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             // email: "",
             // phone: "",
             // direction: "",
-            console.log(country);
             setFormData({
               ...formData,
               name: cedulaData.data[0].cli_nombres || "",
@@ -488,7 +487,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
               email: cedulaData.data[0].cli_email || "",
               phone: cedulaData.data[0].cli_celular || "",
               direction: cedulaData.data[0].cli_direccion || "",
-              country: country.data[69].codpais
+              country: country[69].codpais
             });
           }
         } catch (error) {
