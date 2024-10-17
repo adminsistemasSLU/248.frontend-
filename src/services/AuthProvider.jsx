@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
             const userData = await authService.fetchWithAuth(endpoint, method, data, additionalHeaders);
             if (userData.codigo === 200) {
                 localStorage.setItem(TOKEN_STORAGE_KEY, userData.token);
-
+                console.log(userData);
                 if (userData.data && userData.data.ramoRol && userData.data.ramoRol.ramo_rol) {
                     localStorage.setItem(PERMISSIONS_STORAGE_KEY, userData.data.ramoRol.ramo_rol);
                 }
@@ -77,7 +77,23 @@ export const AuthProvider = ({ children }) => {
 
                 getAgentes(userData.data.usuario)
 
-                navigate('/quoter/dashboard');
+
+                const fechaIni = new Date(userData.data.usuario.usu_fech_ult_passwd); // Supongo que esta es la fecha de la última contraseña
+                const fechaHoy = new Date();
+
+                // Calcular la diferencia en días
+                const diffTime = Math.abs(fechaHoy - fechaIni);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir de milisegundos a días
+
+                if (diffDays <= 90) {
+                    sessionStorage.setItem('new_password', 'N');
+                    navigate('/quoter/dashboard');
+                } else {
+                    sessionStorage.setItem('new_password', 'S');
+                    navigate('/changePassword'); 
+                }
+
+               
                 setIsLoading(false);
             } else {
                 navigate('/login');

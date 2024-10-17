@@ -16,9 +16,17 @@ const baldosasPermiso = storedBaldosasPermiso ? JSON.parse(storedBaldosasPermiso
   // Verificar permisos
   const hasPermission = requiredBaldosaId ? baldosasPermiso.Baldosas.includes(requiredBaldosaId.toString()) : true;
 
-  if (requiredBaldosaId && !hasPermission) {
+  const changePassword = sessionStorage.getItem('new_password');
+
+  if (requiredBaldosaId && !hasPermission ) {
     return <Navigate to="/not-authorized" replace />; // Redirigir si no tiene permiso
   }
+
+  if (changePassword ==='S' ) {
+    return <Navigate to="/not-authorized" replace />; // Redirigir si no tiene permiso
+  }
+
+  
   
   if (isLoading) {
     return <div>Loading...</div>;

@@ -35,5 +35,23 @@ const UsuarioService = {
       throw error;
     }
   },
+
+  fetchCambiarContrasenia: async (txtUser, txtPassword,txtPasswordActual) => {
+    const endpoint = 'api/cambiarContrasenia';
+    const method = 'POST'; 
+    const data = {
+      txtUser: txtUser,
+      txtPassword: txtPassword,
+      txtPasswordActual:txtPasswordActual
+    };
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Cambiar Contrasenia:', error);
+      throw error;
+    }
+  },
+
 }
 export default UsuarioService;
