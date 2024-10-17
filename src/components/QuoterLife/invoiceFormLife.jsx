@@ -487,7 +487,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
               lastname: cedulaData.data[0].cli_apellidos || "",
               email: cedulaData.data[0].cli_email || "",
               phone: cedulaData.data[0].cli_celular || "",
-              address: cedulaData.data[0].cli_direccion || "",
+              direction: cedulaData.data[0].cli_direccion || "",
               country:country.data[69].codpais
             });
           }
