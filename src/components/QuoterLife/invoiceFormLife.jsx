@@ -463,6 +463,38 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         setOpenSnackAlert(false);
     };
 
+    const consultUserData = async (documentType, identification) => {
+        try {
+          const cedulaData = await UsuarioService.fetchConsultarUsuario(
+            documentType,
+            identification
+          );
+          if (cedulaData.codigo === 200 && cedulaData.data) {
+            // const dateString = cedulaData.data[0].cli_fecnacio;
+            // const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
+    
+            // setAge(dateObject);
+            
+            // name: "",
+            // lastname: "",
+            // email: "",
+            // phone: "",
+            // direction: "",
+    
+            setFormData({
+              ...formData,
+              name: cedulaData.data[0].cli_nombres || "",
+              lastname: cedulaData.data[0].cli_apellidos || "",
+              email: cedulaData.data[0].cli_email || "",
+              phone: cedulaData.data[0].cli_celular || "",
+              address: cedulaData.data[0].cli_direccion || "",
+            });
+          }
+        } catch (error) {
+          console.error("Error al verificar cédula:", error);
+        }
+      };
+
     const verifyIdentification = async (e) => {
         const { value } = e.target;
         let documentType = formData.documentType;
@@ -480,7 +512,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             );
             if (cedulaData.codigo === 200) {
                 setErrorCedula(false);
-                // await consultUserData(documentType, identification);
+                await consultUserData(documentType, identification);
                 handleCloseBackdrop();
             } else {
                 setErrorCedula(true);

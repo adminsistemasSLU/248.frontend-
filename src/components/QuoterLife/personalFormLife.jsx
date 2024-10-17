@@ -601,7 +601,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const paises = await ComboService.fetchComboPais();
       if (paises && paises.data) {
         await setCountry(paises.data);
-        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais }));
+        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais,  countryConyugue: paises.data[69].codpais, }));
 
       }
     } catch (error) {
