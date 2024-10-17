@@ -203,7 +203,7 @@ export default function SteppersLife() {
       } else {
         Swal.fire({
           title: "Alerta!",
-          text: `El proceso no ha podido ser completado`,
+          text: terminarTarea.message,
           icon: "warning",
           confirmButtonText: "Ok",
         });

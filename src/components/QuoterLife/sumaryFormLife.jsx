@@ -35,6 +35,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
         muerteCausa: "",
         itp: "",
         muerteAccidental: "",
+        tipoPlan:""
     });
 
     function formatedInput(numero) {
@@ -58,6 +59,8 @@ const SumaryFormLife = forwardRef((props, ref) => {
         let derechoEmision = (parseFloat(data.arrDatosCliente.datosfacturas.admision));
         let iva = (parseFloat(data.arrDatosCliente.datosfacturas.iva));
 
+        let tipoPlan = ((data.arrDatosCliente.datoscertificado.tipoProducto==='I'?'Individual':'Mancomunado'));
+        
         let impuesto = sbs +scc+derechoEmision+iva;
 
         setFormData((prevData) => ({
@@ -79,6 +82,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
             muerteCausa: data.arrDatosCliente.datosfacturas.sumAdd,
             itp: "",
             muerteAccidental: "",
+            tipoPlan:tipoPlan
         }));
     }, [])
 
@@ -326,13 +330,31 @@ const SumaryFormLife = forwardRef((props, ref) => {
 
                     <Grid item xs={10.5} md={3}>
                         <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-                            $ Muerte por cualquier causa
+                            $ Suma Asegurada
                         </Typography>
                         <TextField
                             placeholder="$ Muerte por cualquier causa"
                             type="text"
                             name="muerteCausa"
                             value={formatedInput(formData.muerteCausa)}
+                            onChange={handleChange}
+                            variant="standard"
+                            fullWidth
+                            disabled
+                            inputProps={{ maxLength: 30 }}
+                            required
+                        />
+                    </Grid>
+
+                    <Grid item xs={10.5} md={3}>
+                        <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
+                            Tipo de plan
+                        </Typography>
+                        <TextField
+                            placeholder="$ Muerte por cualquier causa"
+                            type="text"
+                            name="muerteCausa"
+                            value={(formData.tipoPlan)}
                             onChange={handleChange}
                             variant="standard"
                             fullWidth

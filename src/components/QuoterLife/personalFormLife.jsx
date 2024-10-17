@@ -450,26 +450,29 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }
 
       localStorage.setItem(LS_TABLACALC, JSON.stringify(datosprestamo.conf_amparos));
-      
+
       const datos = [];
       datos.data = datosprestamo;
       console.log(datos);
       setCalculado(datos);
 
-      await setDatosCargados(true);
-      let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-      try {
+      setDatosCargados(true);
+      // let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+      // try {
 
-        const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("DD/MM/YYYY"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), datosprestamo.prestamo, dataPoliza.vigencia);
-        if (data) {
-          localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
-        } else {
-        }
-        handleCloseBackdrop();
-      } catch (error) {
-        handleCloseBackdrop();
-      }
-      handleOpenBackdrop(false);
+      //   const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("DD/MM/YYYY"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), datosprestamo.prestamo, dataPoliza.vigencia);
+      //   if (data) {
+      //     localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
+      //   } else {
+      //   }
+      //   handleCloseBackdrop();
+      // } catch (error) {
+      //   handleCloseBackdrop();
+      // } finally {
+      //   setOpenBackdrop(false);
+      // }
+      setOpenBackdrop(false);
+
     }
   };
 
@@ -490,6 +493,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             if (!isNaN(monto) && monto !== null && monto !== '') {
               acc += monto; // Suma el monto válido al acumulador
             } else {
+              setOpenBackdrop(false);
               console.error(`Valor inválido encontrado: ${periodo.monto}`);
             }
           });
@@ -526,6 +530,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           setOpenBackdrop(false);
         }
       }
+
       setcargarDataInicial(false);
     };
 
@@ -559,10 +564,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
       id_CotiGeneral: idCotizacion,
     };
     try {
+      handleOpenBackdrop(true);
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
         dato
       );
-
+      handleOpenBackdrop(false);
       if (cotizacion && cotizacion.data) {
         return cotizacion.data;
       }
@@ -582,7 +588,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       if (ciudades && ciudades.data) {
         setCiudades(ciudades.data);
-        setFormData((formData) => ({ ...formData, city: ciudades.data[0].Codigo }));
+        setFormData((formData) => ({ ...formData, city: ciudades.data[4].Codigo }));
       }
     } catch (error) {
       console.error("Error al obtener ciudad:", error);
@@ -612,8 +618,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (provincias && provincias.data) {
         await setProvinces(provincias.data);
-        await setFormData((formData) => ({ ...formData, province: provincias.data[0].Codigo }));
-        await cargarCiudad(provincias.data[0].Codigo);
+        await setFormData((formData) => ({ ...formData, province: provincias.data[9].Codigo }));
+        await cargarCiudad(provincias.data[9].Codigo);
       }
     } catch (error) {
       console.error("Error al obtener provincias:", error);
@@ -661,7 +667,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
 
-       
+
         setTablasData([]);
         const tablaDinamicaCoberturas = vigencia.data.configuracionTabla.conf_amparos;
         const tablasConfAmparos = Object.entries(tablaDinamicaCoberturas).map(([key, value]) => ({
@@ -678,8 +684,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         localStorage.setItem(LS_FPAGO, vigencia.data.frm_pago);
         localStorage.setItem(LS_TPRESTAMO, vigencia.data.tipo_prestamo);
-     
-   
+
+
 
         setFormData((formData) => ({ ...formData, tipoProducto: vigencia.data.tipo_prestamo }));
 
@@ -770,12 +776,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
     const periodos = tablasData.map((item) => {
       return {
-        codigo: item.codcob, 
+        codigo: item.codcob,
         datos: item.periodos.map((periodo, index) => ({
-          monto: periodo.monto.replace(/[$,.]/g, ''), 
-          periodo: index + 1, 
-          vigencia: "", 
-          nomcob: item.nomcob || 0 
+          monto: periodo.monto.replace(/[$,.]/g, ''),
+          periodo: index + 1,
+          vigencia: "",
+          nomcob: item.nomcob || 0
         }))
       };
     });
@@ -867,23 +873,25 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   //Cuando cambie la variable vigencia
   useEffect(() => {
-    handleOpenBackdrop();
+
     const fetchDataCargaInicial = async () => {
       if (formData.vigencia) {
         if (datosCargados) {
-         
+          handleOpenBackdrop();
           let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
           try {
             const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
             localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.conf_amparos));
             console.log(data.data.montoPeriodo);
-           
+
             setCalculado(data);
 
             handleCloseBackdrop();
           } catch (error) {
             console.error("Error fetching data:", error);
             handleCloseBackdrop();
+          } finally {
+            setOpenBackdrop(false);
           }
         } else {
           handleCloseBackdrop();
@@ -915,6 +923,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
         } catch (error) {
           console.error("Error fetching data:", error);
           handleCloseBackdrop();
+        } finally {
+          setOpenBackdrop(false);
         }
       }
     }
@@ -942,6 +952,36 @@ const PersonalFormLife = forwardRef((props, ref) => {
       if (cedulaData.codigo === 200) {
         setErrorCedula(false);
         await consultUserData(documentType, identification);
+        handleCloseBackdrop();
+      } else {
+        setErrorCedula(true);
+        setOpen(true);
+        setmessageError(cedulaData.message);
+        handleCloseBackdrop();
+      }
+    } catch (error) {
+      console.error("Error al verificar cédula:", error);
+    }
+  };
+
+  const verifyIdentificationConyugue = async (e) => {
+    const { value } = e.target;
+    let documentType = 'C';
+    let identification = value;
+    if (value === "") {
+      setOpen(true);
+      setmessageError("Valor de cedula invalido");
+      return;
+    }
+    try {
+      handleOpenBackdrop();
+      const cedulaData = await UsuarioService.fetchVerificarCedula(
+        documentType,
+        identification
+      );
+      if (cedulaData.codigo === 200) {
+        setErrorCedula(false);
+        await consultConyugueData(documentType, identification);
         handleCloseBackdrop();
       } else {
         setErrorCedula(true);
@@ -985,6 +1025,30 @@ const PersonalFormLife = forwardRef((props, ref) => {
       console.error("Error al verificar cédula:", error);
     }
   };
+
+
+  const consultConyugueData = async (documentType, identification) => {
+    try {
+      const cedulaData = await UsuarioService.fetchConsultarUsuario(
+        documentType,
+        identification
+      );
+      if (cedulaData.codigo === 200 && cedulaData.data) {
+        const dateString = cedulaData.data[0].cli_fecnacio;
+        const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
+        setConyugueAge(dateObject);
+        setFormData({
+          ...formData,
+          conyugenombre: cedulaData.data[0].cli_nombres || "",
+          conyugeapellido: cedulaData.data[0].cli_apellidos || "",
+          conyugesexo: cedulaData.data[0].cli_sexo || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error al verificar cédula:", error);
+    }
+  };
+
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -1111,15 +1175,30 @@ const PersonalFormLife = forwardRef((props, ref) => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
     //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
-    const datosconyugues = {
-      nombreConyuge: formData.conyugenombre,
-      apellidoConyuge: formData.conyugeapellido,
-      identificacion: formData.conyugenumero,
-      fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
-      genero: formData.conyugesexo,
-      tipo: formData.conyugetipo,
-      pais: formData.countryConyugue
-    };
+    let datosconyugues = {};
+
+    if(formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre){
+       datosconyugues = {
+        nombreConyuge: formData.conyugenombre,
+        apellidoConyuge: formData.conyugeapellido,
+        identificacion: formData.conyugenumero,
+        fechaNacimiento: conyugueage ? conyugueage.format("DD/MM/YYYY") : "",
+        genero: formData.conyugesexo,
+        tipo: formData.conyugetipo,
+        pais: formData.countryConyugue
+      };
+    }else {
+      datosconyugues = {
+        nombreConyuge: '',
+        apellidoConyuge: '',
+        identificacion: '',
+        fechaNacimiento: '',
+        genero: '',
+        tipo: '',
+        pais: '',
+      };
+    }
+
 
     const periodos = tablasData.map((item) => {
       return {
@@ -1154,7 +1233,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     console.log(tablasData);
 
     const datosprestamo = {
-      conf_amparos:arrMontoPeriodo,
+      conf_amparos: arrMontoPeriodo,
       prestamo: formData.prestamo,
       prima: formData.prima,
       impuesto: formData.impuesto,
@@ -1217,7 +1296,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //   prima_total: item.prima_total,
     // }));
 
-   
+
 
     const arrFrmEmision = {
       slProducto: producto,
@@ -1253,6 +1332,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
     let calc = JSON.parse(localStorage.getItem(LS_TABLAACTUALIZDA));
+
     const arrValores = {
       tasa: calc.data.valores.tasa,
       prima: formData.prima,
@@ -1362,7 +1442,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     try {
       handleOpenBackdrop();
       const response = await LifeService.fetchGrabaDatosVida(data);
-      
+
       handleCloseBackdrop();
       if (response.codigo === 200) {
         const idVida = response.data.aplicacion;
@@ -1447,19 +1527,25 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //   setOpenSnack(true);
     //   return;
     // }
+    try {
+      const data = crearDatosProcesarDatos();
+      setOpenBackdrop(true);
+      const response = await LifeService.fetchProcesaDatos(data);
+      if (response.codigo === 200) {
+        setOpenBackdrop(false);
+        localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+        setCalculado(response);
+      } else {
+        setErrorMessage(response.message);
+        setOpenSnack(true);
 
-    const data = crearDatosProcesarDatos();
-    setOpenBackdrop(true);
-    const response = await LifeService.fetchProcesaDatos(data);
-    if (response.codigo === 200) {
-      setOpenBackdrop(false);
-      localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
-      setCalculado(response);
-    } else {
-      setErrorMessage(response.message);
+        setCalculado([]);
+        setOpenBackdrop(false);
+      }
+    } catch (error) {
+      setErrorMessage("Error al procesar los datos.");
       setOpenSnack(true);
-      // localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify([]));
-      setCalculado([]);
+    } finally {
       setOpenBackdrop(false);
     }
 
@@ -1468,7 +1554,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   useEffect(() => {
-    if (calculado && calculado.data&& calculado.data.conf_amparos) {
+    if (calculado && calculado.data && calculado.data.conf_amparos) {
       const result = calculado.data.conf_amparos
         ? Object.entries(calculado.data.conf_amparos).map(([codCob, periodos]) => ({
           codcob: codCob,
@@ -1496,7 +1582,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           }))
         }))
         : [];
-      
+
       setTablasData(result);
 
       let prima = 0;
@@ -1511,7 +1597,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       let impuesto = 0;
       const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
       console.log(prima);
-      // Asegúrate de que prima y los valores de parametros son números
       const primaNumber = Number(prima);
       const porIva = Number(parametros[0].por_iva);
       const porSbs = Number(parametros[0].por_sbs);
@@ -1564,22 +1649,41 @@ const PersonalFormLife = forwardRef((props, ref) => {
         impuesto: impuesto,
 
       });
-    }else if (calculado && calculado.data&& calculado.data.montoPeriodo){
+    } else if (calculado && calculado.data && calculado.data.montoPeriodo) {
       const tablaDinamicaCoberturas = calculado.data.montoPeriodo;
-        const tablasConfAmparos = Object.entries(tablaDinamicaCoberturas).map(([key, value]) => ({
-          codcob: key,
-          carcob: value.tipo.toString(),  // Asigna un valor para carcob según tu lógica
-          tipcob: value.tipo === 1 ? "BASICA" : "ADICIONAL", // Lógica para determinar tipcob
-          nomcob: value.nomcob,
-          numcob: "", // Si tienes lógica para numcob, puedes agregarla aquí
-          selcob: "1", // Si necesitas asignar un valor específico
-          pidecapital: value.tipo === 1 ? "N" : "S", // Lógica para pidecapital
-          periodos: generarPeriodos(Object.keys(value.periodos).length) // Asumiendo que generas periodos según la longitud de la entrada
-        }));
-        setTablasData(tablasConfAmparos);
+      const tablasConfAmparos = Object.entries(tablaDinamicaCoberturas).map(([key, value]) => ({
+        codcob: key,
+        carcob: value.tipo.toString(),  // Asigna un valor para carcob según tu lógica
+        tipcob: value.tipo === 1 ? "BASICA" : "ADICIONAL", // Lógica para determinar tipcob
+        nomcob: value.nomcob,
+        numcob: "", // Si tienes lógica para numcob, puedes agregarla aquí
+        selcob: "1", // Si necesitas asignar un valor específico
+        pidecapital: value.tipo === 1 ? "N" : "S", // Lógica para pidecapital
+        periodos: generarPeriodos(Object.keys(value.periodos).length) // Asumiendo que generas periodos según la longitud de la entrada
+      }));
+      setTablasData(tablasConfAmparos);
       console.log(tablasConfAmparos);
       setTablasData(tablasConfAmparos);
-      }
+    } else {
+      // Recupera los datos actuales de tablasData
+      const currentData = [...tablasData]; // Copia los datos actuales
+
+      // Mapea los datos para restablecer solo monto, tasa y prima
+      const updatedData = currentData.map(cobertura => {
+        return {
+          ...cobertura,
+          periodos: cobertura.periodos.map(periodo => ({
+            ...periodo,
+            monto: '',    // Borra el monto
+            tasa: '',     // Borra la tasa
+            prima: ''     // Borra la prima
+          }))
+        };
+      });
+      setcargarDataInicial(false);
+      // Actualiza tablasData con los nuevos valores
+      setTablasData(updatedData);
+    }
   }, [calculado]);
 
   const verificaPrestamo = async (numPrestamo) => {
@@ -2030,6 +2134,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
                     name="conyugenumero"
                     value={formData.conyugenumero}
                     onChange={handleChange}
+                    onBlur={verifyIdentificationConyugue}
                     variant="standard"
                     fullWidth
                     disabled={errorCedula}
