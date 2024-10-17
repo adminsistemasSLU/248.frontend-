@@ -1,7 +1,7 @@
 import React, {
     useState,
 } from "react";
-import { TextField, Grid, Alert, Button,Snackbar } from "@mui/material";
+import { TextField, Grid, Alert, Button,Snackbar,InputAdornment,IconButton } from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Card from '@mui/material/Card';
@@ -10,13 +10,17 @@ import UsuarioService from "../services/UsuarioService/UsuarioService";
 import { USER_STORAGE_KEY } from "./constantes";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 export default function ChangePassword(props) {
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
     const [OpenSnackAlert, setOpenSnackAlert] = React.useState(false);
     const [errorMessage, seterrorMessage] = React.useState([]);
     const navigate = useNavigate();
-
+    const [showActualPassword, setShowActualPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showRepeatPassword, setShowRepeatPassword] = useState(false);
     const [formData, setFormData] = useState({
         actualPassword: "",
         newPassword: "",
@@ -154,7 +158,7 @@ export default function ChangePassword(props) {
                                 Contraseña actual <span style={{ color: 'red' }}>*</span>
                             </Typography>
                             <TextField
-                                type="password"
+                                type={showActualPassword ? "text" : "password"}
                                 name="actualPassword"
                                 value={formData.actualPassword}
                                 onChange={handleChange}
@@ -169,6 +173,18 @@ export default function ChangePassword(props) {
                                         e.target.setCustomValidity('');
                                     }
                                 }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={() => setShowActualPassword(!showActualPassword)} // Alternar el estado
+                                                edge="end"
+                                            >
+                                                {showActualPassword ? <VisibilityOff /> : <Visibility />} {/* Mostrar/ocultar */}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                         </Grid>
                     </Grid>
@@ -179,7 +195,7 @@ export default function ChangePassword(props) {
                                 Nueva Contraseña <span style={{ color: 'red' }}>*</span>
                             </Typography>
                             <TextField
-                                type="password"
+                                 type={showNewPassword ? "text" : "password"}
                                 name="newPassword"
                                 value={formData.newPassword}
                                 placeholder="xxxxxxxxx"
@@ -194,6 +210,18 @@ export default function ChangePassword(props) {
                                         e.target.setCustomValidity('');
                                     }
                                 }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={() => setShowNewPassword(!showNewPassword)} // Alternar el estado
+                                                edge="end"
+                                            >
+                                                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                         </Grid>
                     </Grid>
@@ -204,7 +232,7 @@ export default function ChangePassword(props) {
                                 Repetir Contraseña <span style={{ color: 'red' }}>*</span>
                             </Typography>
                             <TextField
-                                type="password"
+                                type={showRepeatPassword ? "text" : "password"} 
                                 placeholder="xxxxxxxxxxxx"
                                 id="repeatPassword"
                                 name="repeatPassword"
@@ -220,6 +248,18 @@ export default function ChangePassword(props) {
                                     } else {
                                         e.target.setCustomValidity('');
                                     }
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={() => setShowRepeatPassword(!showRepeatPassword)} // Alternar el estado
+                                                edge="end"
+                                            >
+                                                {showRepeatPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
                                 }}
                             />
                         </Grid>
