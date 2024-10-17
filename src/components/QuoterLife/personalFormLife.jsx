@@ -1009,12 +1009,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
         const dateString = cedulaData.data[0].cli_fecnacio;
+        const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
 
-        //const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
+        setAge(dateObject);
 
-        const dateObject = dayjs(dateString, "YYYY/MM/DD", true);
 
-        setAgeCalculate(dateObject);
         setFormData({
           ...formData,
           name: cedulaData.data[0].cli_nombres || "",
@@ -1022,6 +1021,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           email: cedulaData.data[0].cli_email || "",
           phone: cedulaData.data[0].cli_celular || "",
           address: cedulaData.data[0].cli_direccion || "",
+          ageCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
         });
       }
     } catch (error) {
@@ -1038,13 +1038,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
         const dateString = cedulaData.data[0].cli_fecnacio;
-        const dateObject = dayjs(dateString, "YYYY/MM/DD", true);
-        setAgeConyugueCalculate(dateObject);
+        const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
+        setConyugueAge(dateObject);
         setFormData({
           ...formData,
           conyugenombre: cedulaData.data[0].cli_nombres || "",
           conyugeapellido: cedulaData.data[0].cli_apellidos || "",
           conyugesexo: cedulaData.data[0].cli_sexo || "",
+          ageConyugueCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
         });
       }
     } catch (error) {
