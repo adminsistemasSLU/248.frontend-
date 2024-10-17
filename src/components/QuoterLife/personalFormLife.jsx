@@ -1011,7 +1011,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
 
-        setAge(dateObject);
+        setAgeCalculate(dateObject);
         setFormData({
           ...formData,
           name: cedulaData.data[0].cli_nombres || "",
@@ -1036,7 +1036,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       if (cedulaData.codigo === 200 && cedulaData.data) {
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
-        setConyugueAge(dateObject);
+        setAgeConyugueCalculate(dateObject);
         setFormData({
           ...formData,
           conyugenombre: cedulaData.data[0].cli_nombres || "",
