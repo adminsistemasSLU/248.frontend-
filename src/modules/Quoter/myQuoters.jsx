@@ -57,7 +57,8 @@ function createData(
   state,
   createdDate,
   productoId,
-  ramoId
+  ramoId,
+  reason
 ) {
   return {
     id,
@@ -72,6 +73,7 @@ function createData(
     createdDate,
     productoId,
     ramoId,
+    reason
   };
 }
 
@@ -165,6 +167,12 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: "Estado",
+  },
+  {
+    id: "reason",
+    numeric: false,
+    disablePadding: false,
+    label: "Motivo",
   },
   {
     id: "action",
@@ -437,7 +445,8 @@ export default function MyQuoters() {
           item.estado,
           item.created_at,
           item.producto,
-          item.ramo
+          item.ramo,
+          item.motivo||""
         );
         rowsObjetoAmparo.push(row);
       }
@@ -933,8 +942,9 @@ export default function MyQuoters() {
                               disabled
                             />
                           </TableCell>
+                          <TableCell align="left">{row.reason||""}</TableCell>
                           <TableCell align="right">
-                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && (
+                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 &&  row.state !== "No Aprobado" && (
                               <div
                                 style={{
                                   display: "flex",
