@@ -177,7 +177,9 @@ export default function SteppersLife() {
 
     if (steps[activeStep].label === "Resumen") {
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      handleOpenBackdrop();
       const terminarTarea = await LifeService.fetchEmitirCertificado(idCotizacion)
+      handleCloseBackdrop();
       if (terminarTarea.codigo === 200) {
         Swal.fire({
           title: "Exito!",
