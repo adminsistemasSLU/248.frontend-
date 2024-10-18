@@ -32,12 +32,10 @@ import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ProductListCardsLife from "./ProductListCardsLife";
 import SumaryFormLife from ".//../QuoterLife/sumaryFormLife";
-import { TextField, Grid, Alert } from "@mui/material";
-import IncendioService from "../../services/IncencioService/IncendioService";
+import {  Alert } from "@mui/material";
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
-  USER_STORAGE_KEY,
   LS_PRODUCTO, DATOS_PAGO_STORAGE_KEY,
   LS_DATAVIDASEND, LS_DATOSPAGO, LS_PREGUNTASVIDA
   , LS_DOCUMENTOSVIDA, LS_IDCOTIZACIONVIDA, LS_VIDAPOLIZA
@@ -46,7 +44,6 @@ import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
 import RiskFormLife from "./riskFormLife";
 import LifeService from "../../services/LifeService/LifeService";
-import Footer from "../footer";
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {

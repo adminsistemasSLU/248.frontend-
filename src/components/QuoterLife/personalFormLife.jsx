@@ -766,8 +766,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   function crearDatosProcesarDatos() {
-    const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-    let conyugueEdad = '';
+  const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+ let conyugueEdad = '';
     if (!tipoPrestamo === 'I') {
       conyugueEdad = conyugueage.format('DD/MM/YYYY');
     }
@@ -803,7 +803,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       producto: producto,
       ramoAlt: ramo,
       ramoOri: ramo,
-      tipoContrato: tipoPrestamo, // Uso de tipoPrestamo aquí
+      tipoContrato: formData.tipoProducto, // Uso de tipoPrestamo aquí
       vidaGrupo: "N",
       vigencia: formData.vigencia,
       zona: ''

@@ -307,6 +307,19 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     };
 
     const handleChange = (e) => {
+       
+        let f_pago = JSON.parse(localStorage.getItem(LS_FPAGO));
+        f_pago = Number(f_pago);
+        
+        if ((Number(formData.tipoProducto) !== f_pago)) {
+            if (f_pago !== '') {
+                seterrorMessage("La forma de pago ingresada no es valido")
+                setOpenSnackAlert(true);
+                handleCloseBackdrop();
+                return false;
+            }
+        }
+
         if (
             e.target.name === "name" ||
             e.target.name === "lastname" ||
@@ -618,7 +631,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                         required
                                     >
                                         <MenuItem value="1">Mensual</MenuItem>
-                                        <MenuItem value="5">Anual</MenuItem>
+                                        {/* <MenuItem value="5">Anual</MenuItem> */}
                                         <MenuItem value="6">Anticipado</MenuItem>
                                     </Select>
                                 </FormControl>
