@@ -310,7 +310,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         const { name, value } = e.target;
         let f_pago = JSON.parse(localStorage.getItem(LS_FPAGO));
        
-        debugger;
         if (name === "tipoProducto") {
             if ((Number(value) !== f_pago)) {
                 if (f_pago !== '') {
