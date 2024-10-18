@@ -256,7 +256,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             }
             if (formaPago === 'R') {
                 let nombre = '', pais='',lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
-                pais =   country[69].codpais || '';
+                console.log(formaPagoAray);
                 if (formaPagoAray) {
                     nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
                     lastname = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.lastname : '';
