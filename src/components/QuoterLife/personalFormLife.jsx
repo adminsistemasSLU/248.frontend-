@@ -1022,6 +1022,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
           phone: cedulaData.data[0].cli_celular || "",
           address: cedulaData.data[0].cli_direccion || "",
           ageCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
+          genero: cedulaData.data[0].cli_sexo || "",
+          
         });
       }
     } catch (error) {
