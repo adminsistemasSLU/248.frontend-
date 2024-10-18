@@ -158,6 +158,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: "Fecha Creacion",
+    width:'170px'
   },
   {
     id: "state",
@@ -186,6 +187,7 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <StyledTableCell
             key={headCell.id}
+            sx={{ width: headCell.width|| '130px' }}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}

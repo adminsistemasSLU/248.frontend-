@@ -164,6 +164,7 @@ export default function SteppersLife() {
   const personalFormRef = useRef();
   const paidFormRef = useRef();
   const questionFormRef = useRef();
+  const sumaryFormRef = useRef();
 
   const handleNext = async (formData) => {
     // Actualiza el estado formData con los datos recibidos
@@ -174,39 +175,43 @@ export default function SteppersLife() {
       continuar = await personalFormRef.current.handleSubmitExternally();
     }
 
-
+    
     if (steps[activeStep].label === "Resumen") {
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
-      handleOpenBackdrop();
-      const terminarTarea = await LifeService.fetchEmitirCertificado(idCotizacion)
-      handleCloseBackdrop();
-      if (terminarTarea.codigo === 200) {
-        Swal.fire({
-          title: "Exito!",
-          text: `El proceso ha terminado`,
-          icon: "success",
-          confirmButtonText: "Ok",
-        }).then(() => {
-          localStorage.removeItem(LS_PRODUCTO);
-          localStorage.removeItem(LS_DATAVIDASEND);
-          localStorage.removeItem(LS_DATOSPAGO);
-          localStorage.removeItem(LS_PREGUNTASVIDA);
-          localStorage.removeItem(LS_DOCUMENTOSVIDA);
-          localStorage.removeItem(LS_IDCOTIZACIONVIDA);
-          localStorage.removeItem(LS_VIDAPOLIZA);
-          localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
 
-          navigate("/quoter/Pymes/MyQuotes");
-        });
-        return;
-      } else {
-        Swal.fire({
-          title: "Alerta!",
-          text: terminarTarea.message,
-          icon: "warning",
-          confirmButtonText: "Ok",
-        });
-      }
+      
+      continuar = await sumaryFormRef.current.handleSubmitExternally();
+
+      // let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      // handleOpenBackdrop();
+      // const terminarTarea = await LifeService.fetchEmitirCertificado(idCotizacion)
+      // handleCloseBackdrop();
+      // if (terminarTarea.codigo === 200) {
+      //   Swal.fire({
+      //     title: "Exito!",
+      //     text: `El proceso ha terminado`,
+      //     icon: "success",
+      //     confirmButtonText: "Ok",
+      //   }).then(() => {
+      //     localStorage.removeItem(LS_PRODUCTO);
+      //     localStorage.removeItem(LS_DATAVIDASEND);
+      //     localStorage.removeItem(LS_DATOSPAGO);
+      //     localStorage.removeItem(LS_PREGUNTASVIDA);
+      //     localStorage.removeItem(LS_DOCUMENTOSVIDA);
+      //     localStorage.removeItem(LS_IDCOTIZACIONVIDA);
+      //     localStorage.removeItem(LS_VIDAPOLIZA);
+      //     localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
+
+      //     navigate("/quoter/Pymes/MyQuotes");
+      //   });
+      //   return;
+      // } else {
+      //   Swal.fire({
+      //     title: "Alerta!",
+      //     text: terminarTarea.message,
+      //     icon: "warning",
+      //     confirmButtonText: "Ok",
+      //   });
+      // }
     }
 
 
@@ -255,7 +260,7 @@ export default function SteppersLife() {
     },
     {
       label: "Resumen",
-      formComponent: <SumaryFormLife onNext={handleNext} />,
+      formComponent: <SumaryFormLife ref={sumaryFormRef} onNext={handleNext} />,
     },
   ];
 
@@ -406,7 +411,7 @@ export default function SteppersLife() {
         aria-describedby="alert-dialog-description"
       >
         <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          sx={{ color: "#fff", zIndex: 9999 }}
           open={openBackdrop}
         >
           <CircularProgress color="inherit" />

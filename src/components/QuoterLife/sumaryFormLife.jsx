@@ -11,12 +11,15 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
-import { LS_DATAVIDASEND, API_SUBBALDOSAS,LS_PRODUCTO } from "../../utils/constantes";
+import { LS_DATAVIDASEND, API_SUBBALDOSAS,LS_PRODUCTO, LS_COTIZACION, LS_DATOSPAGO, LS_PREGUNTASVIDA, LS_DOCUMENTOSVIDA, LS_IDCOTIZACIONVIDA, LS_VIDAPOLIZA, DATOS_PAGO_STORAGE_KEY } from "../../utils/constantes";
+import Swal from "sweetalert2";
+import LifeService from "../../services/LifeService/LifeService";
+import { useNavigate } from "react-router-dom";
 
 
 const SumaryFormLife = forwardRef((props, ref) => {
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
-
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
         document: "",
@@ -45,6 +48,42 @@ const SumaryFormLife = forwardRef((props, ref) => {
         }).format(numero);
     }
 
+    useImperativeHandle(ref, () => ({
+        handleSubmitExternally: handleSubmit,
+    }));
+
+    const handleSubmit = async (e) => {
+    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    setOpenBackdrop(true);
+      const terminarTarea = await LifeService.fetchEmitirCertificado(idCotizacion)
+      setOpenBackdrop(false);
+      if (terminarTarea.codigo === 200) {
+        Swal.fire({
+          title: "Exito!",
+          text: `El proceso ha terminado`,
+          icon: "success",
+          confirmButtonText: "Ok",
+        }).then(() => {
+            localStorage.removeItem(LS_PRODUCTO);
+            localStorage.removeItem(LS_DATAVIDASEND);
+            localStorage.removeItem(LS_DATOSPAGO);
+            localStorage.removeItem(LS_PREGUNTASVIDA);
+            localStorage.removeItem(LS_DOCUMENTOSVIDA);
+            localStorage.removeItem(LS_IDCOTIZACIONVIDA);
+            localStorage.removeItem(LS_VIDAPOLIZA);
+            localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
+          navigate("/quoter/Pymes/MyQuotes");
+        });
+        return;
+      } else {
+        Swal.fire({
+          title: "Alerta!",
+          text: terminarTarea.message,
+          icon: "warning",
+          confirmButtonText: "Ok",
+        });
+      }
+    }
     //Funcion principal para cargar datos
     useEffect(() => {
         const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
