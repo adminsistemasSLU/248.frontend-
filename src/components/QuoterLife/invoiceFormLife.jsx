@@ -168,6 +168,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
             let idCotizacion = localStorage.getItem(LS_COTIZACION);
             let asegurado;
+            
             // debugger;
             if (idCotizacion) {
                 setOpenBackdrop(true);
@@ -255,6 +256,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             }
             if (formaPago === 'R') {
                 let nombre = '', pais='',lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
+                pais =   country[69].codpais || '';
                 if (formaPagoAray) {
                     nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
                     lastname = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.lastname : '';
