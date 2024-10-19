@@ -120,7 +120,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     }));
 
     const cargarDatosVidaPago = async () => {
-        let f_pago = JSON.parse(localStorage.getItem(LS_FPAGO));
+        let f_pago = localStorage.getItem(LS_FPAGO);
         let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
         let idCotizacion = localStorage.getItem(LS_COTIZACION);
 

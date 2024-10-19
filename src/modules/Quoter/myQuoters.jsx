@@ -944,7 +944,7 @@ export default function MyQuoters() {
                           </TableCell>
                           <TableCell align="left">{row.reason||""}</TableCell>
                           <TableCell align="right">
-                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 &&  row.state !== "No Aprobado" && (
+                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && (
                               <div
                                 style={{
                                   display: "flex",
