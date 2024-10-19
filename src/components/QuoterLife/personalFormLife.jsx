@@ -52,7 +52,8 @@ import {
   LS_DATOSPAGO,
   LS_FPAGO,
   LS_TPRESTAMO,
-  API_SUBBALDOSAS
+  API_SUBBALDOSAS,
+  LS_PREGRESPONDIDAS
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import { Button } from "@mui/base";
@@ -367,6 +368,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
       }));
 
       localStorage.setItem(LS_IDCOTIZACIONVIDA, dataPersonal[0].aplicacion);
+
+      const pregRespondidas = dataPersonal[0].DocumentosPreguntas;
+      localStorage.setItem(LS_PREGRESPONDIDAS, pregRespondidas);
 
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
       setAgeCalculate(dateObject);
@@ -1366,7 +1370,16 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
     const preguntasVida = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+    const dataresp = JSON.parse(localStorage.getItem(LS_PREGRESPONDIDAS));
 
+    let preguntas ;
+
+    if(dataresp){
+      preguntas = dataresp;
+    }else{
+      preguntas = preguntasVida;
+    }
+     
 
     const data = {
       arrDatosCliente: arrDatosCliente,
@@ -1405,7 +1418,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       txtAclaratorios: "",
       slTipCredito: "",
       aprobAutomatica: "",
-      jsonPreguntas: preguntasVida,
+      jsonPreguntas: preguntas,
       arrLogTasa: {},
       vidaGrupo: "N",
     }

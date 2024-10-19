@@ -90,7 +90,7 @@ const QuoterService = {
     }
   },
 
-  fetchExportExcel: async (dato) => {
+  fetchExportExcel: async (dato,estado) => {
     const endpoint = 'api/reporte/ReporteExcelEmisiones';
     const method = 'POST'; 
     const data = {
@@ -99,7 +99,7 @@ const QuoterService = {
       ramo:dato.ramo,
       producto:dato.producto,
       cliente:dato.cliente,
-      estado:dato.estado,
+      estado:estado,
       fecha:dato.fecha
     };
 

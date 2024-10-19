@@ -265,7 +265,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     documentType = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.documentType : '';
                     identification = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.identification : '';
                     direction = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.direction : '';
-                    pais = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.pais : '';
+                    pais = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? country[69].codpais : '';
                 }
                 
                 setFormData({

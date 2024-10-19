@@ -35,6 +35,7 @@ export const LS_VIDACOBERTURA = 'vida_cobertura';
 export const LS_DATAVIDASEND = 'datos_vida_completos';
 export const LS_DATOSPAGO = 'datos_vida_pago';
 export const LS_TPRESTAMO = 'tipo_prestamo';
+export const LS_PREGRESPONDIDAS = 'requisitos_asegurabilidad_resp';
 export const LS_FPAGO = 'frm_pago';
 
 // VEHICULO

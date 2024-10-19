@@ -114,6 +114,12 @@ const headCells = [
     label: "#",
   },
   {
+    id: "codigo",
+    numeric: false,
+    disablePadding: true,
+    label: "Nro de Certificado  ",
+  },
+  {
     id: "ramo",
     numeric: false,
     disablePadding: false,
@@ -160,7 +166,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: "Fecha Creacion",
-    width:'170px'
+    width: '170px'
   },
   {
     id: "state",
@@ -195,7 +201,7 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <StyledTableCell
             key={headCell.id}
-            sx={{ width: headCell.width|| '130px' }}
+            sx={{ width: headCell.width || '130px' }}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
@@ -419,20 +425,20 @@ export default function MyQuoters() {
     if (objetoSeguro) {
       let number = 1;
       const rowsObjetoAmparo = [];
-     
+
       for (let item of objetoSeguro) {
         let tasa = 0;
-        if(item.ramo==="9"){
+        if (item.ramo === "9") {
           tasa = '-';
-        }else{
+        } else {
           tasa = parseFloat(
             (item.total_prima / item.total_monto) * 100
           ).toFixed(2);
 
           tasa = isNaN(tasa) ? 0.0 : tasa;
-          tasa = '%'+tasa;
+          tasa = '%' + tasa;
         }
-        
+
         const row = createData(
           item.id,
           number++,
@@ -446,7 +452,7 @@ export default function MyQuoters() {
           item.created_at,
           item.producto,
           item.ramo,
-          item.motivo||""
+          item.motivo || ""
         );
         rowsObjetoAmparo.push(row);
       }
@@ -469,11 +475,11 @@ export default function MyQuoters() {
     handleCloseBackdrop();
   }
 
-  const handleOpenQuoter = async (id, product, ramo,aplicacion='') => {
+  const handleOpenQuoter = async (id, product, ramo, aplicacion = '') => {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
-    if(aplicacion!==''){
+    if (aplicacion !== '') {
       localStorage.setItem(LS_IDCOTIZACIONVIDA, aplicacion);
     }
     const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
@@ -662,24 +668,64 @@ export default function MyQuoters() {
   };
 
   async function exportarTabla() {
+    if (filters.estado) {
+      Swal.fire({
+        title: "Éxito!",
+        text: 'Desea exportar las cotizaciones Aprobadas',
+        icon: "success",
+        confirmButtonText: "Ok",
+        cancelButtonText: "Cancelra"
+      }).then(async (result) => {  // Aquí se marca como async
+        if (result.isConfirmed) {
+          handleOpenBackdrop();
+          let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+          let dato = {
+            usuario: userId.id,
+            ramo: filters.ramo,
+            producto: filters.producto,
+            estado: filters.estado
+          };
 
-    handleOpenBackdrop();
-    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    let dato = {
-      usuario: userId.id,
-      ramo: filters.ramo,
-      producto: filters.producto,
-      estado: filters.estado
-    };
-    await QuoterService.fetchExportExcel(dato);
+          // Esperar la exportación dentro del contexto async
+          await QuoterService.fetchExportExcel(dato, filters.estado);
 
-    handleCloseBackdrop();
+          handleCloseBackdrop();
+          Swal.fire(
+            "Exportado!",
+            "Las cotizaciones han sido exportadas correctamente.",
+            "success"
+          );
+          return;
+        } else {
+          Swal.fire(
+            "Cancelado",
+            "La exportación fue cancelada.",
+            "error"
+          );
+        }
+      });
+    } else {
+      handleOpenBackdrop();
+      let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+      let dato = {
+        usuario: userId.id,
+        ramo: filters.ramo,
+        producto: filters.producto,
+        estado: filters.estado
+      };
+
+      // Esperar la exportación normalmente
+      await QuoterService.fetchExportExcel(dato, filters.estado);
+
+      handleCloseBackdrop();
+    }
   }
+
 
   const handleComparativo = async (id) => {
     const link = document.createElement('a');
     console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + id);
-    
+
     link.href = `${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + id;
     link.download = 'comparativo.pdf';
     link.click();
@@ -903,6 +949,14 @@ export default function MyQuoters() {
                           >
                             {row.number}
                           </TableCell>
+                          <TableCell
+                            component="th"
+                            id={labelId}
+                            scope="row"
+                            padding="none"
+                          >
+                            {row.id}
+                          </TableCell>
                           <TableCell align="left">{row.ramo}</TableCell>
                           <TableCell align="left">{row.producto}</TableCell>
                           <TableCell align="left">{row.cliente}</TableCell>
@@ -942,7 +996,7 @@ export default function MyQuoters() {
                               disabled
                             />
                           </TableCell>
-                          <TableCell align="left">{row.reason||""}</TableCell>
+                          <TableCell align="left">{row.reason || ""}</TableCell>
                           <TableCell align="right">
                             {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && (
                               <div
@@ -953,7 +1007,7 @@ export default function MyQuoters() {
                               >
                                 <IconButton
                                   onClick={() =>
-                                    handleOpenQuoter(row.id, row.productoId, row.ramoId,row.aplicacion)
+                                    handleOpenQuoter(row.id, row.productoId, row.ramoId, row.aplicacion)
                                   }
                                 >
                                   <EditIcon />

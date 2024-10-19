@@ -11,7 +11,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
-import { LS_DATAVIDASEND, API_SUBBALDOSAS,LS_PRODUCTO, LS_COTIZACION, LS_DATOSPAGO, LS_PREGUNTASVIDA, LS_DOCUMENTOSVIDA, LS_IDCOTIZACIONVIDA, LS_VIDAPOLIZA, DATOS_PAGO_STORAGE_KEY } from "../../utils/constantes";
+import { LS_DATAVIDASEND, API_SUBBALDOSAS,LS_PRODUCTO, LS_COTIZACION, LS_DATOSPAGO, LS_PREGUNTASVIDA, LS_DOCUMENTOSVIDA, LS_IDCOTIZACIONVIDA, LS_VIDAPOLIZA, DATOS_PAGO_STORAGE_KEY, LS_PREGRESPONDIDAS } from "../../utils/constantes";
 import Swal from "sweetalert2";
 import LifeService from "../../services/LifeService/LifeService";
 import { useNavigate } from "react-router-dom";
@@ -72,6 +72,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
             localStorage.removeItem(LS_IDCOTIZACIONVIDA);
             localStorage.removeItem(LS_VIDAPOLIZA);
             localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
+            localStorage.removeItem(LS_PREGRESPONDIDAS);
           navigate("/quoter/Pymes/MyQuotes");
         });
         return;

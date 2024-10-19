@@ -12,7 +12,7 @@ import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CircularProgress from "@mui/material/CircularProgress";
 import { TextField, Box, Grid, FormControl, Select, MenuItem, Snackbar, Alert, AlertTitle, Button } from "@mui/material";
-import { LS_DOCUMENTOSVIDA, LS_PREGUNTASVIDA, LS_DATAVIDASEND, LS_COTIZACION, LS_IDCOTIZACIONVIDA } from "../../utils/constantes";
+import { LS_DOCUMENTOSVIDA, LS_PREGUNTASVIDA, LS_DATAVIDASEND, LS_COTIZACION, LS_IDCOTIZACIONVIDA, LS_PREGRESPONDIDAS } from "../../utils/constantes";
 import LifeService from "../../services/LifeService/LifeService";
 
 const RiskFormLife = forwardRef((props, ref) => {
@@ -45,7 +45,18 @@ const RiskFormLife = forwardRef((props, ref) => {
 
       if (idCotizacion) {
         const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
-        const preguntas = data.jsonPreguntas;
+
+        const dataresp = JSON.parse(localStorage.getItem(LS_PREGRESPONDIDAS));
+        
+        let preguntas = data.jsonPreguntas;
+
+        if(dataresp){
+          preguntas = dataresp;
+        }else{
+          preguntas = data.jsonPreguntas;
+        }
+         
+        
         const questionUploadNew = questions.map((item) => {
           // Buscamos la pregunta correspondiente en el arreglo preguntas
           const preguntaCorrespondiente = preguntas.find(pregunta => pregunta.codigo === item.codigo);
@@ -103,8 +114,7 @@ const RiskFormLife = forwardRef((props, ref) => {
     if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
       data.id_CotiGeneral = id_cotigeneral;
     }
-    data.jsonPreguntas = updatedQuestions
-
+    data.jsonPreguntas = updatedQuestions;
     setOpen(true);
     const response = await LifeService.fetchGrabaDatosVida(data);
 
