@@ -684,7 +684,8 @@ export default function MyQuoters() {
         text: 'Desea exportar las cotizaciones Aprobadas',
         icon: "success",
         confirmButtonText: "Ok",
-        cancelButtonText: "Cancelra"
+        showCancelButton: true,
+        cancelButtonText: "Cancelar"
       }).then(async (result) => {  // Aquí se marca como async
         if (result.isConfirmed) {
           handleOpenBackdrop();
@@ -704,7 +705,9 @@ export default function MyQuoters() {
             "Exportado!",
             "Las cotizaciones han sido exportadas correctamente.",
             "success"
-          );
+          ).then(()=>{
+            cargarTabla();
+          });
           return;
         } else {
           Swal.fire(
