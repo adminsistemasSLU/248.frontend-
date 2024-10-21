@@ -168,7 +168,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
             let idCotizacion = localStorage.getItem(LS_COTIZACION);
             let asegurado;
-            
+
             // debugger;
             if (idCotizacion) {
                 setOpenBackdrop(true);
@@ -182,7 +182,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     direction: coti[0].clidireccion,
                     documentType: coti[0].clitipcedula,
                     identification: coti[0].clicedula,
-                    pais:coti[0].clipais
+                    pais: coti[0].clipais
                 }
                 let formaPagoAray = localStorage.getItem(LS_DATOSPAGO);
 
@@ -210,7 +210,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             } else {
                 formaPagos = factura;
             }
-           
+
             let monto, prima, sbs, scc, derechoEmision, subtot, iva, total;
 
             if (factura) {
@@ -243,7 +243,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     direction: asegurado.direction,
                     documentType: asegurado.documentType,
                     identification: asegurado.identification,
-                    country:asegurado.pais,
+                    country: asegurado.pais,
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -255,7 +255,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 });
             }
             if (formaPago === 'R') {
-                let nombre = '', pais='',lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
+                let nombre = '', pais = '', lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
                 console.log(formaPagoAray);
                 if (formaPagoAray) {
                     nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
@@ -267,7 +267,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     direction = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.direction : '';
                     pais = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? country[69].codpais : '';
                 }
-                
+
                 setFormData({
                     ...formData,
                     name: nombre || '',
@@ -277,7 +277,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     documentType: documentType || 'C',
                     direction: direction || '',
                     identification: identification || '',
-                    country:pais|| '',
+                    country: pais || '',
                     sumAdd: parseFloat(monto).toFixed(2),
                     iva: iva.toFixed(2),
                     prima: parseFloat(prima).toFixed(2),
@@ -311,7 +311,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         let f_pago = (localStorage.getItem(LS_FPAGO));
-       
+
         if (name === "tipoProducto") {
             if ((Number(value) !== f_pago)) {
                 if (f_pago !== '') {
@@ -322,7 +322,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 }
             }
         }
-       
+
 
         if (
             e.target.name === "name" ||
@@ -342,7 +342,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             setformaPago(e.target.value);
         }
 
-        
+
     };
 
     const validarformulario = () => {
@@ -396,9 +396,26 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             setOpenSnackAlert(true);
             handleCloseBackdrop();
         }
-        let f_pago = JSON.parse(localStorage.getItem(LS_FPAGO));
-        f_pago = Number(f_pago);
+        let f_pago = localStorage.getItem(LS_FPAGO);
+
+        if (f_pago !== null) {
+            try {
+                f_pago = JSON.parse(f_pago);
+                f_pago = Number(f_pago);
+                console.log("Valor de f_pago:", f_pago);
+            } catch (error) {
+                // Si el valor no es un JSON válido
+                console.error("Error al parsear JSON:", error);
+                f_pago = '';
+            }
+        } else {
+            // El valor no existe en localStorage
+            console.error("No se encontró el valor en localStorage.");
+            f_pago = '';
+        }
+
         
+
         if ((Number(formData.tipoProducto) !== f_pago)) {
             if (f_pago !== '') {
                 seterrorMessage("La forma de pago ingresada no es valido")
@@ -420,7 +437,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             paidType: formaPago,
             name: formData.name,
             lastname: formData.lastname,
-            tipoProducto:formData.tipoProducto,
+            tipoProducto: formData.tipoProducto,
             email: formData.email,
             phone: formData.phone,
             direction: formData.direction,
@@ -434,9 +451,9 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             admision: formData.admision,
             subtotal: formData.subtotal,
             total: formData.total,
-            pais:formData.pais
+            pais: formData.pais
         }
-        
+
         console.log(datosfacturas);
         if (enviarFormulario) {
             enviarFormulario = false;
@@ -446,12 +463,12 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             data.arrDatosCliente = datosCliente;
             const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
             const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
-        
+
             if (application !== null && application !== undefined && application !== '') {
-            data.aplicacion = application;
+                data.aplicacion = application;
             }
             if (id_cotigeneral !== null && id_cotigeneral !== undefined && id_cotigeneral !== '') {
-            data.id_CotiGeneral = id_cotigeneral;
+                data.id_CotiGeneral = id_cotigeneral;
             }
             try {
                 const response = await LifeService.fetchGrabaDatosVida(data);
@@ -482,35 +499,35 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const consultUserData = async (documentType, identification) => {
         try {
-          const cedulaData = await UsuarioService.fetchConsultarUsuario(
-            documentType,
-            identification
-          );
-          if (cedulaData.codigo === 200 && cedulaData.data) {
-            // const dateString = cedulaData.data[0].cli_fecnacio;
-            // const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
-    
-            // setAge(dateObject);
-            
-            // name: "",
-            // lastname: "",
-            // email: "",
-            // phone: "",
-            // direction: "",
-            setFormData({
-              ...formData,
-              name: cedulaData.data[0].cli_nombres || "",
-              lastname: cedulaData.data[0].cli_apellidos || "",
-              email: cedulaData.data[0].cli_email || "",
-              phone: cedulaData.data[0].cli_celular || "",
-              direction: cedulaData.data[0].cli_direccion || "",
-              country: country[69].codpais
-            });
-          }
+            const cedulaData = await UsuarioService.fetchConsultarUsuario(
+                documentType,
+                identification
+            );
+            if (cedulaData.codigo === 200 && cedulaData.data) {
+                // const dateString = cedulaData.data[0].cli_fecnacio;
+                // const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
+
+                // setAge(dateObject);
+
+                // name: "",
+                // lastname: "",
+                // email: "",
+                // phone: "",
+                // direction: "",
+                setFormData({
+                    ...formData,
+                    name: cedulaData.data[0].cli_nombres || "",
+                    lastname: cedulaData.data[0].cli_apellidos || "",
+                    email: cedulaData.data[0].cli_email || "",
+                    phone: cedulaData.data[0].cli_celular || "",
+                    direction: cedulaData.data[0].cli_direccion || "",
+                    country: country[69].codpais
+                });
+            }
         } catch (error) {
-          console.error("Error al verificar cédula:", error);
+            console.error("Error al verificar cédula:", error);
         }
-      };
+    };
 
     const verifyIdentification = async (e) => {
         const { value } = e.target;
