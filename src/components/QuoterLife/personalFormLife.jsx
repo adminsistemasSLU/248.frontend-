@@ -782,7 +782,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return {
         codigo: item.codcob,
         datos: item.periodos.map((periodo, index) => ({
-          monto: periodo.monto.replace(/[$,.]/g, ''),
+          monto: periodo.monto.replace(/[$,]/g, ''),
           periodo: index + 1,
           vigencia: "",
           nomcob: item.nomcob || 0
@@ -1214,7 +1214,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return {
         codigo: item.codcob, // Usar codcob de tablasData
         datos: item.periodos.map((periodo, index) => ({
-          monto: periodo.monto.replace(/[$,.]/g, ''), // Limpiar el monto
+          monto: periodo.monto.replace(/[$,]/g, ''), // Limpiar el monto
           tipo_monto: "",
           nomcob: item.nomcob,
           desempleo: periodo.desempleo || 0,
@@ -1502,7 +1502,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const todosTienenNumero = tablasData.every((item) => {
       // Verificar que cada item tiene periodos y que cada periodo tiene un monto válido
       return item.periodos.every((periodo) => {
-        const monto = periodo.monto.replace(/[$,.]/g, ''); // Limpiar el monto
+        const monto = periodo.monto.replace(/[$,]/g, ''); // Limpiar el monto
         return monto !== undefined && monto !== null && monto !== '' && !Number.isNaN(Number(monto));
       });
     });
@@ -1524,7 +1524,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const resultado = tablasData.reduce((acc, item) => {
       // Itera sobre cada periodo en el objeto actual
       item.periodos.forEach((periodo) => {
-        const montoConvertido = periodo.monto.replace(/[$,.]/g, ''); // Limpiar el monto
+        const montoConvertido = periodo.monto.replace(/[$,]/g, ''); // Limpiar el monto
         const monto = parseFloat(montoConvertido); // Convierte a número flotante
 
         // Verifica si el valor es un número válido
