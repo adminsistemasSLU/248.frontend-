@@ -490,7 +490,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         const resultado = tablasData.reduce((acc, item) => {
           // Itera sobre cada periodo en el objeto actual
           item.periodos.forEach((periodo) => {
-            const montoConvertido = periodo.monto.replace(/[$,.]/g, ''); // Limpiar el monto
+            const montoConvertido = periodo.monto.replace(/[$,]/g, ''); // Limpiar el monto
             const monto = parseFloat(montoConvertido); // Convierte a número flotante
 
             // Verifica si el valor es un número válido
