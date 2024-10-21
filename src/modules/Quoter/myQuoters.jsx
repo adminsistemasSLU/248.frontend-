@@ -58,7 +58,8 @@ function createData(
   createdDate,
   productoId,
   ramoId,
-  reason
+  reason,
+  fechaExportacion
 ) {
   return {
     id,
@@ -73,7 +74,8 @@ function createData(
     createdDate,
     productoId,
     ramoId,
-    reason
+    reason,
+    fechaExportacion
   };
 }
 
@@ -165,7 +167,14 @@ const headCells = [
     id: "fechaCreacion",
     numeric: true,
     disablePadding: false,
-    label: "Fecha Creacion",
+    label: "Fecha Creación",
+    width: '170px'
+  },
+  {
+    id: "fechaExportacion",
+    numeric: true,
+    disablePadding: false,
+    label: "Fecha Exportación",
     width: '170px'
   },
   {
@@ -452,7 +461,8 @@ export default function MyQuoters() {
           item.created_at,
           item.producto,
           item.ramo,
-          item.motivo || ""
+          item.motivo || "",
+          item.fechaExportacion
         );
         rowsObjetoAmparo.push(row);
       }
@@ -985,6 +995,13 @@ export default function MyQuoters() {
                           <TableCell align="right">
                             <input
                               value={row.createdDate}
+                              className="input-table"
+                              disabled
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              value={row.fechaExportacion}
                               className="input-table"
                               disabled
                             />

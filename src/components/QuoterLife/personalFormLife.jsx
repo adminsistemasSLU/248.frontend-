@@ -988,7 +988,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         await consultConyugueData(documentType, identification);
         handleCloseBackdrop();
       } else {
-        setErrorCedula(true);
+        
         setOpen(true);
         setmessageError(cedulaData.message);
         handleCloseBackdrop();
