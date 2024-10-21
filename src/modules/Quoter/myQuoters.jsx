@@ -680,9 +680,9 @@ export default function MyQuoters() {
   async function exportarTabla() {
     if (filters.estado) {
       Swal.fire({
-        title: "Éxito!",
+        title: "Información",
         text: 'Desea exportar las cotizaciones Aprobadas',
-        icon: "success",
+        icon: "info",
         confirmButtonText: "Ok",
         showCancelButton: true,
         cancelButtonText: "Cancelar"
