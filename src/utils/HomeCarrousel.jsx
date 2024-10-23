@@ -15,7 +15,9 @@ import { API_BALDOSAS,LS_COTIZACION,LS_PRODUCTO,DATOS_PAGO_STORAGE_KEY,
     ,LS_DOCUMENTOSVIDA,LS_IDCOTIZACIONVIDA,LS_VIDAPOLIZA,
     DATOS_PERSONALES_VEHICULO_STORAGE_KEY, DATOS_VEHICULO_STORAGE_KEY, LS_COTIZACION_VEHICULO, DATOS_VEHICULO_COTI_STORAGE_KEY,
     PERMISSIONS_STORAGE_KEY,
-    LS_PREGRESPONDIDAS} from './constantes';
+    LS_PREGRESPONDIDAS,
+    LS_FPAGO,
+    LS_TPRESTAMO} from './constantes';
 
 
 function HomeCarrousel(props) {
@@ -52,6 +54,8 @@ function HomeCarrousel(props) {
         localStorage.removeItem(LS_VIDAPOLIZA);
         localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
         localStorage.removeItem(LS_COTIZACION);
+        localStorage.removeItem(LS_FPAGO);
+        localStorage.removeItem(LS_TPRESTAMO);
         //const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
         if(baldosas){
             setItems(baldosas);

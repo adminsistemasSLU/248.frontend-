@@ -39,6 +39,12 @@ import {
   USER_STORAGE_KEY,
   DATOS_PAGO_STORAGE_KEY,
   LS_IDCOTIZACIONVIDA,
+  LS_PREGUNTASVIDA,
+  LS_DOCUMENTOSVIDA,
+  LS_FPAGO,
+  LS_PREGRESPONDIDAS,
+  LS_TPRESTAMO,
+  LS_DATAVIDASEND,
 
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
@@ -421,8 +427,17 @@ export default function MyQuoters() {
     let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     setUsuarioInterno(usuario.tip_usuario);
     cargarTabla();
+    eliminardatos();
   }, []);
 
+  function eliminardatos (){
+    localStorage.removeItem(LS_PREGUNTASVIDA);
+    localStorage.removeItem(LS_DOCUMENTOSVIDA);
+    localStorage.removeItem(LS_FPAGO);
+    localStorage.removeItem(LS_PREGRESPONDIDAS);
+    localStorage.removeItem(LS_TPRESTAMO);
+    localStorage.removeItem(LS_DATAVIDASEND);
+  }
 
   async function cargarTabla() {
     handleOpenBackdrop();
