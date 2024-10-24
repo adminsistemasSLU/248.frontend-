@@ -1857,7 +1857,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
               required
             >
               <MenuItem value="C">Cédula</MenuItem>
-              <MenuItem value="R">RUC</MenuItem>
+              {/* <MenuItem value="R">RUC</MenuItem> */}
               <MenuItem value="P">Pasaporte</MenuItem>
             </Select>
           </Grid>
