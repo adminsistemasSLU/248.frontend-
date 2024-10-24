@@ -255,7 +255,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 });
             }
             if (formaPago === 'R') {
-                let nombre = '', pais = '', lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '';
+                let nombre = '', pais = '', lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '',tipoProducto='1';
                 console.log(formaPagoAray);
                 if (formaPagoAray) {
                     nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
@@ -266,6 +266,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     identification = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.identification : '';
                     direction = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.direction : '';
                     pais = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? country[69].codpais : '';
+                    tipoProducto = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.tipoProducto : '';
                 }
 
                 setFormData({
@@ -286,6 +287,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     admision: parseFloat(derechoEmision).toFixed(2),
                     subtotal: parseFloat(subtot).toFixed(2),
                     total: parseFloat(total).toFixed(2),
+                    tipoProducto:tipoProducto|| '',
                 });
             }
         }
