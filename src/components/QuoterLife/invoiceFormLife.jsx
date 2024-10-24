@@ -211,7 +211,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 formaPagos = factura;
             }
 
-            let monto, prima, sbs, scc, derechoEmision, subtot, iva, total;
+            let monto, prima, sbs, scc, derechoEmision, subtot, iva, total,tipoProducto;
 
             if (factura) {
                 monto = parseFloat(factura.sumAdd);
@@ -222,6 +222,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 subtot = parseFloat(factura.subtotal);
                 iva = parseFloat(factura.iva);
                 total = parseFloat(factura.total);
+                tipoProducto = formaPagos.tipoProducto;
             } else {
                 monto = parseFloat(formaPagos.sumAdd);
                 prima = parseFloat(formaPagos.prima);
@@ -231,6 +232,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 subtot = parseFloat(formaPagos.subtotal);
                 iva = parseFloat(formaPagos.iva);
                 total = parseFloat(formaPagos.total);
+                tipoProducto = formaPagos.tipoProducto
             }
             if (formaPago === 'C') {
                 //let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
@@ -252,6 +254,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     admision: parseFloat(derechoEmision).toFixed(2),
                     subtotal: parseFloat(subtot).toFixed(2),
                     total: parseFloat(total).toFixed(2),
+                    tipoProducto:tipoProducto
                 });
             }
             if (formaPago === 'R') {
