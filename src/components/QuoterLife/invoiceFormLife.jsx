@@ -232,7 +232,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 subtot = parseFloat(formaPagos.subtotal);
                 iva = parseFloat(formaPagos.iva);
                 total = parseFloat(formaPagos.total);
-                tipoProducto = formaPagos.tipoProducto
+                tipoProducto = formaPagos.tipoProducto;
             }
             if (formaPago === 'C') {
                 //let formaPagos = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
@@ -318,7 +318,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         let f_pago = (localStorage.getItem(LS_FPAGO));
 
         if (name === "tipoProducto") {
-            if ((Number(value) !== f_pago)) {
+            if ((Number(value) !== Number(f_pago))) {
                 if (f_pago !== '') {
                     seterrorMessage("La forma de pago ingresada no es valido")
                     setOpenSnackAlert(true);
