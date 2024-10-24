@@ -215,7 +215,7 @@ const DetailsCar = forwardRef((props, ref) => {
           [name]: formatAmount(nuevoValor),
         }));
       } else {
-        alert("El valor está fuera del rango permitido. ");
+        setOpenSnack(true);
         setFormData((prevData) => ({
           ...prevData,
           [name]: formatAmount(valorOriginal),
@@ -228,12 +228,13 @@ const DetailsCar = forwardRef((props, ref) => {
   const modificarValorConRango = (valorOriginal, valorModificado) => {
     const valorNumericoOriginal = parseFloat(valorOriginal);
     const valorNumericoModificado = parseFloat(valorModificado);
-    const diezPorCiento = valorNumericoOriginal * 0.10;
+    const porCiento = valorNumericoOriginal * 0.20;
 
-    const maximoPermitido = valorNumericoOriginal + diezPorCiento;
-    const minimoPermitido = valorNumericoOriginal - diezPorCiento;
+    const maximoPermitido = valorNumericoOriginal + porCiento;
+    const minimoPermitido = valorNumericoOriginal - porCiento;
 
     if (valorNumericoModificado <= minimoPermitido || valorNumericoModificado >= maximoPermitido) {
+      setMessageError("El valor está fuera del rango permitido ("+formatAmount(minimoPermitido)+" y "+formatAmount(maximoPermitido)+").");
       return null;
     }
     return valorNumericoModificado;
