@@ -605,7 +605,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const paises = await ComboService.fetchComboPais();
       if (paises && paises.data) {
         await setCountry(paises.data);
-        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais, countryConyugue: paises.data[69].codpais, }));
+        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais,  countryConyugue: paises.data[69].codpais, }));
 
       }
     } catch (error) {
@@ -770,8 +770,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   function crearDatosProcesarDatos() {
-    const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-    let conyugueEdad = '';
+  const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+ let conyugueEdad = '';
     if (!tipoPrestamo === 'I') {
       conyugueEdad = conyugueage.format('DD/MM/YYYY');
     }
@@ -958,7 +958,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
         await consultUserData(documentType, identification);
         handleCloseBackdrop();
       } else {
-        verificarLavadoActivo(cedulaData);
+        setErrorCedula(true);
+        setOpen(true);
+        setmessageError(cedulaData.message);
+        handleCloseBackdrop();
       }
     } catch (error) {
       console.error("Error al verificar cédula:", error);
@@ -985,8 +988,51 @@ const PersonalFormLife = forwardRef((props, ref) => {
         await consultConyugueData(documentType, identification);
         handleCloseBackdrop();
       } else {
+        
+        setOpen(true);
+        setmessageError(cedulaData.message);
+        handleCloseBackdrop();
+      }
+    } catch (error) {
+      console.error("Error al verificar cédula:", error);
+    }
+  };
+
+
+  const actualizarVigencia = async (value) => {
+    setInicioVigencia(value);
+    const newFinVigencia = value.add(formData.vigencia, 'month');
+    setFinVigencia(newFinVigencia);
+  }
+
+  const consultUserData = async (documentType, identification) => {
+    try {
+      const cedulaData = await UsuarioService.fetchConsultarUsuario(
+        documentType,
+        identification
+      );
+      if (cedulaData.codigo === 200 && cedulaData.data) {
+        const dateString = cedulaData.data[0].cli_fecnacio;
+        const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
+
+        setAge(dateObject);
+
+
+        setFormData({
+          ...formData,
+          name: cedulaData.data[0].cli_nombres || "",
+          lastname: cedulaData.data[0].cli_apellidos || "",
+          email: cedulaData.data[0].cli_email || "",
+          phone: cedulaData.data[0].cli_celular || "",
+          address: cedulaData.data[0].cli_direccion || "",
+          ageCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
+          genero: cedulaData.data[0].cli_sexo || "",
+          
+        });
+      }else{
         verificarLavadoActivo(cedulaData);
       }
+      
     } catch (error) {
       console.error("Error al verificar cédula:", error);
     }
@@ -1029,43 +1075,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
   }
 
 
-  const actualizarVigencia = async (value) => {
-    setInicioVigencia(value);
-    const newFinVigencia = value.add(formData.vigencia, 'month');
-    setFinVigencia(newFinVigencia);
-  }
-
-  const consultUserData = async (documentType, identification) => {
-    try {
-      const cedulaData = await UsuarioService.fetchConsultarUsuario(
-        documentType,
-        identification
-      );
-      if (cedulaData.codigo === 200 && cedulaData.data) {
-        const dateString = cedulaData.data[0].cli_fecnacio;
-        const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
-
-        setAge(dateObject);
-
-
-        setFormData({
-          ...formData,
-          name: cedulaData.data[0].cli_nombres || "",
-          lastname: cedulaData.data[0].cli_apellidos || "",
-          email: cedulaData.data[0].cli_email || "",
-          phone: cedulaData.data[0].cli_celular || "",
-          address: cedulaData.data[0].cli_direccion || "",
-          ageCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
-          genero: cedulaData.data[0].cli_sexo || "",
-
-        });
-      }
-    } catch (error) {
-      console.error("Error al verificar cédula:", error);
-    }
-  };
-
-
   const consultConyugueData = async (documentType, identification) => {
     try {
       const cedulaData = await UsuarioService.fetchConsultarUsuario(
@@ -1083,6 +1092,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
           conyugesexo: cedulaData.data[0].cli_sexo || "",
           ageConyugueCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
         });
+      }else{
+        verificarLavadoActivo(cedulaData);
       }
     } catch (error) {
       console.error("Error al verificar cédula:", error);
@@ -1217,8 +1228,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
     let datosconyugues = {};
 
-    if (formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre) {
-      datosconyugues = {
+    if(formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre){
+       datosconyugues = {
         nombreConyuge: formData.conyugenombre,
         apellidoConyuge: formData.conyugeapellido,
         identificacion: formData.conyugenumero,
@@ -1227,7 +1238,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         tipo: formData.conyugetipo,
         pais: formData.countryConyugue
       };
-    } else {
+    }else {
       datosconyugues = {
         nombreConyuge: '',
         apellidoConyuge: '',
@@ -1402,14 +1413,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const preguntasVida = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
     const dataresp = JSON.parse(localStorage.getItem(LS_PREGRESPONDIDAS));
 
-    let preguntas;
+    let preguntas ;
 
-    if (dataresp) {
+    if(dataresp){
       preguntas = dataresp;
-    } else {
+    }else{
       preguntas = preguntasVida;
     }
-
+     
 
     const data = {
       arrDatosCliente: arrDatosCliente,
