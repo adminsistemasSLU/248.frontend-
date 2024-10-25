@@ -1031,6 +1031,17 @@ const PersonalFormLife = forwardRef((props, ref) => {
         });
       }else{
         verificarLavadoActivo(cedulaData);
+        setFormData({
+          ...formData,
+          name:  "",
+          lastname: "",
+          email: "",
+          phone: "",
+          address: "",
+          ageCalculated: "",
+          genero:  "",
+          
+        });
       }
       
     } catch (error) {
@@ -1094,6 +1105,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
         });
       }else{
         verificarLavadoActivo(cedulaData);
+        setFormData({
+          ...formData,
+          conyugenombre: "",
+          conyugeapellido:  "",
+          conyugesexo: "",
+          ageConyugueCalculated: "",
+        });
       }
     } catch (error) {
       console.error("Error al verificar cédula:", error);
