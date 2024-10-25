@@ -14,7 +14,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
-
+import Swal from "sweetalert2";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 
@@ -605,7 +605,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const paises = await ComboService.fetchComboPais();
       if (paises && paises.data) {
         await setCountry(paises.data);
-        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais,  countryConyugue: paises.data[69].codpais, }));
+        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais, countryConyugue: paises.data[69].codpais, }));
 
       }
     } catch (error) {
@@ -770,8 +770,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   function crearDatosProcesarDatos() {
-  const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
- let conyugueEdad = '';
+    const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+    let conyugueEdad = '';
     if (!tipoPrestamo === 'I') {
       conyugueEdad = conyugueage.format('DD/MM/YYYY');
     }
@@ -958,10 +958,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         await consultUserData(documentType, identification);
         handleCloseBackdrop();
       } else {
-        setErrorCedula(true);
-        setOpen(true);
-        setmessageError(cedulaData.message);
-        handleCloseBackdrop();
+        verificarLavadoActivo(cedulaData);
       }
     } catch (error) {
       console.error("Error al verificar cédula:", error);
@@ -988,15 +985,47 @@ const PersonalFormLife = forwardRef((props, ref) => {
         await consultConyugueData(documentType, identification);
         handleCloseBackdrop();
       } else {
-        
-        setOpen(true);
-        setmessageError(cedulaData.message);
-        handleCloseBackdrop();
+        verificarLavadoActivo(cedulaData);
       }
     } catch (error) {
       console.error("Error al verificar cédula:", error);
     }
   };
+
+  function verificarLavadoActivo(cedulaData) {
+    setErrorCedula(true);
+    setOpen(true);
+    setmessageError(cedulaData.message);
+    handleCloseBackdrop();
+    if (
+      cedulaData &&
+      cedulaData.message === "La cedula que usted esta consultando pertenece al listados de Lavado de activos"
+    ) {
+
+      Swal.fire({
+        title: "Alerta!",
+        text: cedulaData.message,
+        icon: "warning",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        //Accion para lista de lavado de activos
+      });
+    }
+    if (
+      cedulaData &&
+      cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
+    ) {
+
+      Swal.fire({
+        title: "Alerta!",
+        text: cedulaData.message,
+        icon: "warning",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        //Accion para lista de lavado de activos
+      });
+    }
+  }
 
 
   const actualizarVigencia = async (value) => {
@@ -1027,7 +1056,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           address: cedulaData.data[0].cli_direccion || "",
           ageCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
           genero: cedulaData.data[0].cli_sexo || "",
-          
+
         });
       }
     } catch (error) {
@@ -1187,8 +1216,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
     let datosconyugues = {};
 
-    if(formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre){
-       datosconyugues = {
+    if (formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre) {
+      datosconyugues = {
         nombreConyuge: formData.conyugenombre,
         apellidoConyuge: formData.conyugeapellido,
         identificacion: formData.conyugenumero,
@@ -1197,7 +1226,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         tipo: formData.conyugetipo,
         pais: formData.countryConyugue
       };
-    }else {
+    } else {
       datosconyugues = {
         nombreConyuge: '',
         apellidoConyuge: '',
@@ -1372,14 +1401,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const preguntasVida = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
     const dataresp = JSON.parse(localStorage.getItem(LS_PREGRESPONDIDAS));
 
-    let preguntas ;
+    let preguntas;
 
-    if(dataresp){
+    if (dataresp) {
       preguntas = dataresp;
-    }else{
+    } else {
       preguntas = preguntasVida;
     }
-     
+
 
     const data = {
       arrDatosCliente: arrDatosCliente,
