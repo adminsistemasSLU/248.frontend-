@@ -233,7 +233,7 @@ const DetailsCar = forwardRef((props, ref) => {
     const maximoPermitido = valorNumericoOriginal + porCiento;
     const minimoPermitido = valorNumericoOriginal - porCiento;
 
-    if (valorNumericoModificado <= minimoPermitido || valorNumericoModificado >= maximoPermitido) {
+    if (valorNumericoModificado < minimoPermitido || valorNumericoModificado > maximoPermitido) {
       setMessageError("El valor está fuera del rango permitido ("+formatAmount(minimoPermitido)+" y "+formatAmount(maximoPermitido)+").");
       return null;
     }

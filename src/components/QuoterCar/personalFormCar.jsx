@@ -234,6 +234,11 @@ const PersonalFormCar = forwardRef((props, ref) => {
             requiredFields.push("lastname");
         }
 
+        if (agentes.length > 0 && (!formData.agente || formData.agente.trim() === "")) {
+            faltanDatosUsuario(); 
+            return false;
+        }
+        
         let next = true;
         for (const field of requiredFields) {
             const value = formData[field];
