@@ -993,6 +993,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   };
 
   function verificarLavadoActivo(cedulaData) {
+    debugger;
     setErrorCedula(true);
     setOpen(true);
     setmessageError(cedulaData.message);
