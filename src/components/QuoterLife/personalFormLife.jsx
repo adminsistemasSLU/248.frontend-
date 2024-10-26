@@ -1012,6 +1012,22 @@ const PersonalFormLife = forwardRef((props, ref) => {
         identification
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
+
+        if (
+          cedulaData &&
+          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
+        ) {
+    
+          Swal.fire({
+            title: "Alerta!",
+            text: cedulaData.message,
+            icon: "warning",
+            confirmButtonText: "Ok",
+          }).then(() => {
+            //Accion para lista de lavado de activos
+          });
+        }
+
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
 
@@ -1069,20 +1085,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         //Accion para lista de lavado de activos
       });
     }
-    if (
-      cedulaData &&
-      cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
-    ) {
-
-      Swal.fire({
-        title: "Alerta!",
-        text: cedulaData.message,
-        icon: "warning",
-        confirmButtonText: "Ok",
-      }).then(() => {
-        //Accion para lista de lavado de activos
-      });
-    }
   }
 
 
@@ -1093,6 +1095,22 @@ const PersonalFormLife = forwardRef((props, ref) => {
         identification
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
+
+        if (
+          cedulaData &&
+          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
+        ) {
+    
+          Swal.fire({
+            title: "Alerta!",
+            text: cedulaData.message,
+            icon: "warning",
+            confirmButtonText: "Ok",
+          }).then(() => {
+            //Accion para lista de lavado de activos
+          });
+        }
+
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
         setConyugueAge(dateObject);
@@ -1107,9 +1125,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
         verificarLavadoActivo(cedulaData);
         setFormData({
           ...formData,
-          conyugenombre: "",
-          conyugeapellido:  "",
-          conyugesexo: "",
+          conyugenombre:  "",
+          conyugeapellido: "",
+          conyugesexo:  "",
           ageConyugueCalculated: "",
         });
       }
