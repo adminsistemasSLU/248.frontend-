@@ -777,7 +777,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
-    const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
     const periodos = tablasData.map((item) => {
       return {
         codigo: item.codcob,

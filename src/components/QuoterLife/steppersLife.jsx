@@ -32,13 +32,12 @@ import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ProductListCardsLife from "./ProductListCardsLife";
 import SumaryFormLife from ".//../QuoterLife/sumaryFormLife";
-import {  Alert } from "@mui/material";
+import { Alert } from "@mui/material";
 import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
-  LS_PRODUCTO, DATOS_PAGO_STORAGE_KEY,
-  LS_DATAVIDASEND, LS_DATOSPAGO, LS_PREGUNTASVIDA
-  , LS_DOCUMENTOSVIDA, LS_IDCOTIZACIONVIDA, LS_VIDAPOLIZA
+  LS_PRODUCTO,
+  LS_DATOSPAGO
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
@@ -175,43 +174,10 @@ export default function SteppersLife() {
       continuar = await personalFormRef.current.handleSubmitExternally();
     }
 
-    
-    if (steps[activeStep].label === "Resumen") {
 
-      
+    if (steps[activeStep].label === "Resumen") {
       continuar = await sumaryFormRef.current.handleSubmitExternally();
 
-      // let idCotizacion = localStorage.getItem(LS_COTIZACION);
-      // handleOpenBackdrop();
-      // const terminarTarea = await LifeService.fetchEmitirCertificado(idCotizacion)
-      // handleCloseBackdrop();
-      // if (terminarTarea.codigo === 200) {
-      //   Swal.fire({
-      //     title: "Exito!",
-      //     text: `El proceso ha terminado`,
-      //     icon: "success",
-      //     confirmButtonText: "Ok",
-      //   }).then(() => {
-      //     localStorage.removeItem(LS_PRODUCTO);
-      //     localStorage.removeItem(LS_DATAVIDASEND);
-      //     localStorage.removeItem(LS_DATOSPAGO);
-      //     localStorage.removeItem(LS_PREGUNTASVIDA);
-      //     localStorage.removeItem(LS_DOCUMENTOSVIDA);
-      //     localStorage.removeItem(LS_IDCOTIZACIONVIDA);
-      //     localStorage.removeItem(LS_VIDAPOLIZA);
-      //     localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
-
-      //     navigate("/quoter/Pymes/MyQuotes");
-      //   });
-      //   return;
-      // } else {
-      //   Swal.fire({
-      //     title: "Alerta!",
-      //     text: terminarTarea.message,
-      //     icon: "warning",
-      //     confirmButtonText: "Ok",
-      //   });
-      // }
     }
 
 
@@ -431,31 +397,31 @@ export default function SteppersLife() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" style={{ display: "flex", gap: '30px' }} >
-          <Button
-            onClick={handleDownloadPdf}
-            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
-            Descargar Formulario
-          </Button>
-          <Button
-            onClick={handleDownloadPdfCertificado}
-            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
-            Descargar Certificado
-          </Button>
-          <Button
-            onClick={handleDownloadPdfFormulario}
-            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
-            Descargar Solicitud
-          </Button>
+            <Button
+              onClick={handleDownloadPdf}
+              style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+              Descargar Formulario
+            </Button>
+            <Button
+              onClick={handleDownloadPdfCertificado}
+              style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+              Descargar Certificado
+            </Button>
+            <Button
+              onClick={handleDownloadPdfFormulario}
+              style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+              Descargar Solicitud
+            </Button>
           </DialogContentText>
         </DialogContent>
         <DialogActions style={{ display: "flex", gap: '30px' }}>
-         
+
           <Button
             onClick={handleClose}
-            style={{ top: "20%",fontSize:'10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+            style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
             Cerrar
           </Button>
-         
+
         </DialogActions>
       </Dialog>
 
