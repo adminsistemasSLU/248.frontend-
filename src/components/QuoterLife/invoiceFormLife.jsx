@@ -32,6 +32,7 @@ import LifeService from "../../services/LifeService/LifeService";
 import UsuarioService from "../../services/UsuarioService/UsuarioService";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import ComboService from "../../services/ComboService/ComboService";
+import Swal from "sweetalert2";
 
 const InvoiceFormLife = forwardRef((props, ref) => {
 
@@ -504,35 +505,74 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const consultUserData = async (documentType, identification) => {
         try {
-            const cedulaData = await UsuarioService.fetchConsultarUsuario(
-                documentType,
-                identification
-            );
-            if (cedulaData.codigo === 200 && cedulaData.data) {
-                // const dateString = cedulaData.data[0].cli_fecnacio;
-                // const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
-
-                // setAge(dateObject);
-
-                // name: "",
-                // lastname: "",
-                // email: "",
-                // phone: "",
-                // direction: "",
-                setFormData({
-                    ...formData,
-                    name: cedulaData.data[0].cli_nombres || "",
-                    lastname: cedulaData.data[0].cli_apellidos || "",
-                    email: cedulaData.data[0].cli_email || "",
-                    phone: cedulaData.data[0].cli_celular || "",
-                    direction: cedulaData.data[0].cli_direccion || "",
-                    country: country[69].codpais
-                });
+          const cedulaData = await UsuarioService.fetchConsultarUsuario(
+            documentType,
+            identification
+          );
+          if (cedulaData.codigo === 200 && cedulaData.data) {
+    
+            if (
+              cedulaData &&
+              cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
+            ) {
+        
+              Swal.fire({
+                title: "Alerta!",
+                text: cedulaData.message,
+                icon: "warning",
+                confirmButtonText: "Ok",
+              }).then(() => {
+                //Accion para lista de lavado de activos
+              });
             }
+            
+            setFormData({
+              ...formData,
+              name: cedulaData.data[0].cli_nombres || "",
+              lastname: cedulaData.data[0].cli_apellidos || "",
+              email: cedulaData.data[0].cli_email || "",
+              phone: cedulaData.data[0].cli_celular || "",
+              direction: cedulaData.data[0].cli_direccion || "",
+            });
+          }else{
+            verificarLavadoActivo(cedulaData);
+            setFormData({
+              ...formData,
+              name:  "",
+              lastname: "",
+              email: "",
+              phone: "",
+              direction: "",
+            });
+          }
+          
         } catch (error) {
-            console.error("Error al verificar cédula:", error);
+          console.error("Error al verificar cédula:", error);
         }
-    };
+      };
+    
+      function verificarLavadoActivo(cedulaData) {
+        debugger;
+        setErrorCedula(true);
+        setOpen(true);
+        setmessageError(cedulaData.message);
+        handleCloseBackdrop();
+        if (
+          cedulaData &&
+          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de Lavado de activos"
+        ) {
+    
+          Swal.fire({
+            title: "Alerta!",
+            text: cedulaData.message,
+            icon: "warning",
+            confirmButtonText: "Ok",
+          }).then(() => {
+            //Accion para lista de lavado de activos
+          });
+        }
+      }
+    
 
     const verifyIdentification = async (e) => {
         const { value } = e.target;
