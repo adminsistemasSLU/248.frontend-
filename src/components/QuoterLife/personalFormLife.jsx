@@ -1014,7 +1014,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         if (
           cedulaData &&
-          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
+          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PEPS"
         ) {
     
           Swal.fire({
@@ -1097,7 +1097,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         if (
           cedulaData &&
-          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
+          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PEPS"
         ) {
     
           Swal.fire({
