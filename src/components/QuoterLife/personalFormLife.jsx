@@ -1077,7 +1077,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       Swal.fire({
         title: "Alerta!",
-        text: cedulaData.message,
+        text: ' No se puede cotizar al cliente. Favor comunicarse con el equipo comercial de la Aseguradora',
         icon: "warning",
         confirmButtonText: "Ok",
       }).then(() => {
