@@ -348,7 +348,7 @@ export default function MyQuoters() {
   //Filtrar tabla
   const [filter, setFilter] = React.useState("");
   const getHeadCells = (rows = []) => {
-    const isRamo3 = rows.some(row => row.ramoId == 3); // Verificar si algún `ramoId` es 3
+    const isRamo3 = rows.some(row => row.ramoId != 3); 
 
     const commonHeadCells = [
       {
@@ -361,7 +361,7 @@ export default function MyQuoters() {
         id: "codigo",
         numeric: false,
         disablePadding: true,
-        label: isRamo3 ? "Nro de Cotización" : "Nro de Certificado"
+        label: isRamo3 ? "Nro de Certificado" : "Nro de Cotización"
       },
       { id: "ramo", numeric: false, disablePadding: false, label: "Ramo" },
       { id: "producto", numeric: false, disablePadding: false, label: "Producto" },
@@ -1030,7 +1030,7 @@ export default function MyQuoters() {
                           </TableCell>
 
                           {/* Renderizar "Tasa" y "Prima" solo si ramoId es 3 */}
-                          {row.ramoId == 3 && (
+                          {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
                                 <input
