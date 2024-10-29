@@ -204,7 +204,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { order, orderBy, onRequestSort } = props;
+  const { order, orderBy, onRequestSort, headCells } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -247,6 +247,7 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
+  headCells: PropTypes.array.isRequired,
 };
 
 const EnhancedTableToolbar = React.memo(({ filter, setFilter }) => {
@@ -346,9 +347,48 @@ export default function MyQuoters() {
 
   //Filtrar tabla
   const [filter, setFilter] = React.useState("");
+  const getHeadCells = (rows = []) => {
+    const isRamo3 = rows.some(row => row.ramoId != 3); 
+
+    const commonHeadCells = [
+      {
+        id: "number",
+        numeric: false,
+        disablePadding: true,
+        label: "#"
+      },
+      {
+        id: "codigo",
+        numeric: false,
+        disablePadding: true,
+        label: isRamo3 ? "Nro de Certificado" : "Nro de Cotización"
+      },
+      { id: "ramo", numeric: false, disablePadding: false, label: "Ramo" },
+      { id: "producto", numeric: false, disablePadding: false, label: "Producto" },
+      { id: "cliente", numeric: false, disablePadding: false, label: "Cliente" },
+      { id: "amount", numeric: true, disablePadding: false, label: "Monto" },
+    ];
+
+    if (isRamo3) {
+      commonHeadCells.push(
+        { id: "rate", numeric: true, disablePadding: false, label: "Tasa" },
+        { id: "prima", numeric: true, disablePadding: false, label: "Prima" }
+      );
+    }
+
+    commonHeadCells.push(
+      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px' },
+      { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px' },
+      { id: "state", numeric: true, disablePadding: false, label: "Estado" },
+      { id: "reason", numeric: false, disablePadding: false, label: "Motivo" },
+      { id: "action", numeric: true, disablePadding: false, label: "Acción" }
+    );
+
+    return commonHeadCells;
+  };
 
 
-
+  const headCells = getHeadCells(rows);
   const cargarRamo = async () => {
     try {
       const baldosas = await BaldosasService.fetchBaldosas();
@@ -412,11 +452,6 @@ export default function MyQuoters() {
     );
   });
 
-
-
-
-
-
   const handleSetFilter = React.useCallback((value) => {
 
     setFilter(value);
@@ -424,13 +459,19 @@ export default function MyQuoters() {
 
 
   useEffect(() => {
-    let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    setUsuarioInterno(usuario.tip_usuario);
-    cargarTabla();
+    const cargarOpciones = async () => {
+      let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+      setUsuarioInterno(usuario.tip_usuario);
+      await cargarEstado();
+      await cargarRamo();
+      await cargarBroker();
+    };
+
+    cargarOpciones();
     eliminardatos();
   }, []);
 
-  function eliminardatos (){
+  function eliminardatos() {
     localStorage.removeItem(LS_PREGUNTASVIDA);
     localStorage.removeItem(LS_DOCUMENTOSVIDA);
     localStorage.removeItem(LS_FPAGO);
@@ -669,6 +710,11 @@ export default function MyQuoters() {
   };
 
   const handleSearch = () => {
+    if (!filters.ramo) {
+      setErrorMessage("Se deben ingresar un filtro de ramo");
+      setOpenSnack(true);
+      return;
+    }
     cargarTabla();
   };
 
@@ -693,7 +739,7 @@ export default function MyQuoters() {
   };
 
   async function exportarTabla() {
-    if (filters.estado && filters.estado  ==='S' ) {
+    if (filters.estado && filters.estado === 'S') {
       Swal.fire({
         title: "Información",
         text: 'Desea exportar las cotizaciones Aprobadas',
@@ -720,7 +766,7 @@ export default function MyQuoters() {
             "Exportado!",
             "Las cotizaciones han sido exportadas correctamente.",
             "success"
-          ).then(()=>{
+          ).then(() => {
             cargarTabla();
           });
           return;
@@ -952,6 +998,7 @@ export default function MyQuoters() {
                     onSelectAllClick={handleSelectAllClick}
                     onRequestSort={handleRequestSort}
                     rowCount={rows.length}
+                    headCells={headCells}
                   />
                   <TableBody>
                     {visibleRows.map((row, index) => {
@@ -969,71 +1016,51 @@ export default function MyQuoters() {
                           sx={{ cursor: "pointer" }}
                         >
                           <TableCell padding="checkbox"></TableCell>
-                          <TableCell
-                            component="th"
-                            id={labelId}
-                            scope="row"
-                            padding="none"
-                          >
+                          <TableCell component="th" id={labelId} scope="row" padding="none">
                             {row.number}
                           </TableCell>
-                          <TableCell
-                            component="th"
-                            id={labelId}
-                            scope="row"
-                            padding="none"
-                          >
+                          <TableCell component="th" id={labelId} scope="row" padding="none">
                             {row.id}
                           </TableCell>
                           <TableCell align="left">{row.ramo}</TableCell>
                           <TableCell align="left">{row.producto}</TableCell>
                           <TableCell align="left">{row.cliente}</TableCell>
+                          <TableCell align="right">
+                            <CurrencyInput value={row.amount} className="input-table" disabled />
+                          </TableCell>
+
+                          {/* Renderizar "Tasa" y "Prima" solo si ramoId es 3 */}
+                          {row.ramoId != 3 && (
+                            <>
+                              <TableCell align="right">
+                                <input
+                                  value={(row.rate || 0)}
+                                  className="input-table"
+                                  disabled
+                                />
+                              </TableCell>
+                              <TableCell align="right">
+                                <CurrencyInput
+                                  value={row.prima}
+                                  className="input-table"
+                                  disabled
+                                />
+                              </TableCell>
+                            </>
+                          )}
 
                           <TableCell align="right">
-                            <CurrencyInput
-                              value={row.amount}
-                              className="input-table"
-                              disabled
-                            />
+                            <input value={row.createdDate} className="input-table" disabled />
                           </TableCell>
                           <TableCell align="right">
-                            <input
-                              value={(row.rate || 0)}
-                              className="input-table"
-                              disabled
-                            />
+                            <input value={row.fechaExportacion} className="input-table" disabled />
                           </TableCell>
                           <TableCell align="right">
-                            <CurrencyInput
-                              value={row.prima}
-                              className="input-table"
-                              disabled
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <input
-                              value={row.createdDate}
-                              className="input-table"
-                              disabled
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <input
-                              value={row.fechaExportacion}
-                              className="input-table"
-                              disabled
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <input
-                              value={row.state}
-                              className="input-table"
-                              disabled
-                            />
+                            <input value={row.state} className="input-table" disabled />
                           </TableCell>
                           <TableCell align="left">{row.reason || ""}</TableCell>
                           <TableCell align="right">
-                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state!=='Exportada' && (
+                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state !== 'Exportada' && (
                               <div
                                 style={{
                                   display: "flex",
@@ -1062,16 +1089,8 @@ export default function MyQuoters() {
                         </StyledTableRow>
                       );
                     })}
-                    {emptyRows > 0 && (
-                      <TableRow
-                        style={{
-                          height: 33 * emptyRows,
-                        }}
-                      >
-                        <TableCell colSpan={6} />
-                      </TableRow>
-                    )}
                   </TableBody>
+
                 </Table>
               </TableContainer>
             )}
