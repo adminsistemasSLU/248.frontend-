@@ -73,6 +73,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
             localStorage.removeItem(LS_VIDAPOLIZA);
             localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
             localStorage.removeItem(LS_PREGRESPONDIDAS);
+            localStorage.removeItem(LS_COTIZACION);
             window.location.reload();
         });
         return;
