@@ -45,6 +45,7 @@ import {
   LS_PREGRESPONDIDAS,
   LS_TPRESTAMO,
   LS_DATAVIDASEND,
+  DATOS_AGENTES,
 
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
@@ -65,7 +66,8 @@ function createData(
   productoId,
   ramoId,
   reason,
-  fechaExportacion
+  fechaExportacion,
+  identificacion
 ) {
   return {
     id,
@@ -81,7 +83,8 @@ function createData(
     productoId,
     ramoId,
     reason,
-    fechaExportacion
+    fechaExportacion,
+    identificacion
   };
 }
 
@@ -324,7 +327,7 @@ export default function MyQuoters() {
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
-
+  const [agentes, setAgentes] = React.useState([]);
 
   const [openSnack, setOpenSnack] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -349,7 +352,7 @@ export default function MyQuoters() {
   //Filtrar tabla
   const [filter, setFilter] = React.useState("");
   const getHeadCells = (rows = []) => {
-    const isRamo3 = rows.some(row => row.ramoId != 3); 
+    const isRamo3 = rows.some(row => row.ramoId != 3);
 
     const commonHeadCells = [
       {
@@ -364,6 +367,7 @@ export default function MyQuoters() {
         disablePadding: true,
         label: isRamo3 ? "Nro de Certificado" : "Nro de Cotización"
       },
+      { id: "identificacion", numeric: false, disablePadding: false, label: "Identificación" },
       { id: "ramo", numeric: false, disablePadding: false, label: "Ramo" },
       { id: "producto", numeric: false, disablePadding: false, label: "Producto" },
       { id: "cliente", numeric: false, disablePadding: false, label: "Cliente" },
@@ -379,10 +383,25 @@ export default function MyQuoters() {
 
     commonHeadCells.push(
       { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px' },
-      { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px' },
+    );
+
+    if (isRamo3) {
+      commonHeadCells.push(
+        { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px' },
+      );
+    }
+
+    commonHeadCells.push(
       { id: "state", numeric: true, disablePadding: false, label: "Estado" },
-      { id: "reason", numeric: false, disablePadding: false, label: "Motivo" },
-      { id: "action", numeric: true, disablePadding: false, label: "Acción" }
+    );
+
+    if (isRamo3) {
+      commonHeadCells.push(
+        { id: "reason", numeric: false, disablePadding: false, label: "Motivo" },
+      );
+    }
+    commonHeadCells.push(
+      { id: "action", numeric: true, disablePadding: false, label: "Acción" },
     );
 
     return commonHeadCells;
@@ -466,6 +485,7 @@ export default function MyQuoters() {
       await cargarEstado();
       await cargarRamo();
       await cargarUsuarioBusqueda();
+      cargarAgentesDesdeLocalStorage()
     };
 
     cargarOpciones();
@@ -486,7 +506,7 @@ export default function MyQuoters() {
     await cargarEstado();
     await cargarRamo();
     await cargarUsuarioBusqueda();
-    const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado, filters.broker);
+    const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado, filters.broker, filters.usuarioBusq);
 
     if (objetoSeguro) {
       let number = 1;
@@ -519,7 +539,8 @@ export default function MyQuoters() {
           item.producto,
           item.ramo,
           item.motivo || "",
-          item.fechaExportacion
+          item.fechaExportacion,
+          item.clicedula,
         );
         rowsObjetoAmparo.push(row);
       }
@@ -597,7 +618,7 @@ export default function MyQuoters() {
     await eliminarCotizacion(id);
   };
 
-  const cargarCotizacion = async (ramo = '', producto = "", estado = '', idBroker = null) => {
+  const cargarCotizacion = async (ramo = '', producto = "", estado = '', idBroker = null, usuarioBusq = null) => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let dato = {
       usuario: userId.id,
@@ -605,6 +626,7 @@ export default function MyQuoters() {
       producto: producto,
       estado: estado,
       idBroker: idBroker,
+      usuarioBusq: usuarioBusq,
     };
     try {
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
@@ -721,19 +743,22 @@ export default function MyQuoters() {
 
   const handleExport = () => {
     let validar = true;
-    // if (!filters.ramo || filters.ramo === "") {
-    //   setErrorMessage("Se deben ingresar un filtro de ramo");
-    //   setOpenSnack(true);
-    //   validar = false;
-    //   return;
-    // }
+    if (!filters.ramo || filters.ramo === "") {
+      setErrorMessage("Se deben ingresar un filtro de ramo");
+      setOpenSnack(true);
+      validar = false;
+      return;
+    }
 
-    // if (!filters.producto || filters.producto === "") {
-    //   setErrorMessage("Se deben ingresar un filtro en producto");
-    //   setOpenSnack(true);
-    //   validar = false;
-    //   return;
-    // }
+    if (filters.ramo != "3") {
+      if (!filters.producto || filters.producto === "") {
+        setErrorMessage("Se deben ingresar un filtro en producto");
+        setOpenSnack(true);
+        validar = false;
+        return;
+      }
+    }
+
     if (validar) {
       exportarTabla();
     }
@@ -748,14 +773,14 @@ export default function MyQuoters() {
         confirmButtonText: "Ok",
         showCancelButton: true,
         cancelButtonText: "Cancelar"
-      }).then(async (result) => { 
+      }).then(async (result) => {
         if (result.isConfirmed) {
           handleOpenBackdrop();
           let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
           let dato = {
             usuario: userId.id,
             ramo: filters.ramo,
-            producto: filters.producto,
+            producto: filters.ramo != "3" ? filters.producto : 99999,
             estado: filters.estado
           };
 
@@ -784,7 +809,7 @@ export default function MyQuoters() {
       let dato = {
         usuario: userId.id,
         ramo: filters.ramo,
-        producto: "99999",
+        producto: filters.ramo != "3" ? filters.producto : 99999,
         estado: filters.estado
       };
 
@@ -795,6 +820,19 @@ export default function MyQuoters() {
     }
   }
 
+  const cargarAgentesDesdeLocalStorage = () => {
+    const datosAgentes = localStorage.getItem(DATOS_AGENTES);
+    if (datosAgentes) {
+      try {
+        const agentesGuardados = JSON.parse(datosAgentes);
+        if (Array.isArray(agentesGuardados)) {
+          setAgentes(agentesGuardados);
+        }
+      } catch (error) {
+        console.error("Error al parsear DATOS_AGENTES:", error);
+      }
+    }
+  };
 
   const handleComparativo = async (id) => {
     const link = document.createElement('a');
@@ -847,28 +885,30 @@ export default function MyQuoters() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={8} md={2}>
-            <FormControl fullWidth>
-              <InputLabel id="producto-label">Producto</InputLabel>
-              <Select
-                labelId="producto-label"
-                id="producto"
-                name="producto"
-                variant="standard"
-                fullWidth
-                value={filters.producto}
-                onChange={handleChange}
-                label="Producto"
-              >
-                <MenuItem value=""><em>Ninguno</em></MenuItem>
-                {producto.map((pro, index) => (
-                  <MenuItem key={index} value={pro.producto}>
-                    {pro.titulo}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+          {filters.ramo != "3" && (
+            <Grid item xs={8} md={2}>
+              <FormControl fullWidth>
+                <InputLabel id="producto-label">Producto</InputLabel>
+                <Select
+                  labelId="producto-label"
+                  id="producto"
+                  name="producto"
+                  variant="standard"
+                  fullWidth
+                  value={filters.producto}
+                  onChange={handleChange}
+                  label="Producto"
+                >
+                  <MenuItem value=""><em>Ninguno</em></MenuItem>
+                  {producto.map((pro, index) => (
+                    <MenuItem key={index} value={pro.producto}>
+                      {pro.titulo}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
 
           <Grid item xs={8} md={2}>
             <FormControl fullWidth>
@@ -892,36 +932,59 @@ export default function MyQuoters() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={8} md={2}>
-            {(usuarioInterno === "I" || usuarioInterno === "B") && (
-              <FormControl fullWidth>
-                <InputLabel id="usuario-label">
-                  {(usuarioInterno !== "B") && (
-                    "Usuario"
-                  )}
-                </InputLabel>
-                <Select
-                  labelId="usuario-label"
-                  id="usuario"
-                  name="usuarioBusq"
-                  variant="standard"
-                  fullWidth
-                  value={filters.usuarioBusq}
-                  onChange={handleChange}
-                  label="usuario"
-                  disabled={usuarioInterno === "B"}
-                >
-                  <MenuItem value=""><em>Ninguno</em></MenuItem>
-                  {usuarioBusqueda.map((usu, index) => (
-                    <MenuItem key={index} value={usu.id}>
-                      {usu.usu_descripcion}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
+          {agentes.length > 0 && (
+            <>
+              <Grid item xs={8} md={2}>
+                <FormControl fullWidth>
+                  <InputLabel id="usuario-label">
+                    {(usuarioInterno !== "B") && (
+                      "Usuario"
+                    )}
+                  </InputLabel>
+                  <Select
+                    labelId="usuario-label"
+                    id="usuario"
+                    name="usuarioBusq"
+                    variant="standard"
+                    fullWidth
+                    value={filters.usuarioBusq}
+                    onChange={handleChange}
+                    label="usuario"
+                    disabled={usuarioInterno === "B"}
+                  >
+                    <MenuItem value=""><em>Ninguno</em></MenuItem>
+                    {usuarioBusqueda.map((usu, index) => (
+                      <MenuItem key={index} value={usu.id}>
+                        {usu.usu_descripcion}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-          </Grid>
+              <Grid item xs={8} md={2}>
+                <FormControl fullWidth>
+                  <InputLabel id="broker-label">Broker</InputLabel>
+                  <Select
+                    labelId="broker-label"
+                    id="broker"
+                    name="broker"
+                    variant="standard"
+                    fullWidth
+                    value={filters.broker}
+                    onChange={handleChange}
+                    label="broker"
+                  >
+                    {agentes.map((broker, index) => (
+                      <MenuItem key={index} value={broker.clave}>
+                        {`${broker.nombre}`}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </>
+          )}
         </Grid>
 
       </Grid>
@@ -1019,6 +1082,7 @@ export default function MyQuoters() {
                           <TableCell component="th" id={labelId} scope="row" padding="none">
                             {row.id}
                           </TableCell>
+                          <TableCell align="left">{row.identificacion}</TableCell>
                           <TableCell align="left">{row.ramo}</TableCell>
                           <TableCell align="left">{row.producto}</TableCell>
                           <TableCell align="left">{row.cliente}</TableCell>
@@ -1049,13 +1113,21 @@ export default function MyQuoters() {
                           <TableCell align="right">
                             <input value={row.createdDate} className="input-table" disabled />
                           </TableCell>
-                          <TableCell align="right">
-                            <input value={row.fechaExportacion} className="input-table" disabled />
-                          </TableCell>
+                          {row.ramoId != 3 && (
+                            <>
+                              <TableCell align="right">
+                                <input value={row.fechaExportacion} className="input-table" disabled />
+                              </TableCell>
+                            </>
+                          )}
                           <TableCell align="right">
                             <input value={row.state} className="input-table" disabled />
                           </TableCell>
-                          <TableCell align="left">{row.reason || ""}</TableCell>
+                          {row.ramoId != 3 && (
+                            <>
+                              <TableCell align="left">{row.reason || ""}</TableCell>
+                            </>
+                          )}
                           <TableCell align="right">
                             {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state !== 'Exportada' && (
                               <div
