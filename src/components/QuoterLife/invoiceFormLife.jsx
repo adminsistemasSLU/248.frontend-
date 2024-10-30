@@ -430,6 +430,14 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 return false;
             }
         }
+
+        if ((formData.tipoProducto) === '') {
+            seterrorMessage("La forma de pago ingresada no es valido")
+            setOpenSnackAlert(true);
+            handleCloseBackdrop();
+            return false;
+            
+        }
         return valido;
     };
 
