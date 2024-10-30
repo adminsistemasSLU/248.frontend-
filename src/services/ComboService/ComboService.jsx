@@ -279,7 +279,7 @@ const ComboService = {
         }
     },
 
-    fetchComboBroker: async () => {
+    fetchComboUsuarioBusqueda: async () => {
         const endpoint = 'api/obtenerTodosUsaurios';
         const method = 'GET';
         try {

@@ -336,12 +336,13 @@ export default function MyQuoters() {
   const [estado, setEstado] = React.useState([]);
   const [ramo, setRamo] = React.useState([]);
   const [producto, setProducto] = React.useState([]);
-  const [broker, setBroker] = React.useState([]);
+  const [usuarioBusqueda, setUsuarioBusqueda] = React.useState([]);
   const [filters, setFilters] = React.useState({
     estado: '',
     producto: '',
     ramo: '',
     cliente: '',
+    usuarioBusq: null,
     broker: null,
   });
 
@@ -423,22 +424,22 @@ export default function MyQuoters() {
     }
   };
 
-  const cargarBroker = async () => {
+  const cargarUsuarioBusqueda = async () => {
     try {
-      const broker = await ComboService.fetchComboBroker();
-      if (broker && broker.data) {
-        setBroker(broker.data);
+      const usuarioBusqueda = await ComboService.fetchComboUsuarioBusqueda();
+      if (usuarioBusqueda && usuarioBusqueda.data) {
+        setUsuarioBusqueda(usuarioBusqueda.data);
       }
 
       let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
       if (usuario.tip_usuario == "B") {
         setFilters((prevFilters) => ({
           ...prevFilters,
-          broker: usuario.id,
+          usuarioBusqueda: usuario.id,
         }));
       }
     } catch (error) {
-      console.error("Error al obtener broker:", error);
+      console.error("Error al obtener Usuario busqueda:", error);
     }
   };
 
@@ -464,7 +465,7 @@ export default function MyQuoters() {
       setUsuarioInterno(usuario.tip_usuario);
       await cargarEstado();
       await cargarRamo();
-      await cargarBroker();
+      await cargarUsuarioBusqueda();
     };
 
     cargarOpciones();
@@ -484,7 +485,7 @@ export default function MyQuoters() {
     handleOpenBackdrop();
     await cargarEstado();
     await cargarRamo();
-    await cargarBroker();
+    await cargarUsuarioBusqueda();
     const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado, filters.broker);
 
     if (objetoSeguro) {
@@ -720,19 +721,19 @@ export default function MyQuoters() {
 
   const handleExport = () => {
     let validar = true;
-    if (!filters.ramo || filters.ramo === "") {
-      setErrorMessage("Se deben ingresar un filtro de ramo");
-      setOpenSnack(true);
-      validar = false;
-      return;
-    }
+    // if (!filters.ramo || filters.ramo === "") {
+    //   setErrorMessage("Se deben ingresar un filtro de ramo");
+    //   setOpenSnack(true);
+    //   validar = false;
+    //   return;
+    // }
 
-    if (!filters.producto || filters.producto === "") {
-      setErrorMessage("Se deben ingresar un filtro en producto");
-      setOpenSnack(true);
-      validar = false;
-      return;
-    }
+    // if (!filters.producto || filters.producto === "") {
+    //   setErrorMessage("Se deben ingresar un filtro en producto");
+    //   setOpenSnack(true);
+    //   validar = false;
+    //   return;
+    // }
     if (validar) {
       exportarTabla();
     }
@@ -747,7 +748,7 @@ export default function MyQuoters() {
         confirmButtonText: "Ok",
         showCancelButton: true,
         cancelButtonText: "Cancelar"
-      }).then(async (result) => {  // Aquí se marca como async
+      }).then(async (result) => { 
         if (result.isConfirmed) {
           handleOpenBackdrop();
           let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
@@ -758,7 +759,6 @@ export default function MyQuoters() {
             estado: filters.estado
           };
 
-          // Esperar la exportación dentro del contexto async
           await QuoterService.fetchExportExcel(dato, filters.estado);
 
           handleCloseBackdrop();
@@ -784,7 +784,7 @@ export default function MyQuoters() {
       let dato = {
         usuario: userId.id,
         ramo: filters.ramo,
-        producto: filters.producto,
+        producto: "99999",
         estado: filters.estado
       };
 
@@ -844,7 +844,6 @@ export default function MyQuoters() {
                     {rm.titulo}
                   </MenuItem>
                 ))}
-                {/* Agrega más opciones según tu necesidad */}
               </Select>
             </FormControl>
           </Grid>
@@ -867,7 +866,6 @@ export default function MyQuoters() {
                     {pro.titulo}
                   </MenuItem>
                 ))}
-                {/* Agrega más opciones según tu necesidad */}
               </Select>
             </FormControl>
           </Grid>
@@ -891,33 +889,32 @@ export default function MyQuoters() {
                     {est.Nombre}
                   </MenuItem>
                 ))}
-                {/* Agrega más opciones según tu necesidad */}
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={8} md={2}>
             {(usuarioInterno === "I" || usuarioInterno === "B") && (
               <FormControl fullWidth>
-                <InputLabel id="broker-label">
+                <InputLabel id="usuario-label">
                   {(usuarioInterno !== "B") && (
-                    "Broker"
+                    "Usuario"
                   )}
                 </InputLabel>
                 <Select
-                  labelId="broker-label"
-                  id="broker"
-                  name="broker"
+                  labelId="usuario-label"
+                  id="usuario"
+                  name="usuarioBusq"
                   variant="standard"
                   fullWidth
-                  value={filters.broker}
+                  value={filters.usuarioBusq}
                   onChange={handleChange}
-                  label="broker"
+                  label="usuario"
                   disabled={usuarioInterno === "B"}
                 >
                   <MenuItem value=""><em>Ninguno</em></MenuItem>
-                  {broker.map((broker, index) => (
-                    <MenuItem key={index} value={broker.id}>
-                      {broker.usu_descripcion}
+                  {usuarioBusqueda.map((usu, index) => (
+                    <MenuItem key={index} value={usu.id}>
+                      {usu.usu_descripcion}
                     </MenuItem>
                   ))}
                 </Select>
