@@ -67,7 +67,9 @@ function createData(
   ramoId,
   reason,
   fechaExportacion,
-  identificacion
+  identificacion,
+  usuario,
+  broker,
 ) {
   return {
     id,
@@ -84,7 +86,9 @@ function createData(
     ramoId,
     reason,
     fechaExportacion,
-    identificacion
+    identificacion,
+    usuario,
+    broker,
   };
 }
 
@@ -401,6 +405,8 @@ export default function MyQuoters() {
       );
     }
     commonHeadCells.push(
+      { id: "broker", numeric: true, disablePadding: false, label: "Broker" },
+      { id: "usuario", numeric: true, disablePadding: false, label: "Usuario" },
       { id: "action", numeric: true, disablePadding: false, label: "Acción" },
     );
 
@@ -541,6 +547,8 @@ export default function MyQuoters() {
           item.motivo || "",
           item.fechaExportacion,
           item.clicedula,
+          item.usuCodigo,
+          item.agente,
         );
         rowsObjetoAmparo.push(row);
       }
@@ -1128,6 +1136,9 @@ export default function MyQuoters() {
                               <TableCell align="left">{row.reason || ""}</TableCell>
                             </>
                           )}
+                          <TableCell align="right"><input value={row.broker} className="input-table" disabled /></TableCell>
+                          <TableCell align="right"><input value={row.usuario} className="input-table" disabled /></TableCell>
+
                           <TableCell align="right">
                             {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state !== 'Exportada' && (
                               <div
