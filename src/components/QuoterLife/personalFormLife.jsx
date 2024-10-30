@@ -1055,10 +1055,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
           address: "",
           ageCalculated: "",
           genero:  "",
-          
         });
       }
-      
     } catch (error) {
       console.error("Error al verificar cédula:", error);
     }
@@ -1232,6 +1230,17 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return false;
     }
 
+    if (formData.phone === '') {
+      setErrorMessage("Se debe ingresar datos en télefono")
+      setOpenSnack(true);
+      return false;
+    }
+
+    if (formData.email === '') {
+      setErrorMessage("Se debe ingresar datos en email")
+      setOpenSnack(true);
+      return false;
+    }
 
 
     const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
@@ -1364,25 +1373,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       datosfacturas: datosFactura,
       datoscertificado: datoscertificado,
     };
-
-    // const periodos = formDataTabla.map((item, index) => ({
-    //   tipo_monto: "",
-    //   monto: item.monto,
-    //   desempleo: item.desempleo || 0,
-    //   periodo: index + 1,
-    //   vigencia: formData.vigencia,
-    //   vigencia_desde: item.vigencia_desde,
-    //   vigencia_hasta: item.vigencia_hasta,
-    //   fecha_desde: item.fecha_desde,
-    //   fecha_hasta: item.fecha_hasta,
-    //   total_dias: item.total_dias,
-    //   tasa: item.tasa,
-    //   prima_anio: item.prima_anio,
-    //   prima_dia: item.prima_dia,
-    //   prima_total: item.prima_total,
-    // }));
-
-
 
     const arrFrmEmision = {
       slProducto: producto,
