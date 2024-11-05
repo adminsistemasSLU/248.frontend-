@@ -339,6 +339,7 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const consultUserData = async (documentType, identification) => {
         try {
             const cedulaData = await UsuarioService.fetchConsultarUsuario(documentType, identification);
+            debugger;
             if (cedulaData.codigo === 200 && cedulaData.data) {
                 setFormData({
                     ...formData,
@@ -355,6 +356,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 handleDateChange(dateObject);
                 setFechaNacimiento(dateObject);
 
+            } else {
+                setErrorMessage(cedulaData.message);
+                formData.identification = "";
+                setOpenSnack(true);
             }
         } catch (error) {
             console.error("Error al verificar cédula:", error);
