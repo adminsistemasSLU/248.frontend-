@@ -89,7 +89,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
     //Funcion principal para cargar datos
     useEffect(() => {
         const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
-        const productos = JSON.parse(sessionStorage.getItem(API_SUBBALDOSAS));
+        const productos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
         const IdProducto = JSON.parse(sessionStorage.getItem(LS_PRODUCTO));
         const nombreProducto = productos.filter((item)=>{
             return item.producto === IdProducto;
