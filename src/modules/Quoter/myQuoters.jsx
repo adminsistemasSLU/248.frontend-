@@ -1102,42 +1102,36 @@ export default function MyQuoters() {
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
-                                <TextField
-                                  value={(row.rate || 0)}
-                                  className="input-table"
-                                  disabled
-                                />
+                               {(row.rate || 0)}
+                                 
                               </TableCell>
                               <TableCell align="right">
-                                <CurrencyInput
-                                  value={row.prima}
-                                  className="input-table"
-                                  disabled
-                                />
+                               {row.prima}
+                                 
                               </TableCell>
                             </>
                           )}
 
                           <TableCell align="right">
-                            <TextField value={row.createdDate} className="input-table" disabled />
+                           {row.createdDate}
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
-                                <TextField value={row.fechaExportacion} className="input-table" disabled />
+                                {row.fechaExportacion}
                               </TableCell>
                             </>
                           )}
                           <TableCell align="right">
-                            <TextField value={row.state} className="input-table" disabled />
+                           {row.state}
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="left">{row.reason || ""}</TableCell>
                             </>
                           )}
-                          <TableCell align="right"><TextField value={row.broker} className="input-table" disabled /></TableCell>
-                          <TableCell align="right"><TextField value={row.usuario} className="input-table" disabled /></TableCell>
+                          <TableCell align="right">{row.broker}</TableCell>
+                          <TableCell align="right">{row.usuario}</TableCell>
 
                           <TableCell align="right">
                             {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state !== 'Exportada' && (
