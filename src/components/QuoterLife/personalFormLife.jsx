@@ -921,8 +921,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
           handleOpenBackdrop();
           debugger;
           const data = await LifeService.fetchActualizaPreguntas(ramo, producto,formData.prestamo);
+          let preguntasVida = data.data.arrDeclaracionesAsegurado.pregunta;
           if (data) {
-            localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(data.arrDeclaracionesAsegurado.pregunta));
+            localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
           } else {
             console.log("No existen poreguntas para este grupo de parametros");
           }
