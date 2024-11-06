@@ -1095,25 +1095,29 @@ export default function MyQuoters() {
                           <TableCell align="left">{row.producto}</TableCell>
                           <TableCell align="left">{row.cliente}</TableCell>
                           <TableCell align="right">
-                            <CurrencyInput value={row.amount} className="input-table" disabled />
+                          {row.amount ?
+                                  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.amount)
+                                  : '$0.00'}
+                            
                           </TableCell>
 
                           {/* Renderizar "Tasa" y "Prima" solo si ramoId es 3 */}
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
-                               {(row.rate || 0)}
-                                 
+                                {(row.rate || 0)}
+
                               </TableCell>
                               <TableCell align="right">
-                               {row.prima}
-                                 
+                                {row.prima ?
+                                  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.prima)
+                                  : '$0.00'}
                               </TableCell>
                             </>
                           )}
 
                           <TableCell align="right">
-                           {row.createdDate}
+                            {row.createdDate}
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
@@ -1122,8 +1126,8 @@ export default function MyQuoters() {
                               </TableCell>
                             </>
                           )}
-                          <TableCell align="right">
-                           {row.state}
+                          <TableCell align="center">
+                            {row.state}
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
