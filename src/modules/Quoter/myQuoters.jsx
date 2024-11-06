@@ -1095,10 +1095,12 @@ export default function MyQuoters() {
                           <TableCell align="left">{row.producto}</TableCell>
                           <TableCell align="left">{row.cliente}</TableCell>
                           <TableCell align="right">
-                          {row.amount ?
-                                  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.amount)
-                                  : row.amount}
-                            
+                            {row.amount
+                              ? (row.amount.includes('$')
+                                ? row.amount
+                                : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.amount))
+                              : '0'}
+
                           </TableCell>
 
                           {/* Renderizar "Tasa" y "Prima" solo si ramoId es 3 */}
