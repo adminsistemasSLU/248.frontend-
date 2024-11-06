@@ -357,9 +357,11 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 setFechaNacimiento(dateObject);
 
             } else {
-                setErrorMessage(cedulaData.message);
-                formData.identification = "";
-                setOpenSnack(true);
+                if (cedulaData.message != "ok") {
+                    setErrorMessage(cedulaData.message);
+                    formData.identification = "";
+                    setOpenSnack(true);
+                }
             }
         } catch (error) {
             console.error("Error al verificar cédula:", error);
