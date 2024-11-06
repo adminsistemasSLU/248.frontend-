@@ -121,8 +121,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     }));
 
     const cargarDatosVidaPago = async () => {
-        let f_pago = localStorage.getItem(LS_FPAGO);
-        let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+        let f_pago = sessionStorage.getItem(LS_FPAGO);
+        let factura = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
         let idCotizacion = localStorage.getItem(LS_COTIZACION);
 
         // debugger;
@@ -132,10 +132,10 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             setOpenBackdrop(false);
             factura = JSON.parse(cotiVida[0].datosfacturas);
             if (factura && factura.length !== 0) {
-                localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+                sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
             }
         }
-        let formaPagoAray = localStorage.getItem(LS_DATAVIDASEND);
+        let formaPagoAray = sessionStorage.getItem(LS_DATAVIDASEND);
 
         if (formaPagoAray && formaPagoAray !== undefined) {
             formaPagoAray = JSON.parse(formaPagoAray);
@@ -166,7 +166,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     useEffect(() => {
         const cargarData = async () => {
-            let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+            let factura = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
             let idCotizacion = localStorage.getItem(LS_COTIZACION);
             let asegurado;
 
@@ -185,7 +185,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     identification: coti[0].clicedula,
                     pais: coti[0].clipais
                 }
-                let formaPagoAray = localStorage.getItem(LS_DATOSPAGO);
+                let formaPagoAray = sessionStorage.getItem(LS_DATOSPAGO);
 
                 if (formaPagoAray && formaPagoAray !== undefined) {
                     factura = JSON.parse(formaPagoAray);
@@ -193,12 +193,12 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     setEditForm(false);
                     factura = JSON.parse(coti[0].datosfacturas);
                     if (factura && factura.length !== 0) {
-                        localStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
+                        sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(factura));
                     }
 
                 }
             }
-            let formaPagoAray = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+            let formaPagoAray = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
             // let factura = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
             let formaPagos;
 
@@ -316,7 +316,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        let f_pago = (localStorage.getItem(LS_FPAGO));
+        let f_pago = (sessionStorage.getItem(LS_FPAGO));
 
         if (name === "tipoProducto") {
             if ((Number(value) !== Number(f_pago))) {
@@ -402,7 +402,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             setOpenSnackAlert(true);
             handleCloseBackdrop();
         }
-        let f_pago = localStorage.getItem(LS_FPAGO);
+        let f_pago = sessionStorage.getItem(LS_FPAGO);
 
         if (f_pago !== null) {
             try {
@@ -473,7 +473,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         console.log(datosfacturas);
         if (enviarFormulario) {
             enviarFormulario = false;
-            const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+            const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
             const datosCliente = data.arrDatosCliente;
             datosCliente.datosfacturas = datosfacturas;
             data.arrDatosCliente = datosCliente;
@@ -490,7 +490,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 const response = await LifeService.fetchGrabaDatosVida(data);
                 if (response.codigo === 200) {
                     enviarFormulario = true;
-                    localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
+                    sessionStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
                     handleCloseBackdrop();
                     return true;
                 } else {

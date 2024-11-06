@@ -23,7 +23,7 @@ const QuestionModalLife = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-        let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+        let preguntas = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
         setQuestions(preguntas || []);
 
         let questions = (preguntas || []).map(pregunta => ({
@@ -71,7 +71,7 @@ const QuestionModalLife = forwardRef((props, ref) => {
     };
 
     const handleSaveChanges = async () => {
-        let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+        let preguntas = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
 
         let updatedQuestions = preguntas.map(pregunta => {
             let respuestaEncontrada = questionsUpload.find(q => q.codigo === pregunta.codigo);
@@ -81,14 +81,14 @@ const QuestionModalLife = forwardRef((props, ref) => {
             };
         });
 
-        const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+        const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
         setOpenBackdrop(true);
 
         data.jsonPreguntas = updatedQuestions
         //const response = await LifeService.fetchGrabaDatosVida(data);
         // if (response.codigo === 200) {
 
-        //     localStorage.setItem(LS_DATAVIDASEND,data);
+        //     sessionStorage.setItem(LS_DATAVIDASEND,data);
         //     closeModalDetail("true");
         // } else {
 

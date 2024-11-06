@@ -367,10 +367,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
         status: dataPersonal[0].cliestadocivil || "",
       }));
 
-      localStorage.setItem(LS_IDCOTIZACIONVIDA, dataPersonal[0].aplicacion);
+      sessionStorage.setItem(LS_IDCOTIZACIONVIDA, dataPersonal[0].aplicacion);
 
       const pregRespondidas = dataPersonal[0].DocumentosPreguntas;
-      localStorage.setItem(LS_PREGRESPONDIDAS, pregRespondidas);
+      sessionStorage.setItem(LS_PREGRESPONDIDAS, pregRespondidas);
 
       const dateObject = dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD");
       setAgeCalculate(dateObject);
@@ -437,7 +437,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           const newFinVigencia = inicioVigencia.add(dataPoliza.vigencia, 'month');
           setFinVigencia(newFinVigencia);
         }
-        localStorage.setItem(LS_VIDAPOLIZA, dataPoliza.poliza);
+        sessionStorage.setItem(LS_VIDAPOLIZA, dataPoliza.poliza);
 
 
         setcargarDataInicial(true);
@@ -453,7 +453,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         setFormDataTabla(transformedData);
       }
 
-      localStorage.setItem(LS_TABLACALC, JSON.stringify(datosprestamo.conf_amparos));
+      sessionStorage.setItem(LS_TABLACALC, JSON.stringify(datosprestamo.conf_amparos));
 
       const datos = [];
       datos.data = datosprestamo;
@@ -461,20 +461,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setCalculado(datos);
 
       setDatosCargados(true);
-      // let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
-      // try {
-
-      //   const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("DD/MM/YYYY"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), datosprestamo.prestamo, dataPoliza.vigencia);
-      //   if (data) {
-      //     localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
-      //   } else {
-      //   }
-      //   handleCloseBackdrop();
-      // } catch (error) {
-      //   handleCloseBackdrop();
-      // } finally {
-      //   setOpenBackdrop(false);
-      // }
       setOpenBackdrop(false);
 
     }
@@ -519,7 +505,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           // Llama al servicio para procesar datos
           const response = await LifeService.fetchProcesaDatos(data);
           if (response.codigo === 200) {
-            localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+            sessionStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
             setCalculado(response);
           } else {
             setErrorMessage(response.message);
@@ -668,7 +654,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         let tabla1 = vigencia.data.crearTablaPeriodos.tabla1
         if (tabla1.EtiquetaTable.codigo) {
 
-          localStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
+          sessionStorage.setItem(LS_VIDACOBERTURA, tabla1.EtiquetaTable.codigo);
         }
 
 
@@ -686,27 +672,27 @@ const PersonalFormLife = forwardRef((props, ref) => {
         }));
         setTablasData(tablasConfAmparos);
 
-        localStorage.setItem(LS_FPAGO, vigencia.data.frm_pago);
-        localStorage.setItem(LS_TPRESTAMO, vigencia.data.tipo_prestamo);
+        sessionStorage.setItem(LS_FPAGO, vigencia.data.frm_pago);
+        sessionStorage.setItem(LS_TPRESTAMO, vigencia.data.tipo_prestamo);
 
 
 
         setFormData((formData) => ({ ...formData, tipoProducto: vigencia.data.tipo_prestamo }));
 
-        const preguntasprevias = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+        const preguntasprevias = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
         if (!(preguntasprevias && preguntasprevias.length > 0)) {
 
-          localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+          sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
         }
 
         if (vigencia.data.polizas[0]) {
-          localStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
+          sessionStorage.setItem(LS_VIDAPOLIZA, JSON.stringify(vigencia.data.polizas[0].Codigo));
         } else {
         }
 
-        localStorage.setItem(LS_TABLACALC, JSON.stringify(tabla1));
+        sessionStorage.setItem(LS_TABLACALC, JSON.stringify(tabla1));
         setTablecalc(tabla1);
-        localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(documentosVida));// se omite el stringify por que de base esta pasado como string
+        sessionStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(documentosVida));// se omite el stringify por que de base esta pasado como string
         const detalle = transformData(tabla1);
         setFormDataTabla(detalle);
 
@@ -776,7 +762,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       conyugueEdad = conyugueage.format('DD/MM/YYYY');
     }
 
-    const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
+    const poliza = JSON.parse(sessionStorage.getItem(LS_VIDAPOLIZA));
     const periodos = tablasData.map((item) => {
       return {
         codigo: item.codcob,
@@ -821,7 +807,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
     if (name === "tipoProducto") {
-      const tipo_prestamo = localStorage.getItem(LS_TPRESTAMO)
+      const tipo_prestamo = sessionStorage.getItem(LS_TPRESTAMO)
       console.log(value);
       console.log(tipo_prestamo);
       if ((value !== tipo_prestamo)) {
@@ -884,7 +870,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
           try {
             const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
-            localStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.conf_amparos));
+            sessionStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.conf_amparos));
             console.log(data.data.montoPeriodo);
 
             setCalculado(data);
@@ -919,11 +905,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
       if (datosCargados) {
         try {
           handleOpenBackdrop();
-          debugger;
           const data = await LifeService.fetchActualizaPreguntas(ramo, producto,formData.prestamo);
           let preguntasVida = data.data.arrDeclaracionesAsegurado.pregunta;
           if (data) {
-            localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+            sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
           } else {
             console.log("No existen poreguntas para este grupo de parametros");
           }
@@ -946,7 +931,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           handleOpenBackdrop();
           const data = await LifeService.fetchActualizaDocumento(ramo, producto, tipoPrestamo, age.format("DD/MM/YYYY"), inicioVigencia.format("DD/MM/YYYY"), finVigencia.format("DD/MM/YYYY"), formData.prestamo, formData.vigencia);
           if (data) {
-            localStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
+            sessionStorage.setItem(LS_DOCUMENTOSVIDA, JSON.stringify(data));
           } else {
             console.log("No existen documentos para este grupo de parametros Revise requisito de asegurabilidad");
           }
@@ -1274,7 +1259,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     }
 
 
-    const poliza = JSON.parse(localStorage.getItem(LS_VIDAPOLIZA));
+    const poliza = JSON.parse(sessionStorage.getItem(LS_VIDAPOLIZA));
     const requiredFields = [
       "name",
       "lastname",
@@ -1299,7 +1284,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     next = age !== "" ? true : false;
     let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    const cobertura = localStorage.getItem(LS_VIDACOBERTURA);
+    const cobertura = sessionStorage.getItem(LS_VIDACOBERTURA);
     //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
     let datosconyugues = {};
 
@@ -1438,7 +1423,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       hddVidaGrupo: 'N',
     }
 
-    let calc = JSON.parse(localStorage.getItem(LS_TABLAACTUALIZDA));
+    let calc = JSON.parse(sessionStorage.getItem(LS_TABLAACTUALIZDA));
 
     const arrValores = {
       tasa: calc.data.valores.tasa,
@@ -1466,8 +1451,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
       txtPgCadTarjetaAnio: "",
     }
 
-    const preguntasVida = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
-    const dataresp = JSON.parse(localStorage.getItem(LS_PREGRESPONDIDAS));
+    const preguntasVida = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
+    const dataresp = JSON.parse(sessionStorage.getItem(LS_PREGRESPONDIDAS));
 
     let preguntas ;
 
@@ -1519,7 +1504,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       arrLogTasa: {},
       vidaGrupo: "N",
     }
-    const pag = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+    const pag = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
 
     const totalPagar = {
       documentType: formData.documentType,
@@ -1539,7 +1524,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       total: pag.total,
       pais: formData.country
     }
-    localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
+    sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
     // Si existen entonces estamos en modo editar
     const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
@@ -1554,7 +1539,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
 
-    localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
+    sessionStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
     try {
       handleOpenBackdrop();
       const response = await LifeService.fetchGrabaDatosVida(data);
@@ -1567,13 +1552,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
         const idCotizacion = response.data.id_CotiGeneral;
         localStorage.setItem(LS_COTIZACION, idCotizacion);
         handleCloseBackdrop();
-        localStorage.removeItem(LS_POLVIDAEDIT);
-        localStorage.removeItem(DATOS_PERSONALES_STORAGE_KEY);
-        localStorage.removeItem(LS_PROCESODATOSVIDA);
-        localStorage.removeItem(LS_TABLAACTUALIZDA);
-        localStorage.removeItem(LS_TABLACALC);
-        localStorage.removeItem(LS_VIDACOBERTURA);
-        localStorage.removeItem(LS_VIDAPOLIZA);
+        sessionStorage.removeItem(LS_POLVIDAEDIT);
+        sessionStorage.removeItem(DATOS_PERSONALES_STORAGE_KEY);
+        sessionStorage.removeItem(LS_PROCESODATOSVIDA);
+        sessionStorage.removeItem(LS_TABLAACTUALIZDA);
+        sessionStorage.removeItem(LS_TABLACALC);
+        sessionStorage.removeItem(LS_VIDACOBERTURA);
+        sessionStorage.removeItem(LS_VIDAPOLIZA);
         return true;
       } else {
         handleCloseBackdrop();
@@ -1649,7 +1634,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const response = await LifeService.fetchProcesaDatos(data);
       if (response.codigo === 200) {
         setOpenBackdrop(false);
-        localStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+        sessionStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
         setCalculado(response);
       } else {
         setErrorMessage(response.message);
@@ -1754,7 +1739,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         total: totalPag,
         pais: formData.country
       }
-      localStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
+      sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
       // Actualiza el formData con los valores calculados y redondeados
       setFormData({
@@ -1818,7 +1803,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    let calc = JSON.parse(localStorage.getItem(LS_TABLAACTUALIZDA));
+    let calc = JSON.parse(sessionStorage.getItem(LS_TABLAACTUALIZDA));
     setCalculado(calc);
   };
 

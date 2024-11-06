@@ -29,8 +29,8 @@ const RiskFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
 
-    let docuemtos = JSON.parse(localStorage.getItem(LS_DOCUMENTOSVIDA));
-    let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+    let docuemtos = JSON.parse(sessionStorage.getItem(LS_DOCUMENTOSVIDA));
+    let preguntas = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
     let questions = (preguntas || []).map(pregunta => ({
       codigo: pregunta.codigo,
       respuesta: ""
@@ -44,9 +44,9 @@ const RiskFormLife = forwardRef((props, ref) => {
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
 
       if (idCotizacion) {
-        const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+        const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
 
-        const dataresp = JSON.parse(localStorage.getItem(LS_PREGRESPONDIDAS));
+        const dataresp = JSON.parse(sessionStorage.getItem(LS_PREGRESPONDIDAS));
         
         let preguntas = data.jsonPreguntas;
 
@@ -98,7 +98,7 @@ const RiskFormLife = forwardRef((props, ref) => {
     const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
 
 
-    let preguntas = JSON.parse(localStorage.getItem(LS_PREGUNTASVIDA));
+    let preguntas = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
 
     let updatedQuestions = preguntas.map(pregunta => {
       let respuestaEncontrada = questionsUpload.find(q => q.codigo === pregunta.codigo);
@@ -107,7 +107,7 @@ const RiskFormLife = forwardRef((props, ref) => {
         respuestapregunta: respuestaEncontrada ? respuestaEncontrada.respuesta : ""
       };
     });
-    const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+    const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
     if (application !== null && application !== undefined && application !== '') {
       data.aplicacion = application;
     }
@@ -119,8 +119,8 @@ const RiskFormLife = forwardRef((props, ref) => {
     const response = await LifeService.fetchGrabaDatosVida(data);
 
     if (response.codigo === 200) {
-      localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(updatedQuestions));
-      localStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
+      sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(updatedQuestions));
+      sessionStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
       setOpen(false);
       return true;
     } else {

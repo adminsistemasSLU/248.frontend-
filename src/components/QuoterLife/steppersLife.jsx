@@ -314,7 +314,7 @@ export default function SteppersLife() {
     try {
       handleOpenBackdrop();
 
-      let user = JSON.parse(localStorage.getItem(LS_DATOSPAGO));
+      let user = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
       let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
       let idCotizacion = localStorage.getItem(LS_COTIZACION);
       let name = user.name + ' ' + user.lastname;

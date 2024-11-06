@@ -44,18 +44,18 @@ function HomeCarrousel(props) {
         localStorage.removeItem(DATOS_VEHICULO_STORAGE_KEY);
         localStorage.removeItem(DATOS_VEHICULO_COTI_STORAGE_KEY);
         localStorage.removeItem(LS_COTIZACION_VEHICULO);
-        localStorage.removeItem(LS_PREGRESPONDIDAS);
+        sessionStorage.removeItem(LS_PREGRESPONDIDAS);
         localStorage.removeItem(LS_PRODUCTO);
-        localStorage.removeItem(LS_DATAVIDASEND);
-        localStorage.removeItem(LS_DATOSPAGO);
-        localStorage.removeItem(LS_PREGUNTASVIDA);
-        localStorage.removeItem(LS_DOCUMENTOSVIDA);
-        localStorage.removeItem(LS_IDCOTIZACIONVIDA);
-        localStorage.removeItem(LS_VIDAPOLIZA);
+        sessionStorage.removeItem(LS_DATAVIDASEND);
+        sessionStorage.removeItem(LS_DATOSPAGO);
+        sessionStorage.removeItem(LS_PREGUNTASVIDA);
+        sessionStorage.removeItem(LS_DOCUMENTOSVIDA);
+        sessionStorage.removeItem(LS_IDCOTIZACIONVIDA);
+        sessionStorage.removeItem(LS_VIDAPOLIZA);
         localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
         localStorage.removeItem(LS_COTIZACION);
-        localStorage.removeItem(LS_FPAGO);
-        localStorage.removeItem(LS_TPRESTAMO);
+        sessionStorage.removeItem(LS_FPAGO);
+        sessionStorage.removeItem(LS_TPRESTAMO);
         //const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
         if(baldosas){
             setItems(baldosas);

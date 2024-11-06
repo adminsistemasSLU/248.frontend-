@@ -64,15 +64,15 @@ const SumaryFormLife = forwardRef((props, ref) => {
           icon: "success",
           confirmButtonText: "Ok",
         }).then(() => {
-            localStorage.removeItem(LS_PRODUCTO);
-            localStorage.removeItem(LS_DATAVIDASEND);
-            localStorage.removeItem(LS_DATOSPAGO);
-            localStorage.removeItem(LS_PREGUNTASVIDA);
-            localStorage.removeItem(LS_DOCUMENTOSVIDA);
+            sessionStorage.removeItem(LS_PRODUCTO);
+            sessionStorage.removeItem(LS_DATAVIDASEND);
+            sessionStorage.removeItem(LS_DATOSPAGO);
+            sessionStorage.removeItem(LS_PREGUNTASVIDA);
+            sessionStorage.removeItem(LS_DOCUMENTOSVIDA);
             localStorage.removeItem(LS_IDCOTIZACIONVIDA);
-            localStorage.removeItem(LS_VIDAPOLIZA);
+            sessionStorage.removeItem(LS_VIDAPOLIZA);
             localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
-            localStorage.removeItem(LS_PREGRESPONDIDAS);
+            sessionStorage.removeItem(LS_PREGRESPONDIDAS);
             localStorage.removeItem(LS_COTIZACION);
             window.location.reload();
         });
@@ -88,7 +88,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
     }
     //Funcion principal para cargar datos
     useEffect(() => {
-        const data = JSON.parse(localStorage.getItem(LS_DATAVIDASEND));
+        const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
         const productos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
         const IdProducto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
         const nombreProducto = productos.filter((item)=>{
