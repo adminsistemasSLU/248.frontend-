@@ -1102,7 +1102,7 @@ export default function MyQuoters() {
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
-                                <input
+                                <TextField
                                   value={(row.rate || 0)}
                                   className="input-table"
                                   disabled
@@ -1119,25 +1119,25 @@ export default function MyQuoters() {
                           )}
 
                           <TableCell align="right">
-                            <input value={row.createdDate} className="input-table" disabled />
+                            <TextField value={row.createdDate} className="input-table" disabled />
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
-                                <input value={row.fechaExportacion} className="input-table" disabled />
+                                <TextField value={row.fechaExportacion} className="input-table" disabled />
                               </TableCell>
                             </>
                           )}
                           <TableCell align="right">
-                            <input value={row.state} className="input-table" disabled />
+                            <TextField value={row.state} className="input-table" disabled />
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="left">{row.reason || ""}</TableCell>
                             </>
                           )}
-                          <TableCell align="right"><input value={row.broker} className="input-table" disabled /></TableCell>
-                          <TableCell align="right"><input value={row.usuario} className="input-table" disabled /></TableCell>
+                          <TableCell align="right"><TextField value={row.broker} className="input-table" disabled /></TableCell>
+                          <TableCell align="right"><TextField value={row.usuario} className="input-table" disabled /></TableCell>
 
                           <TableCell align="right">
                             {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state !== 'Exportada' && (

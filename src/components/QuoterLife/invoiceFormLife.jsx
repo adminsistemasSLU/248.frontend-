@@ -429,8 +429,10 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 handleCloseBackdrop();
                 return false;
             }
-        }
+        } 
 
+        console.log(formData.tipoProducto);
+        
         if ((formData.tipoProducto) === '') {
             seterrorMessage("La forma de pago ingresada no es valido")
             setOpenSnackAlert(true);
@@ -438,6 +440,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             return false;
             
         }
+
         return valido;
     };
 
