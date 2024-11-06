@@ -165,6 +165,7 @@ function Item(props) {
     }
     const handleImageClick = (ramo) => {
         localStorage.setItem(LS_RAMO,JSON.stringify(ramo));
+        sessionStorage.setItem(LS_RAMO,JSON.stringify(ramo));
         localStorage.removeItem(API_SUBBALDOSAS);
         localStorage.removeItem(LS_COTIZACION);
         navigate(props.item.url); 
