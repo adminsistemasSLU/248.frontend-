@@ -53,7 +53,7 @@ const SumaryFormLife = forwardRef((props, ref) => {
     }));
 
     const handleSubmit = async (e) => {
-    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
     setOpenBackdrop(true);
       const terminarTarea = await LifeService.fetchEmitirCertificado(idCotizacion)
       setOpenBackdrop(false);
@@ -69,11 +69,11 @@ const SumaryFormLife = forwardRef((props, ref) => {
             sessionStorage.removeItem(LS_DATOSPAGO);
             sessionStorage.removeItem(LS_PREGUNTASVIDA);
             sessionStorage.removeItem(LS_DOCUMENTOSVIDA);
-            localStorage.removeItem(LS_IDCOTIZACIONVIDA);
+            sessionStorage.removeItem(LS_IDCOTIZACIONVIDA);
             sessionStorage.removeItem(LS_VIDAPOLIZA);
             localStorage.removeItem(DATOS_PAGO_STORAGE_KEY);
             sessionStorage.removeItem(LS_PREGRESPONDIDAS);
-            localStorage.removeItem(LS_COTIZACION);
+            sessionStorage.removeItem(LS_COTIZACION);
             window.location.reload();
         });
         return;
@@ -89,8 +89,8 @@ const SumaryFormLife = forwardRef((props, ref) => {
     //Funcion principal para cargar datos
     useEffect(() => {
         const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
-        const productos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
-        const IdProducto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+        const productos = JSON.parse(sessionStorage.getItem(API_SUBBALDOSAS));
+        const IdProducto = JSON.parse(sessionStorage.getItem(LS_PRODUCTO));
         const nombreProducto = productos.filter((item)=>{
             return item.producto === IdProducto;
         })

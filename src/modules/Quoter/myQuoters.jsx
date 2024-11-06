@@ -499,12 +499,15 @@ export default function MyQuoters() {
   }, []);
 
   function eliminardatos() {
-    localStorage.removeItem(LS_PREGUNTASVIDA);
-    localStorage.removeItem(LS_DOCUMENTOSVIDA);
-    localStorage.removeItem(LS_FPAGO);
-    localStorage.removeItem(LS_PREGRESPONDIDAS);
-    localStorage.removeItem(LS_TPRESTAMO);
-    localStorage.removeItem(LS_DATAVIDASEND);
+    sessionStorage.removeItem(LS_PREGUNTASVIDA);
+    sessionStorage.removeItem(LS_DOCUMENTOSVIDA);
+    sessionStorage.removeItem(LS_FPAGO);
+    sessionStorage.removeItem(LS_PREGRESPONDIDAS);
+    sessionStorage.removeItem(LS_TPRESTAMO);
+    sessionStorage.removeItem(LS_DATAVIDASEND);
+    sessionStorage.removeItem(LS_COTIZACION);
+    sessionStorage.removeItem(LS_PRODUCTO);
+    sessionStorage.removeItem(LS_RAMO);
   }
 
   async function cargarTabla() {
@@ -575,8 +578,14 @@ export default function MyQuoters() {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
+    if(ramo == 9){
+      sessionStorage.setItem(LS_COTIZACION, id);
+      sessionStorage.setItem(LS_PRODUCTO, product);
+      sessionStorage.setItem(LS_RAMO, ramo);
+    }
+    
     if (aplicacion !== '') {
-      localStorage.setItem(LS_IDCOTIZACIONVIDA, aplicacion);
+      sessionStorage.setItem(LS_IDCOTIZACIONVIDA, aplicacion);
     }
     const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
 

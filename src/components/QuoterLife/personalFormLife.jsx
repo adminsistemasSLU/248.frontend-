@@ -65,8 +65,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime);
 
-let producto = localStorage.getItem(LS_PRODUCTO);
-let ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+let producto = sessionStorage.getItem(LS_PRODUCTO);
+let ramo = JSON.parse(sessionStorage.getItem(LS_RAMO));
 
 const StyledTableRow = styled(({ ...props }) => <TableRow {...props} />)(({ theme }) => ({
   "td, &:last-child th": {
@@ -529,9 +529,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   const cargarDatosPoliza = async () => {
-    let ramo = JSON.parse(localStorage.getItem(LS_RAMO));
-    let idCotizacion = localStorage.getItem(LS_COTIZACION);
-    let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+    let ramo = JSON.parse(sessionStorage.getItem(LS_RAMO));
+    let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
+    let producto = JSON.parse(sessionStorage.getItem(LS_PRODUCTO));
 
     try {
       const cotizacion = await LifeService.fetchConsultarPolizaVida(ramo, idCotizacion, producto);
@@ -547,7 +547,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const cargarCotizacion = async () => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
 
     let dato = {
       usuario: userId.id,
@@ -640,8 +640,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const cargarVigencia = async () => {
     try {
-      producto = localStorage.getItem(LS_PRODUCTO);
-      ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+      producto = sessionStorage.getItem(LS_PRODUCTO);
+      ramo = JSON.parse(sessionStorage.getItem(LS_RAMO));
 
       const vigencia = await LifeService.fetchVidaProducto(ramo, producto);
       if (vigencia && vigencia.data) {
@@ -709,7 +709,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
     isMounted.current = true; // Establecer a true cuando el componente está montado
-    const producto = Number(localStorage.getItem(LS_PRODUCTO));
+    const producto = Number(sessionStorage.getItem(LS_PRODUCTO));
     let listaProductos = JSON.parse(localStorage.getItem(API_SUBBALDOSAS)) || [];
     if (listaProductos.length > 0) {
       const resultado = listaProductos
@@ -732,7 +732,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     };
 
     const modoEditar = async () => {
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
 
       if (idCotizacion) {
         await cargarDatos();
@@ -1282,7 +1282,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     //VALIDAR MENOR DE EDAD
     next = age !== "" ? true : false;
-    let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
+    let producto = JSON.parse(sessionStorage.getItem(LS_PRODUCTO));
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     const cobertura = sessionStorage.getItem(LS_VIDACOBERTURA);
     //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
@@ -1527,8 +1527,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
     // Si existen entonces estamos en modo editar
-    const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
-    const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
+    const application = sessionStorage.getItem(LS_IDCOTIZACIONVIDA);
+    const id_cotigeneral = sessionStorage.getItem(LS_COTIZACION);
 
     if (application !== null && application !== undefined && application !== '') {
       data.aplicacion = application;
@@ -1547,10 +1547,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
       handleCloseBackdrop();
       if (response.codigo === 200) {
         const idVida = response.data.aplicacion;
-        localStorage.setItem(LS_IDCOTIZACIONVIDA, idVida);
+        sessionStorage.setItem(LS_IDCOTIZACIONVIDA, idVida);
 
         const idCotizacion = response.data.id_CotiGeneral;
-        localStorage.setItem(LS_COTIZACION, idCotizacion);
+        sessionStorage.setItem(LS_COTIZACION, idCotizacion);
         handleCloseBackdrop();
         sessionStorage.removeItem(LS_POLVIDAEDIT);
         sessionStorage.removeItem(DATOS_PERSONALES_STORAGE_KEY);
@@ -1788,7 +1788,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   }, [calculado]);
 
   const verificaPrestamo = async (numPrestamo) => {
-    var idCotizacion = localStorage.getItem(LS_COTIZACION);
+    var idCotizacion = sessionStorage.getItem(LS_COTIZACION);
     setOpenBackdrop(true);
     const response = await LifeService.fetchVerificaPrestamo(producto, numPrestamo, idCotizacion);
     if (response.codigo === 200) {

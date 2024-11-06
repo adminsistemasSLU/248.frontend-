@@ -150,7 +150,7 @@ export default function SteppersLife() {
   };
 
   const modoEditar = () => {
-    let idCotizacion = localStorage.getItem(LS_COTIZACION);
+    let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
     if (idCotizacion) {
       setActiveStep(1);
     }
@@ -233,8 +233,8 @@ export default function SteppersLife() {
   const descargarPdf = async () => {
     try {
       handleOpenBackdrop();
-      const idCotizacion = localStorage.getItem(LS_COTIZACION);
-      const producto = localStorage.getItem(LS_PRODUCTO);
+      const idCotizacion = sessionStorage.getItem(LS_COTIZACION);
+      const producto = sessionStorage.getItem(LS_PRODUCTO);
       await LifeService.fetchPrevizualizarPDFFormulario(producto, idCotizacion);
       handleCloseBackdrop();
     } catch (error) {
@@ -258,8 +258,8 @@ export default function SteppersLife() {
   const descargarPdfCertificado = async (titulo) => {
     try {
       handleOpenBackdrop();
-      const idCotizacion = localStorage.getItem(LS_COTIZACION);
-      const producto = localStorage.getItem(LS_PRODUCTO);
+      const idCotizacion = sessionStorage.getItem(LS_COTIZACION);
+      const producto = sessionStorage.getItem(LS_PRODUCTO);
       await LifeService.fetchPrevizualizarPDFCertificado(producto, idCotizacion, titulo);
       handleCloseBackdrop();
     } catch (error) {
@@ -315,8 +315,8 @@ export default function SteppersLife() {
       handleOpenBackdrop();
 
       let user = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
-      let producto = JSON.parse(localStorage.getItem(LS_PRODUCTO));
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      let producto = JSON.parse(sessionStorage.getItem(LS_PRODUCTO));
+      let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
       let name = user.name + ' ' + user.lastname;
       let emailValido = validateEmail(email);
       if (!emailValido) {

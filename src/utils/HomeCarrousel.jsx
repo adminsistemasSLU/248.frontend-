@@ -56,6 +56,9 @@ function HomeCarrousel(props) {
         localStorage.removeItem(LS_COTIZACION);
         sessionStorage.removeItem(LS_FPAGO);
         sessionStorage.removeItem(LS_TPRESTAMO);
+        sessionStorage.removeItem(LS_COTIZACION);
+        sessionStorage.removeItem(LS_PRODUCTO);
+        sessionStorage.removeItem(LS_RAMO);
         //const cotizacion = JSON.parse(localStorage.getItem(LS_COTIZACION));
         if(baldosas){
             setItems(baldosas);

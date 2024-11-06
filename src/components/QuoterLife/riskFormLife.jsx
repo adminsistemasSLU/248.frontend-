@@ -41,7 +41,7 @@ const RiskFormLife = forwardRef((props, ref) => {
       setDocuments(array || []);
 
       //PREGUNTAR SI ES MODO EDITAR
-      let idCotizacion = localStorage.getItem(LS_COTIZACION);
+      let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
 
       if (idCotizacion) {
         const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
@@ -94,8 +94,8 @@ const RiskFormLife = forwardRef((props, ref) => {
       setOpenSnack(true);
       return false;
     }
-    const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
-    const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
+    const application = sessionStorage.getItem(LS_IDCOTIZACIONVIDA);
+    const id_cotigeneral = sessionStorage.getItem(LS_COTIZACION);
 
 
     let preguntas = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));

@@ -85,7 +85,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const cargarCotizacion = async () => {
         let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-        let idCotizacion = localStorage.getItem(LS_COTIZACION);
+        let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
 
         let dato = {
             usuario: userId.id,
@@ -123,7 +123,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     const cargarDatosVidaPago = async () => {
         let f_pago = sessionStorage.getItem(LS_FPAGO);
         let factura = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
-        let idCotizacion = localStorage.getItem(LS_COTIZACION);
+        let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
 
         // debugger;
         if (idCotizacion) {
@@ -167,7 +167,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     useEffect(() => {
         const cargarData = async () => {
             let factura = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
-            let idCotizacion = localStorage.getItem(LS_COTIZACION);
+            let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
             let asegurado;
 
             // debugger;
@@ -477,8 +477,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             const datosCliente = data.arrDatosCliente;
             datosCliente.datosfacturas = datosfacturas;
             data.arrDatosCliente = datosCliente;
-            const application = localStorage.getItem(LS_IDCOTIZACIONVIDA);
-            const id_cotigeneral = localStorage.getItem(LS_COTIZACION);
+            const application = sessionStorage.getItem(LS_IDCOTIZACIONVIDA);
+            const id_cotigeneral = sessionStorage.getItem(LS_COTIZACION);
 
             if (application !== null && application !== undefined && application !== '') {
                 data.aplicacion = application;

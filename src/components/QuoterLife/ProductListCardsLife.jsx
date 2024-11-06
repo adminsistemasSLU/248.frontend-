@@ -9,7 +9,7 @@ const ProductListCardsLife = ({ onNext }) => {
   const [data, setdata] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const subbaldosas = JSON.parse(localStorage.getItem(API_SUBBALDOSAS));
-  const ramo = JSON.parse(localStorage.getItem(LS_RAMO));
+  const ramo = JSON.parse(sessionStorage.getItem(LS_RAMO));
 
   useEffect(() => {
     if (subbaldosas) {
@@ -43,7 +43,7 @@ const ProductListCardsLife = ({ onNext }) => {
   }, []);
 
   const handleCardClick = async (index, producto) => {
-    localStorage.setItem(LS_PRODUCTO, (producto));
+    sessionStorage.setItem(LS_PRODUCTO, (producto));
     onNext(index);
   };
 
