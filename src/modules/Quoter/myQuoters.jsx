@@ -1097,7 +1097,7 @@ export default function MyQuoters() {
                           <TableCell align="right">
                           {row.amount ?
                                   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.amount)
-                                  : '$0.00'}
+                                  : row.amount}
                             
                           </TableCell>
 
