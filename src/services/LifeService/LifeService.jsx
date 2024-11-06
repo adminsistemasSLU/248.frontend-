@@ -69,6 +69,24 @@ const LifeService = {
     }
   },
 
+  fetchActualizaPreguntas: async (ramo, producto,  monto) => {
+    const endpoint = "api/vida/PreguntasAsegurabilidad";
+    const method = "POST";
+    const data = {
+      ramo: ramo,
+      producto: producto,
+      monto: monto,
+    };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error("Error fetching Vida Producto:", error);
+      throw error;
+    }
+  },
+
   fetchProcesaDatos: async (datos) => {
     const endpoint = "api/vida/procesarDatos";
     const method = "POST";

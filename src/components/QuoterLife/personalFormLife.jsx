@@ -910,6 +910,32 @@ const PersonalFormLife = forwardRef((props, ref) => {
   }, [formData.vigencia, formData.prestamo, age]);
 
 
+  useEffect(() => {
+    fetchDataPreguntas();
+  }, [formData.prestamo]);
+
+  const fetchDataPreguntas = async () => {
+    if (formData.prestamo ) {
+      if (datosCargados) {
+        try {
+          handleOpenBackdrop();
+          const data = await LifeService.fetchActualizaPreguntas(ramo, producto,formData.prestamo);
+          if (data) {
+            localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(data));
+          } else {
+            console.log("No existen poreguntas para este grupo de parametros");
+          }
+          handleCloseBackdrop();
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          handleCloseBackdrop();
+        } finally {
+          setOpenBackdrop(false);
+        }
+      }
+    }
+  }
+
   const fetchDataDocumento = async () => {
     if (formData.vigencia && formData.prestamo && age) {
       if (datosCargados) {
@@ -1061,6 +1087,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
       console.error("Error al verificar cédula:", error);
     }
   };
+
+
+
 
   function verificarLavadoActivo(cedulaData) {
  
