@@ -919,6 +919,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       if (datosCargados) {
         try {
           handleOpenBackdrop();
+          debugger;
           const data = await LifeService.fetchActualizaPreguntas(ramo, producto,formData.prestamo);
           if (data) {
             localStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(data.arrDeclaracionesAsegurado.pregunta));
