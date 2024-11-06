@@ -1095,49 +1095,49 @@ export default function MyQuoters() {
                           <TableCell align="left">{row.producto}</TableCell>
                           <TableCell align="left">{row.cliente}</TableCell>
                           <TableCell align="right">
-                            {row.amount
-                              ? (row.amount.includes('$')
-                                ? row.amount
-                                : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.amount))
-                              : '0'}
-
+                            <CurrencyInput value={row.amount} className="input-table" disabled />
                           </TableCell>
 
                           {/* Renderizar "Tasa" y "Prima" solo si ramoId es 3 */}
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
-                                {(row.rate || 0)}
-
+                                <input
+                                  value={(row.rate || 0)}
+                                  className="input-table"
+                                  disabled
+                                />
                               </TableCell>
                               <TableCell align="right">
-                                {row.prima ?
-                                  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.prima)
-                                  : '$0.00'}
+                                <CurrencyInput
+                                  value={row.prima}
+                                  className="input-table"
+                                  disabled
+                                />
                               </TableCell>
                             </>
                           )}
 
                           <TableCell align="right">
-                            {row.createdDate}
+                            <input value={row.createdDate} className="input-table" disabled />
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
-                                {row.fechaExportacion}
+                                <input value={row.fechaExportacion} className="input-table" disabled />
                               </TableCell>
                             </>
                           )}
-                          <TableCell align="center">
-                            {row.state}
+                          <TableCell align="right">
+                            <input value={row.state} className="input-table" disabled />
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="left">{row.reason || ""}</TableCell>
                             </>
                           )}
-                          <TableCell align="right">{row.broker}</TableCell>
-                          <TableCell align="right">{row.usuario}</TableCell>
+                          <TableCell align="right"><input value={row.broker} className="input-table" disabled /></TableCell>
+                          <TableCell align="right"><input value={row.usuario} className="input-table" disabled /></TableCell>
 
                           <TableCell align="right">
                             {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state !== 'Exportada' && (
