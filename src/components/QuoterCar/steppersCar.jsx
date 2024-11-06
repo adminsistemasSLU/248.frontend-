@@ -32,9 +32,12 @@ import { TextField, Grid, Alert } from "@mui/material";
 import IncendioService from "../../services/IncencioService/IncendioService";
 import Swal from "sweetalert2";
 import {
-  LS_COTIZACION_VEHICULO,
   LS_COTIZACION,
   MAIL_COTIZACION,
+  DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
+  DATOS_VEHICULO_STORAGE_KEY,
+  DATOS_VEHICULO_COTI_STORAGE_KEY,
+  LS_COTIZACION_VEHICULO
 
 } from "../../utils/constantes";
 import PersonalFormCar from "./personalFormCar";
@@ -274,6 +277,14 @@ export default function SteppersCar() {
     setOpen(true);
   };
 
+  const handleHomeCar = () => {
+    localStorage.removeItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY);
+    localStorage.removeItem(DATOS_VEHICULO_STORAGE_KEY);
+    localStorage.removeItem(DATOS_VEHICULO_COTI_STORAGE_KEY);
+    localStorage.removeItem(LS_COTIZACION_VEHICULO);
+    setActiveStep((prevActiveStep) => 0);
+  };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -487,6 +498,17 @@ export default function SteppersCar() {
                 style={{ top: "20%", backgroundColor: '#0099A8', color: "white" }}
               >
                 Enviar Cotización
+              </Button>
+            )}
+
+            {steps[activeStep].label === "Planes" && (
+              <Button
+                onClick={handleHomeCar}
+                sx={{ mr: 1 }}
+                className="button-styled-primary"
+                style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
+              >
+                Nueva Cotización
               </Button>
             )}
           </div>
