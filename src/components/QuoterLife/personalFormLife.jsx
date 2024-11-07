@@ -909,16 +909,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
           let preguntasVida = data.data.arrDeclaracionesAsegurado.pregunta;
           if (data) {
             sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
-          } else {
-            //console.log("No existen poreguntas para este grupo de parametros");
-            setOpen(true);
-            setmessageError('No se encontraron detalle de preguntas para los parametros asignados');
-          }
+          } 
           handleCloseBackdrop();
         } catch (error) {
-          setOpen(true);
-          setmessageError('No se encontraron detalle de preguntas para los parametros asignados');
-          console.error("Error fetching data:", error);
+          setErrorMessage("No existen requisitos de asegurabilidad con los parametros ingresados");
+          setOpenSnack(true);
           handleCloseBackdrop();
         } finally {
           setOpenBackdrop(false);
