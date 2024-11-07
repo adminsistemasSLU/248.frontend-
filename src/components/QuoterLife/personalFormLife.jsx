@@ -649,7 +649,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         setFormData((formData) => ({ ...formData, vigencia: vigencia.data.vigencia[0].Codigo }));
         const newFinVigencia = inicioVigencia.add(vigencia.data.vigencia[0].Codigo, 'month');
         setFinVigencia(newFinVigencia);
-        let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
+        //let preguntasVida = vigencia.data.arrDeclaracionesAsegurado.pregunta
         let documentosVida = vigencia.data.documentos
         let tabla1 = vigencia.data.crearTablaPeriodos.tabla1
         if (tabla1.EtiquetaTable.codigo) {
