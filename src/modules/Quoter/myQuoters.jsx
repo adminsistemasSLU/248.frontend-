@@ -380,13 +380,13 @@ export default function MyQuoters() {
 
     if (isRamo3) {
       commonHeadCells.push(
-        { id: "rate", numeric: true, disablePadding: false, label: "Tasa" },
-        { id: "prima", numeric: true, disablePadding: false, label: "Prima" }
+        { id: "rate", numeric: true, disablePadding: false, label: "Tasa" }
       );
     }
 
     commonHeadCells.push(
-      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px' },
+      { id: "prima", numeric: true, disablePadding: false, label: "Prima" },
+      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px' }
     );
 
     if (isRamo3) {
@@ -1113,6 +1113,13 @@ export default function MyQuoters() {
                           </TableCell>
 
                           {/* Renderizar "Tasa" y "Prima" solo si ramoId es 3 */}
+                          {row.ramoId == 3 && (
+                            <>
+                              <TableCell align="right">
+                                {row.prima}
+                              </TableCell>
+                            </>
+                          )}
                           {row.ramoId != 3 && (
                             <>
                               <TableCell align="right">
