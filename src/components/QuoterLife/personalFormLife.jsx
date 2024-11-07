@@ -682,7 +682,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         const preguntasprevias = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
         if (!(preguntasprevias && preguntasprevias.length > 0)) {
 
-          sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
+          //sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
         }
 
         if (vigencia.data.polizas[0]) {
@@ -910,7 +910,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
           if (data) {
             sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
           } else {
-            console.log("No existen poreguntas para este grupo de parametros");
+            //console.log("No existen poreguntas para este grupo de parametros");
+            setOpen(true);
+            setmessageError('No existen poreguntas para este grupo de parametros');
           }
           handleCloseBackdrop();
         } catch (error) {
@@ -967,7 +969,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200) {
         setErrorCedula(false);
-        await consultUserData(documentType, identification);
+        if(documentType =='C'){
+          await consultUserData(documentType, identification);
+        }
+        
         handleCloseBackdrop();
       } else {
         setErrorCedula(true);
@@ -997,7 +1002,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200) {
         setErrorCedula(false);
-        await consultConyugueData(documentType, identification);
+        if(documentType =='C'){
+          await consultConyugueData(documentType, identification);
+        }
         handleCloseBackdrop();
       } else {
         

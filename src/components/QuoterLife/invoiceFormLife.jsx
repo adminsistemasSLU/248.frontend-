@@ -212,7 +212,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 formaPagos = factura;
             }
 
-            let monto, prima, sbs, scc, derechoEmision, subtot, iva, total,tipoProducto;
+            let monto, prima, sbs, scc, derechoEmision, subtot, iva, total, tipoProducto;
 
             if (factura) {
                 monto = parseFloat(factura.sumAdd);
@@ -255,11 +255,11 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     admision: parseFloat(derechoEmision).toFixed(2),
                     subtotal: parseFloat(subtot).toFixed(2),
                     total: parseFloat(total).toFixed(2),
-                    tipoProducto:tipoProducto
+                    tipoProducto: tipoProducto
                 });
             }
             if (formaPago === 'R') {
-                let nombre = '', pais = '', lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '',tipoProducto='1';
+                let nombre = '', pais = '', lastname = '', email = '', phone = '', documentType = '', identification = '', direction = '', tipoProducto = '1';
                 console.log(formaPagoAray);
                 if (formaPagoAray) {
                     nombre = formaPagoAray.arrDatosCliente.datosfacturas.paidType === 'R' ? formaPagoAray.arrDatosCliente.datosfacturas.name : '';
@@ -291,7 +291,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     admision: parseFloat(derechoEmision).toFixed(2),
                     subtotal: parseFloat(subtot).toFixed(2),
                     total: parseFloat(total).toFixed(2),
-                    tipoProducto:tipoProducto|| '',
+                    tipoProducto: tipoProducto || '',
                 });
             }
         }
@@ -420,7 +420,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             f_pago = '';
         }
 
-        
+
 
         if ((Number(formData.tipoProducto) !== f_pago)) {
             if (f_pago !== '') {
@@ -429,7 +429,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 handleCloseBackdrop();
                 return false;
             }
-        } 
+        }
 
 
         if (!formData.tipoProducto) {
@@ -437,7 +437,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             setOpenSnackAlert(true);
             handleCloseBackdrop();
             return false;
-            
+
         }
 
         return valido;
@@ -515,74 +515,74 @@ const InvoiceFormLife = forwardRef((props, ref) => {
 
     const consultUserData = async (documentType, identification) => {
         try {
-          const cedulaData = await UsuarioService.fetchConsultarUsuario(
-            documentType,
-            identification
-          );
-          if (cedulaData.codigo === 200 && cedulaData.data) {
-    
-            if (
-              cedulaData &&
-              cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
-            ) {
-        
-              Swal.fire({
-                title: "Alerta!",
-                text: cedulaData.message,
-                icon: "warning",
-                confirmButtonText: "Ok",
-              }).then(() => {
-                //Accion para lista de lavado de activos
-              });
+            const cedulaData = await UsuarioService.fetchConsultarUsuario(
+                documentType,
+                identification
+            );
+            if (cedulaData.codigo === 200 && cedulaData.data) {
+
+                if (
+                    cedulaData &&
+                    cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
+                ) {
+
+                    Swal.fire({
+                        title: "Alerta!",
+                        text: cedulaData.message,
+                        icon: "warning",
+                        confirmButtonText: "Ok",
+                    }).then(() => {
+                        //Accion para lista de lavado de activos
+                    });
+                }
+
+                setFormData({
+                    ...formData,
+                    name: cedulaData.data[0].cli_nombres || "",
+                    lastname: cedulaData.data[0].cli_apellidos || "",
+                    email: cedulaData.data[0].cli_email || "",
+                    phone: cedulaData.data[0].cli_celular || "",
+                    direction: cedulaData.data[0].cli_direccion || "",
+                });
+            } else {
+                verificarLavadoActivo(cedulaData);
+                setFormData({
+                    ...formData,
+                    name: "",
+                    lastname: "",
+                    email: "",
+                    phone: "",
+                    direction: "",
+                });
             }
-            
-            setFormData({
-              ...formData,
-              name: cedulaData.data[0].cli_nombres || "",
-              lastname: cedulaData.data[0].cli_apellidos || "",
-              email: cedulaData.data[0].cli_email || "",
-              phone: cedulaData.data[0].cli_celular || "",
-              direction: cedulaData.data[0].cli_direccion || "",
-            });
-          }else{
-            verificarLavadoActivo(cedulaData);
-            setFormData({
-              ...formData,
-              name:  "",
-              lastname: "",
-              email: "",
-              phone: "",
-              direction: "",
-            });
-          }
-          
+
         } catch (error) {
-          console.error("Error al verificar cédula:", error);
+            console.error("Error al verificar cédula:", error);
         }
-      };
-    
-      function verificarLavadoActivo(cedulaData) {
+    };
+
+    function verificarLavadoActivo(cedulaData) {
         debugger;
         setErrorCedula(true);
         setOpen(true);
         setmessageError(cedulaData.message);
         handleCloseBackdrop();
         if (
-          cedulaData &&
-          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de Lavado de activos"
+            cedulaData &&
+            cedulaData.message === "La cedula que usted esta consultando pertenece al listados de Lavado de activos"
         ) {
-    
-          Swal.fire({
-            title: "Alerta!",
-            text: cedulaData.message,
-            icon: "warning",
-            confirmButtonText: "Ok",
-          }).then(() => {
-            //Accion para lista de lavado de activos
-          });
+
+            Swal.fire({
+                title: "Alerta!",
+                text: cedulaData.message,
+                icon: "warning",
+                confirmButtonText: "Ok",
+            }).then(() => {
+                //Accion para lista de lavado de activos
+            });
         }
-      }
-    
+    }
+
 
     const verifyIdentification = async (e) => {
         const { value } = e.target;
@@ -601,7 +601,11 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             );
             if (cedulaData.codigo === 200) {
                 setErrorCedula(false);
-                await consultUserData(documentType, identification);
+
+                if (documentType == 'C') {
+                    await consultUserData(documentType, identification);
+                }
+
                 handleCloseBackdrop();
             } else {
                 setErrorCedula(true);
