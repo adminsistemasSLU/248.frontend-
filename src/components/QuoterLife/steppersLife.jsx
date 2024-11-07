@@ -37,7 +37,9 @@ import {
   DATOS_PERSONALES_STORAGE_KEY,
   LS_COTIZACION,
   LS_PRODUCTO,
-  LS_DATOSPAGO
+  LS_DATOSPAGO,
+  LS_PREGUNTASVIDA,
+  LS_PREGRESPONDIDAS
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
@@ -140,6 +142,7 @@ export default function SteppersLife() {
   const [emailError, setEmailError] = React.useState("");
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [openSnack, setOpenSnack] = React.useState(false);
+  const [isVisibleFormulario, setIsVisibleFormulario] = React.useState(true);
   const navigate = useNavigate();
 
   const handleCloseBackdrop = () => {
@@ -300,6 +303,11 @@ export default function SteppersLife() {
   };
 
   const handleClickOpen = () => {
+    setIsVisibleFormulario(true);
+    let Preguntas = sessionStorage.getItem(LS_PREGUNTASVIDA);
+    if (!Preguntas || (Array.isArray(JSON.parse(Preguntas)) && JSON.parse(Preguntas).length === 0)) {
+      setIsVisibleFormulario(false);
+  }
     setOpen(true);
   };
 
@@ -397,11 +405,14 @@ export default function SteppersLife() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" style={{ display: "flex", gap: '30px' }} >
-            <Button
-              onClick={handleDownloadPdf}
-              style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
-              Descargar Formulario
-            </Button>
+            {isVisibleFormulario && (
+              <Button
+                onClick={handleDownloadPdf}
+                style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+              >
+                Descargar Formulario
+              </Button>
+            )}
             <Button
               onClick={handleDownloadPdfCertificado}
               style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
