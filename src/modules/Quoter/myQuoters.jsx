@@ -767,7 +767,7 @@ export default function MyQuoters() {
       return;
     }
 
-    if (filters.ramo != "3") {
+    if (filters.ramo != "3" && filters.estado == "S") {
       if (!filters.producto || filters.producto === "") {
         setErrorMessage("Se deben ingresar un filtro en producto");
         setOpenSnack(true);
