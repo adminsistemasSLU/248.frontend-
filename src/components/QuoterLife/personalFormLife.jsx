@@ -912,12 +912,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
           } else {
             //console.log("No existen poreguntas para este grupo de parametros");
             setOpen(true);
-            setmessageError('No existen poreguntas para este grupo de parametros');
+            setmessageError('No se encontraron detalle de preguntas para los parametros asignados');
           }
           handleCloseBackdrop();
         } catch (error) {
           setOpen(true);
-          setmessageError('No se encontraron detalle de preguntas para la cabecera');
+          setmessageError('No se encontraron detalle de preguntas para los parametros asignados');
           console.error("Error fetching data:", error);
           handleCloseBackdrop();
         } finally {
