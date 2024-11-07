@@ -912,8 +912,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
           } 
           handleCloseBackdrop();
         } catch (error) {
-          setErrorMessage("No existen Preguntas asignadas con los parametros ingresados");
-          setOpenSnack(true);
+          //setErrorMessage("No existen Preguntas asignadas con los parametros ingresados");
+          //setOpenSnack(true);
           handleCloseBackdrop();
         } finally {
           setOpenBackdrop(false);
