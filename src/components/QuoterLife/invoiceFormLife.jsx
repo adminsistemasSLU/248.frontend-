@@ -595,8 +595,8 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                 handleCloseBackdrop();
             } else {
                 setErrorCedula(true);
-                setOpen(true);
-                setmessageError(cedulaData.message);
+                setOpenSnackAlert(true);
+                seterrorMessage(cedulaData.message);
                 handleCloseBackdrop();
             }
         } catch (error) {
