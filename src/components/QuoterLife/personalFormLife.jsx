@@ -916,6 +916,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
           }
           handleCloseBackdrop();
         } catch (error) {
+          setOpen(true);
+          setmessageError(error.message);
           console.error("Error fetching data:", error);
           handleCloseBackdrop();
         } finally {
