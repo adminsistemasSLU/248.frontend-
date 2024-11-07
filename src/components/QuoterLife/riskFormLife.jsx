@@ -47,16 +47,16 @@ const RiskFormLife = forwardRef((props, ref) => {
         const data = JSON.parse(sessionStorage.getItem(LS_DATAVIDASEND));
 
         const dataresp = JSON.parse(sessionStorage.getItem(LS_PREGRESPONDIDAS));
-        
+
         let preguntas = data.jsonPreguntas;
 
-        if(dataresp){
+        if (dataresp) {
           preguntas = dataresp;
-        }else{
+        } else {
           preguntas = data.jsonPreguntas;
         }
-         
-        
+
+
         const questionUploadNew = questions.map((item) => {
           // Buscamos la pregunta correspondiente en el arreglo preguntas
           const preguntaCorrespondiente = preguntas.find(pregunta => pregunta.codigo === item.codigo);
@@ -100,7 +100,7 @@ const RiskFormLife = forwardRef((props, ref) => {
 
     let preguntas = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
 
-    let updatedQuestions = preguntas.map(pregunta => {
+    let updatedQuestions = (preguntas || []).map(pregunta => {
       let respuestaEncontrada = questionsUpload.find(q => q.codigo === pregunta.codigo);
       return {
         ...pregunta,
