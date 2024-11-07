@@ -917,7 +917,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           handleCloseBackdrop();
         } catch (error) {
           setOpen(true);
-          setmessageError(error.message);
+          setmessageError('No se encontraron detalle de preguntas para la cabecera');
           console.error("Error fetching data:", error);
           handleCloseBackdrop();
         } finally {
