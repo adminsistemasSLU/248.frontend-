@@ -556,7 +556,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         if (
             cedulaData &&
             cedulaData.codigo === 500
-          ) {
+        ) {
 
             Swal.fire({
                 title: "Alerta!",
@@ -596,6 +596,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             } else {
                 setErrorCedula(true);
                 setOpenSnackAlert(true);
+                setOpen(true);
                 seterrorMessage(cedulaData.message);
                 handleCloseBackdrop();
             }
@@ -760,7 +761,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                 <TextField
                                     type="text"
                                     name="name"
-                                    disabled={formaPago === 'C'}
+                                    disabled={formaPago === 'C' && errorCedula}
                                     value={formData.name}
                                     placeholder="Nombres"
                                     onChange={handleChange}
@@ -777,7 +778,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     type="text"
                                     name="lastname"
                                     value={formData.lastname}
-                                    disabled={formaPago === 'C'}
+                                    disabled={formaPago === 'C' && errorCedula}
                                     placeholder="Apellidos"
                                     onChange={handleChange}
                                     variant="standard"
@@ -793,7 +794,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     type="email"
                                     name="email"
                                     value={formData.email}
-                                    disabled={formaPago === 'C'}
+                                    disabled={formaPago === 'C' && errorCedula}
                                     placeholder="Email"
                                     onChange={handleChange}
                                     variant="standard"
@@ -810,7 +811,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     type="text"
                                     name="phone"
                                     value={formData.phone}
-                                    disabled={formaPago === 'C'}
+                                    disabled={formaPago === 'C' && errorCedula}
                                     placeholder="Télefono"
                                     onChange={handleChange}
                                     variant="standard"
@@ -827,7 +828,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                                     type="text"
                                     name="direction"
                                     value={formData.direction}
-                                    disabled={formaPago === 'C'}
+                                    disabled={formaPago === 'C' && errorCedula}
                                     placeholder="Dirección"
                                     onChange={handleChange}
                                     variant="standard"
