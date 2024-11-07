@@ -578,12 +578,12 @@ export default function MyQuoters() {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
-    if(ramo == 9){
+    if (ramo == 9) {
       sessionStorage.setItem(LS_COTIZACION, id);
       sessionStorage.setItem(LS_PRODUCTO, product);
       sessionStorage.setItem(LS_RAMO, ramo);
     }
-    
+
     if (aplicacion !== '') {
       sessionStorage.setItem(LS_IDCOTIZACIONVIDA, aplicacion);
     }
@@ -992,6 +992,9 @@ export default function MyQuoters() {
                     onChange={handleChange}
                     label="broker"
                   >
+                    <MenuItem value={null}>
+                      TODOS
+                    </MenuItem>
                     {agentes.map((broker, index) => (
                       <MenuItem key={index} value={broker.clave}>
                         {`${broker.nombre}`}
