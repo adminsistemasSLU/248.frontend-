@@ -1034,21 +1034,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
 
-        if (
-          cedulaData &&
-          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PEPS"
-        ) {
-    
-          Swal.fire({
-            title: "Alerta!",
-            text: cedulaData.message,
-            icon: "warning",
-            confirmButtonText: "Ok",
-          }).then(() => {
-            //Accion para lista de lavado de activos
-          });
-        }
-
+       
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
 
@@ -1095,12 +1081,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
     handleCloseBackdrop();
     if (
       cedulaData &&
-      cedulaData.message === "La cedula que usted esta consultando pertenece al listados de Lavado de activos"
+      cedulaData.codigo === 500
     ) {
 
       Swal.fire({
         title: "Alerta!",
-        text: ' No se puede cotizar al cliente. Favor comunicarse con el equipo comercial de la Aseguradora',
+        text: cedulaData.message,
         icon: "warning",
         confirmButtonText: "Ok",
       }).then(() => {
@@ -1117,21 +1103,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         identification
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
-
-        if (
-          cedulaData &&
-          cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PEPS"
-        ) {
-    
-          Swal.fire({
-            title: "Alerta!",
-            text: cedulaData.message,
-            icon: "warning",
-            confirmButtonText: "Ok",
-          }).then(() => {
-            //Accion para lista de lavado de activos
-          });
-        }
 
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
@@ -1471,6 +1442,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
       preguntas = preguntasVida;
     }
      
+
+    if(!preguntas){
+        setErrorMessage("No existen requisitos de asegurabilidad con los parametros ingresados");
+        setOpenSnack(true);
+        return false;
+    }
 
     const data = {
       arrDatosCliente: arrDatosCliente,

@@ -521,20 +521,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             );
             if (cedulaData.codigo === 200 && cedulaData.data) {
 
-                if (
-                    cedulaData &&
-                    cedulaData.message === "La cedula que usted esta consultando pertenece al listados de PLA"
-                ) {
-
-                    Swal.fire({
-                        title: "Alerta!",
-                        text: cedulaData.message,
-                        icon: "warning",
-                        confirmButtonText: "Ok",
-                    }).then(() => {
-                        //Accion para lista de lavado de activos
-                    });
-                }
 
                 setFormData({
                     ...formData,
@@ -564,13 +550,13 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     function verificarLavadoActivo(cedulaData) {
         debugger;
         setErrorCedula(true);
-        setOpen(true);
-        setmessageError(cedulaData.message);
+        //setOpen(true);
+        //setmessageError(cedulaData.message);
         handleCloseBackdrop();
         if (
             cedulaData &&
-            cedulaData.message === "La cedula que usted esta consultando pertenece al listados de Lavado de activos"
-        ) {
+            cedulaData.codigo === 500
+          ) {
 
             Swal.fire({
                 title: "Alerta!",
