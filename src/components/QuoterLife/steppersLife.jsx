@@ -305,27 +305,21 @@ export default function SteppersLife() {
   };
 
   const handleClickOpen = () => {
-    //isVisibleCertificado, setIsVisibleCertificado
-
-    setIsVisibleCertificado(true);
-    setIsVisibleFormulario(true);
-   
-   
     let DocumentosVida = sessionStorage.getItem(LS_DOCUMENTOSVIDA);
-
-
-    //let dato =  Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno");
-
+    //SE HABILITA CUANDO NO TIENE REQUISITOS DE ASEGURABILIDAD O SOLO LA DECLARACION DE SALUD 
+    setIsVisibleCertificado(false);
+    //VERIFICO SI NO EXISTE
     if ( !DocumentosVida ||(Array.isArray(JSON.parse(DocumentosVida)))
     ) {
-      setIsVisibleCertificado(false);
-    }
-
+      setIsVisibleCertificado(true);
+    } //VERIFICO SI ES DIFERENTE A NINGUNO
     if( (JSON.parse(DocumentosVida).length === 0 ||
-          Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno"))){
-      setIsVisibleCertificado(false);
+          Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre.toLowerCase() === "ninguno"))){
+      setIsVisibleCertificado(true);
     }
 
+
+    setIsVisibleFormulario(true);
     let Preguntas = sessionStorage.getItem(LS_PREGUNTASVIDA);
     if (!Preguntas || (Array.isArray(JSON.parse(Preguntas)) && JSON.parse(Preguntas).length === 0)) {
       setIsVisibleFormulario(false);
