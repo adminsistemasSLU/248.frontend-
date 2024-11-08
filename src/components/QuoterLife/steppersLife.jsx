@@ -313,9 +313,9 @@ export default function SteppersLife() {
     let DocumentosVida = sessionStorage.getItem(LS_DOCUMENTOSVIDA);
     if (
       !DocumentosVida ||
-      (Array.isArray(JSON.parse(DocumentosVida)) &&
-        (JSON.parse(DocumentosVida).length === 0 ||
-          JSON.parse(DocumentosVida).some(doc => doc.nombre === "Ninguno"))
+      (Array.isArray(JSON.parse(DocumentosVida)) && 
+       (JSON.parse(DocumentosVida).length === 0 ||
+       Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno"))
       )
     ) {
       setIsVisibleCertificado(false);
@@ -324,7 +324,7 @@ export default function SteppersLife() {
     let Preguntas = sessionStorage.getItem(LS_PREGUNTASVIDA);
     if (!Preguntas || (Array.isArray(JSON.parse(Preguntas)) && JSON.parse(Preguntas).length === 0)) {
       setIsVisibleFormulario(false);
-    }
+  }
     setOpen(true);
   };
 
@@ -430,15 +430,16 @@ export default function SteppersLife() {
                 Descargar Formulario
               </Button>
             )}
-            {isVisibleCertificado && (
-              <Button
-                onClick={handleDownloadPdfCertificado}
-                style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
-                Descargar Certificado
-              </Button>
-            )}
             <Button
-
+              disabled={!isVisibleCertificado}
+              onClick={handleDownloadPdfCertificado}
+              style={{ top: "20%", fontSize: '10px', backgroundColor: isVisibleCertificado ? "#0099a8" : "#d3d3d3",
+                color: isVisibleCertificado ? "white" : "#a9a9a9",
+                borderRadius: "5px",
+                cursor: isVisibleCertificado ? "pointer" : "not-allowed" }}>
+              Descargar Certificado
+            </Button>
+            <Button
               onClick={handleDownloadPdfFormulario}
               style={{ top: "20%", fontSize: '10px', backgroundColor: '#02545c', color: "white", borderRadius: "5px" }}>
               Descargar Solicitud
