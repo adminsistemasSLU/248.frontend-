@@ -69,13 +69,14 @@ const LifeService = {
     }
   },
 
-  fetchActualizaPreguntas: async (ramo, producto,  monto) => {
+  fetchActualizaPreguntas: async (ramo, producto,  monto,edad) => {
     const endpoint = "api/vida/PreguntasAsegurabilidad";
     const method = "POST";
     const data = {
       ramo: ramo,
       producto: producto,
       monto: monto,
+      edad:edad
     };
 
     try {

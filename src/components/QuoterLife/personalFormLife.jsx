@@ -898,14 +898,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
     fetchDataPreguntas();
-  }, [formData.prestamo]);
+  }, [formData.prestamo,formData.ageCalculated]);
 
   const fetchDataPreguntas = async () => {
-    if (formData.prestamo ) {
+    if (formData.prestamo && formData.ageCalculated  ) {
       if (datosCargados) {
         try {
           handleOpenBackdrop();
-          const data = await LifeService.fetchActualizaPreguntas(ramo, producto,formData.prestamo);
+          const data = await LifeService.fetchActualizaPreguntas(ramo, producto,formData.prestamo,formData.ageCalculated);
           let preguntasVida = data.data.arrDeclaracionesAsegurado.pregunta;
           if (data) {
             sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
