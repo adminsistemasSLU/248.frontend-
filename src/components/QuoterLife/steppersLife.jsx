@@ -314,7 +314,7 @@ export default function SteppersLife() {
     let DocumentosVida = sessionStorage.getItem(LS_DOCUMENTOSVIDA);
 
 
-    let dato =  Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno");
+    //let dato =  Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno");
 
     if ( !DocumentosVida ||(Array.isArray(JSON.parse(DocumentosVida)))
     ) {
