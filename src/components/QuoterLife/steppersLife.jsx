@@ -309,7 +309,8 @@ export default function SteppersLife() {
 
     setIsVisibleCertificado(true);
     setIsVisibleFormulario(true);
-
+    debugger;
+    let dato =  Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno");
     let DocumentosVida = sessionStorage.getItem(LS_DOCUMENTOSVIDA);
     if (
       !DocumentosVida ||
