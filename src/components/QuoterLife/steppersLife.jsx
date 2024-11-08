@@ -315,14 +315,14 @@ export default function SteppersLife() {
 
 
     let dato =  Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno");
-    
-    if (
-      !DocumentosVida ||
-      (Array.isArray(JSON.parse(DocumentosVida)) && 
-       (JSON.parse(DocumentosVida).length === 0 ||
-       Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno"))
-      )
+
+    if ( !DocumentosVida ||(Array.isArray(JSON.parse(DocumentosVida)))
     ) {
+      setIsVisibleCertificado(false);
+    }
+
+    if( (JSON.parse(DocumentosVida).length === 0 ||
+          Object.values(JSON.parse(DocumentosVida)).some(doc => doc.nombre === "Ninguno"))){
       setIsVisibleCertificado(false);
     }
 
