@@ -39,7 +39,8 @@ import {
   LS_PRODUCTO,
   LS_DATOSPAGO,
   LS_PREGUNTASVIDA,
-  LS_PREGRESPONDIDAS
+  LS_PREGRESPONDIDAS,
+  LS_DOCUMENTOSVIDA
 } from "../../utils/constantes";
 import EmailService from "../../services/EmailService/EmailService";
 import Swal from "sweetalert2";
@@ -143,6 +144,7 @@ export default function SteppersLife() {
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [openSnack, setOpenSnack] = React.useState(false);
   const [isVisibleFormulario, setIsVisibleFormulario] = React.useState(true);
+  const [isVisibleCertificado, setIsVisibleCertificado] = React.useState(true);
   const navigate = useNavigate();
 
   const handleCloseBackdrop = () => {
@@ -303,11 +305,26 @@ export default function SteppersLife() {
   };
 
   const handleClickOpen = () => {
+    //isVisibleCertificado, setIsVisibleCertificado
+
+    setIsVisibleCertificado(true);
     setIsVisibleFormulario(true);
+
+    let DocumentosVida = sessionStorage.getItem(LS_DOCUMENTOSVIDA);
+    if (
+      !DocumentosVida ||
+      (Array.isArray(JSON.parse(DocumentosVida)) &&
+        (JSON.parse(DocumentosVida).length === 0 ||
+          JSON.parse(DocumentosVida).some(doc => doc.nombre === "Ninguno"))
+      )
+    ) {
+      setIsVisibleCertificado(false);
+    }
+
     let Preguntas = sessionStorage.getItem(LS_PREGUNTASVIDA);
     if (!Preguntas || (Array.isArray(JSON.parse(Preguntas)) && JSON.parse(Preguntas).length === 0)) {
       setIsVisibleFormulario(false);
-  }
+    }
     setOpen(true);
   };
 
@@ -408,19 +425,22 @@ export default function SteppersLife() {
             {isVisibleFormulario && (
               <Button
                 onClick={handleDownloadPdf}
-                style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+                style={{ top: "20%", fontSize: '10px', backgroundColor: '#004ba8cc', color: "white", borderRadius: "5px" }}
               >
                 Descargar Formulario
               </Button>
             )}
+            {isVisibleCertificado && (
+              <Button
+                onClick={handleDownloadPdfCertificado}
+                style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+                Descargar Certificado
+              </Button>
+            )}
             <Button
-              onClick={handleDownloadPdfCertificado}
-              style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
-              Descargar Certificado
-            </Button>
-            <Button
+
               onClick={handleDownloadPdfFormulario}
-              style={{ top: "20%", fontSize: '10px', backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}>
+              style={{ top: "20%", fontSize: '10px', backgroundColor: '#02545c', color: "white", borderRadius: "5px" }}>
               Descargar Solicitud
             </Button>
           </DialogContentText>
@@ -496,7 +516,7 @@ export default function SteppersLife() {
               </Button>
             )}
 
-            {steps[activeStep].label !== "Productos" && (
+            {steps[activeStep].label !== "Productos" && steps[activeStep].label !== "Resumen" && (
               <Button
                 onClick={handleNext}
                 sx={{ mr: 1 }}
@@ -504,6 +524,16 @@ export default function SteppersLife() {
                 style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
               >
                 Siguiente
+              </Button>
+            )}
+            {steps[activeStep].label === "Resumen" && (
+              <Button
+                onClick={handleNext}
+                sx={{ mr: 1 }}
+                className="button-styled-primary"
+                style={{ top: "20%", backgroundColor: '#02545C', color: "white" }}
+              >
+                Grabar Cotización
               </Button>
             )}
           </div>
