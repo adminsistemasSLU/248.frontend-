@@ -309,7 +309,7 @@ export default function SteppersLife() {
 
     setIsVisibleCertificado(true);
     setIsVisibleFormulario(true);
-    debugger;
+   
    
     let DocumentosVida = sessionStorage.getItem(LS_DOCUMENTOSVIDA);
 
@@ -439,7 +439,7 @@ export default function SteppersLife() {
               disabled={!isVisibleCertificado}
               onClick={handleDownloadPdfCertificado}
               style={{ top: "20%", fontSize: '10px', backgroundColor: isVisibleCertificado ? "#0099a8" : "#d3d3d3",
-                color: isVisibleCertificado ? "white" : "#a9a9a9",
+                color: isVisibleCertificado ? "white" : "black",
                 borderRadius: "5px",
                 cursor: isVisibleCertificado ? "pointer" : "not-allowed" }}>
               Descargar Certificado
