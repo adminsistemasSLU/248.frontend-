@@ -923,7 +923,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    label="Imp SCVS %3.50"
+                                    label="Imp SCVS 3.50%"
                                     type="text"
                                     name="impScvs"
                                     value={formatedInput(formData.impScvs)}
@@ -940,7 +940,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    label="Imp SSC %0.50"
+                                    label="Imp SSC 0.50%"
                                     type="text"
                                     name="impSsc"
                                     value={formatedInput(formData.impSsc)}
