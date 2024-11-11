@@ -1142,7 +1142,7 @@ export default function MyQuoters() {
                             </>
                           )}
 
-                          <TableCell align="right">
+                          <TableCell align="right" sx={{ width: '140px' }}>
                             {row.createdDate}
                           </TableCell>
                           {row.ramoId != 3 && (
