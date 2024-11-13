@@ -352,6 +352,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const cargarDatos = async () => {
     if (datosCargados) return; // Prevenir cargas redundantes
     handleOpenBackdrop(true);
+    sessionStorage.removeItem(LS_PREGRESPONDIDAS);
     const dataPersonal = await cargarCotizacion();
     if (isMounted.current) {
       setFormData((formData) => ({
@@ -546,6 +547,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   const cargarCotizacion = async () => {
+
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
 
