@@ -120,6 +120,7 @@ const RiskFormLife = forwardRef((props, ref) => {
 
     if (response.codigo === 200) {
       sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(updatedQuestions));
+      sessionStorage.setItem(LS_PREGRESPONDIDAS, JSON.stringify(updatedQuestions));
       sessionStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
       setOpen(false);
       return true;
