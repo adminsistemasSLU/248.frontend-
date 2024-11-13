@@ -1198,7 +1198,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     
     let continuar =  await handleOpenModal();
    if(!continuar){
-    return;
+    return false;
    }
 
     const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
