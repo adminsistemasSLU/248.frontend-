@@ -1196,7 +1196,11 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const handleSubmit = async (e) => {
     // Valida y Procesa los datos en caso de cambiar los valores antes de guardar,
     // actualiza los valores en facturacion
-    await handleOpenModal();
+    try{
+      await handleOpenModal();
+    }catch(Error){
+      return;
+    }
 
     const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
     if (tipoPrestamo === 'M') {
@@ -1574,13 +1578,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
     if (!todosTienenNumero) {
       setErrorMessage("Se deben ingresar valores validos en la tabla de montos")
       setOpenSnack(true);
-      return;
+      throw new Error("Se deben ingresar datos en vigencia");
+      //return;
     }
 
     if (formData.vigencia === '' || formData.vigencia === 0) {
       setErrorMessage("Se deben ingresar datos en vigencia")
       setOpenSnack(true);
-      return;
+      throw new Error("Se deben ingresar datos en vigencia");
+      //return;
     }
 
     //SUMATORIA DE PRESTAMO A PARTIR DE LA TABLA DE CALCULOS
@@ -1595,6 +1601,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           acc += monto; // Suma el monto válido al acumulador
         } else {
           console.error(`Valor inválido encontrado: ${periodo.monto}`);
+          throw new Error(`Valor inválido encontrado: ${periodo.monto}`);
         }
       });
 
@@ -1627,6 +1634,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     } catch (error) {
       setErrorMessage("Error al procesar los datos.");
       setOpenSnack(true);
+      throw new Error("Error al procesar los datos.");
     } finally {
       setOpenBackdrop(false);
     }
