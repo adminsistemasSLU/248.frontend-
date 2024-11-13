@@ -772,14 +772,14 @@ export default function MyQuoters() {
       return;
     }
 
-    if (filters.ramo != "3" && filters.estado == "S") {
-      if (!filters.producto || filters.producto === "") {
-        setErrorMessage("Se deben ingresar un filtro en producto");
-        setOpenSnack(true);
-        validar = false;
-        return;
-      }
-    }
+    // if (filters.ramo != "3" && filters.estado == "S") {
+    //   if (!filters.producto || filters.producto === "") {
+    //     setErrorMessage("Se deben ingresar un filtro en producto");
+    //     setOpenSnack(true);
+    //     validar = false;
+    //     return;
+    //   }
+    // }
 
     if (validar) {
       exportarTabla();
@@ -907,7 +907,7 @@ export default function MyQuoters() {
               </Select>
             </FormControl>
           </Grid>
-          {filters.ramo != "3" && (
+          {/* {filters.ramo != "3" && (
             <Grid item xs={8} md={2}>
               <FormControl fullWidth>
                 <InputLabel id="producto-label">Producto</InputLabel>
@@ -930,7 +930,7 @@ export default function MyQuoters() {
                 </Select>
               </FormControl>
             </Grid>
-          )}
+          )} */}
 
           <Grid item xs={8} md={2}>
             <FormControl fullWidth>
