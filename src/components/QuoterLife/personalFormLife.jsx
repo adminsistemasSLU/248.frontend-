@@ -1628,6 +1628,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         setCalculado([]);
         setOpenBackdrop(false);
+        return false;
       }
     } catch (error) {
       setErrorMessage("Error al procesar los datos.");
