@@ -1194,6 +1194,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
   }
 
   const handleSubmit = async (e) => {
+    // Valida y Procesa los datos en caso de cambiar los valores antes de guardar,
+    // actualiza los valores en facturacion
+    await handleOpenModal();
+
     const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
     if (tipoPrestamo === 'M') {
       if (faltanDatosConyugue()) {
