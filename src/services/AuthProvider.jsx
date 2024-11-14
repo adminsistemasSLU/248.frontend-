@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
                     localStorage.setItem(PERMISSIONS_STORAGE_KEY, userData.data.ramoRol.ramo_rol);
                 }
                 if (userData.data && userData.data.ramoTipo) {
-                    localStorage.setItem(USERS_FEATURES_STORAGE_KEY, userData.data.ramoTipo);
+                    localStorage.setItem(USERS_FEATURES_STORAGE_KEY, JSON.stringify(userData.data.ramoTipo));
                 }
                 localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData.data.usuario));
                 localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(userData.data.menu));
