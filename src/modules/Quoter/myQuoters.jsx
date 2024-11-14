@@ -1196,7 +1196,7 @@ export default function MyQuoters() {
                           <TableCell align="center">
                             {row.state}
                           </TableCell>
-                          {row.ramoId !== 3 && (
+                          {row.ramoId != 3 && (
                             <TableCell align="left">
                               <>
                                 <Tooltip title={row.reason && row.reason.length > 50 ? row.reason : ""}>
