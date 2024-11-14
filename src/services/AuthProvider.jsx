@@ -4,6 +4,7 @@ import authService from './authServices'; // Asegúrate de importar authService 
 import {
     TOKEN_STORAGE_KEY, USER_STORAGE_KEY, MENU_STORAGE_KEY, PARAMETROS_STORAGE_KEY, PARAMETROS_RAMO_STORAGE_KEY,
     PERMISSIONS_STORAGE_KEY, DATOS_AGENTES,
+    USERS_FEATURES_STORAGE_KEY,
 } from '../utils/constantes';
 
 export const AuthContext = React.createContext({
@@ -67,6 +68,9 @@ export const AuthProvider = ({ children }) => {
                 console.log(userData);
                 if (userData.data && userData.data.ramoRol && userData.data.ramoRol.ramo_rol) {
                     localStorage.setItem(PERMISSIONS_STORAGE_KEY, userData.data.ramoRol.ramo_rol);
+                }
+                if (userData.data && userData.data.ramoTipo) {
+                    localStorage.setItem(USERS_FEATURES_STORAGE_KEY, userData.data.ramoTipo);
                 }
                 localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData.data.usuario));
                 localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(userData.data.menu));

@@ -46,6 +46,7 @@ import {
   LS_TPRESTAMO,
   LS_DATAVIDASEND,
   DATOS_AGENTES,
+  USERS_FEATURES_STORAGE_KEY,
 
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
@@ -120,89 +121,6 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-
-// const headCells = [
-//   {
-//     id: "number",
-//     numeric: false,
-//     disablePadding: true,
-//     label: "#",
-//   },
-//   {
-//     id: "codigo",
-//     numeric: false,
-//     disablePadding: true,
-//     label: "Nro de Certificado",
-//   },
-//   {
-//     id: "ramo",
-//     numeric: false,
-//     disablePadding: false,
-//     label: "Ramo",
-//   },
-//   {
-//     id: "producto",
-//     numeric: false,
-//     disablePadding: false,
-//     label: "Producto",
-//   },
-//   {
-//     id: "cliente",
-//     numeric: false,
-//     disablePadding: false,
-//     label: "Cliente",
-//   },
-//   {
-//     id: "amount",
-//     numeric: true,
-//     disablePadding: false,
-//     label: "Monto",
-//   },
-//   {
-//     id: "rate",
-//     numeric: true,
-//     disablePadding: false,
-//     label: "Tasa",
-//   },
-//   {
-//     id: "prima",
-//     numeric: true,
-//     disablePadding: false,
-//     label: "Prima",
-//   },
-//   {
-//     id: "fechaCreacion",
-//     numeric: true,
-//     disablePadding: false,
-//     label: "Fecha Creación",
-//     width: "170px",
-//   },
-//   {
-//     id: "fechaExportacion",
-//     numeric: true,
-//     disablePadding: false,
-//     label: "Fecha Exportación",
-//     width: "170px",
-//   },
-//   {
-//     id: "state",
-//     numeric: true,
-//     disablePadding: false,
-//     label: "Estado",
-//   },
-//   {
-//     id: "reason",
-//     numeric: false,
-//     disablePadding: false,
-//     label: "Motivo",
-//   },
-//   {
-//     id: "action",
-//     numeric: true,
-//     disablePadding: false,
-//     label: "Acción",
-//   },
-// ];
 
 function EnhancedTableHead(props) {
   const { order, orderBy, onRequestSort, headCells } = props;
@@ -330,6 +248,8 @@ export default function MyQuoters() {
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
   const [agentes, setAgentes] = React.useState([]);
+
+  const [apruebaCotizacion, setApruebaCotizacion] = React.useState([]);
 
   const [openSnack, setOpenSnack] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -485,14 +405,19 @@ export default function MyQuoters() {
 
 
   useEffect(() => {
+    let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+    setUsuarioInterno(usuario.tip_usuario);
     const cargarOpciones = async () => {
-      let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-      setUsuarioInterno(usuario.tip_usuario);
+      
       await cargarEstado();
       await cargarRamo();
       await cargarUsuarioBusqueda();
       cargarAgentesDesdeLocalStorage()
     };
+
+    let usuarioAtributo = JSON.parse(localStorage.getItem(USERS_FEATURES_STORAGE_KEY) || "[]");
+    const containsAprobarEmision = usuarioAtributo.some(item => item.tipo === "aprobar_emision") && usuario.tip_usuario=='I';
+    setApruebaCotizacion(containsAprobarEmision);
 
     cargarOpciones();
     eliminardatos();
@@ -1206,9 +1131,9 @@ export default function MyQuoters() {
                                 </Tooltip>
                               </>
                             </TableCell>
-                           )}
-                          
-                            
+                          )}
+
+
                           <TableCell align="right">{row.broker}</TableCell>
                           <TableCell align="right">{row.usuario}</TableCell>
 
@@ -1239,7 +1164,7 @@ export default function MyQuoters() {
                               </IconButton>
                             )}
 
-                            {usuarioInterno === "I" && row.state == 'No Aprobado' && row.ramoId == 9 && (
+                            {apruebaCotizacion && row.state == 'No Aprobado' && row.ramoId == 9 && (
                               <IconButton onClick={() => aprobarSolicitud(row.id)}>
                                 <CheckCircleIcon />
                               </IconButton>
