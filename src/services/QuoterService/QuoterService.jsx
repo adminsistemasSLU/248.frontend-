@@ -42,6 +42,24 @@ const QuoterService = {
     }
   },
 
+  fetchActualizaCotizacionGeneral: async (id_CotiGeneral,idUsuario,comentario) => {
+    const endpoint = 'api/ActualizaCotizacionGeneral';
+    const method = 'POST'; 
+    const data = {
+      id_CotiGeneral:id_CotiGeneral,
+      idUsuario :idUsuario,
+      comentario:comentario
+    };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Actualiza Cotizacion General:', error);
+      throw error;
+    }
+  },
+
   fetchGuardarCotizacion: async (id_CotiGeneral) => {
     const endpoint = 'api/EliminarCotizacionGeneral';
     const method = 'POST'; 

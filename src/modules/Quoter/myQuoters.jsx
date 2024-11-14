@@ -16,7 +16,7 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
-
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Tooltip from "@mui/material/Tooltip";
 import CurrencyInput from "../../utils/currencyInput";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -226,7 +226,7 @@ function EnhancedTableHead(props) {
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : "asc"}
                 onClick={createSortHandler(headCell.id)}
-                
+
               >
                 {headCell.label}
                 {orderBy === headCell.id ? (
@@ -362,52 +362,52 @@ export default function MyQuoters() {
         numeric: false,
         disablePadding: true,
         label: "#",
-        sortable:true
+        sortable: true
       },
       {
         id: "codigo",
         numeric: false,
         disablePadding: true,
         label: isRamo3 ? "Nro de Certificado" : "Nro de Cotización",
-        sortable:false
+        sortable: false
       },
-      { id: "identificacion", numeric: false, disablePadding: false, label: "Identificación",sortable:true },
-      { id: "ramo", numeric: false, disablePadding: false, label: "Ramo",sortable:false },
-      { id: "producto", numeric: false, disablePadding: false, label: "Producto",sortable:true },
-      { id: "cliente", numeric: false, disablePadding: false, label: "Cliente",sortable:true },
-      { id: "amount", numeric: true, disablePadding: false, label: "Monto",sortable:false },
+      { id: "identificacion", numeric: false, disablePadding: false, label: "Identificación", sortable: true },
+      { id: "ramo", numeric: false, disablePadding: false, label: "Ramo", sortable: false },
+      { id: "producto", numeric: false, disablePadding: false, label: "Producto", sortable: true },
+      { id: "cliente", numeric: false, disablePadding: false, label: "Cliente", sortable: true },
+      { id: "amount", numeric: true, disablePadding: false, label: "Monto", sortable: false },
     ];
 
     if (isRamo3) {
       commonHeadCells.push(
-        { id: "rate", numeric: true, disablePadding: false, label: "Tasa",sortable:false }
+        { id: "rate", numeric: true, disablePadding: false, label: "Tasa", sortable: false }
       );
     }
 
     commonHeadCells.push(
-      { id: "prima", numeric: true, disablePadding: false, label: "Prima",sortable:false },
-      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px',sortable:false }
+      { id: "prima", numeric: true, disablePadding: false, label: "Prima", sortable: false },
+      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px', sortable: false }
     );
 
     if (isRamo3) {
       commonHeadCells.push(
-        { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px',sortable:false },
+        { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px', sortable: false },
       );
     }
 
     commonHeadCells.push(
-      { id: "state", numeric: true, disablePadding: false, label: "Estado",sortable:true },
+      { id: "state", numeric: true, disablePadding: false, label: "Estado", sortable: true },
     );
 
     if (isRamo3) {
       commonHeadCells.push(
-        { id: "reason", numeric: false, disablePadding: false, label: "Motivo",sortable:true },
+        { id: "reason", numeric: false, disablePadding: false, label: "Motivo", sortable: true },
       );
     }
     commonHeadCells.push(
-      { id: "broker", numeric: true, disablePadding: false, label: "Broker",sortable:true },
-      { id: "usuario", numeric: true, disablePadding: false, label: "Usuario",sortable:true },
-      { id: "action", numeric: true, disablePadding: false, label: "Acción",sortable:false },
+      { id: "broker", numeric: true, disablePadding: false, label: "Broker", sortable: true },
+      { id: "usuario", numeric: true, disablePadding: false, label: "Usuario", sortable: true },
+      { id: "action", numeric: true, disablePadding: false, label: "Acción", sortable: false },
     );
 
     return commonHeadCells;
@@ -629,6 +629,52 @@ export default function MyQuoters() {
       window.location.href = `/quoter/pymes/`;
     }
 
+  };
+
+  const aprobarSolicitud = async (id) => {
+    await aprobarCotizacion(id);
+  };
+
+  const aprobarCotizacion = async (id) => {
+    const result = await Swal.fire({
+      title: "¿Está seguro que desea aprobar la cotización?",
+      text: "Por favor, ingrese un comentario antes de confirmar.",
+      icon: "info",
+      input: "textarea",  // Agrega un campo de texto para comentarios
+      inputPlaceholder: "Escribe tu comentario aquí...",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Debe ingresar un comentario";
+        }
+      },
+    });
+
+    try {
+      if (result.isConfirmed) {
+        const comentario = result.value;
+        const idUsuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+        handleOpenBackdrop();
+        const cotizacion = await QuoterService.fetchActualizaCotizacionGeneral(
+          id,
+          idUsuario.id,
+          comentario
+        );
+
+        if (cotizacion && cotizacion.data) {
+          await cargarTabla();
+          return cotizacion.data;
+        }
+
+        handleCloseBackdrop();
+      }
+    } catch (error) {
+      console.error("Error al Eliminar Cotizacion General:", error);
+    }
   };
 
   const handleDeleteQuoter = async (id) => {
@@ -1150,12 +1196,22 @@ export default function MyQuoters() {
                           <TableCell align="center">
                             {row.state}
                           </TableCell>
-                          {row.ramoId != 3 && (
+                          <TableCell align="left">
+                            {row.ramoId !== 3 && (
+                              <>
+                                <Tooltip title={row.reason && row.reason.length > 50 ? row.reason : ""}>
+                                  <span>
+                                    {row.reason ? (row.reason.length > 50 ? `${row.reason.slice(0, 50)}...` : row.reason) : ""}
+                                  </span>
+                                </Tooltip>
+                              </>
+                            )}
+                          </TableCell>
+                          {row.ramoId == 3 && (
                             <>
-                              <TableCell align="left">{row.reason || ""}</TableCell>
+                              <TableCell align="right">{row.broker}</TableCell>
                             </>
                           )}
-                          <TableCell align="right">{row.broker}</TableCell>
                           <TableCell align="right">{row.usuario}</TableCell>
 
                           <TableCell align="right">
@@ -1184,6 +1240,13 @@ export default function MyQuoters() {
                                 <DownloadIcon />
                               </IconButton>
                             )}
+
+                            {usuarioInterno === "I" && row.state == 'No Aprobado' && row.ramoId == 9 && (
+                              <IconButton onClick={() => aprobarSolicitud(row.id)}>
+                                <CheckCircleIcon />
+                              </IconButton>
+                            )}
+
                           </TableCell>
                         </StyledTableRow>
                       );
