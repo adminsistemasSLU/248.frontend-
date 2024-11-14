@@ -91,13 +91,14 @@ const areEqual = (prevProps, nextProps) => {
   );
 };
 
-const MemoizedMontoCell = React.memo(({ value, onChange }) => {
+const MemoizedMontoCell = React.memo(({ value, onChange,disabledMonto }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <TableCell>
       <CurrencyInput
+        disabled = {disabledMonto}
         className="input-table"
         value={value || ''}
         onChange={(e) => {
@@ -119,7 +120,7 @@ const MemoizedMontoCell = React.memo(({ value, onChange }) => {
 
 
 
-const MemoizedRow = React.memo(({ item, codcobIndex, periodoIndex, handleTableChange }) => {
+const MemoizedRow = React.memo(({ item, codcobIndex, periodoIndex, handleTableChange,disabledMonto }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -149,6 +150,7 @@ const MemoizedRow = React.memo(({ item, codcobIndex, periodoIndex, handleTableCh
       <MemoizedMontoCell
         value={(item.monto)}
         onChange={(e) => handleTableChange(e, codcobIndex, periodoIndex, 'monto')}
+        disabledMonto ={disabledMonto}
       />
       <TableCell>
         <TextField
@@ -300,6 +302,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const [finVigencia, setFinVigencia] = useState(dayjs());
   const [openBackdrop, setOpenBackdrop] = React.useState(true);
   const [NomnbreProducto, setNomnbreProducto] = useState("");
+
+  const [disabledMonto, setDisabledMonto] = useState(false);
 
   const isMounted = useRef(false);
   //Combos
@@ -868,6 +872,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const fetchDataCargaInicial = async () => {
       if (formData.vigencia) {
         if (datosCargados) {
+          setDisabledMonto(false);
           handleOpenBackdrop();
           let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
           try {
@@ -888,10 +893,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
           handleCloseBackdrop();
         }
       }
+      if(formData.vigencia ==0){
+        setErrorMessage("La vigencia seleccionada no es valida");
+        setOpenSnack(true);
+        setDisabledMonto(true);
+      }
     };
     fetchDataCargaInicial();
   }, [formData.vigencia]);
-
   //Cuando cambie la variable vigencia
   useEffect(() => {
     fetchDataDocumento();
@@ -2515,72 +2524,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
             />
           </Grid>
 
-
-
-          {/* <Grid item xs={10.5} md={3} style={{ paddingTop: '21px' }} >
-            <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              $ Desempleo <span style={{ color: 'red' }}>*</span>
-            </Typography>
-            <TextField
-              placeholder="Monto Desempleo"
-              type="text"
-              disabled={errorCedula}
-              name="montodesempleo"
-              value={ValidationUtils.Valida_moneda(formData.montodesempleo)}
-              onChange={handleChange}
-              variant="standard"
-              fullWidth
-              inputProps={{ maxLength: 10 }}
-              required
-            />
-          </Grid> */}
-
         </Grid>
-
-
-
 
         <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingTop: '30px', fontWeight: 'bold' }}>
           CALCULOS
         </Typography>
 
-
-        {/* <TableContainer
-          style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-        >
-          <Table
-            sx={{ minWidth: 500, width: 500 }}
-            aria-labelledby="tableTitle"
-            size="small"
-          >
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Periodo</StyledTableCell>
-                <StyledTableCell>Monto</StyledTableCell>
-                {visibleDesempleo && <StyledTableCell>Desempleo</StyledTableCell>}
-                <StyledTableCell>Tasa</StyledTableCell>
-                <StyledTableCell>Prima</StyledTableCell>
-              </TableRow>
-            </TableHead>
-           
-            <TableBody>
-              {Array.isArray(memoizedFormDataTabla) && memoizedFormDataTabla.map((item, index) => (
-                <MemoizedRow key={index} item={item} index={index} handleTableChange={handleTableChange} visibleDesempleo={visibleDesempleo} />
-              ))}
-            </TableBody>
-          </Table>
-
-          <Grid item xs={10.5} md={3} style={{ paddingTop: '25px' }}>
-            <Button
-              onClick={handleOpenModal}
-              sx={{ mr: 1 }}
-              className="button-styled-primary"
-              style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
-            >
-              Calcular
-            </Button>
-          </Grid>
-        </TableContainer> */}
 
         {tablasData.length > 0 ? (tablasData.map((item, index) => (
           <TableContainer key={item.codcob} style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
@@ -2607,6 +2556,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
                     codcobIndex={index}
                     periodoIndex={periodoIndex}
                     handleTableChange={handleTableChange}
+                    disabledMonto = {disabledMonto}
                   />
                 ))}
               </TableBody>
