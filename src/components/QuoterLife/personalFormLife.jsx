@@ -890,7 +890,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           } finally {
             setOpenBackdrop(false);
           }
-
+          debugger;
           if(formData.vigencia ==0){
             setErrorMessage("La vigencia seleccionada no es valida");
             setOpenSnack(true);
