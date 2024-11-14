@@ -872,7 +872,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const fetchDataCargaInicial = async () => {
       if (formData.vigencia) {
         if (datosCargados) {
-          setDisabledMonto(false);
+
+          
           handleOpenBackdrop();
           let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
           try {
@@ -889,15 +890,20 @@ const PersonalFormLife = forwardRef((props, ref) => {
           } finally {
             setOpenBackdrop(false);
           }
+
+          if(formData.vigencia ==0){
+            setErrorMessage("La vigencia seleccionada no es valida");
+            setOpenSnack(true);
+            setDisabledMonto(true);
+          }else{
+            setDisabledMonto(false);
+          }
+
         } else {
           handleCloseBackdrop();
         }
       }
-      if(formData.vigencia ==0){
-        setErrorMessage("La vigencia seleccionada no es valida");
-        setOpenSnack(true);
-        setDisabledMonto(true);
-      }
+      
     };
     fetchDataCargaInicial();
   }, [formData.vigencia]);
