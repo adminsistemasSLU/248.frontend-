@@ -87,7 +87,8 @@ const areEqual = (prevProps, nextProps) => {
     prevProps.item.tasa === nextProps.item.tasa &&
     prevProps.item.prima === nextProps.item.prima &&
     prevProps.index === nextProps.index &&
-    prevProps.handleTableChange === nextProps.handleTableChange
+    prevProps.handleTableChange === nextProps.handleTableChange &&
+    prevProps.disabledMonto === nextProps.disabledMonto
   );
 };
 
@@ -872,8 +873,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const fetchDataCargaInicial = async () => {
       if (formData.vigencia) {
         if (datosCargados) {
-
-          
           handleOpenBackdrop();
           let tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
           try {
@@ -898,6 +897,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           handleCloseBackdrop();
         }
       }else{
+        setDisabledMonto(true);
         if (datosCargados) {
           if(formData.vigencia ==0){
             setErrorMessage("La vigencia seleccionada no es valida");
