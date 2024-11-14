@@ -1196,8 +1196,9 @@ export default function MyQuoters() {
                           <TableCell align="center">
                             {row.state}
                           </TableCell>
+                          {row.ramoId !== 3 && (
                           <TableCell align="left">
-                            {row.ramoId !== 3 && (
+                            
                               <>
                                 <Tooltip title={row.reason && row.reason.length > 50 ? row.reason : ""}>
                                   <span>
@@ -1205,8 +1206,8 @@ export default function MyQuoters() {
                                   </span>
                                 </Tooltip>
                               </>
-                            )}
-                          </TableCell>
+                            </TableCell>
+                           )}
                           {row.ramoId == 3 && (
                             <>
                               <TableCell align="right">{row.broker}</TableCell>
