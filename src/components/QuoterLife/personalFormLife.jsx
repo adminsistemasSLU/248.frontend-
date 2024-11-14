@@ -972,14 +972,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         if(documentType =='C'){
           await consultUserData(documentType, identification);
         }
-        if(cedulaData.message!=='ok' ){
-          Swal.fire({
-            title: "Alerta!",
-            text: cedulaData.message,
-            icon: "warning",
-            confirmButtonText: "Ok",
-          });
-        }
         handleCloseBackdrop();
       } else {
         setErrorCedula(true);
@@ -1039,7 +1031,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
 
-       
+        if(cedulaData.message!=='ok' ){
+          Swal.fire({
+            title: "Alerta!",
+            text: cedulaData.message,
+            icon: "warning",
+            confirmButtonText: "Ok",
+          });
+        }
+
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
 
@@ -1108,7 +1108,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
         identification
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
-
+        if(cedulaData.message!=='ok' ){
+          Swal.fire({
+            title: "Alerta!",
+            text: cedulaData.message,
+            icon: "warning",
+            confirmButtonText: "Ok",
+          });
+        }
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
         setConyugueAge(dateObject);
