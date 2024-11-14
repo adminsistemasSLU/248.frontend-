@@ -972,7 +972,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
         if(documentType =='C'){
           await consultUserData(documentType, identification);
         }
-        
+        if(cedulaData.message!=='ok' ){
+          Swal.fire({
+            title: "Alerta!",
+            text: cedulaData.message,
+            icon: "warning",
+            confirmButtonText: "Ok",
+          });
+        }
         handleCloseBackdrop();
       } else {
         setErrorCedula(true);

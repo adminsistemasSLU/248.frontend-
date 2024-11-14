@@ -121,101 +121,94 @@ function stableSort(array, comparator) {
 }
 
 
-const headCells = [
-  {
-    id: "number",
-    numeric: false,
-    disablePadding: true,
-    label: "#",
-  },
-  {
-    id: "codigo",
-    numeric: false,
-    disablePadding: true,
-    label: "Nro de Certificado  ",
-  },
-  {
-    id: "ramo",
-    numeric: false,
-    disablePadding: false,
-    label: "Ramo",
-  },
-  {
-    id: "producto",
-    numeric: false,
-    disablePadding: false,
-    label: "Producto",
-  },
-  {
-    id: "cliente",
-    numeric: false,
-    disablePadding: false,
-    label: "Cliente",
-  },
-  // {
-  //   id: 'risk',
-  //   numeric: true,
-  //   disablePadding: false,
-  //   label: 'T.Riesgo',
-  // },
-  {
-    id: "amount",
-    numeric: true,
-    disablePadding: false,
-    label: "Monto",
-  },
-  {
-    id: "rate",
-    numeric: true,
-    disablePadding: false,
-    label: "Tasa",
-  },
-  {
-    id: "prima",
-    numeric: true,
-    disablePadding: false,
-    label: "Prima",
-  },
-  {
-    id: "fechaCreacion",
-    numeric: true,
-    disablePadding: false,
-    label: "Fecha Creación",
-    width: '170px'
-  },
-  {
-    id: "fechaExportacion",
-    numeric: true,
-    disablePadding: false,
-    label: "Fecha Exportación",
-    width: '170px'
-  },
-  {
-    id: "state",
-    numeric: true,
-    disablePadding: false,
-    label: "Estado",
-  },
-  {
-    id: "reason",
-    numeric: false,
-    disablePadding: false,
-    label: "Motivo",
-  },
-  {
-    id: "action",
-    numeric: true,
-    disablePadding: false,
-    label: "Acción",
-  },
-];
+// const headCells = [
+//   {
+//     id: "number",
+//     numeric: false,
+//     disablePadding: true,
+//     label: "#",
+//   },
+//   {
+//     id: "codigo",
+//     numeric: false,
+//     disablePadding: true,
+//     label: "Nro de Certificado",
+//   },
+//   {
+//     id: "ramo",
+//     numeric: false,
+//     disablePadding: false,
+//     label: "Ramo",
+//   },
+//   {
+//     id: "producto",
+//     numeric: false,
+//     disablePadding: false,
+//     label: "Producto",
+//   },
+//   {
+//     id: "cliente",
+//     numeric: false,
+//     disablePadding: false,
+//     label: "Cliente",
+//   },
+//   {
+//     id: "amount",
+//     numeric: true,
+//     disablePadding: false,
+//     label: "Monto",
+//   },
+//   {
+//     id: "rate",
+//     numeric: true,
+//     disablePadding: false,
+//     label: "Tasa",
+//   },
+//   {
+//     id: "prima",
+//     numeric: true,
+//     disablePadding: false,
+//     label: "Prima",
+//   },
+//   {
+//     id: "fechaCreacion",
+//     numeric: true,
+//     disablePadding: false,
+//     label: "Fecha Creación",
+//     width: "170px",
+//   },
+//   {
+//     id: "fechaExportacion",
+//     numeric: true,
+//     disablePadding: false,
+//     label: "Fecha Exportación",
+//     width: "170px",
+//   },
+//   {
+//     id: "state",
+//     numeric: true,
+//     disablePadding: false,
+//     label: "Estado",
+//   },
+//   {
+//     id: "reason",
+//     numeric: false,
+//     disablePadding: false,
+//     label: "Motivo",
+//   },
+//   {
+//     id: "action",
+//     numeric: true,
+//     disablePadding: false,
+//     label: "Acción",
+//   },
+// ];
 
 function EnhancedTableHead(props) {
   const { order, orderBy, onRequestSort, headCells } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
-
   return (
     <TableHead>
       <TableRow>
@@ -226,13 +219,14 @@ function EnhancedTableHead(props) {
             sx={{ width: headCell.width || '130px' }}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
+            sortDirection={orderBy === headCell.id ? order : false}
           >
             {headCell.sortable ? (
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : "asc"}
                 onClick={createSortHandler(headCell.id)}
-                hideSortIcon={true}
+                
               >
                 {headCell.label}
                 {orderBy === headCell.id ? (
@@ -242,13 +236,12 @@ function EnhancedTableHead(props) {
                 ) : null}
               </TableSortLabel>
             ) : (
-              headCell.label // Solo muestra el texto sin `TableSortLabel`
+              headCell.label // Solo el texto sin `TableSortLabel`
             )}
           </StyledTableCell>
         ))}
       </TableRow>
     </TableHead>
-
   );
 }
 
@@ -368,51 +361,53 @@ export default function MyQuoters() {
         id: "number",
         numeric: false,
         disablePadding: true,
-        label: "#"
+        label: "#",
+        sortable:true
       },
       {
         id: "codigo",
         numeric: false,
         disablePadding: true,
-        label: isRamo3 ? "Nro de Certificado" : "Nro de Cotización"
+        label: isRamo3 ? "Nro de Certificado" : "Nro de Cotización",
+        sortable:false
       },
-      { id: "identificacion", numeric: false, disablePadding: false, label: "Identificación" },
-      { id: "ramo", numeric: false, disablePadding: false, label: "Ramo" },
-      { id: "producto", numeric: false, disablePadding: false, label: "Producto" },
-      { id: "cliente", numeric: false, disablePadding: false, label: "Cliente" },
-      { id: "amount", numeric: true, disablePadding: false, label: "Monto" },
+      { id: "identificacion", numeric: false, disablePadding: false, label: "Identificación",sortable:true },
+      { id: "ramo", numeric: false, disablePadding: false, label: "Ramo",sortable:false },
+      { id: "producto", numeric: false, disablePadding: false, label: "Producto",sortable:true },
+      { id: "cliente", numeric: false, disablePadding: false, label: "Cliente",sortable:true },
+      { id: "amount", numeric: true, disablePadding: false, label: "Monto",sortable:false },
     ];
 
     if (isRamo3) {
       commonHeadCells.push(
-        { id: "rate", numeric: true, disablePadding: false, label: "Tasa" }
+        { id: "rate", numeric: true, disablePadding: false, label: "Tasa",sortable:false }
       );
     }
 
     commonHeadCells.push(
-      { id: "prima", numeric: true, disablePadding: false, label: "Prima" },
-      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px' }
+      { id: "prima", numeric: true, disablePadding: false, label: "Prima",sortable:false },
+      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px',sortable:false }
     );
 
     if (isRamo3) {
       commonHeadCells.push(
-        { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px' },
+        { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px',sortable:false },
       );
     }
 
     commonHeadCells.push(
-      { id: "state", numeric: true, disablePadding: false, label: "Estado" },
+      { id: "state", numeric: true, disablePadding: false, label: "Estado",sortable:true },
     );
 
     if (isRamo3) {
       commonHeadCells.push(
-        { id: "reason", numeric: false, disablePadding: false, label: "Motivo" },
+        { id: "reason", numeric: false, disablePadding: false, label: "Motivo",sortable:true },
       );
     }
     commonHeadCells.push(
-      { id: "broker", numeric: true, disablePadding: false, label: "Broker" },
-      { id: "usuario", numeric: true, disablePadding: false, label: "Usuario" },
-      { id: "action", numeric: true, disablePadding: false, label: "Acción" },
+      { id: "broker", numeric: true, disablePadding: false, label: "Broker",sortable:true },
+      { id: "usuario", numeric: true, disablePadding: false, label: "Usuario",sortable:true },
+      { id: "action", numeric: true, disablePadding: false, label: "Acción",sortable:false },
     );
 
     return commonHeadCells;
