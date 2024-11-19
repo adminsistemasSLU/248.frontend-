@@ -1537,27 +1537,27 @@ const PersonalFormLife = forwardRef((props, ref) => {
       arrLogTasa: {},
       vidaGrupo: "N",
     }
-    const pag = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
+    // const pag = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
 
-    const totalPagar = {
-      documentType: formData.documentType,
-      identification: formData.identification,
-      name: formData.name,
-      lastname: formData.lastname,
-      direction: formData.address,
-      email: formData.email,
-      phone: formData.phone,
-      sumAdd: formData.prestamo,
-      prima: formData.prima,
-      impScvs: pag.impScvs,
-      impSsc: pag.impSsc,
-      admision: pag.admision,
-      subtotal: pag.subtotal,
-      iva: pag.iva,
-      total: pag.total,
-      pais: formData.country
-    }
-    sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
+    // const totalPagar = {
+    //   documentType: formData.documentType,
+    //   identification: formData.identification,
+    //   name: formData.name,
+    //   lastname: formData.lastname,
+    //   direction: formData.address,
+    //   email: formData.email,
+    //   phone: formData.phone,
+    //   sumAdd: formData.prestamo,
+    //   prima: formData.prima,
+    //   impScvs: pag.impScvs,
+    //   impSsc: pag.impSsc,
+    //   admision: pag.admision,
+    //   subtotal: pag.subtotal,
+    //   iva: pag.iva,
+    //   total: pag.total,
+    //   pais: formData.country
+    // }
+    // sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
 
     // Si existen entonces estamos en modo editar
     const application = sessionStorage.getItem(LS_IDCOTIZACIONVIDA);
