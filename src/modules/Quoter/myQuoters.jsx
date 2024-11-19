@@ -94,14 +94,38 @@ function createData(
 }
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
+  const valueA = a[orderBy];
+  const valueB = b[orderBy];
+
+  // Intentar parsear como fechas
+  const dateA = Date.parse(valueA);
+  const dateB = Date.parse(valueB);
+
+  if (!isNaN(dateA) && !isNaN(dateB)) {
+    // Si ambos son fechas válidas, compararlas
+    return dateB - dateA;
+  }
+
+  // Si uno es fecha válida y el otro no, tratar la fecha como mayor
+  if (!isNaN(dateA) && isNaN(dateB)) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (isNaN(dateA) && !isNaN(dateB)) {
     return 1;
   }
+
+  // Si no son fechas, manejar como números o cadenas
+  if (valueB < valueA) {
+    return -1;
+  }
+  if (valueB > valueA) {
+    return 1;
+  }
+
+  // Igualdad
   return 0;
 }
+
 
 function getComparator(order, orderBy) {
   return order === "desc"
