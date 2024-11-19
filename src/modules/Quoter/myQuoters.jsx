@@ -306,7 +306,7 @@ export default function MyQuoters() {
 
     commonHeadCells.push(
       { id: "prima", numeric: true, disablePadding: false, label: "Prima", sortable: false },
-      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px', sortable: false }
+      { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px', sortable: true }
     );
 
     if (isRamo3) {

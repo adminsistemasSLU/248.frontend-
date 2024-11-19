@@ -1745,8 +1745,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const ssc = parseFloat((primaNumber * porSsc / 100).toFixed(2));
       const der_poliza = parseFloat(derPoliza.toFixed(2));
 
-
-
       // Suma los impuestos
       impuesto = parseFloat((iva + sbs + ssc + der_poliza).toFixed(2));
 
