@@ -777,7 +777,7 @@ export default function MyQuoters() {
   };
 
   async function exportarTabla() {
-    if (filters.estado && filters.estado === 'S') {
+    if (filters.estado && filters.estado === 'S' && apruebaCotizacion) {
       Swal.fire({
         title: "Información",
         text: 'Desea exportar las cotizaciones Aprobadas',
