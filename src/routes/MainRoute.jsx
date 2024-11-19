@@ -7,6 +7,7 @@ import QuoterRoutes from '../routes/QuoterRoute';
 import Loading from '../utils/loading';
 import { useAuth } from '../services/AuthProvider';
 import ChangePassword from '../utils/changePassword';
+import Login2 from '../modules/Register/Login2';
 
 const Login = lazy(() => import('../modules/Register/Login'));
 const Register = lazy(() => import('../modules/Register/Register'));
@@ -32,6 +33,7 @@ const MainRoute = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="login" element={<Login />} />
+          <Route path="login2" element={<Login2 />} />
           <Route path="changePassword" element={<ChangePassword />} />
           <Route path="register" element={<Register />} />
           <Route path="/" element={<Navigate to="login" />} />
