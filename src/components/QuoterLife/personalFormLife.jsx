@@ -1671,6 +1671,73 @@ const PersonalFormLife = forwardRef((props, ref) => {
         setOpenBackdrop(false);
         sessionStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
         setCalculado(response);
+        let prima = 0;
+        let monto = 0;
+        for (let key in response.data.conf_amparos) {
+  
+          for (let subKey in response.data.conf_amparos[key]) {
+            let item = response.data.conf_amparos[key][subKey];
+            prima = item.prima_anio + prima;
+          }
+          for (let subKey in response.data.conf_amparos[key]) {
+            let item = response.data.conf_amparos[key][subKey];
+            monto = parseFloat(item.monto) + parseFloat(monto);
+          }
+        }
+  
+        let impuesto = 0;
+        const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
+        console.log(prima);
+        const primaNumber = Number(prima);
+        const porIva = Number(parametros[0].por_iva);
+        const porSbs = Number(parametros[0].por_sbs);
+        const porSsc = Number(parametros[0].por_ssc);
+        const derPoliza = Number(parametros[0].der_poliza);
+  
+        // Calcula los impuestos y redondea a 2 decimales
+        //const iva = parseFloat((primaNumber * porIva / 100).toFixed(2));
+        const iva = 0;
+        const sbs = parseFloat((primaNumber * porSbs / 100).toFixed(2));
+        const ssc = parseFloat((primaNumber * porSsc / 100).toFixed(2));
+        const der_poliza = parseFloat(derPoliza.toFixed(2));
+  
+        // Suma los impuestos
+        impuesto = parseFloat((iva + sbs + ssc + der_poliza).toFixed(2));
+  
+        // Calcula el total y redondea a 2 decimales
+        let total = parseFloat((primaNumber + impuesto).toFixed(2));
+  
+        let subTotal = parseFloat(((impuesto - iva) + prima).toFixed(2));
+        let totalPag = parseFloat((subTotal + iva).toFixed(2));
+  
+        const totalPagar = {
+          documentType: formData.documentType,
+          identification: formData.identification,
+          name: formData.name,
+          lastname: formData.lastname,
+          email: formData.email,
+          phone: formData.phone,
+          sumAdd: monto,
+          prima: primaNumber,
+          impScvs: sbs,
+          impSsc: ssc,
+          admision: der_poliza,
+          subtotal: subTotal,
+          iva: iva,
+          total: totalPag,
+          pais: formData.country
+        }
+        sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
+  
+        // Actualiza el formData con los valores calculados y redondeados
+        setFormData({
+          ...formData,
+          prima: parseFloat(primaNumber.toFixed(2)),
+          primaMensual: parseFloat((total / 12).toFixed(2)),
+          primaTotal: total,
+          impuesto: impuesto,
+  
+        });
       } else {
         setErrorMessage(response.message);
         setOpenSnack(true);
