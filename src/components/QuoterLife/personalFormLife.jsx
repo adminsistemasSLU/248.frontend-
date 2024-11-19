@@ -1682,7 +1682,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         }
         for (let subKey in response.data.conf_amparos[key]) {
           let item = response.data.conf_amparos[key][subKey];
-          monto = item.monto + monto;
+          monto = parseFloat(item.monto) + parseFloat(monto);
         }
       }
 
