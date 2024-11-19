@@ -92,14 +92,14 @@ const areEqual = (prevProps, nextProps) => {
   );
 };
 
-const MemoizedMontoCell = React.memo(({ value, onChange,disabledMonto }) => {
+const MemoizedMontoCell = React.memo(({ value, onChange, disabledMonto }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <TableCell>
       <CurrencyInput
-        disabled = {disabledMonto}
+        disabled={disabledMonto}
         className="input-table"
         value={value || ''}
         onChange={(e) => {
@@ -121,7 +121,7 @@ const MemoizedMontoCell = React.memo(({ value, onChange,disabledMonto }) => {
 
 
 
-const MemoizedRow = React.memo(({ item, codcobIndex, periodoIndex, handleTableChange,disabledMonto }) => {
+const MemoizedRow = React.memo(({ item, codcobIndex, periodoIndex, handleTableChange, disabledMonto }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -151,7 +151,7 @@ const MemoizedRow = React.memo(({ item, codcobIndex, periodoIndex, handleTableCh
       <MemoizedMontoCell
         value={(item.monto)}
         onChange={(e) => handleTableChange(e, codcobIndex, periodoIndex, 'monto')}
-        disabledMonto ={disabledMonto}
+        disabledMonto={disabledMonto}
       />
       <TableCell>
         <TextField
@@ -305,6 +305,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
   const [NomnbreProducto, setNomnbreProducto] = useState("");
 
   const [disabledMonto, setDisabledMonto] = useState(false);
+
+  const [showTable, setShowTable] = useState(true);
 
   const isMounted = useRef(false);
   //Combos
@@ -598,7 +600,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       const paises = await ComboService.fetchComboPais();
       if (paises && paises.data) {
         await setCountry(paises.data);
-        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais,  countryConyugue: paises.data[69].codpais, }));
+        await setFormData((formData) => ({ ...formData, country: paises.data[69].codpais, countryConyugue: paises.data[69].codpais, }));
 
       }
     } catch (error) {
@@ -763,8 +765,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   function crearDatosProcesarDatos() {
-  const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
- let conyugueEdad = '';
+    const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
+    let conyugueEdad = '';
     if (!tipoPrestamo === 'I') {
       conyugueEdad = conyugueage.format('DD/MM/YYYY');
     }
@@ -889,31 +891,34 @@ const PersonalFormLife = forwardRef((props, ref) => {
           } finally {
             setOpenBackdrop(false);
           }
-          if(formData.vigencia !=0){
+          if (formData.vigencia != 0) {
             setDisabledMonto(false);
+            setShowTable(true);
           }
 
         } else {
-          if (formData.vigencia !=0) {
+          if (formData.vigencia != 0) {
             setDisabledMonto(false);
+            setShowTable(true);
           }
           handleCloseBackdrop();
         }
-      }else{
+      } else {
         //setDisabledMonto(true);
         if (datosCargados) {
-          if(formData.vigencia ==0){
+          if (formData.vigencia == 0) {
             setErrorMessage("La vigencia seleccionada no es valida");
             setOpenSnack(true);
             setDisabledMonto(true);
           }
-        }else{
-          if(formData.vigencia ==0){
+        } else {
+          if (formData.vigencia == 0) {
             setDisabledMonto(true);
+            setShowTable(false);
           }
         }
       }
-      
+
     };
     fetchDataCargaInicial();
   }, [formData.vigencia]);
@@ -925,18 +930,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   useEffect(() => {
     fetchDataPreguntas();
-  }, [formData.prestamo,formData.ageCalculated]);
+  }, [formData.prestamo, formData.ageCalculated]);
 
   const fetchDataPreguntas = async () => {
-    if (formData.prestamo && formData.ageCalculated  ) {
+    if (formData.prestamo && formData.ageCalculated) {
       if (datosCargados) {
         try {
           handleOpenBackdrop();
-          const data = await LifeService.fetchActualizaPreguntas(ramo, producto,formData.prestamo,formData.ageCalculated);
+          const data = await LifeService.fetchActualizaPreguntas(ramo, producto, formData.prestamo, formData.ageCalculated);
           let preguntasVida = data.data.arrDeclaracionesAsegurado.pregunta;
           if (data) {
             sessionStorage.setItem(LS_PREGUNTASVIDA, JSON.stringify(preguntasVida));
-          } 
+          }
           handleCloseBackdrop();
         } catch (error) {
           //setErrorMessage("No existen Preguntas asignadas con los parametros ingresados");
@@ -994,7 +999,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200) {
         setErrorCedula(false);
-        if(documentType =='C'){
+        if (documentType == 'C') {
           await consultUserData(documentType, identification);
         }
         handleCloseBackdrop();
@@ -1026,12 +1031,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200) {
         setErrorCedula(false);
-        if(documentType =='C'){
+        if (documentType == 'C') {
           await consultConyugueData(documentType, identification);
         }
         handleCloseBackdrop();
       } else {
-        
+
         setOpen(true);
         setmessageError(cedulaData.message);
         handleCloseBackdrop();
@@ -1056,7 +1061,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
 
-        if(cedulaData.message!=='ok' ){
+        if (cedulaData.message !== 'ok') {
           Swal.fire({
             title: "Alerta!",
             text: cedulaData.message,
@@ -1080,19 +1085,19 @@ const PersonalFormLife = forwardRef((props, ref) => {
           address: cedulaData.data[0].cli_direccion || "",
           ageCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
           genero: cedulaData.data[0].cli_sexo || "",
-          
+
         });
-      }else{
+      } else {
         verificarLavadoActivo(cedulaData);
         setFormData({
           ...formData,
-          name:  "",
+          name: "",
           lastname: "",
           email: "",
           phone: "",
           address: "",
           ageCalculated: "",
-          genero:  "",
+          genero: "",
         });
       }
     } catch (error) {
@@ -1104,7 +1109,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   function verificarLavadoActivo(cedulaData) {
- 
+
     setErrorCedula(true);
     setOpen(true);
     setmessageError(cedulaData.message);
@@ -1133,7 +1138,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         identification
       );
       if (cedulaData.codigo === 200 && cedulaData.data) {
-        if(cedulaData.message!=='ok' ){
+        if (cedulaData.message !== 'ok') {
           Swal.fire({
             title: "Alerta!",
             text: cedulaData.message,
@@ -1151,13 +1156,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
           conyugesexo: cedulaData.data[0].cli_sexo || "",
           ageConyugueCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
         });
-      }else{
+      } else {
         verificarLavadoActivo(cedulaData);
         setFormData({
           ...formData,
-          conyugenombre:  "",
+          conyugenombre: "",
           conyugeapellido: "",
-          conyugesexo:  "",
+          conyugesexo: "",
           ageConyugueCalculated: "",
         });
       }
@@ -1235,12 +1240,12 @@ const PersonalFormLife = forwardRef((props, ref) => {
   }
 
   const handleSubmit = async (e) => {
-    
-    
-    let continuar =  await handleOpenModal();
-   if(!continuar){
-    return false;
-   }
+
+
+    let continuar = await handleOpenModal();
+    if (!continuar) {
+      return false;
+    }
 
     const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
     if (tipoPrestamo === 'M') {
@@ -1312,8 +1317,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //JSON PARA MAPEAR LOS CAMPOS Y ENVIARLOS
     let datosconyugues = {};
 
-    if(formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre){
-       datosconyugues = {
+    if (formData.status === CodigoComboCasado || formData.status === CodigoComboUnionLibre) {
+      datosconyugues = {
         nombreConyuge: formData.conyugenombre,
         apellidoConyuge: formData.conyugeapellido,
         identificacion: formData.conyugenumero,
@@ -1322,7 +1327,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         tipo: formData.conyugetipo,
         pais: formData.countryConyugue
       };
-    }else {
+    } else {
       datosconyugues = {
         nombreConyuge: '',
         apellidoConyuge: '',
@@ -1478,14 +1483,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
     const preguntasVida = JSON.parse(sessionStorage.getItem(LS_PREGUNTASVIDA));
     const dataresp = JSON.parse(sessionStorage.getItem(LS_PREGRESPONDIDAS));
 
-    let preguntas ;
+    let preguntas;
 
-    if(dataresp){
+    if (dataresp) {
       preguntas = dataresp;
-    }else{
+    } else {
       preguntas = preguntasVida;
     }
-     
+
 
 
     const data = {
@@ -1618,7 +1623,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     if (!todosTienenNumero) {
       setErrorMessage("Se deben ingresar valores validos en la tabla de montos")
       setOpenSnack(true);
-      
+
       return false;
     }
 
@@ -1679,7 +1684,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setOpenBackdrop(false);
     }
     return true;
-        // setOpenModal(true);
+    // setOpenModal(true);
   };
 
 
@@ -2546,51 +2551,57 @@ const PersonalFormLife = forwardRef((props, ref) => {
           CALCULOS
         </Typography>
 
+        {showTable ? (
+          <>
 
-        {tablasData.length > 0 ? (tablasData.map((item, index) => (
-          <TableContainer key={item.codcob} style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-          >
-            <h3>{item.nomcob}</h3>
-            <Table
-              sx={{ minWidth: 500, width: 500 }}
-              aria-labelledby="tableTitle"
-              size="small"
-            >
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Periodo</StyledTableCell>
-                  <StyledTableCell>Monto</StyledTableCell>
-                  <StyledTableCell>Tasa</StyledTableCell>
-                  <StyledTableCell>Prima</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {item.periodos.map((periodo, periodoIndex) => (
-                  <MemoizedRow
-                    key={periodoIndex}
-                    item={periodo}
-                    codcobIndex={index}
-                    periodoIndex={periodoIndex}
-                    handleTableChange={handleTableChange}
-                    disabledMonto = {disabledMonto}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        ))) : (
-          <p>No hay coberturas disponibles configuradas para este producto.</p>
+            {tablasData.length > 0 ? (tablasData.map((item, index) => (
+              <TableContainer key={item.codcob} style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+              >
+                <h3>{item.nomcob}</h3>
+                <Table
+                  sx={{ minWidth: 500, width: 500 }}
+                  aria-labelledby="tableTitle"
+                  size="small"
+                >
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell>Periodo</StyledTableCell>
+                      <StyledTableCell>Monto</StyledTableCell>
+                      <StyledTableCell>Tasa</StyledTableCell>
+                      <StyledTableCell>Prima</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {item.periodos.map((periodo, periodoIndex) => (
+                      <MemoizedRow
+                        key={periodoIndex}
+                        item={periodo}
+                        codcobIndex={index}
+                        periodoIndex={periodoIndex}
+                        handleTableChange={handleTableChange}
+                        disabledMonto={disabledMonto}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ))) : (
+              <p>No hay coberturas disponibles configuradas para este producto.</p>
+            )}
+            <Grid item xs={10.5} md={3} style={{ paddingTop: '0px', paddingBottom: '25px' }}>
+              <Button
+                onClick={handleOpenModal}
+                sx={{ mr: 1 }}
+                className="button-styled-primary"
+                style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
+              >
+                Calcular
+              </Button>
+            </Grid>
+          </>
+        ) : (
+          <p>Debe ingresar todos los campos.</p>
         )}
-        <Grid item xs={10.5} md={3} style={{ paddingTop: '0px', paddingBottom: '25px' }}>
-          <Button
-            onClick={handleOpenModal}
-            sx={{ mr: 1 }}
-            className="button-styled-primary"
-            style={{ top: "20%", backgroundColor: '#0099a8', color: "white", borderRadius: "5px" }}
-          >
-            Calcular
-          </Button>
-        </Grid>
 
 
         <Grid container spacing={2} style={{ paddingRight: '45px' }}>
