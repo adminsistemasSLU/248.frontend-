@@ -904,6 +904,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
             setOpenSnack(true);
             setDisabledMonto(true);
           }
+        }else{
+          if(formData.vigencia ==0){
+            setDisabledMonto(true);
+          }
         }
       }
       
