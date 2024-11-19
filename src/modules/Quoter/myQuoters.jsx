@@ -63,7 +63,7 @@ function createData(
   prima,
   rate,
   state,
-  createdDate,
+  fechaCreacion,
   productoId,
   ramoId,
   reason,
@@ -82,7 +82,7 @@ function createData(
     prima,
     rate,
     state,
-    createdDate,
+    fechaCreacion,
     productoId,
     ramoId,
     reason,
@@ -418,7 +418,7 @@ export default function MyQuoters() {
       row.producto.toLowerCase().includes(filter.toLowerCase()) ||
       row.cliente.toLowerCase().includes(filter.toLowerCase()) ||
       row.state.toLowerCase().includes(filter.toLowerCase()) ||
-      row.createdDate.toLowerCase().includes(filter.toLowerCase())
+      row.fechaCreacion.toLowerCase().includes(filter.toLowerCase())
     );
   });
 
@@ -1133,7 +1133,7 @@ export default function MyQuoters() {
                           )}
 
                           <TableCell align="right" sx={{ width: '140px' }}>
-                            {row.createdDate}
+                            {row.fechaCreacion}
                           </TableCell>
                           {row.ramoId != 3 && (
                             <>
