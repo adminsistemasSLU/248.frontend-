@@ -1239,6 +1239,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
     return false;
   }
 
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const handleSubmit = async (e) => {
 
 
@@ -1246,7 +1250,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
     if (!continuar) {
       return false;
     }
-
+    await delay(1000);
     const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
     if (tipoPrestamo === 'M') {
       if (faltanDatosConyugue()) {
