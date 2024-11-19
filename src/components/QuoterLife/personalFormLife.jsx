@@ -1673,11 +1673,16 @@ const PersonalFormLife = forwardRef((props, ref) => {
         setCalculado(response);
 
       let prima = 0;
+      let monto = 0;
       for (let key in response.data.conf_amparos) {
 
         for (let subKey in response.data.conf_amparos[key]) {
           let item = response.data.conf_amparos[key][subKey];
           prima = item.prima_anio + prima;
+        }
+        for (let subKey in response.data.conf_amparos[key]) {
+          let item = response.data.conf_amparos[key][subKey];
+          monto = item.monto + monto;
         }
       }
 
@@ -1713,7 +1718,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         lastname: formData.lastname,
         email: formData.email,
         phone: formData.phone,
-        sumAdd: formData.prestamo,
+        sumAdd: monto,
         prima: primaNumber,
         impScvs: sbs,
         impSsc: ssc,
