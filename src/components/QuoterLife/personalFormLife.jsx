@@ -894,6 +894,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
           }
 
         } else {
+          if (formData.vigencia !=0) {
+            setDisabledMonto(false);
+          }
           handleCloseBackdrop();
         }
       }else{
