@@ -897,7 +897,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           handleCloseBackdrop();
         }
       }else{
-        setDisabledMonto(true);
+        //setDisabledMonto(true);
         if (datosCargados) {
           if(formData.vigencia ==0){
             setErrorMessage("La vigencia seleccionada no es valida");
