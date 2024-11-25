@@ -1763,18 +1763,19 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setTablasData(result);
 
       let prima = 0;
+      let monto =0;
       for (let key in calculado.data.conf_amparos) {
 
         for (let subKey in calculado.data.conf_amparos[key]) {
           let item = calculado.data.conf_amparos[key][subKey];
           prima = item.prima_anio + prima;
+          monto = parseFloat(item.monto) + parseFloat(monto);
         }
 
       }
-
       let impuesto = 0;
       const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
-      console.log(prima);
+      
       const primaNumber = Number(prima);
       const porIva = Number(parametros[0].por_iva);
       const porSbs = Number(parametros[0].por_sbs);
@@ -1804,8 +1805,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
         lastname: formData.lastname,
         email: formData.email,
         phone: formData.phone,
-        sumAdd: formData.prestamo,
+        //sumAdd: formData.prestamo,
         prima: primaNumber,
+        sumaAdd:monto,
         impScvs: sbs,
         impSsc: ssc,
         admision: der_poliza,
