@@ -465,7 +465,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       const datos = [];
       datos.data = datosprestamo;
-      console.log(datos);
       setCalculado(datos);
 
       setDatosCargados(true);
@@ -551,7 +550,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       console.error("Error al obtener antiguedad:", error);
     }
   };
-
 
   const cargarCotizacion = async () => {
 
@@ -815,8 +813,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
     if (name === "tipoProducto") {
       const tipo_prestamo = sessionStorage.getItem(LS_TPRESTAMO)
-      console.log(value);
-      console.log(tipo_prestamo);
       if ((value !== tipo_prestamo)) {
         if (tipo_prestamo !== 'A' || value === 'Z') {
           setErrorMessage("El tipo de plan ingresado no es valido")
@@ -878,7 +874,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
           try {
             const data = await LifeService.fetchTablaPeriodo(ramo, producto, tipoPrestamo, formData.vigencia, inicioVigencia.format("DD/MM/YYYY"));
             sessionStorage.setItem(LS_TABLACALC, JSON.stringify(data.data.conf_amparos));
-            console.log(data.data.montoPeriodo);
 
             setCalculado(data);
 
@@ -1659,7 +1654,9 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         }
 
-        let monto = response.data.sumaAsegurada;  
+        let monto = response.data.sumaAsegurada;
+        setFormData({ ...formData, prestamo: monto });
+
         let impuesto = 0;
         const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
         const primaNumber = Number(prima);
@@ -1667,7 +1664,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         const porSbs = Number(parametros[0].por_sbs);
         const porSsc = Number(parametros[0].por_ssc);
         const derPoliza = Number(parametros[0].der_poliza);
-  
+
         // Calcula los impuestos y redondea a 2 decimales
         //const iva = parseFloat((primaNumber * porIva / 100).toFixed(2));
         const iva = 0;
@@ -1704,8 +1701,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
         sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
   
         // Actualiza el formData con los valores calculados y redondeados
+        console.log("MOnto:" + monto);
         setFormData({
           ...formData,
+          prestamo: parseFloat(monto.toFixed(2)),
           prima: parseFloat(primaNumber.toFixed(2)),
           primaMensual: parseFloat((total / 12).toFixed(2)),
           primaTotal: total,
@@ -1774,7 +1773,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
       let impuesto = 0;
       const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
-      console.log(prima);
       const primaNumber = Number(prima);
       const porIva = Number(parametros[0].por_iva);
       const porSbs = Number(parametros[0].por_sbs);
