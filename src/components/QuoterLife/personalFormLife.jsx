@@ -486,7 +486,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
           item.periodos.forEach((periodo) => {
             const montoConvertido = periodo.monto.replace(/[$,]/g, ''); // Limpiar el monto
             const monto = parseFloat(montoConvertido); // Convierte a número flotante
-
             // Verifica si el valor es un número válido
             if (!isNaN(monto) && monto !== null && monto !== '') {
               acc += monto; // Suma el monto válido al acumulador
@@ -505,7 +504,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           setOpenSnack(true);
           return;
         }
-        setFormData({ ...formData, prestamo: resultado });
+        
         const data = crearDatosProcesarDatos();
         setOpenBackdrop(true);
 
@@ -514,6 +513,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           const response = await LifeService.fetchProcesaDatos(data);
           if (response.codigo === 200) {
             sessionStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
+            setFormData({ ...formData, prestamo: response.data.sumaAsegurada});
             setCalculado(response);
           } else {
             setErrorMessage(response.message);
@@ -683,8 +683,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         sessionStorage.setItem(LS_FPAGO, vigencia.data.frm_pago);
         sessionStorage.setItem(LS_TPRESTAMO, vigencia.data.tipo_prestamo);
-
-
 
         setFormData((formData) => ({ ...formData, tipoProducto: vigencia.data.tipo_prestamo }));
 
@@ -1235,20 +1233,15 @@ const PersonalFormLife = forwardRef((props, ref) => {
     //   setOpenSnack(true);
     //   return true;
     // }
-
     return false;
   }
 
- 
   const handleSubmit = async (e) => {
-
 
     let continuar = await handleOpenModal();
     if (!continuar) {
       return false;
     }
-
-    
 
     const tipoPrestamo = (formData.status === 2 || formData.status === 5) ? 'M' : 'I';
     if (tipoPrestamo === 'M') {
@@ -1289,7 +1282,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setOpenSnack(true);
       return false;
     }
-
 
     const poliza = JSON.parse(sessionStorage.getItem(LS_VIDAPOLIZA));
     const requiredFields = [
@@ -1342,7 +1334,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       };
     }
 
-
     const periodos = tablasData.map((item) => {
       return {
         codigo: item.codcob, // Usar codcob de tablasData
@@ -1371,10 +1362,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return acc;
     }, {});
 
-    console.log(arrMontoPeriodo);
-
-    console.log(tablasData);
-
     const datosprestamo = {
       conf_amparos: arrMontoPeriodo,
       prestamo: formData.prestamo,
@@ -1393,8 +1380,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       numPrestamo: formData.numPrestamo,
       tipoProducto: formData.tipoProducto
     };
-
-
 
     const arrDatosCliente = {
       nombre: formData.name,
@@ -1494,8 +1479,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       preguntas = preguntasVida;
     }
 
-
-
     const data = {
       arrDatosCliente: arrDatosCliente,
       ramoAlt: ramo,
@@ -1570,8 +1553,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       data.id_CotiGeneral = id_cotigeneral;
     }
 
-
-
     sessionStorage.setItem(LS_DATAVIDASEND, JSON.stringify(data));
     try {
       handleOpenBackdrop();
@@ -1622,7 +1603,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
       });
     });
 
-
     if (!todosTienenNumero) {
       setErrorMessage("Se deben ingresar valores validos en la tabla de montos")
       setOpenSnack(true);
@@ -1655,9 +1635,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
       return acc; // Devuelve el acumulador
     }, 0); // El acumulador comienza en 0
 
-    setFormData({ ...formData, prestamo: resultado });
-
-
+    //setFormData({ ...formData, prestamo: resultado });
     // if (formData.prestamo === '') {
     //   setErrorMessage("Se deben ingresar un valor en prestamo")
     //   setOpenSnack(true);
@@ -1672,22 +1650,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
         sessionStorage.setItem(LS_TABLAACTUALIZDA, JSON.stringify(response));
         setCalculado(response);
         let prima = 0;
-        let monto = 0;
         for (let key in response.data.conf_amparos) {
   
           for (let subKey in response.data.conf_amparos[key]) {
             let item = response.data.conf_amparos[key][subKey];
             prima = item.prima_anio + prima;
           }
-          for (let subKey in response.data.conf_amparos[key]) {
-            let item = response.data.conf_amparos[key][subKey];
-            monto = parseFloat(item.monto) + parseFloat(monto);
-          }
+
         }
-  
+
+        let monto = response.data.sumaAsegurada;  
         let impuesto = 0;
         const parametros = JSON.parse(localStorage.getItem(PARAMETROS_STORAGE_KEY));
-        console.log(prima);
         const primaNumber = Number(prima);
         const porIva = Number(parametros[0].por_iva);
         const porSbs = Number(parametros[0].por_sbs);
@@ -1735,8 +1709,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
           prima: parseFloat(primaNumber.toFixed(2)),
           primaMensual: parseFloat((total / 12).toFixed(2)),
           primaTotal: total,
-          impuesto: impuesto,
-  
+          impuesto: impuesto
         });
       } else {
         setErrorMessage(response.message);
@@ -1756,7 +1729,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
     return true;
     // setOpenModal(true);
   };
-
 
   useEffect(() => {
     if (calculado && calculado.data && calculado.data.conf_amparos) {
@@ -1791,17 +1763,13 @@ const PersonalFormLife = forwardRef((props, ref) => {
       setTablasData(result);
 
       let prima = 0;
-      let monto = 0;
       for (let key in calculado.data.conf_amparos) {
 
         for (let subKey in calculado.data.conf_amparos[key]) {
           let item = calculado.data.conf_amparos[key][subKey];
           prima = item.prima_anio + prima;
         }
-        for (let subKey in calculado.data.conf_amparos[key]) {
-          let item = calculado.data.conf_amparos[key][subKey];
-          monto = parseFloat(item.monto) + parseFloat(monto);
-        }
+
       }
 
       let impuesto = 0;
@@ -1836,7 +1804,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
         lastname: formData.lastname,
         email: formData.email,
         phone: formData.phone,
-        sumAdd: monto,
+        sumAdd: formData.prestamo,
         prima: primaNumber,
         impScvs: sbs,
         impSsc: ssc,
@@ -2012,7 +1980,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             DATOS PERSONALES
           </Typography>
 
-          <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold', marginRight: '35px' }}>
+          <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingLeft: '0px', fontWeight: 'bold', marginRight: '55px' }}>
             Producto: {NomnbreProducto}
           </Typography>
 
@@ -2244,7 +2212,8 @@ const PersonalFormLife = forwardRef((props, ref) => {
               ))}
             </Select>
           </Grid>
-          <Grid item xs={10.5} md={3}>
+          
+          <Grid item xs={10.5} md={2.5} style={{ paddingTop: '21px' }} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
               Ciudad <span style={{ color: 'red' }}>*</span>
             </Typography>
@@ -2620,15 +2589,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
         </Grid>
 
-        <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '20px', paddingTop: '30px', fontWeight: 'bold' }}>
+        <Typography variant="body2" color="#02545C" style={{ textAlign: 'left', paddingBottom: '1px', paddingTop: '30px', fontWeight: 'bold' }}>
           CALCULOS
         </Typography>
 
         {showTable ? (
           <>
-
             {tablasData.length > 0 ? (tablasData.map((item, index) => (
-              <TableContainer key={item.codcob} style={{ overflow: "auto", height: "100%", marginBottom: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+              <TableContainer key={item.codcob} style={{ overflow: "auto", height: "100%", marginBottom: "20px", display: 'flex', flexDirection: 'column', alignItems: 'center' }}
               >
                 <h3>{item.nomcob}</h3>
                 <Table
@@ -2661,7 +2629,7 @@ const PersonalFormLife = forwardRef((props, ref) => {
             ))) : (
               <p>No hay coberturas disponibles configuradas para este producto.</p>
             )}
-            <Grid item xs={10.5} md={3} style={{ paddingTop: '0px', paddingBottom: '25px' }}>
+            <Grid item xs={10.5} md={3} style={{ paddingTop: '20px', paddingBottom: '35px' }}>
               <Button
                 onClick={handleOpenModal}
                 sx={{ mr: 1 }}
@@ -2681,10 +2649,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              $ Prestamo <span style={{ color: 'red' }}>*</span>
+              $ Suma Asegurada <span style={{ color: 'red' }}>*</span>
             </Typography>
             <TextField
-              placeholder="Prestamo"
+              placeholder="Suma Asegurada"
               type="text"
               disabled={true}
               name="prestamo"
@@ -2717,10 +2685,10 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
           <Grid item xs={10.5} md={3} >
             <Typography variant="body2" style={{ textAlign: 'left', fontSize: '16px', paddingBottom: '5px' }}>
-              $ Impuesto <span style={{ color: 'red' }}>*</span>
+              $ Impuestos <span style={{ color: 'red' }}>*</span>
             </Typography>
             <TextField
-              placeholder="Impuesto"
+              placeholder="Impuestos"
               type="text"
               disabled={true}
               name="impuesto"

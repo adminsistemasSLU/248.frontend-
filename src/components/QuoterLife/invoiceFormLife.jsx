@@ -168,7 +168,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         const cargarData = async () => {
             let factura = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
             let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
-            let asegurado;
+            let asegurado, montoAsegurado;
 
             // debugger;
             if (idCotizacion) {
@@ -185,6 +185,7 @@ const InvoiceFormLife = forwardRef((props, ref) => {
                     identification: coti[0].clicedula,
                     pais: coti[0].clipais
                 }
+                let montoAsegurado = coti[0].total_monto;
                 let formaPagoAray = sessionStorage.getItem(LS_DATOSPAGO);
 
                 if (formaPagoAray && formaPagoAray !== undefined) {
