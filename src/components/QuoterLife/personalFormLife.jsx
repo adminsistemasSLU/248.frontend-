@@ -1701,7 +1701,6 @@ const PersonalFormLife = forwardRef((props, ref) => {
         sessionStorage.setItem(LS_DATOSPAGO, JSON.stringify(totalPagar));
   
         // Actualiza el formData con los valores calculados y redondeados
-        console.log("MOnto:" + monto);
         setFormData({
           ...formData,
           prestamo: parseFloat(monto.toFixed(2)),

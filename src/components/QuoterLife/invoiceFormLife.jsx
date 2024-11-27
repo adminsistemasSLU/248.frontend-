@@ -125,7 +125,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
         let factura = JSON.parse(sessionStorage.getItem(LS_DATOSPAGO));
         let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
 
-        // debugger;
         if (idCotizacion) {
             setOpenBackdrop(true);
             let cotiVida = await cargarCotizacion();
@@ -170,7 +169,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
             let idCotizacion = sessionStorage.getItem(LS_COTIZACION);
             let asegurado, montoAsegurado;
 
-            // debugger;
             if (idCotizacion) {
                 setOpenBackdrop(true);
                 let coti = await cargarCotizacion();
@@ -549,7 +547,6 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     };
 
     function verificarLavadoActivo(cedulaData) {
-        debugger;
         setErrorCedula(true);
         //setOpen(true);
         //setmessageError(cedulaData.message);

@@ -339,7 +339,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const consultUserData = async (documentType, identification) => {
         try {
             const cedulaData = await UsuarioService.fetchConsultarUsuario(documentType, identification);
-            debugger;
             if (cedulaData.codigo === 200 && cedulaData.data) {
                 setFormData({
                     ...formData,

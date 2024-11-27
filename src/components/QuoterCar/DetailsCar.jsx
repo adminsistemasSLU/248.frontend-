@@ -262,6 +262,12 @@ const DetailsCar = forwardRef((props, ref) => {
       return;
     }
 
+    console.log( cars.length );
+    if( cars.length >= 1 ) {
+      setError("Solo se permite 1 vehículo por cotización.");
+      return;
+    }
+
     const newCar = {
       marca: formData.marca,
       anio: formData.anio,
@@ -548,7 +554,6 @@ const DetailsCar = forwardRef((props, ref) => {
 
   const obtenerNombreGrupoPorId = (idBuscado) => {
     const objetoEncontrado = grupo.find(item => item.idGrupo === idBuscado);
-    console.log(objetoEncontrado);
     return objetoEncontrado ? objetoEncontrado.nombre : 'ID no encontrado';
   };
 
