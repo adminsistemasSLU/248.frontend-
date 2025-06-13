@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom"
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
@@ -17,6 +18,7 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import Tooltip from "@mui/material/Tooltip";
 import CurrencyInput from "../../utils/currencyInput";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -30,6 +32,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DownloadIcon from '@mui/icons-material/Download';
 import BaldosasService from "../../services/BaldosasService/BaldosasService"
 import ComboService from "../../services/ComboService/ComboService";
+import eventBus from "../../utils/eventBus";
 
 import {
   DATOS_PERSONALES_STORAGE_KEY,
@@ -47,11 +50,15 @@ import {
   LS_DATAVIDASEND,
   DATOS_AGENTES,
   USERS_FEATURES_STORAGE_KEY,
+  DATOS_VEHICULO_STORAGE_KEY,
+  DATOS_VEHICULO_COTI_STORAGE_KEY,
+  DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
+  LS_COTIZACION_VEHICULO,
+  MAIL_COTIZACION,
 
 } from "../../utils/constantes";
 import QuoterService from "../../services/QuoterService/QuoterService";
 import Swal from "sweetalert2";
-
 
 function createData(
   id,
@@ -145,7 +152,6 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-
 function EnhancedTableHead(props) {
   const { order, orderBy, onRequestSort, headCells } = props;
   const createSortHandler = (property) => (event) => {
@@ -168,7 +174,6 @@ function EnhancedTableHead(props) {
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : "asc"}
                 onClick={createSortHandler(headCell.id)}
-
               >
                 {headCell.label}
                 {orderBy === headCell.id ? (
@@ -186,7 +191,6 @@ function EnhancedTableHead(props) {
     </TableHead>
   );
 }
-
 EnhancedTableHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
@@ -196,10 +200,8 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
   headCells: PropTypes.array.isRequired,
 };
-
 const EnhancedTableToolbar = React.memo(({ filter, setFilter }) => {
   const user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-
   return (
     <Toolbar
       sx={{
@@ -208,7 +210,7 @@ const EnhancedTableToolbar = React.memo(({ filter, setFilter }) => {
 
       }}
       style={{
-        borderBottom: "2px solid #00a99e ",
+        borderBottom: "2px solid #000 ",
         height: "40px",
         minHeight: "0px",
       }}
@@ -231,7 +233,6 @@ const EnhancedTableToolbar = React.memo(({ filter, setFilter }) => {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           placeholder="Buscar..."
-
           sx={{ marginLeft: "16px", marginTop: '5px', borderRadius: "4px", height: '15px' }}
         />
         <IconButton>
@@ -241,9 +242,6 @@ const EnhancedTableToolbar = React.memo(({ filter, setFilter }) => {
     </Toolbar>
   );
 });
-
-
-
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     borderBottom: "1px solid black",
@@ -252,13 +250,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     borderBottom: "1px solid black",
   },
 }));
-
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:last-child td, &:last-child th": {
     borderBottom: "1px solid black",
   },
 }));
-
 export default function MyQuoters() {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -272,20 +268,26 @@ export default function MyQuoters() {
   const [totalMonto, setTotalMonto] = React.useState(0);
   const [totalPrima, setTotalPrima] = React.useState(0);
   const [agentes, setAgentes] = React.useState([]);
-
   const [apruebaCotizacion, setApruebaCotizacion] = React.useState([]);
-
   const [openSnack, setOpenSnack] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
-
   const RAMOINCENDIO = "1";
-  // const RAMOVEHICULO = "3";
+  const RAMOVEHICULO = "3";
   const RAMOVIDA = "9";
   const [usuarioInterno, setUsuarioInterno] = React.useState([]);
   const [estado, setEstado] = React.useState([]);
   const [ramo, setRamo] = React.useState([]);
   const [producto, setProducto] = React.useState([]);
   const [usuarioBusqueda, setUsuarioBusqueda] = React.useState([]);
+  const [fechaInicio, setFechaInicio] = React.useState(null);
+  const [fechaFin, setFechaFin] = React.useState(null);
+  const location = useLocation();
+  const [cargandoDesdeNotificacion, setCargandoDesdeNotificacion] = React.useState(false);
+  const [autoLoadFromNotification, setAutoLoadFromNotification] = React.useState(false);
+  const [isAutoLoad, setIsAutoLoad] = React.useState(false);
+  
+
+
   const [filters, setFilters] = React.useState({
     estado: '',
     producto: '',
@@ -293,13 +295,12 @@ export default function MyQuoters() {
     cliente: '',
     usuarioBusq: null,
     broker: null,
+    fechaInicio: '',
+    fechaFin: ''
   });
-
-  //Filtrar tabla
   const [filter, setFilter] = React.useState("");
   const getHeadCells = (rows = []) => {
-    const isRamo3 = rows.some(row => row.ramoId != 3);
-
+  const isRamo3 = rows.some(row => row.ramoId != 3);
     const commonHeadCells = [
       {
         id: "number",
@@ -332,17 +333,14 @@ export default function MyQuoters() {
       { id: "prima", numeric: true, disablePadding: false, label: "Prima", sortable: false },
       { id: "fechaCreacion", numeric: true, disablePadding: false, label: "Fecha Creación", width: '170px', sortable: true }
     );
-
     if (isRamo3) {
       commonHeadCells.push(
         { id: "fechaExportacion", numeric: true, disablePadding: false, label: "Fecha Exportación", width: '170px', sortable: false },
       );
     }
-
     commonHeadCells.push(
       { id: "state", numeric: true, disablePadding: false, label: "Estado", sortable: true },
     );
-
     if (isRamo3) {
       commonHeadCells.push(
         { id: "reason", numeric: false, disablePadding: false, label: "Motivo", sortable: true },
@@ -353,16 +351,12 @@ export default function MyQuoters() {
       { id: "usuario", numeric: true, disablePadding: false, label: "Usuario", sortable: true },
       { id: "action", numeric: true, disablePadding: false, label: "Acción", sortable: false },
     );
-
     return commonHeadCells;
   };
-
-
   const headCells = getHeadCells(rows);
   const cargarRamo = async () => {
     try {
       const baldosas = await BaldosasService.fetchBaldosas();
-
       if (baldosas && baldosas.data) {
         setRamo(baldosas.data.BaldosaServisios);
       }
@@ -370,7 +364,6 @@ export default function MyQuoters() {
       console.error("Error al obtener baldosas:", error);
     }
   };
-
   const cargarProducto = async (ramo) => {
     try {
       const subbaldosas = await BaldosasService.fetchSubBaldosas(ramo, '');
@@ -381,7 +374,6 @@ export default function MyQuoters() {
       console.error("Error al obtener subbaldosas:", error);
     }
   };
-
   const cargarEstado = async () => {
     try {
       const estado = await ComboService.fetchComboEstado();
@@ -392,14 +384,12 @@ export default function MyQuoters() {
       console.error("Error al obtener baldosas:", error);
     }
   };
-
   const cargarUsuarioBusqueda = async () => {
     try {
       const usuarioBusqueda = await ComboService.fetchComboUsuarioBusqueda();
       if (usuarioBusqueda && usuarioBusqueda.data) {
         setUsuarioBusqueda(usuarioBusqueda.data);
       }
-
       let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
       if (usuario.tip_usuario == "B") {
         setFilters((prevFilters) => ({
@@ -411,42 +401,34 @@ export default function MyQuoters() {
       console.error("Error al obtener Usuario busqueda:", error);
     }
   };
-
   const filteredRows = rows.filter((row) => {
     return (
       row.ramo.toLowerCase().includes(filter.toLowerCase()) ||
       row.producto.toLowerCase().includes(filter.toLowerCase()) ||
       row.cliente.toLowerCase().includes(filter.toLowerCase()) ||
       row.state.toLowerCase().includes(filter.toLowerCase()) ||
-      row.fechaCreacion.toLowerCase().includes(filter.toLowerCase())
+      (row.fechaCreacion && row.fechaCreacion.toString().toLowerCase().includes(filter.toLowerCase())) // Asegurarse de convertir la fecha a string
     );
   });
-
   const handleSetFilter = React.useCallback((value) => {
 
     setFilter(value);
   }, []);
-
-
   useEffect(() => {
     let usuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     setUsuarioInterno(usuario.tip_usuario);
     const cargarOpciones = async () => {
-      
       await cargarEstado();
       await cargarRamo();
       await cargarUsuarioBusqueda();
       cargarAgentesDesdeLocalStorage()
     };
-
     let usuarioAtributo = JSON.parse(localStorage.getItem(USERS_FEATURES_STORAGE_KEY) || "[]");
     const containsAprobarEmision = usuarioAtributo.some(item => item.tipo === "aprobar_emision") && usuario.tip_usuario=='I';
     setApruebaCotizacion(containsAprobarEmision);
-
     cargarOpciones();
     eliminardatos();
   }, []);
-
   function eliminardatos() {
     sessionStorage.removeItem(LS_PREGUNTASVIDA);
     sessionStorage.removeItem(LS_DOCUMENTOSVIDA);
@@ -458,18 +440,16 @@ export default function MyQuoters() {
     sessionStorage.removeItem(LS_PRODUCTO);
     sessionStorage.removeItem(LS_RAMO);
   }
-
   async function cargarTabla() {
     handleOpenBackdrop();
     await cargarEstado();
     await cargarRamo();
     await cargarUsuarioBusqueda();
-    const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado, filters.broker, filters.usuarioBusq);
-
+    const objetoSeguro = await cargarCotizacion(filters.ramo, filters.producto, filters.estado, filters.broker, filters.usuarioBusq, filters.fechaInicio, filters.fechaFin);
+    //console.log("Resultado de cargarCotizacion:", objetoSeguro);
     if (objetoSeguro) {
       let number = 1;
       const rowsObjetoAmparo = [];
-
       for (let item of objetoSeguro) {
         let tasa = 0;
         if (item.ramo === "9") {
@@ -482,7 +462,6 @@ export default function MyQuoters() {
           tasa = isNaN(tasa) ? 0.0 : tasa;
           tasa = '%' + tasa;
         }
-
         const row = createData(
           item.id,
           number++,
@@ -504,9 +483,8 @@ export default function MyQuoters() {
         );
         rowsObjetoAmparo.push(row);
       }
-
+      //console.log("Rows procesadas:", rowsObjetoAmparo);
       setRows(rowsObjetoAmparo);
-
       setCotizacion(objetoSeguro);
       const newTotalMonto = objetoSeguro.reduce(
         (sum, row) => sum + parseFloat(row.monto),
@@ -519,25 +497,23 @@ export default function MyQuoters() {
       );
       setTotalPrima(newTotalPrima);
     }
-
     handleCloseBackdrop();
   }
-
   const handleOpenQuoter = async (id, product, ramo, aplicacion = '') => {
     localStorage.setItem(LS_COTIZACION, id);
     localStorage.setItem(LS_PRODUCTO, product);
     localStorage.setItem(LS_RAMO, ramo);
-    if (ramo == 9) {
-      sessionStorage.setItem(LS_COTIZACION, id);
-      sessionStorage.setItem(LS_PRODUCTO, product);
-      sessionStorage.setItem(LS_RAMO, ramo);
-    }
+    sessionStorage.setItem(LS_COTIZACION, id);
+    sessionStorage.setItem(LS_PRODUCTO, product);
+    sessionStorage.setItem(LS_RAMO, ramo);
 
+    
+    if (ramo == 9){
     if (aplicacion !== '') {
       sessionStorage.setItem(LS_IDCOTIZACIONVIDA, aplicacion);
     }
     const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
-
+    
     const dataFormaPago = resultadoFiltrado.map((item) => ({
       numpagos: item.numpagos,
       tipfacturacion: item.tipfacturacion,
@@ -545,13 +521,11 @@ export default function MyQuoters() {
       formapago: item.formapago,
       id: item.id,
     }));
-
-    //Datos de pago de existir
+    
     localStorage.setItem(
       DATOS_PAGO_STORAGE_KEY,
       JSON.stringify(dataFormaPago)
     );
-
     const data = cotizacion.map((item) => ({
       correo: item.clicorreo,
       apellido: item.cliapellido,
@@ -560,24 +534,81 @@ export default function MyQuoters() {
       id: item.id,
     }));
     let datosPersonales = data.length > 0 ? data[0] : null;
-    //Datos de personales obligatorios para coti vida
     if (datosPersonales) {
       localStorage.setItem(
         DATOS_PERSONALES_STORAGE_KEY,
         JSON.stringify(datosPersonales)
       );
+    }}
+
+    if (ramo == 3) {
+      if (aplicacion !== '') {
+        sessionStorage.setItem(LS_COTIZACION_VEHICULO, aplicacion);
+      }
+    
+      const resultadoFiltrado = cotizacion.filter((item) => item.id === id);
+    
+      const dataVehiculo = resultadoFiltrado.map((item) => ({
+        id: item.id,
+        placa: item.placa || "",
+        marca: item.marca || "",
+        grupo: item.grupo || "",
+        modelo: item.modelo || "",
+        anio: item.anio || "",
+        uso: item.uso || "",
+        tipo: item.tipo || "",
+        valor_vehiculo: item.total_monto || "",
+        valor_accesorios: item.valor_accesorios || "0,00",
+        suma_asegurada: item.total_monto || "",
+        ocupantes: item.ocupantes,
+      }));
+    
+      localStorage.setItem(
+        DATOS_VEHICULO_STORAGE_KEY, // 👈 este sí lo usa DetailsCar
+        JSON.stringify(dataVehiculo)
+
+      );
+    
+      const data = resultadoFiltrado.map((item) => ({
+        correo: item.clicorreo,
+        apellido: item.cliapellido,
+        identificacion: item.clicedula,
+        nombre: item.clinombre,
+        id: item.id,
+        fechaNacimiento: item.clinacimiento,
+        documentType: item.clitipcedula,
+        address: item.clidireccion,
+        gender: item.cligenero,
+        status: item.cliestadocivil,
+        anios: item.vigencia,
+        agente: item.agente,
+        provincia: item.cliprovincia,
+        ciudad: item.cliciudad,
+        pais: item.clipais,
+      }));
+    
+      const dataPersonal = data.length > 0 ? data[0] : null;
+    
+      if (dataPersonal) {
+        localStorage.setItem(
+          DATOS_PERSONALES_VEHICULO_STORAGE_KEY, // 👈 este lo usa personalFormCar
+          JSON.stringify(dataPersonal)
+        );
+      }
     }
 
     if (ramo === RAMOVIDA) {
       //OPCIONES PARA ABRIR EL MODAL DE VIDA 
       window.location.href = `/quoter/life`;
     }
-
     if (ramo === RAMOINCENDIO) {
       //OPCIONES PARA ABRIR EL MODAL DE INCENDIO 
       window.location.href = `/quoter/pymes/`;
     }
-
+    if (ramo === RAMOVEHICULO) {
+      //OPCIONES PARA ABRIR EL MODAL DE INCENDIO 
+      window.location.href = `/quoter/car/`;
+    }
   };
 
   const aprobarSolicitud = async (id) => {
@@ -626,11 +657,58 @@ export default function MyQuoters() {
     }
   };
 
-  const handleDeleteQuoter = async (id) => {
-    await eliminarCotizacion(id);
+  const NoConcretado = async (id) => {
+    await NoConcretadochangue(id);
   };
 
-  const cargarCotizacion = async (ramo = '', producto = "", estado = '', idBroker = null, usuarioBusq = null) => {
+  const NoConcretadochangue = async (id) => {
+    const result = await Swal.fire({
+      title: "¿Está seguro que desea No concretar?",
+      text: "Por favor, ingrese un comentario antes de confirmar.",
+      icon: "info",
+      input: "textarea",  // Agrega un campo de texto para comentarios
+      inputPlaceholder: "Escribe tu comentario aquí...",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Debe ingresar un comentario";
+        }
+      },
+    });
+
+    try {
+      if (result.isConfirmed) {
+        const comentario = result.value;
+        const idUsuario = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+        handleOpenBackdrop();
+        const cotizacion = await QuoterService.fetchActualizaEstadoNoConcretado(
+          id,
+          idUsuario.id,
+          comentario
+        );
+
+        if (cotizacion && cotizacion.data) {
+          await cargarTabla();
+          eventBus.emit("quote:updated", cotizacion.data);
+          return cotizacion.data;
+        }
+
+        handleCloseBackdrop();
+      }
+    } catch (error) {
+      console.error("Error al cambiar de estado Cotizacion General:", error);
+    }
+  };
+
+  const handleDeleteQuoter = async (id) => {
+    await eliminarCotizacion(id);
+  }; 
+
+  const cargarCotizacion = async (ramo = '', producto = "", estado = '', idBroker = null, usuarioBusq = null, fechaInicio = '', fechaFin= '') => {
     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
     let dato = {
       usuario: userId.id,
@@ -639,8 +717,10 @@ export default function MyQuoters() {
       estado: estado,
       idBroker: idBroker,
       usuarioBusq: usuarioBusq,
+      fechaInicio: fechaInicio,
+      fechaFin: fechaFin,
     };
-    try {
+    try { 
       const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(
         dato
       );
@@ -652,6 +732,37 @@ export default function MyQuoters() {
       console.error("Error al obtener Consultar Cotizacion General:", error);
     }
   };
+
+  useEffect(() => {
+    const desdeNotificacion = localStorage.getItem("cargarCotizacionDesdeNotificacion");
+    const filtrosGuardados = localStorage.getItem("filtrosCotizacion");
+  
+    if (desdeNotificacion === "true" && filtrosGuardados) {
+      const filtros = JSON.parse(filtrosGuardados);
+      setFilters(filtros);
+      setIsAutoLoad(true);
+      localStorage.removeItem("cargarCotizacionDesdeNotificacion");
+  
+      // 👇 Esto es lo que te falta
+      cargarCotizacion(filtros);
+    }
+  }, []);
+  
+  
+
+  useEffect(() => {
+    if (isAutoLoad) {
+      if (filters.ramo) {
+        cargarTabla(filters);
+        setIsAutoLoad(false);  // Ya se hizo la carga automática, resetea flag
+      } else {
+        // Si no hay ramo, no hace nada y resetea el flag igual
+        setIsAutoLoad(false);
+      }
+    }
+  }, [filters, isAutoLoad]);
+  
+  
 
   const eliminarCotizacion = async (id) => {
     const result = await Swal.fire({
@@ -734,15 +845,27 @@ export default function MyQuoters() {
 
     if (e.target.name === "ramo") {
       cargarProducto(e.target.value);
-    }
+      }
 
     setFilters({
       ...filters,
       [e.target.name]: e.target.value,
     });
-
-
   };
+
+  const handleFechaInicioChange = (event) => {
+    setFilters({
+      ...filters,
+      fechaInicio: event.target.value,
+    });
+  };
+  
+  const handleFechaFinChange = (event) => {
+    setFilters({
+      ...filters,
+      fechaFin: event.target.value,
+    });
+  };  
 
   const handleSearch = () => {
     if (!filters.ramo) {
@@ -848,13 +971,15 @@ export default function MyQuoters() {
 
   const handleComparativo = async (id) => {
     const link = document.createElement('a');
-    console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + id);
+    //console.log(`${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + id);
 
     link.href = `${process.env.PUBLIC_URL}/api/cotizacion_pdf/` + id;
     link.download = 'comparativo.pdf';
     link.click();
   };
-
+  
+ /* const   = JSON.parse(localStorage.getItem('USER_STORAGE_KEY')) || [];
+  ramo.filter((rm) => rm.acceso === true && storedPermissions.includes(rm.ramoId));*/
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Typography variant="h4" sx={{ color: "#00a99e", mb: 2 }} xs={{ fontSize: 10 }}>Mis Cotizaciones</Typography>
@@ -874,9 +999,8 @@ export default function MyQuoters() {
               onChange={(event) => setFilter(event.target.value)}
             />
           </Grid>
-
-          <Grid item xs={8} md={2}>
-            <FormControl fullWidth>
+          {/*<Grid item xs={8} md={2}>
+             <FormControl fullWidth>
               <InputLabel id="ramo-label">Ramo</InputLabel>
               <Select
                 labelId="ramo-label"
@@ -888,16 +1012,35 @@ export default function MyQuoters() {
                 onChange={handleChange}
                 label="Ramo"
               >
-                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                <MenuItem value=""><em>NINGUNO</em></MenuItem>
                 {ramo.map((rm, index) => (
-                  <MenuItem key={index} value={rm.ramo}>
+                  <MenuItem key={index} value={rm.ramo}> 
                     {rm.titulo}
                   </MenuItem>
-                ))}
+                  ))}
+              </Select>
+            </FormControl>
+          </Grid>*/} 
+          <Grid item xs={8} md={2}>
+             <FormControl fullWidth>
+              <InputLabel id="ramo-label">Ramo</InputLabel>
+              <Select
+                labelId="ramo-label"
+                id="ramo"
+                name="ramo"
+                variant="standard"
+                fullWidth
+                value={filters.ramo}
+                onChange={handleChange}
+                label="Ramo"
+              >
+                {/*<MenuItem value="1">PYMES</MenuItem>*/}
+                <MenuItem value="3">VEHICULO</MenuItem>
+                <MenuItem value="9">VIDA</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          {/* {filters.ramo != "3" && (
+          {/*{filters.ramo != "3" && ( 
             <Grid item xs={8} md={2}>
               <FormControl fullWidth>
                 <InputLabel id="producto-label">Producto</InputLabel>
@@ -911,7 +1054,7 @@ export default function MyQuoters() {
                   onChange={handleChange}
                   label="Producto"
                 >
-                  <MenuItem value=""><em>Ninguno</em></MenuItem>
+                  <MenuItem value=""><em>NINGUNO</em></MenuItem>
                   {producto.map((pro, index) => (
                     <MenuItem key={index} value={pro.producto}>
                       {pro.titulo}
@@ -920,7 +1063,7 @@ export default function MyQuoters() {
                 </Select>
               </FormControl>
             </Grid>
-          )} */}
+          )}*/}
 
           <Grid item xs={8} md={2}>
             <FormControl fullWidth>
@@ -935,7 +1078,7 @@ export default function MyQuoters() {
                 onChange={handleChange}
                 label="Estado"
               >
-                <MenuItem value=""><em>Ninguno</em></MenuItem>
+                <MenuItem value=""><em>NINGUNO</em></MenuItem>
                 {estado.map((est, index) => (
                   <MenuItem key={index} value={est.Codigo}>
                     {est.Nombre}
@@ -944,8 +1087,8 @@ export default function MyQuoters() {
               </Select>
             </FormControl>
           </Grid>
-          {agentes.length > 0 && (
-            <>
+                {agentes.length > 0 && (
+              <>
               <Grid item xs={8} md={2}>
                 <FormControl fullWidth>
                   <InputLabel id="usuario-label">
@@ -964,16 +1107,17 @@ export default function MyQuoters() {
                     label="usuario"
                     disabled={usuarioInterno === "B"}
                   >
-                    <MenuItem value=""><em>Ninguno</em></MenuItem>
+                    <MenuItem value={null}>
+                      TODOS
+                    </MenuItem>
                     {usuarioBusqueda.map((usu, index) => (
                       <MenuItem key={index} value={usu.id}>
-                        {usu.usu_descripcion}
+                        {`${usu.usu_descripcion}`}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
-
               <Grid item xs={8} md={2}>
                 <FormControl fullWidth>
                   <InputLabel id="broker-label">Broker</InputLabel>
@@ -998,12 +1142,34 @@ export default function MyQuoters() {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={8} md={2}>
+                <TextField
+                  fullWidth
+                  id="fechaInicio"
+                  label="Fecha Inicio"
+                  type="date"
+                  variant="standard"
+                  InputLabelProps={{ shrink: true }}
+                  value={filters.fechaInicio}
+                  onChange={handleFechaInicioChange}  // Actualiza el estado al cambiar la fecha
+                />
+              </Grid>
+              <Grid item xs={8} md={2}>
+                <TextField
+                  fullWidth
+                  id="fechaFin"
+                  label="Fecha Fin"
+                  type="date"
+                  variant="standard"
+                  InputLabelProps={{ shrink: true }}
+                  value={filters.fechaFin}
+                  onChange={handleFechaFinChange}  // Actualiza el estado al cambiar la fecha
+                />
+              </Grid>
             </>
           )}
         </Grid>
-
       </Grid>
-
       <Grid style={{ width: '90%', paddingTop: '20px', display: 'flex', justifyContent: 'center' }} spacing={2}>
         <Grid item xs={8} md={2} style={{ paddingRight: '20px' }}>
           <Button variant="contained"
@@ -1011,9 +1177,8 @@ export default function MyQuoters() {
             onClick={handleSearch}
             startIcon={<SearchIcon />}
           >
-            Buscar</Button>
-        </Grid>
-
+            Buscar</Button>  
+        </Grid>  
         {usuarioInterno === "I" && (
           <Grid item xs={8} md={2}>
             <Button variant="contained"
@@ -1058,7 +1223,7 @@ export default function MyQuoters() {
             ) : (
 
               <TableContainer
-                style={{ overflow: "auto", height: 300 }}
+                style={{ overflow: "auto", maxHeight: "50vh" }}
               >
                 <Table stickyHeader
                   sx={{ minWidth: 750 }}
@@ -1162,7 +1327,7 @@ export default function MyQuoters() {
                           <TableCell align="right">{row.usuario}</TableCell>
 
                           <TableCell align="right">
-                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.ramoId != 3 && row.state !== 'Exportada' && (
+                            {row.state !== "Cancelado" && row.state !== "Emitida" && row.state !== 'Exportada' && row.state !== 'No concretado' && (
                               <div
                                 style={{
                                   display: "flex",
@@ -1176,15 +1341,22 @@ export default function MyQuoters() {
                                 >
                                   <EditIcon />
                                 </IconButton>
+                                {row.ramoId == 9 && ( 
                                 <IconButton onClick={() => handleDeleteQuoter(row.id)}>
                                   <DeleteIcon />
-                                </IconButton>
+                                </IconButton>)}
                               </div>
                             )}
 
                             {row.ramoId == 3 && (
                               <IconButton onClick={() => handleComparativo(row.id)}>
                                 <DownloadIcon />
+                              </IconButton>
+                            )}
+
+                            {row.state !== "No concretado" && row.ramoId == 3 && (
+                              <IconButton onClick={() => NoConcretado(row.id)}>
+                                <HighlightOffIcon />
                               </IconButton>
                             )}
 

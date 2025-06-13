@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -9,6 +10,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import Badge from "@mui/material/Badge";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
@@ -19,6 +22,10 @@ import { Collapse } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useAuth } from "../services/AuthProvider";
+import QuoterService from "../services/QuoterService/QuoterService";
+import eventBus from "../utils/eventBus";
+import { TOKEN_STORAGE_KEY } from "../utils/constantes";
+import { Token } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -27,7 +34,9 @@ function Header(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [open, setOpen] = React.useState({});
   const { user, isLoading, menu, signout } = useAuth();
-
+  const [pendingQuotes, setPendingQuotes] = React.useState(0);
+  const navigate = useNavigate();
+  
   const settings = user
     ? [
         {
@@ -55,6 +64,7 @@ function Header(props) {
   const drawerRef = useRef();
   const navItemsMob = menu1;
   const navItems = menu1;
+  
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -102,6 +112,71 @@ function Header(props) {
     setAnchorEl(null); // Cierra también los submenús si están abiertos
   };
 
+  useEffect(() => {
+    async function fetchPendingQuotes() {
+      try {
+        const count = await QuoterService.fetchPendingCount({ ramo: 3 });
+        setPendingQuotes(count ?? 0);
+        if (count > 0) {
+          localStorage.setItem("cargarCotizacionDesdeNotificacion", "true");
+        } else {
+          localStorage.removeItem("cargarCotizacionDesdeNotificacion");
+        }
+      } catch (error) {
+        console.error("Error fetching pending quotes:", error);
+        setPendingQuotes(0);
+      }
+    }
+  
+    fetchPendingQuotes();
+    // Suscripción a eventos del eventBus
+    const onQuoteUpdated = () => {
+      fetchPendingQuotes(); // vuelve a consultar al detectar evento
+    };
+  
+    eventBus.on("quote:created", onQuoteUpdated);
+    eventBus.on("quote:deleted", onQuoteUpdated);
+    eventBus.on("quote:updated", onQuoteUpdated);
+  
+    return () => {
+      clearInterval(interval);
+      eventBus.off("quote:created", onQuoteUpdated);
+      eventBus.off("quote:deleted", onQuoteUpdated);
+      eventBus.off("quote:updated", onQuoteUpdated);
+    };
+  }, []);
+  
+  // Botón de notificación
+  const handleNotificationClick = () => {
+    const userStr = localStorage.getItem("user");
+    let usuarioId = "";
+  
+    if (userStr) {
+      try {
+        const userObj = JSON.parse(userStr);
+        if (userObj?.id) {
+          usuarioId = userObj.id.toString();
+        }
+      } catch (error) {
+        console.warn("Error parseando user de localStorage", error);
+      }
+    }
+  
+    localStorage.setItem("cargarCotizacionDesdeNotificacion", "true");
+  
+    const filtrosDesdeNotificacion = {
+      ramo: 3,
+      estado: "A",
+      usuarioBusq: usuarioId,
+    };
+    localStorage.setItem("filtrosCotizacion", JSON.stringify(filtrosDesdeNotificacion));
+    navigate("/quoter/Pymes/MyQuotes/");
+  };
+  
+  
+  
+  
+  
   const drawer = (
     <Box ref={drawerRef} sx={{ textAlign: "center" }}>
       <List>
@@ -247,6 +322,25 @@ function Header(props) {
           </Link>
           {/* Menú de escritorio */}
           <Box sx={{ display: { xs: "none", sm: "block", textAlign: 'right' }, flexGrow: 1 }}>
+          <Tooltip title="Cotizaciones pendientes">
+            <IconButton
+              sx={{ color: "white", fontSize: "12px", marginRight: 2 }}
+              onClick={handleNotificationClick}
+            >
+              <Badge
+                badgeContent={pendingQuotes}
+                showZero
+                sx={{
+                  "& .MuiBadge-badge": {
+                    backgroundColor: pendingQuotes > 0 ? "#d32f2f" : "#00a99e", // rojo o verde claro
+                    color: pendingQuotes > 0 ? "white" : "#1b5e20",             // blanco o verde oscuro
+                  },
+                }}
+              >
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
             {menu && (
               <Button
                 key={"-1"}
@@ -293,7 +387,7 @@ function Header(props) {
                 </Menu>
               </React.Fragment>
             ))}
-            {/* Configuración de usuario y otros botones */}
+            {/* Configuración de usuario y otros botones */}  
             <Tooltip title="Open settings">
               <Button
                 onClick={handleOpenUserMenu}

@@ -39,10 +39,24 @@ const ProductListCardsCar = ({ onNext, ref }) => {
     // const handleSubmit = async (e) => {
     //     return false;
     // };
-
     const formatCurrency = (value) => {
-        return Number(value).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (value == null || value === "") return "";
+    
+        if (typeof value === "string") {
+            value = value.replace(/\./g, "").replace(",", ".");
+        }
+    
+        const num = parseFloat(value);
+        if (isNaN(num)) return "";
+    
+        return new Intl.NumberFormat("es-ES", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(num);
     };
+    
 
     const handleCardClick = (index, producto) => {
         localStorage.setItem(LS_PRODUCTO, (producto));

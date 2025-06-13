@@ -5,7 +5,7 @@ import '../styles/footer.scss';
 
 const Footer = () => {
   return (
-    <AppBar position="static" component="footer" className="appBar">
+    <AppBar position="static" component="footer" className="appBar" sx={{ position: 'fixed', bottom: 0, width: '100%' }}>
       <Toolbar sx={{ backgroundColor: '#00a99e', height: '75px', display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="body1" color="inherit">
           © 2023 Seguros La Unión.

@@ -746,7 +746,7 @@ const AddObjectInsurance = ({ closeModal, idObjectSelected }) => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     variant="standard"
-                    placeholder="SELECCIONE UNA PROVINCIA"
+                    placeholder="SELECCIONE UNA CIUDAD"
                     fullWidth
                   >
                     {ciudades.map((ciudad, index) => (

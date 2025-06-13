@@ -20,6 +20,7 @@ import {
     Typography,
 } from "@mui/material";
 import {
+    LS_COTIZACION,
     LS_COTIZACION_VEHICULO,
     DATOS_PERSONALES_VEHICULO_STORAGE_KEY,
     DATOS_AGENTES,
@@ -36,6 +37,7 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import CarsService from "../../services/CarsServices/CarsService";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { DataObject } from "@mui/icons-material";
+import QuoterService from "../../services/QuoterService/QuoterService";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime);
@@ -72,6 +74,10 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const [fechaNacimiento, setFechaNacimiento] = useState();
     const [vigencia, setVigencia] = useState([]);
     const [agentes, setAgentes] = useState([]);
+    const nombreACodigoRef = useRef({});
+    const nombrePCodigoRef = useRef({});
+    const nombreECCodigoRef = useRef({});
+    const nombrePaCodigoRef = useRef({});
 
     const [showLastName, setShowLastName] = useState(true); // Controla si se muestra o no el campo apellido
     const [labelName, setLabelName] = useState("Nombres"); // Controla la etiqueta de nombre/empresa
@@ -85,98 +91,187 @@ const PersonalFormCar = forwardRef((props, ref) => {
             setLabelName("Nombres");
         }
     }, [formData.documentType]);
-
+   
     useEffect(() => {
         const iniciarDatosCombos = async () => {
-            handleOpenBackdrop();
-
-            await Promise.all([cargarProvincias(), cargarEstadoCivil(), cargarPais(), cargarVigencia()]);
-            handleCloseBackdrop();
-
+          handleOpenBackdrop();
+      
+          try {
+            await Promise.all([
+              cargarProvincias(),
+              cargarEstadoCivil(),
+              cargarPais(),
+              cargarVigencia(),
+            ]);
             cargarAgentesDesdeLocalStorage()
-            let data = JSON.parse(localStorage.getItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY));
+                cargarDatos( );
+          } catch (e) {
+            console.error("❌ Error cargando combos:", e);
+          }
+      
+          handleCloseBackdrop();
 
-            if (data) {
-                setFormData(data);
-                const dateObject = dayjs(data.fechaNacimiento, "DD/MM/YYYY");
-                setFechaNacimiento(dateObject);
-            }
         };
-
+      
         isMounted.current = true;
-        iniciarDatosCombos();
-
+        iniciarDatosCombos();  
+      
         return () => {
-            isMounted.current = false; // Establecer a false cuando el componente se desmonta
+          isMounted.current = false;
         };
-    }, []);
-
-    const cargarAgentesDesdeLocalStorage = () => {
+      }, []);
+      
+      const cargarAgentesDesdeLocalStorage = () => {
         const datosAgentes = localStorage.getItem(DATOS_AGENTES);
         if (datosAgentes) {
-            try {
-                const agentesGuardados = JSON.parse(datosAgentes);
-                if (Array.isArray(agentesGuardados)) {
-                    setAgentes(agentesGuardados);
-                }
-            } catch (error) {
-                console.error("Error al parsear DATOS_AGENTES:", error);
+          try {
+            const agentesGuardados = JSON.parse(datosAgentes);
+            if (Array.isArray(agentesGuardados)) {
+              const primero = "LA UNION COMPANIA NACIONAL DE SEGUROS S.A.";
+              const agenteDestacado = agentesGuardados.filter(a => a.nombre === primero);
+              const otrosAgentes  = agentesGuardados.filter(a => a.nombre !== primero);
+      
+
+              otrosAgentes.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      
+              // Creamos el array final: destacado primero, luego el resto
+              const agentesOrdenados = [...agenteDestacado, ...otrosAgentes];
+      
+              setAgentes(agentesOrdenados);
             }
+          } catch (error) {
+            console.error("Error al parsear DATOS_AGENTES:", error);
+          }
         }
-    };
+      };
+    
+      useEffect(() => {
+        if (agentes.length) {
+          const dict = agentes.reduce((acc, a) => {
+            acc[a.nombre.trim().toLowerCase()] = a.clave;
+            return acc;
+          }, {});
+          nombreACodigoRef.current = dict;
+        }
+      }, [agentes]);
+      
+      useEffect(() => {
+        if (!Array.isArray(provinces) || provinces.length === 0) return;
+      
+        const dict = provinces.reduce((acc, p) => {
+          const nombre = p?.Nombre?.trim?.().toLowerCase?.();
+          if (nombre) acc[nombre] = p.Codigo;
+          return acc;
+        }, {});
+      
+        nombrePCodigoRef.current = dict;
+        console.log("✅ Diccionario provincias construido:", dict);
+      }, [provinces]);
+      
+      
+      
+      useEffect(() => {
+        if (!Array.isArray(estadoCivil) || estadoCivil.length === 0) return;
+      
+        const dict = estadoCivil.reduce((acc, p) => {
+          const nombre = p?.Nombre?.trim?.().toLowerCase?.();
+          if (nombre) acc[nombre] = p.Codigo;
+          return acc;
+        }, {});
+      
+        nombreECCodigoRef.current = dict;
+        console.log("✅ Diccionario estado civil construido:", dict);
+      }, [estadoCivil]);
 
-    // const cargarDatos = async () => {
-    //     const dataPersonal = await cargarCotizacion();
+      useEffect(() => {
+        if (!Array.isArray(pais) || pais.length === 0) return;
+      
+        const dict = pais.reduce((acc, p) => {
+          const nombre = p?.Nombre?.trim?.().toLowerCase?.();
+          if (nombre) acc[nombre] = p.Codigo;
+          return acc;
+        }, {});
+      
+        nombrePaCodigoRef.current = dict;
+        console.log("✅ Diccionario estado civil construido:", dict);
+      }, [pais]);
+      
 
-    //     if (isMounted.current && dataPersonal?.length) {
-    //         setFormData({
-    //             name: dataPersonal[0].clinombre,
-    //             lastname: dataPersonal[0].cliapellido,
-    //             email: dataPersonal[0].clicorreo,
-    //             phone: dataPersonal[0].clitelefono,
-    //             documentType: dataPersonal[0].clitipcedula,
-    //             identification: dataPersonal[0].clicedula,
-    //             address: dataPersonal[0].clidireccion,
-    //             gender: dataPersonal[0].cli_genero,
-    //             status: dataPersonal[0].cliestadocivil,
-    //             anios: dataPersonal[0].vigencia,
-    //             agente: dataPersonal[0].cliagente,
-    //             provincia: dataPersonal[0].cliprovincia,
-    //             ciudad: dataPersonal[0].cliciudad,
-    //             fechaNacimiento: dayjs(dataPersonal[0].clinacimiento, "YYYY/MM/DD"),
-    //         });
-    //     }
-    // };
+    const cargarCotizacion = async () => {
+        try {
+          const user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY)) || {};
+          const cotId = localStorage.getItem(LS_COTIZACION_VEHICULO);
+          if (!cotId) return [];
+      
+          const payload = { usuario: user.id, id_CotiGeneral: cotId };
+          const response = await QuoterService.fetchConsultarCotizacionGeneral(payload);
+          return Array.isArray(response?.data) ? response.data : [];
+        } catch (err) {
+          console.error("Error al obtener cotización:", err);
+          return [];
+        }
+      };
 
-    // const cargarCotizacion = async () => {
-    //     let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
-    //     let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
+      const cargarDatos = async () => {
+        const data = await cargarCotizacion();
+        //console.log("🔍 Datos cargados:", data);
+        if (!isMounted.current || !data.length) return;
 
-    //     let dato = {
-    //         usuario: userId.id,
-    //         id_CotiGeneral: idCotizacion,
-    //     };
-    //     try {
-    //         const cotizacion = await QuoterService.fetchConsultarCotizacionGeneral(dato);
+        const raw = data[0];
 
-    //         if (cotizacion && cotizacion.data) {
-    //             return cotizacion.data;
-    //         }
-    //     } catch (error) {
-    //         console.error("Error al obtener antigüedad:", error);
-    //     }
-    // };
+        const keyp = raw.cliprovincia?.trim().toLowerCase() || "";
+        const keye = raw.cliestadocivil?.trim().toLowerCase() || "";
+        const keypa = raw.clipais?.trim().toLowerCase() || "";
+        const keya = raw.agente?.trim().toLowerCase() || "";
+
+        const provinciaObj = nombrePCodigoRef.current[keyp] || "";
+        const paisObj = nombrePaCodigoRef.current[keypa] || "";
+        const EstadoObj = nombreECCodigoRef.current[keye] || "";
+        const agenteCodigo = nombreACodigoRef.current[keya] || "";
+        
+        const dob = raw.clinacimiento
+            ? dayjs(raw.clinacimiento, ['YYYY-MM-DD', 'DD/MM/YYYY'], true)
+            : null;
+
+        setFormData(old => ({
+            ...old,
+            name:           raw.clinombre    || old.name,
+            lastname:       raw.cliapellido  || old.lastname,
+            email:          raw.clicorreo    || old.email,
+            phone:          raw.clitelefono  || old.phone,
+            documentType:   raw.clitipcedula || old.documentType,
+            identification: raw.clicedula    || old.identification,
+            address:        raw.clidireccion || old.address,
+            gender:         raw.cligenero    || old.gender,
+            anios:          raw.vigencia     || old.anios,
+            agente:         agenteCodigo     || old.agente,
+
+            status:         EstadoObj        || old.status,
+            pais:           paisObj          || old.pais,
+            provincia:      provinciaObj     || old.provincia,
+            //ciudad:         ciudadObj?.Codigo    || old.ciudad,
+            fechaNacimiento: dob?.format('YYYY-MM-DD') || ''
+        }));
+
+        if (dob?.isValid()) {
+            setFechaNacimiento(dob);
+            handleDateChange(dob);
+        }
+        };
+
 
     const handleChange = (e) => {
+        
         const { name, value } = e.target;
-
         if (name === "provincia") {
             cargarCiudad(value);
-            setFormData({ ...formData, provincia: value, ciudad: "" });  // Reseteamos la ciudad cuando cambia la provincia
+            setFormData({ ...formData, provincia: value, ciudad: "" }); 
         } else if (name === "ciudad") {
             setFormData({ ...formData, ciudad: value });
         } else if (name === "pais") {
             setFormData({ ...formData, pais: value });
+        } else if (name === "agente") {
+            setFormData({ ...formData, agente: value });
         } else {
             let modifiedValue = value;
             if (name === "identification") {
@@ -186,95 +281,82 @@ const PersonalFormCar = forwardRef((props, ref) => {
                 if (formData.documentType === "R" && value.length > 13) {
                     modifiedValue = value.slice(0, 13);
                 }
-                if (isNaN(value)) {
-                    e.preventDefault();
-                    return;
-                }
+                if (isNaN(value)) {e.preventDefault(); return;}
             }
-
-            if (name === "phone") {
-                modifiedValue = value.slice(0, 10);
-            }
-
+            if (name === "phone") { modifiedValue = value.slice(0, 10); }
             if (name === "email") {
                 if (!ValidationUtils.validateEmail(modifiedValue)) {
                     setError("Por favor ingresa un correo electrónico válido.");
-                } else {
-                    setError("");
-                }
+                } else {setError("");}
             }
             setFormData({ ...formData, [name]: modifiedValue });
         }
     };
-
     useImperativeHandle(ref, () => ({
         handleSubmitExternally: handleSubmit,
     }));
-
     const handleSubmit = async (e) => {
         if (e && e.preventDefault) e.preventDefault();
-
+      
+        // Campos obligatorios para validar
         const requiredFields = [
-            "name",
-            "email",
-            "phone",
-            "documentType",
-            "identification",
-            "address",
-            "gender",
-            "status",
-            "anios",
-            "provincia",
-            "ciudad",
-            "fechaNacimiento",
-            "pais",
+          "name", "email", "phone", "documentType", "identification", 
+          "address", "gender", "status", "anios", "provincia", 
+          "ciudad", "fechaNacimiento", "pais", "agente"
         ];
 
         if (formData.documentType !== "R") {
-            requiredFields.push("lastname");
+          requiredFields.push("lastname");
         }
-
+      
         if (agentes.length > 0 && (!formData.agente || formData.agente.trim() === "")) {
-            faltanDatosUsuario(); 
-            return false;
+          faltanDatosUsuario();
+          return false;
         }
-        
-        let next = true;
+      
         for (const field of requiredFields) {
-            const value = formData[field];
-            if (typeof value === "undefined" || value === null || (typeof value === "string" && value.trim() === "")) {
-                next = false;
-                faltanDatosUsuario();
-                break;
-            }
+          const value = formData[field];
+          if (typeof value === "undefined" || value === null || (typeof value === "string" && value.trim() === "")) {
+            faltanDatosUsuario();
+            return false;
+          }
         }
-
-        if (!next) return false;
+      
+      
         localStorage.setItem(MAIL_COTIZACION, formData.email);
         const data = transformarObjetoSeguro(formData);
-        localStorage.setItem(DATOS_PERSONALES_VEHICULO_STORAGE_KEY, JSON.stringify(formData));
-
+        let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
+      
         try {
-            handleOpenBackdrop();
-            const response = await CarsService.fetchGrabaDatosPersona(data);
-            if (response.codigo === 200) {
-                handleCloseBackdrop();
-                localStorage.setItem(LS_COTIZACION_VEHICULO, response.data)
-                return true;
+          handleOpenBackdrop();
+          if (!idCotizacion) {
+            const responseCrear = await CarsService.fetchGrabaDatosPersona(data);
+            if (responseCrear?.codigo === 200) {
+              idCotizacion = responseCrear.data;
+              localStorage.setItem(LS_COTIZACION_VEHICULO, idCotizacion);
             } else {
-                handleCloseBackdrop();
-                setErrorMessage("Se presentó un error, por favor vuelva a intentar");
-                setOpenSnack(true);
-                return false;
+              throw new Error(responseCrear?.message || "Error al crear cotización");
             }
-        } catch (error) {
+          }
+          data.idCotizacion = parseInt(idCotizacion, 10);
+          const responseEditar = await CarsService.fetchEditarDatosPersona(data);
+      
+          if (responseEditar?.codigo === 200) {
             handleCloseBackdrop();
-            setErrorMessage("Se presentó un error, por favor vuelva a intentar");
-            setOpenSnack(true);
-            return false;
+            return true;
+          } else {
+            throw new Error(responseEditar?.message || "Error desconocido");
+          }
+      
+        } catch (error) {
+          console.error(error);
+          setErrorMessage(error.message || "Se presentó un error, por favor vuelva a intentar");
+          setOpenSnack(true);
+          handleCloseBackdrop();
+          return false;
         }
-    };
-
+      };
+      
     const transformarObjetoSeguro = (objetoSeguro) => {
         let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
         return {
@@ -307,8 +389,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
             }
         };
     };
-
-
     const verifyIdentification = async (e) => {
         const { value } = e.target;
         let documentType = formData.documentType;
@@ -335,10 +415,14 @@ const PersonalFormCar = forwardRef((props, ref) => {
             console.error("Error al verificar cédula:", error);
         }
     };
-
     const consultUserData = async (documentType, identification) => {
+        let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
         try {
-            const cedulaData = await UsuarioService.fetchConsultarUsuario(documentType, identification);
+            const cedulaData = await UsuarioService.fetchConsultarUsuario_v2(
+                documentType, 
+                identification, 
+                userId.id
+            );
             if (cedulaData.codigo === 200 && cedulaData.data) {
                 setFormData({
                     ...formData,
@@ -366,14 +450,12 @@ const PersonalFormCar = forwardRef((props, ref) => {
             console.error("Error al verificar cédula:", error);
         }
     };
-
     const cambiarFormatoFecha = (fecha) => {
         if (!fecha) return '';
 
         const [anio, mes, dia] = fecha.split('-');
         return `${dia}/${mes}/${anio}`;
     };
-
     const handleClose = (event, reason) => {
         if (reason === "clickaway") {
             return;
@@ -393,7 +475,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
     const handleOpenBackdrop = () => {
         setOpenBackdrop(true);
     };
-
     const cargarEstadoCivil = async () => {
         try {
             const estadoCivil = await ComboService.fetchComboEstadoCivil();
@@ -406,7 +487,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
             console.error("Error al obtener estadoCivil:", error);
         }
     };
-
     const cargarProvincias = async () => {
         try {
             const provincias = await ComboService.fetchComboProvincias(1, 113);
@@ -423,7 +503,6 @@ const PersonalFormCar = forwardRef((props, ref) => {
             console.error("Error al obtener provincias:", error);
         }
     };
-
     const cargarVigencia = async () => {
         try {
             const vigencia = await ComboService.fetchComboVigencia(99999);
@@ -484,6 +563,9 @@ const PersonalFormCar = forwardRef((props, ref) => {
             fechaNacimiento: formattedDate,
         }));
     };
+
+    //console.log("🔍 Valor actual de formData.agente:", formData.agente);
+
 
     return (
         <Card elevation={4} sx={{ width: '100%', m: 2, mx: 'auto', paddingTop: '30px', paddingBottom: '20px' }}>

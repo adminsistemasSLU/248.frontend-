@@ -157,7 +157,7 @@ export default function SteppersCar() {
   const modoEditar = () => {
     let idCotizacion = localStorage.getItem(LS_COTIZACION_VEHICULO);
     if (idCotizacion) {
-      setActiveStep(2);
+      setActiveStep(0);
     }
   };
 

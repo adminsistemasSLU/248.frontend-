@@ -36,6 +36,24 @@ const UsuarioService = {
     }
   },
 
+  fetchConsultarUsuario_v2: async (tipoDocumento, documento, usuario) => {
+    const endpoint = 'api/validar_Cliente';
+    const method = 'POST';
+    const data = {
+      tipoDocumento: tipoDocumento,
+      documento: documento,
+      usuario: usuario
+    };
+  
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching validar Cedula:', error);
+      throw error;
+    }
+  },
+
   fetchCambiarContrasenia: async (txtUser, txtPassword,txtPasswordActual) => {
     const endpoint = 'api/cambiarContrasenia';
     const method = 'POST'; 

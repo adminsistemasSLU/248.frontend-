@@ -1,4 +1,5 @@
 import authService from '../authServices'; 
+import { TOKEN_STORAGE_KEY } from '../../utils/constantes';
 
 const QuoterService = {
 
@@ -15,6 +16,8 @@ const QuoterService = {
       fecha:dato.fecha,
       idBroker:dato.idBroker,
       usuarioBusq: dato.usuarioBusq,
+      fechaInicio: dato.fechaInicio,
+      fechaFin: dato.fechaFin,
     };
 
     try {
@@ -26,6 +29,46 @@ const QuoterService = {
     }
   },
 
+  fetchPendingCount: async ({ ramo }) => {
+    try {
+      const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+      const user = JSON.parse(localStorage.getItem("user"));
+  
+      if (!token || !user?.id) {
+        console.warn("Token o usuario no encontrado");
+        return 0;
+      }
+  
+      const response = await fetch('/api/cotizacionesPendientes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ usuario: user.id })
+      });
+  
+      const data = await response.json();
+  
+      if (data.codigo === 200 && Array.isArray(data.data)) {
+        const resultado = data.data.find(
+          item => item.estado === "A" && item.ramo === String(ramo)
+        );
+        return resultado?.totalCotizaciones ?? 0;
+      } else {
+        console.warn("Respuesta inválida:", data.message);
+        return 0;
+      }
+    } catch (error) {
+      console.error('Error fetching pending quotes:', error);
+      return 0;
+    }
+  },  
+
+  
+  
+  
   fetchEliminarCotizacionGeneral: async (id_CotiGeneral) => {
     const endpoint = 'api/EliminarCotizacionGeneral';
     const method = 'POST'; 
@@ -44,6 +87,24 @@ const QuoterService = {
 
   fetchActualizaCotizacionGeneral: async (id_CotiGeneral,idUsuario,comentario) => {
     const endpoint = 'api/ActualizaCotizacionGeneral';
+    const method = 'POST'; 
+    const data = {
+      id_CotiGeneral:id_CotiGeneral,
+      idUsuario :idUsuario,
+      comentario:comentario
+    };
+
+    try {
+      const response = await authService.fetchWithAuth(endpoint, method, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching Actualiza Cotizacion General:', error);
+      throw error;
+    }
+  },
+
+  fetchActualizaEstadoNoConcretado: async (id_CotiGeneral,idUsuario,comentario) => {
+    const endpoint = 'api/ActualizaCotizacionGeneralenc';
     const method = 'POST'; 
     const data = {
       id_CotiGeneral:id_CotiGeneral,

@@ -64,7 +64,7 @@ const InvoiceFormCar = forwardRef((props, ref) => {
             handleOpenBackdrop();
             // await cargarFormaPago();
             // await cargarTipoCredito();
-            // await cargarDatosCotizacion();
+             await cargarDatosCotizacion();
             handleCloseBackdrop();
         };
         cargarData();
