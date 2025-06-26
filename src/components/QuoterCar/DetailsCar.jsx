@@ -64,28 +64,16 @@ const DetailsCar = forwardRef((props, ref) => {
       isMounted.current = false;
     };
   }, []);
-
-  const obtenerNombreModeloDesdeServicio = async (anio, marca, grupo, idModelo) => {
-    try {
-      const response = await ComboService.fetchComboModelo(grupo, anio, marca);
-      if (response?.data?.length > 0) {
-        const modeloEncontrado = response.data.find((item) => String(item.id) === String(idModelo));
-        return modeloEncontrado ? modeloEncontrado.nombre : "ID no encontrado";
-      }
-    } catch (err) {
-      console.error("Error obteniendo modelo:", err);
-    }
-    return "ID no encontrado";
-  };
   
-
 useEffect(() => {
   localStorage.setItem(DATOS_VEHICULO_STORAGE_KEY, JSON.stringify(cars));
+  console.log("🚗 Vehículos guardados en localStorage:", cars);
 }, [cars]);
 
 const cargarDatos = async () => {
   try {
     const dataPersonal = await cargarCotizacion();
+    console.log("🚗 Datos de vehículos obtenidos:", dataPersonal);
     if (!Array.isArray(dataPersonal) || dataPersonal.length === 0) return;
 
     // -> Promise<[vehículo]> que resolverá a un array de objetos ya “despromisados”
@@ -94,21 +82,14 @@ const cargarDatos = async () => {
         const valorVehiculo   = parseFloat((item.valor_vehiculo   || '0').replace(',', '.'));
         const valorAccesorios = parseFloat((item.valor_accesorios || '0').replace(',', '.'));
 
-        // aquí ya esperas el nombre real, no la promesa
-        const modeloNombre = await obtenerNombreModeloDesdeServicio(
-          item.anio,
-          item.marca,
-          item.grupo,
-          item.modelo
-        );
-
         return {
           placa:          item.placa,
           marca:          item.marca,
           grupo:          item.grupo,
           nombreGrupo:    item.grupo,
           modelo:         item.modelo,
-          modeloNombre,          // ya es string
+          nommodelo:      item.nommodelo, // ya es string
+          desmodelo:      item.desmodelo,  // ya es string
           anio:           item.anio,
           uso:            item.uso,
           tipo:           item.tipo,
@@ -116,6 +97,7 @@ const cargarDatos = async () => {
           valor_vehiculo: item.valor_vehiculo,
           valor_accesorios: item.valor_accesorios,
           totalAsegurado: formatAmount(valorVehiculo + valorAccesorios),
+          json: JSON.stringify(item),
         };
       })
     );      
@@ -131,8 +113,6 @@ const cargarDatos = async () => {
   
 const cargarCotizacion = async () => {
   const cotizacionRaw = localStorage.getItem(LS_COTIZACION_VEHICULO);
-  console.log("🗃 cotizacionRaw desde localStorage:", cotizacionRaw);
-
   let idCotizacion;
 
   try {
@@ -381,6 +361,7 @@ const cargarCotizacion = async () => {
     formData.grupo = carToEdit.grupo;
     formData.marca = carToEdit.marca;
     formData.modelo = Number(carToEdit.modelo);
+    formData.modeloNombre = carToEdit.nommodelo || carToEdit.modeloNombre;
     await cargarMarca(carToEdit.anio);
     await loadOnlyGrupo(carToEdit.marca);
     await loadOnlyModel(carToEdit.grupo, carToEdit.anio, carToEdit.marca);
@@ -391,8 +372,8 @@ const cargarCotizacion = async () => {
       anio: carToEdit.anio,
       marca: carToEdit.marca,
       grupo: carToEdit.grupo,
-      modelo: carToEdit.modelo,
-      modeloNombre: carToEdit.modeloNombre,
+      modelo: Number(carToEdit.modelo),
+      modeloNombre: carToEdit.nommodelo || carToEdit.modeloNombre,
       uso: carToEdit.uso,
       tipo: carToEdit.tipo,
       placa: carToEdit.placa,
@@ -421,7 +402,7 @@ const cargarCotizacion = async () => {
       return false;
     }
   
-    const data = await crearObjetoVehiculo(cars);
+    const data = crearObjetoVehiculo(cars);
     try {
       handleOpenBackdrop();
       data.modo = isEditMode ? 'editar' : 'nuevo'; // importante
@@ -445,14 +426,13 @@ const cargarCotizacion = async () => {
     }
   };
   
-  const crearObjetoVehiculo = async (listaVehiculos) => {
+  const crearObjetoVehiculo = (listaVehiculos) => {
     console.log("🚗 listaVehiculos:", listaVehiculos);
     if (!Array.isArray(listaVehiculos)) {
       console.error("Se esperaba una lista de vehículos.");
       return null;
     }
-    const arrVehiculo = await Promise.all(
-      listaVehiculos.map(async newCar => {
+    const arrVehiculo = listaVehiculos.map((newCar) => {
       const valorVehiculo = (newCar.costo && typeof newCar.costo === 'string')
         ? parseFloat(newCar.costo.replace(/\./g, '').replace(',', '.'))
         : parseFloat(newCar.costo || newCar.valorvehiculo || newCar.valor_vehiculo);
@@ -460,13 +440,7 @@ const cargarCotizacion = async () => {
       const valorAccesorios = (newCar.valorAccesorios && typeof newCar.valorAccesorios === 'string')
         ? parseFloat(newCar.valorAccesorios.replace(/\./g, '').replace(',', '.'))
         : parseFloat(newCar.valorAccesorios || newCar.accesorios || newCar.valor_accesorios || "0,00");
-      
-        const modeloNombre = await obtenerNombreModeloDesdeServicio(
-          newCar.anio,
-          newCar.marca,
-          newCar.nombreGrupo,
-          newCar.modelo
-        );
+  
         
       return {
         riesgo: "",
@@ -476,7 +450,7 @@ const cargarCotizacion = async () => {
         marca: newCar.marca,
         grupoModelo: newCar.grupo,
         modelo: newCar.modelo,
-        nommodelo: modeloNombre,
+        nommodelo: newCar.modeloNombre || "",
         desmodelo: newCar.modeloNombre || "",
         color: "",
         uso: newCar.uso,
@@ -518,8 +492,7 @@ const cargarCotizacion = async () => {
         clase: "",
         nomClase: "",
       };
-    })
-  );
+    });
     return {
       producto: 99999,
       ramo: 3,

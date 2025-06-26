@@ -513,14 +513,16 @@ const InvoiceFormLife = forwardRef((props, ref) => {
     };
 
     const consultUserData = async (documentType, identification) => {
+        let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+        console.log("modulo vida",userId);
         try {
-            const cedulaData = await UsuarioService.fetchConsultarUsuario(
-                documentType,
-                identification
+            const cedulaData = await UsuarioService.fetchConsultarUsuario_v2(
+                documentType, 
+                identification, 
+                userId.id
             );
+            console.log("envio2",cedulaData);
             if (cedulaData.codigo === 200 && cedulaData.data) {
-
-
                 setFormData({
                     ...formData,
                     name: cedulaData.data[0].cli_nombres || "",

@@ -173,11 +173,14 @@ const PersonalForm = forwardRef((props, ref) => {
   };
 
   const consultUserData = async (documentType, identification) => {
-    try {
-      const cedulaData = await UsuarioService.fetchConsultarUsuario(
-        documentType,
-        identification
-      );
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+        console.log("modulo pymes",userId);
+        try {
+            const cedulaData = await UsuarioService.fetchConsultarUsuario_v2(
+                documentType, 
+                identification, 
+                userId.id
+            );
       if (cedulaData.codigo === 200 && cedulaData.data) {
         const dateString = cedulaData.data[0].cli_fecnacio;
         const dateObject = dayjs(dateString, "YYYY-MM-DD", true);

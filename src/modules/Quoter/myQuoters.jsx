@@ -356,9 +356,9 @@ export default function MyQuoters() {
   const headCells = getHeadCells(rows);
   const cargarRamo = async () => {
     try {
-      const baldosas = await BaldosasService.fetchBaldosas();
+      const baldosas = await BaldosasService.fetchPermisosBaldosas();
       if (baldosas && baldosas.data) {
-        setRamo(baldosas.data.BaldosaServisios);
+        setRamo(baldosas.data);
       }
     } catch (error) {
       console.error("Error al obtener baldosas:", error);
@@ -748,8 +748,6 @@ export default function MyQuoters() {
     }
   }, []);
   
-  
-
   useEffect(() => {
     if (isAutoLoad) {
       if (filters.ramo) {
@@ -762,8 +760,6 @@ export default function MyQuoters() {
     }
   }, [filters, isAutoLoad]);
   
-  
-
   const eliminarCotizacion = async (id) => {
     const result = await Swal.fire({
       title: "¿Está seguro que desea eliminar la cotización?",
@@ -977,7 +973,6 @@ export default function MyQuoters() {
     link.download = 'comparativo.pdf';
     link.click();
   };
-  
  /* const   = JSON.parse(localStorage.getItem('USER_STORAGE_KEY')) || [];
   ramo.filter((rm) => rm.acceso === true && storedPermissions.includes(rm.ramoId));*/
   return (
@@ -1034,9 +1029,18 @@ export default function MyQuoters() {
                 onChange={handleChange}
                 label="Ramo"
               >
-                {/*<MenuItem value="1">PYMES</MenuItem>*/}
-                <MenuItem value="3">VEHICULO</MenuItem>
-                <MenuItem value="9">VIDA</MenuItem>
+              {Array.isArray(ramo) && ramo.length > 0 ? (
+                ramo.map((item) => (
+                  <MenuItem
+                    key={item.id_BaldosaServisios}
+                    value={item.ramo}
+                  >
+                    {item.titulo}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No hay opciones disponibles</MenuItem>
+              )}
               </Select>
             </FormControl>
           </Grid>
@@ -1110,10 +1114,18 @@ export default function MyQuoters() {
                     <MenuItem value={null}>
                       TODOS
                     </MenuItem>
-                    {usuarioBusqueda.map((usu, index) => (
-                      <MenuItem key={index} value={usu.id}>
-                        {`${usu.usu_descripcion}`}
-                      </MenuItem>
+                    {usuarioBusqueda
+                      .slice()
+                      .sort((a, b) => {
+                        const prioridad = { I: 0, B: 1, C: 2 };
+                        const pa = prioridad[a.usu_tipo] ?? 99;
+                        const pb = prioridad[b.usu_tipo] ?? 99;
+                        return pa - pb || a.usu_descripcion.localeCompare(b.usu_descripcion);
+                      })
+                      .map((usu, index) => (
+                        <MenuItem key={index} value={usu.id}>
+                          {usu.usu_descripcion}
+                        </MenuItem>
                     ))}
                   </Select>
                 </FormControl>

@@ -1048,13 +1048,18 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
   const consultUserData = async (documentType, identification) => {
     try {
-      const cedulaData = await UsuarioService.fetchConsultarUsuario(
+      const userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+      const cedulaData = await UsuarioService.fetchConsultarUsuario_v2(
         documentType,
-        identification
+        identification,
+        userId?.id
       );
-      if (cedulaData.codigo === 200 && cedulaData.data) {
+      console.log("envio", cedulaData);
+      const datos = cedulaData?.data;
+      if (cedulaData.codigo === 200 && Array.isArray(datos) && datos.length > 0) {
+        const cli = datos[0];
 
-        if (cedulaData.message !== 'ok') {
+        if (cedulaData.message && cedulaData.message !== 'ok') {
           Swal.fire({
             title: "Alerta!",
             text: cedulaData.message,
@@ -1062,28 +1067,26 @@ const PersonalFormLife = forwardRef((props, ref) => {
             confirmButtonText: "Ok",
           });
         }
+        const dateString = cli.cli_fecnacio;
+        const dateObject = dateString ? dayjs(dateString, "YYYY-MM-DD", true) : null;
+        if (dateObject && dateObject.isValid()) {
+          setAge(dateObject);
+        }
 
-        const dateString = cedulaData.data[0].cli_fecnacio;
-        const dateObject = dayjs(dateString, "YYYY-MM-DD", true);
-
-        setAge(dateObject);
-
-
-        setFormData({
-          ...formData,
-          name: cedulaData.data[0].cli_nombres || "",
-          lastname: cedulaData.data[0].cli_apellidos || "",
-          email: cedulaData.data[0].cli_email || "",
-          phone: cedulaData.data[0].cli_celular || "",
-          address: cedulaData.data[0].cli_direccion || "",
-          ageCalculated: parseInt(cedulaData.data[0].cli_edad) || "",
-          genero: cedulaData.data[0].cli_sexo || "",
-
-        });
-      } else {
-        verificarLavadoActivo(cedulaData);
-        setFormData({
-          ...formData,
+        setFormData((prev) => ({
+          ...prev,
+          name: cli.cli_nombres || "",
+          lastname: cli.cli_apellidos || "",
+          email: cli.cli_email || "",
+          phone: cli.cli_celular || "",
+          address: cli.cli_direccion || "",
+          ageCalculated: parseInt(cli.cli_edad) || "",
+          genero: cli.cli_sexo || "",
+        }));
+      } 
+      else if (cedulaData.codigo === 200 && (!datos || (Array.isArray(datos) && datos.length === 0))) {
+        setFormData((prev) => ({
+          ...prev,
           name: "",
           lastname: "",
           email: "",
@@ -1091,10 +1094,19 @@ const PersonalFormLife = forwardRef((props, ref) => {
           address: "",
           ageCalculated: "",
           genero: "",
-        });
+        }));
+      } 
+      else {
+        verificarLavadoActivo(cedulaData);
       }
     } catch (error) {
       console.error("Error al verificar cédula:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo verificar la cédula. Intenta nuevamente.",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
     }
   };
 
@@ -1125,11 +1137,14 @@ const PersonalFormLife = forwardRef((props, ref) => {
 
 
   const consultConyugueData = async (documentType, identification) => {
-    try {
-      const cedulaData = await UsuarioService.fetchConsultarUsuario(
-        documentType,
-        identification
-      );
+    let userId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+        console.log("modulo vida",userId);
+        try {
+            const cedulaData = await UsuarioService.fetchConsultarUsuario_v2(
+                documentType, 
+                identification, 
+                userId.id
+            );
       if (cedulaData.codigo === 200 && cedulaData.data) {
         if (cedulaData.message !== 'ok') {
           Swal.fire({
